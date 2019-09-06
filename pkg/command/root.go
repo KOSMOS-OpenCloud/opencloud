@@ -45,6 +45,7 @@ func Root() *cobra.Command {
 	return cmd
 }
 
+// setupLogger prepares the logger.
 func setupLogger() {
 	switch strings.ToLower(viper.GetString("log.level")) {
 	case "panic":
@@ -73,6 +74,7 @@ func setupLogger() {
 	}
 }
 
+// setupConfig prepares the config
 func setupConfig() {
 	viper.SetConfigName("phoenix")
 
@@ -84,7 +86,7 @@ func setupConfig() {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
 			log.Debug().
-				Msg("Continue without config")
+				Msg("Initializing without config file")
 		case viper.UnsupportedConfigError:
 			log.Fatal().
 				Msg("Unsupported config type")

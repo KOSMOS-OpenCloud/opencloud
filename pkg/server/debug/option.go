@@ -1,6 +1,8 @@
-package assets
+package debug
 
 import (
+	"context"
+
 	"github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-pkg/log"
 )
@@ -10,8 +12,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger log.Logger
-	Config *config.Config
+	Logger  log.Logger
+	Context context.Context
+	Config  *config.Config
 }
 
 // newOptions initializes the available default options.
@@ -29,6 +32,13 @@ func newOptions(opts ...Option) Options {
 func Logger(val log.Logger) Option {
 	return func(o *Options) {
 		o.Logger = val
+	}
+}
+
+// Context provides a function to set the context option.
+func Context(val context.Context) Option {
+	return func(o *Options) {
+		o.Context = val
 	}
 }
 

@@ -1,6 +1,8 @@
-package assets
+package svc
 
 import (
+	"net/http"
+
 	"github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-pkg/log"
 )
@@ -10,8 +12,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger log.Logger
-	Config *config.Config
+	Logger     log.Logger
+	Config     *config.Config
+	Middleware []func(http.Handler) http.Handler
 }
 
 // newOptions initializes the available default options.
@@ -36,5 +39,12 @@ func Logger(val log.Logger) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
+	}
+}
+
+// Middleware provides a function to set the middleware option.
+func Middleware(val ...func(http.Handler) http.Handler) Option {
+	return func(o *Options) {
+		o.Middleware = val
 	}
 }

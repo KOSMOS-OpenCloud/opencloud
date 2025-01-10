@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/services/webfinger/pkg/webfinger"
+	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"
 )
 
 func TestOpenidDiscovery(t *testing.T) {

@@ -22,15 +22,15 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/config"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
-	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/query/bleve"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 )
 
 // NewHandler returns a service implementation for Service.

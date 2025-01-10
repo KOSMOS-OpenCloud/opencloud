@@ -1,6 +1,6 @@
 package config
 
-import "github.com/owncloud/ocis/v2/ocis-pkg/shared"
+import "github.com/opencloud-eu/opencloud/ocis-pkg/shared"
 
 // GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {

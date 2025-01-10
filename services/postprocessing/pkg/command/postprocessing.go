@@ -6,9 +6,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/parser"
 	"github.com/urfave/cli/v2"
 )
 

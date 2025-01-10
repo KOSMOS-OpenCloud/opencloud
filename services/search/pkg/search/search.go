@@ -15,9 +15,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
 )
 
 var scopeRegex = regexp.MustCompile(`scope:\s*([^" "\n\r]*)`)

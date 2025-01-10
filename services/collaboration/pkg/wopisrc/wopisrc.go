@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 )
 
 // GenerateWopiSrc generates a WOPI src URL for the given file reference.

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
-	"github.com/owncloud/ocis/v2/services/search/pkg/query"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/query"
 )
 
 func toNode[T ast.Node](in interface{}) (T, error) {

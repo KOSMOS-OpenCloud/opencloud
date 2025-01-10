@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
-	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/clihelper"
+	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )

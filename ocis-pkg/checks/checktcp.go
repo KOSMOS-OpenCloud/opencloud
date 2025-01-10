@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/handlers"
 )
 
 // NewTCPCheck returns a check that connects to a given tcp endpoint.

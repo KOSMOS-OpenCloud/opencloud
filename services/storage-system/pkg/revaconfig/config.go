@@ -2,8 +2,8 @@ package revaconfig
 
 import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	pkgconfig "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
+	pkgconfig "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/config"
 )
 
 // StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

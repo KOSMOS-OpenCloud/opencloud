@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
 )
 
 type Config struct {

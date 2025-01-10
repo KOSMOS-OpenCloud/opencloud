@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/sync"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"

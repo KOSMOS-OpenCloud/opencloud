@@ -18,11 +18,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/wopisrc"
 )
 
 // NewHandler creates a new grpc service implementing the OpenInApp interface

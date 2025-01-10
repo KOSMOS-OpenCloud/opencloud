@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/email"
 	"github.com/rs/zerolog"
 )
 

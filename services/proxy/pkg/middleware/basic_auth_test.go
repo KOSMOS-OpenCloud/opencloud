@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend/mocks"
 )
 
 var _ = Describe("Authenticating requests", Label("BasicAuthenticator"), func() {

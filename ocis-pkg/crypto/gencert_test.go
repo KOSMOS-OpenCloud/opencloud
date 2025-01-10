@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 )
 
 func TestEnsureExistsDir(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/metrics"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/broker"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
-	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	ociscrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
 )

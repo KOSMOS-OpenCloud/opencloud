@@ -1,7 +1,7 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
 )
 
 // EOS is the config mapping for the EOS storage driver

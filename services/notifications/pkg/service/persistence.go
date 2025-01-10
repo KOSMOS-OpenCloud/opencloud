@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
-	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4/store"
 )

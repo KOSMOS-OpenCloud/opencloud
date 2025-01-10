@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/config"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/backends/keycloak"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
 )
 
 const (

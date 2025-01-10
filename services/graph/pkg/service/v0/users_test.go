@@ -26,15 +26,15 @@ import (
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	settingsmocks "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0/mocks"
-	"github.com/owncloud/ocis/v2/services/graph/mocks"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
-	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	settings "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0/mocks"
+	"github.com/opencloud-eu/opencloud/services/graph/mocks"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
+	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 )
 
 type userList struct {

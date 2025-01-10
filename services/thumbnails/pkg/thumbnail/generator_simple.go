@@ -6,7 +6,7 @@ import (
 	"image"
 
 	"github.com/kovidgoyal/imaging"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 )
 
 // SimpleGenerator is the default image generator and is used for all image types expect gif.

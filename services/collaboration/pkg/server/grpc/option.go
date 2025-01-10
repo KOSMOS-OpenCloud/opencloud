@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 )

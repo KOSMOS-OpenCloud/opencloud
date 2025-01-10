@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
 )
 
 // Config is the configuration for the storage-users service

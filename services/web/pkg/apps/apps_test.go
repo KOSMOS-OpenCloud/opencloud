@@ -7,9 +7,9 @@ import (
 
 	"github.com/onsi/gomega"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
-	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/apps"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 )
 
 func TestApplication_ToExternal(t *testing.T) {

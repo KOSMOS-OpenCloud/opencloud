@@ -5,8 +5,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/email"
 )
 
 func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMeshInviteTokenGenerated) {

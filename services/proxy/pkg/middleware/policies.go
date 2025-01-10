@@ -17,9 +17,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
-	pService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
+	pMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/policies/v0"
+	pService "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/policies/v0"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/net"
 )
 
 type (

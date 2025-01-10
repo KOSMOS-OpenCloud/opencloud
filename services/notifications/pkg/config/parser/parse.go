@@ -6,13 +6,13 @@ import (
 	"net/mail"
 	"strings"
 
-	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/logging"
+	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/logging"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.

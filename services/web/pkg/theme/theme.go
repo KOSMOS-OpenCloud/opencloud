@@ -3,8 +3,8 @@ package theme
 import (
 	"path"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/capabilities"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/capabilities"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 var (

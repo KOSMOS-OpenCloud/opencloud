@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/owncloud/ocis/v2/services/sse/pkg/command"
-	"github.com/owncloud/ocis/v2/services/sse/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/sse/pkg/command"
+	"github.com/opencloud-eu/opencloud/services/sse/pkg/config/defaults"
 )
 
 func main() {

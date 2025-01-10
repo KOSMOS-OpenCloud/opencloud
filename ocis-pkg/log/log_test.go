@@ -5,8 +5,8 @@ import (
 
 	"github.com/onsi/gomega"
 
-	"github.com/owncloud/ocis/v2/internal/testenv"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/internal/testenv"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 )
 
 func TestDeprecation(t *testing.T) {

@@ -26,7 +26,7 @@ import (
 	"github.com/libregraph/lico/identity"
 	"github.com/libregraph/lico/identity/managers"
 
-	cs3 "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/identifier"
+	cs3 "github.com/opencloud-eu/opencloud/services/idp/pkg/backends/cs3/identifier"
 )
 
 // Identity managers.

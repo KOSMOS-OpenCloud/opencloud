@@ -6,8 +6,8 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

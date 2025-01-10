@@ -3,7 +3,7 @@ package filepathx_test
 import (
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/path/filepathx"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/x/path/filepathx"
 )
 
 func TestJailJoin(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	context "context"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	keycloak "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
+	keycloak "github.com/opencloud-eu/opencloud/ocis-pkg/keycloak"
 
 	mock "github.com/stretchr/testify/mock"
 )

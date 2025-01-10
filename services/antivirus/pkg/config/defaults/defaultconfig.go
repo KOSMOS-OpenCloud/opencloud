@@ -3,7 +3,7 @@ package defaults
 import (
 	"time"
 
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration which is needed for doc generation.

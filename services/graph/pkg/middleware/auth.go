@@ -10,10 +10,10 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/owncloud/ocis/v2/ocis-pkg/account"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/account"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	opkgm "github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
 // authOptions initializes the available default options.

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/MicahParks/keyfunc/v2"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 
 	goidc "github.com/coreos/go-oidc/v3/oidc"
 )

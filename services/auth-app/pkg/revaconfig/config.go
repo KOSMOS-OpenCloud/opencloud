@@ -3,8 +3,8 @@ package revaconfig
 import (
 	"path/filepath"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/auth-app/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 )
 
 // AuthAppConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

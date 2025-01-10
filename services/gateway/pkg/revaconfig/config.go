@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/utils"
-	pkgconfig "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
+	pkgconfig "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/gateway/pkg/config"
 )
 
 // GatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

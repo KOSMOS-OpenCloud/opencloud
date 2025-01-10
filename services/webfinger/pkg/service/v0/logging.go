@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/webfinger/pkg/webfinger"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"
 )
 
 // NewLogging returns a service that logs messages.

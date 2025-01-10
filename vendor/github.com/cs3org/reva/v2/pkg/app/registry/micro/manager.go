@@ -30,7 +30,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/app"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	oreg "github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	oreg "github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 	"github.com/rs/zerolog/log"
 	mreg "go-micro.dev/v4/registry"
 )

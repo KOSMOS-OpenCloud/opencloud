@@ -11,15 +11,15 @@ import (
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/logging"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/revaconfig"
-	"github.com/owncloud/ocis/v2/services/storage-system/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/logging"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/revaconfig"
+	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/server/debug"
 )
 
 // Server is the entry point for the server command.

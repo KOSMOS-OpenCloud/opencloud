@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/audit/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration

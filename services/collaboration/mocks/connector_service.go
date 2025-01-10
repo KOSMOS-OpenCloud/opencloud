@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+	connector "github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector"
 	mock "github.com/stretchr/testify/mock"
 )
 

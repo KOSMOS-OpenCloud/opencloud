@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
-	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/config"
+	rdefaults "github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	"github.com/pkg/errors"
 )
 

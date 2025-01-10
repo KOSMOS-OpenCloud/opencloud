@@ -34,7 +34,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"

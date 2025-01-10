@@ -6,11 +6,11 @@ import (
 
 	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
 	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/v2/ocis/pkg/backup"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/backup"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

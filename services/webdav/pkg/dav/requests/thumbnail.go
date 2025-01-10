@@ -12,7 +12,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/constants"
 )
 
 const (

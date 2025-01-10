@@ -6,7 +6,7 @@ import (
 
 	gofig "github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/unrolled/secure"
 	"github.com/unrolled/secure/cspbuilder"
 )

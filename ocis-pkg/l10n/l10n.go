@@ -9,8 +9,8 @@ import (
 	"reflect"
 
 	"github.com/leonelquinteros/gotext"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	micrometadata "go-micro.dev/v4/metadata"
 )
 

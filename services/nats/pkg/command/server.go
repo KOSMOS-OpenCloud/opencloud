@@ -10,13 +10,13 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/v2/services/nats/pkg/config"
-	"github.com/owncloud/ocis/v2/services/nats/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/nats/pkg/logging"
-	"github.com/owncloud/ocis/v2/services/nats/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/nats/pkg/server/nats"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	pkgcrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
+	"github.com/opencloud-eu/opencloud/services/nats/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/nats/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/nats/pkg/logging"
+	"github.com/opencloud-eu/opencloud/services/nats/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/services/nats/pkg/server/nats"
 )
 
 // Server is the entrypoint for the server command.

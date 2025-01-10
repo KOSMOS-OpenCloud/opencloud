@@ -15,10 +15,10 @@ import (
 	rjwt "github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/wopisrc"
 )
 
 var _ = Describe("Wopi Context Middleware", func() {

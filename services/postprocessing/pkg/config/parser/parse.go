@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/defaults"
+	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/defaults"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.

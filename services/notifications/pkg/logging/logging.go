@@ -1,8 +1,8 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"
 )
 
 // Configure initializes a service-specific logger instance.

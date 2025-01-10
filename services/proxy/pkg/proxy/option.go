@@ -1,8 +1,8 @@
 package proxy
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 )
 
 // Option defines a single option function.

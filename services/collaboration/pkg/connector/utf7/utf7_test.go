@@ -3,7 +3,7 @@ package utf7_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/utf7"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector/utf7"
 )
 
 var _ = Describe("Utf7", func() {

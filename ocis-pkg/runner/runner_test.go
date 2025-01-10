@@ -7,7 +7,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/runner"
 )
 
 // TimedTask will create a task with the specified duration

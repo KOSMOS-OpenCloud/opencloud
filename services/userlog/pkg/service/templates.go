@@ -1,6 +1,6 @@
 package service
 
-import "github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+import "github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
 
 // the available templates
 var (

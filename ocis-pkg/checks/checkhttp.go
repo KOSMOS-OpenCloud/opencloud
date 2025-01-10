@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/handlers"
 )
 
 // NewHTTPCheck checks the reachability of a http server.

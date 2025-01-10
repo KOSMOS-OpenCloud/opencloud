@@ -15,7 +15,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
 )
 
 var (

@@ -8,9 +8,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	oidcmocks "github.com/owncloud/ocis/v2/ocis-pkg/oidc/mocks"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	oidcmocks "github.com/opencloud-eu/opencloud/ocis-pkg/oidc/mocks"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/store"
 )

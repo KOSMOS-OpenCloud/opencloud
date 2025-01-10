@@ -20,7 +20,7 @@ import (
 	"golang.org/x/image/math/fixed"
 
 	"github.com/dhowden/tag"
-	thumbnailerErrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	thumbnailerErrors "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 )
 
 // FileConverter is the interface for the file converter

@@ -1,10 +1,10 @@
 package grpc
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
-	svc "github.com/owncloud/ocis/v2/services/eventhistory/pkg/service"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/service/grpc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
+	svc "github.com/opencloud-eu/opencloud/services/eventhistory/pkg/service"
 )
 
 // NewService initializes the grpc service and server.

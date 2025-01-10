@@ -6,8 +6,8 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
-	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/kql"
 )
 
 var _fields = map[string]string{

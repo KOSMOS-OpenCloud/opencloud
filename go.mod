@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis/v2
+module github.com/opencloud-eu/opencloud
 
 go 1.22.7
 

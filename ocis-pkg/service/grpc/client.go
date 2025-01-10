@@ -8,8 +8,8 @@ import (
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
 	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"

@@ -3,8 +3,8 @@ package grpcSVC
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
-	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
+	"github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/policies/v0"
+	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine"
 )
 
 // Service defines the service handlers.

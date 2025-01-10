@@ -7,7 +7,7 @@ import (
 
 	mRegistry "go-micro.dev/v4/registry"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 )
 
 // RegisterService publishes an arbitrary endpoint to the service-registry. This allows querying nodes of

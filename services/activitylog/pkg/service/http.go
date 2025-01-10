@@ -19,11 +19,11 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
-	"github.com/owncloud/ocis/v2/ocis-pkg/kql"
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
-	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/kql"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 )
 
 var (

@@ -18,7 +18,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
 )
 
 //go:embed l10n/locale

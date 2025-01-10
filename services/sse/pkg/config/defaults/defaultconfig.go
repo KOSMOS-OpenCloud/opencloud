@@ -3,7 +3,7 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/sse/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration which is needed for doc generation.

@@ -14,8 +14,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	l10n_pkg "github.com/opencloud-eu/opencloud/services/graph/pkg/l10n"
 )
 
 var (

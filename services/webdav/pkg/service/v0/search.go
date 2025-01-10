@@ -18,12 +18,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/propfind"
+	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/constants"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/net"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/prop"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/propfind"
 )
 
 const (

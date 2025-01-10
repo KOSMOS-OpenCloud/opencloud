@@ -31,9 +31,9 @@ type Config struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	CorePath   string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/web/assets/core" introductionVersion:"6.0.0"`
-	ThemesPath string `yaml:"themes_path" env:"OCIS_ASSET_THEMES_PATH;WEB_ASSET_THEMES_PATH" desc:"Serve ownCloud themes from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/web/assets/themes" introductionVersion:"6.0.0"`
-	AppsPath   string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/web/assets/apps" introductionVersion:"6.0.0"`
+	CorePath   string `yaml:"core_path" env:"WEB_ASSET_CORE_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OC_BASE_DATA_PATH/web/assets/core" introductionVersion:"6.0.0"`
+	ThemesPath string `yaml:"themes_path" env:"OC_ASSET_THEMES_PATH;WEB_ASSET_THEMES_PATH" desc:"Serve ownCloud themes from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OC_BASE_DATA_PATH/web/assets/themes" introductionVersion:"6.0.0"`
+	AppsPath   string `yaml:"apps_path" env:"WEB_ASSET_APPS_PATH" desc:"Serve ownCloud Web apps assets from a path on the filesystem instead of the builtin assets. If not defined, the root directory derives from $OC_BASE_DATA_PATH/web/assets/apps" introductionVersion:"6.0.0"`
 }
 
 // CustomStyle references additional css to be loaded into ownCloud Web.
@@ -54,7 +54,7 @@ type CustomTranslation struct {
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string              `json:"server,omitempty" yaml:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER" desc:"URL, where the oCIS APIs are reachable for ownCloud Web." introductionVersion:"pre5.0"`
+	Server        string              `json:"server,omitempty" yaml:"server" env:"OC_URL;WEB_UI_CONFIG_SERVER" desc:"URL, where the oCIS APIs are reachable for ownCloud Web." introductionVersion:"pre5.0"`
 	Theme         string              `json:"theme,omitempty" yaml:"-"`
 	OpenIDConnect OIDC                `json:"openIdConnect,omitempty" yaml:"oidc"`
 	Apps          []string            `json:"apps" yaml:"apps"`
@@ -69,8 +69,8 @@ type WebConfig struct {
 // OIDC defines the available oidc configuration
 type OIDC struct {
 	MetadataURL           string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL" desc:"URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + '/.well-known/openid-configuration'." introductionVersion:"pre5.0"`
-	Authority             string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	ClientID              string `json:"client_id,omitempty" yaml:"client_id" env:"OCIS_OIDC_CLIENT_ID;WEB_OIDC_CLIENT_ID" desc:"The OIDC client ID which ownCloud Web uses. This client needs to be set up in your IDP. Note that this setting has no effect when using the builtin IDP." introductionVersion:"pre5.0"`
+	Authority             string `json:"authority,omitempty" yaml:"authority" env:"OC_URL;OC_OIDC_ISSUER;WEB_OIDC_AUTHORITY" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
+	ClientID              string `json:"client_id,omitempty" yaml:"client_id" env:"OC_OIDC_CLIENT_ID;WEB_OIDC_CLIENT_ID" desc:"The OIDC client ID which ownCloud Web uses. This client needs to be set up in your IDP. Note that this setting has no effect when using the builtin IDP." introductionVersion:"pre5.0"`
 	ResponseType          string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"The OIDC response type to use for authentication." introductionVersion:"pre5.0"`
 	Scope                 string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc." introductionVersion:"pre5.0"`
 	PostLogoutRedirectURI string `json:"post_logout_redirect_uri,omitempty" yaml:"post_logout_redirect_uri" env:"WEB_OIDC_POST_LOGOUT_REDIRECT_URI" desc:"This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page." introductionVersion:"pre5.0"`
@@ -108,8 +108,8 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
-	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Path to the theme json file. Will be appended to the URL of the theme server." introductionVersion:"pre5.0"`   // used to build Theme in WebConfig
+	ThemeServer string    `yaml:"theme_server" env:"OC_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
+	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Path to the theme json file. Will be appended to the URL of the theme server." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`
 }
 
@@ -121,5 +121,5 @@ type App struct {
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;WEB_JWT_SECRET" desc:"The secret to mint and validate jwt tokens." introductionVersion:"pre5.0"`
+	JWTSecret string `yaml:"jwt_secret" env:"OC_JWT_SECRET;WEB_JWT_SECRET" desc:"The secret to mint and validate jwt tokens." introductionVersion:"pre5.0"`
 }

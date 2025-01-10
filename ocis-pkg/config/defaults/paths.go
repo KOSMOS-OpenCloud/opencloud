@@ -20,7 +20,7 @@ func BaseDataPath() string {
 	// It is not nice to have hidden / secrete configuration options
 	// But how can we update the base path for every occurrence with a flagset option?
 	// This is currently not possible and needs a new configuration concept
-	p := os.Getenv("OCIS_BASE_DATA_PATH")
+	p := os.Getenv("OC_BASE_DATA_PATH")
 	if p != "" {
 		return p
 	}
@@ -53,7 +53,7 @@ func BaseConfigPath() string {
 	// It is not nice to have hidden / secrete configuration options
 	// But how can we update the base path for every occurrence with a flagset option?
 	// This is currently not possible and needs a new configuration concept
-	p := os.Getenv("OCIS_CONFIG_DIR")
+	p := os.Getenv("OC_CONFIG_DIR")
 	if p != "" {
 		return p
 	}

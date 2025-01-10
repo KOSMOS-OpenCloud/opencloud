@@ -37,13 +37,13 @@ to get started:
       ```
    2. Enabling and configuring tracing on oCIS itself will forward the configuration to all services:
       ```console
-      OCIS_TRACING_ENABLED=true \
-      OCIS_TRACING_ENDPOINT=localhost:6831 \
-      OCIS_TRACING_COLLECTOR=http://localhost:14268/api/traces \
+      OC_TRACING_ENABLED=true \
+      OC_TRACING_ENDPOINT=localhost:6831 \
+      OC_TRACING_COLLECTOR=http://localhost:14268/api/traces \
       ./bin/ocis server
       ```
       If you want to set individual tracing configuration for each service, make sure to set
-      `OCIS_TRACING_ENABLED=false`.
+      `OC_TRACING_ENABLED=false`.
 3. Make the actual request that you want to trace.
 4. Open up the [Jaeger UI](http://localhost:16686) to analyze request traces.
 

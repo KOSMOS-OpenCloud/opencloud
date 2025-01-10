@@ -50,7 +50,7 @@ Consider that embedding images via a CID resource may not be fully supported in 
 
 The `notification` service can initiate sending emails based on events stored in the configured store that are grouped into a `daily` or `weekly` bucket. These groups contain events that get populated e.g. when the user configures `daily` or `weekly` email notifications in his personal settings in the web UI. If a user does not define any of the named groups for notification events, no event is stored.
 
-Grouped events are stored for the TTL defined in `OCIS_PERSISTENT_STORE_TTL`. This TTL can either be configured globally or individually for the notification service via the `NOTIFICATIONS_STORE_TTL` envvar.
+Grouped events are stored for the TTL defined in `OC_PERSISTENT_STORE_TTL`. This TTL can either be configured globally or individually for the notification service via the `NOTIFICATIONS_STORE_TTL` envvar.
 
 Grouped events that have passed the TTL are removed automatically without further notice or sending!
 
@@ -71,9 +71,9 @@ Note: The service can only be scaled if not using `memory` store and the stores 
 Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
 
 Store specific notes:
--   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
--   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
--   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+-   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+-   When using `nats-js-kv` it is recommended to set `OC_CACHE_STORE_NODES` to the same value as `OC_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+-   When using the `nats-js-kv` store, it is possible to set `OC_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ## Translations
 
@@ -102,4 +102,4 @@ which is the source of the texts provided by the code.
 
 ## Default Language
 
-The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
+The default language can be defined via the `OC_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.

@@ -35,7 +35,7 @@ For the documentation to show the correct value for the `removalVersion`, our do
 ```golang
 // Notifications defines the config options for the notifications service.
 type Notifications struct {
-RevaGateway string `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY;REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" deprecationVersion:"3.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"REVA_GATEWAY changing name for consistency" deprecationReplacement:"OCIS_REVA_GATEWAY"`
+RevaGateway string `yaml:"reva_gateway" env:"OC_REVA_GATEWAY;REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" deprecationVersion:"3.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"REVA_GATEWAY changing name for consistency" deprecationReplacement:"OC_REVA_GATEWAY"`
 ...
 }
 ```

@@ -48,9 +48,9 @@ Note: The service can only be scaled if not using `memory` store and the stores 
 Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
 
 Store specific notes:
-  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
-  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
-  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OC_CACHE_STORE_NODES` to the same value as `OC_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OC_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ## Settings Management
 
@@ -62,7 +62,7 @@ Services can set or query Infinite Scale *setting values* of a user from setting
 
 ## Service Accounts
 
-The settings service needs to know the IDs of service accounts but it doesn't need their secrets. They can be configured using the `SETTINGS_SERVICE_ACCOUNTS_IDS` envvar. When only using one service account `OCIS_SERVICE_ACCOUNT_ID` can also be used. All configured service accounts will get a hidden 'service-account' role. This role contains all permissions the service account needs but will not appear calls to the list roles endpoint. It is not possible to assign the 'service-account' role to a normal user.
+The settings service needs to know the IDs of service accounts but it doesn't need their secrets. They can be configured using the `SETTINGS_SERVICE_ACCOUNTS_IDS` envvar. When only using one service account `OC_SERVICE_ACCOUNT_ID` can also be used. All configured service accounts will get a hidden 'service-account' role. This role contains all permissions the service account needs but will not appear calls to the list roles endpoint. It is not possible to assign the 'service-account' role to a normal user.
 
 ## Translations
 
@@ -88,19 +88,19 @@ which is the source of the texts provided by the code.
 
 ## Default Language
 
-The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for notification and invitation emails.
+The default language can be defined via the `OC_DEFAULT_LANGUAGE` environment variable. If this variable is not defined, English will be used as default. The value has the ISO 639-1 format ("de", "en", etc.) and is limited by the list supported languages. This setting can be used to set the default language for notification and invitation emails.
 
 Important developer note: the list of supported languages is at the moment not easy defineable, as it is the minimum intersection of languages shown in the WebUI and languages defined in the ocis code for the use of notifications and userlog. Even more, not all languages where there are translations available on transifex, are available in the WebUI respectively for ocis notifications, and the translation rate for existing languages is partially not that high. You will see therefore quite often English default strings though a supported language may exist and was selected.
 
-The `OCIS_DEFAULT_LANGUAGE` setting impacts the `notification` and `userlog` services and the WebUI. Note that translations must exist for all named components to be presented correctly.
+The `OC_DEFAULT_LANGUAGE` setting impacts the `notification` and `userlog` services and the WebUI. Note that translations must exist for all named components to be presented correctly.
 
-*   If  `OCIS_DEFAULT_LANGUAGE` **is not set**, the expected behavior is:
+*   If  `OC_DEFAULT_LANGUAGE` **is not set**, the expected behavior is:
     *   The `notification` and `userlog` services and the WebUI use English by default until a user sets another language in the WebUI via _Account -> Language_.
     *    If a user sets another language in the WebUI in _Account -> Language_, then the `notification` and `userlog` services and WebUI use the language defined by the user. If no translation is found, it falls back to English.
 
-*   If  `OCIS_DEFAULT_LANGUAGE` **is set**, the expected behavior is:
-    *   The `notification` and `userlog` services and the WebUI use `OCIS_DEFAULT_LANGUAGE`  by default until a user sets another language in the WebUI via _Account -> Language_.
-    *   If a user sets another language in the WebUI in _Account -> Language_, the `notification` and `userlog` services and WebUI use the language defined by the user. If no translation is found, it falls back to `OCIS_DEFAULT_LANGUAGE` and then to English.
+*   If  `OC_DEFAULT_LANGUAGE` **is set**, the expected behavior is:
+    *   The `notification` and `userlog` services and the WebUI use `OC_DEFAULT_LANGUAGE`  by default until a user sets another language in the WebUI via _Account -> Language_.
+    *   If a user sets another language in the WebUI in _Account -> Language_, the `notification` and `userlog` services and WebUI use the language defined by the user. If no translation is found, it falls back to `OC_DEFAULT_LANGUAGE` and then to English.
 
 ## Custom Roles
 

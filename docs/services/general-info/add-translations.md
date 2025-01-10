@@ -32,7 +32,7 @@ Note that paths are examples and can be adapted based on requirements.\
 Replace `<service-name>` with the name of the respective service.\
 Translations have a `context` and a `translatable string`. The context is shown on Transifex but not translated and helps translators to get a context for the string to be translated.
 
-* Add the `OCIS_DEFAULT_LANGUAGE` envvar in `services/<service-name>/pkg/config/config.go`.\
+* Add the `OC_DEFAULT_LANGUAGE` envvar in `services/<service-name>/pkg/config/config.go`.\
   For details see the userlog or notifications service code.
 
 * Add the `<SERVICE_NAME>_TRANSLATION_PATH` envvar in `services/<service-name>/pkg/config/config.go`.\

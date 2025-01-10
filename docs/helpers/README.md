@@ -71,7 +71,7 @@ For details on deprecation see the [deprecating-variables](https://github.com/ow
 
 Global envvars are gathered by checking if the envvar is available in more than one service. The table created is similar to the service-dependent envvar table but additionally contains a column with all service names where this envvar occurs. The output is rendered in list form where each item is clickable and automatically points to the corresponding service page. The template file can be found at `docs/templates/ADOC_global.tmpl`.
 
-If global envvars do not appear in the list of globals, before checking if the code works, do a manual search in the ocis/services folder with `grep -rn OCIS_xxx` if the envvar in question appears at least twice. If the envvar only appears once, the helpers code works correct.
+If global envvars do not appear in the list of globals, before checking if the code works, do a manual search in the ocis/services folder with `grep -rn OC_xxx` if the envvar in question appears at least twice. If the envvar only appears once, the helpers code works correct.
 
 ## Extended Envvars
 

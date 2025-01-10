@@ -25,7 +25,7 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
     good `<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />`
 - [ ] If new CLI commands are introduced, those commands must be described in the README.md.
   - Commands are added to `ocis/pkg/command`
-- [ ] If new global envvars are introduced, the name must start with `OCIS_`.
+- [ ] If new global envvars are introduced, the name must start with `OC_`.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Service startup:
   - add it to `ocis/pkg/command/services.go`
@@ -42,7 +42,7 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] Create proper description strings for envvars - see other services for examples, especially when it comes to multiple values. This must include:
   - base description, set of available values, description of each value.
 - [ ] When suggested commits are created for text changes, and you agree, collect them to a batch and commit them. Do not forget to rebase locally to avoid overwriting the changes made.
-- [ ] If new envvars are introduced which serve the same purpose but in multiple services, an additional envvar must be added at the beginning of the list starting with `OCIS_` (global envvar).
+- [ ] If new envvars are introduced which serve the same purpose but in multiple services, an additional envvar must be added at the beginning of the list starting with `OC_` (global envvar).
 - [ ] Ensure that a service has a debug port
 - [ ] If the new service introduces a new port:
   - The port must be added to [port-ranges.md](https://github.com/owncloud/ocis/blob/master/docs/services/general-info/port-ranges.md) and to the README.md file.

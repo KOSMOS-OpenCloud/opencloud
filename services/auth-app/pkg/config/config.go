@@ -24,7 +24,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_APP_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's group memberships in the access token. This reduces the token size, especially when users are members of a large number of groups." introductionVersion:"7.0.0"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_APP_MACHINE_AUTH_API_KEY" desc:"The machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"7.0.0"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OC_MACHINE_AUTH_API_KEY;AUTH_APP_MACHINE_AUTH_API_KEY" desc:"The machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"7.0.0"`
 
 	AllowImpersonation bool `yaml:"allow_impersonation" env:"AUTH_APP_ENABLE_IMPERSONATION" desc:"Allows admins to create app tokens for other users. Used for migration. Do NOT use in productive deployments." introductionVersion:"7.0.0"`
 
@@ -33,10 +33,10 @@ type Config struct {
 
 // Log defines the loging configuration
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_APP_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"7.0.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_APP_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"7.0.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_APP_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"7.0.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_APP_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"7.0.0"`
+	Level  string `yaml:"level" env:"OC_LOG_LEVEL;AUTH_APP_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"7.0.0"`
+	Pretty bool   `yaml:"pretty" env:"OC_LOG_PRETTY;AUTH_APP_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"7.0.0"`
+	Color  bool   `yaml:"color" env:"OC_LOG_COLOR;AUTH_APP_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"7.0.0"`
+	File   string `yaml:"file" env:"OC_LOG_FILE;AUTH_APP_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"7.0.0"`
 }
 
 // Service defines the service configuration
@@ -57,7 +57,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"AUTH_APP_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"7.0.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;AUTH_APP_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"7.0.0"`
+	Protocol  string                 `yaml:"protocol" env:"OC_GRPC_PROTOCOL;AUTH_APP_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"7.0.0"`
 }
 
 // HTTP defines the available http configuration.
@@ -71,8 +71,8 @@ type HTTP struct {
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;AUTH_APP_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;AUTH_APP_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;AUTH_APP_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;AUTH_APP_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"pre5.0"`
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OC_CORS_ALLOW_ORIGINS;AUTH_APP_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OC_CORS_ALLOW_METHODS;AUTH_APP_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OC_CORS_ALLOW_HEADERS;AUTH_APP_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OC_CORS_ALLOW_CREDENTIALS;AUTH_APP_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"pre5.0"`
 }

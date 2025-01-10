@@ -76,7 +76,7 @@ Feature: PROPFIND with depth:infinity
     And the following configs have been set:
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |
       | space           | Personal      |
@@ -125,7 +125,7 @@ Feature: PROPFIND with depth:infinity
     Given the following configs have been set:
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |

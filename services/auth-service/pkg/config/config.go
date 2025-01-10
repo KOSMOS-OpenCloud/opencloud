@@ -25,10 +25,10 @@ type Config struct {
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_SERVICE_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_SERVICE_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;AUTH_SERVICE_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_SERVICE_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
+	Level  string `yaml:"level" env:"OC_LOG_LEVEL;AUTH_SERVICE_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"5.0"`
+	Pretty bool   `yaml:"pretty" env:"OC_LOG_PRETTY;AUTH_SERVICE_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"5.0"`
+	Color  bool   `yaml:"color" env:"OC_LOG_COLOR;AUTH_SERVICE_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"5.0"`
+	File   string `yaml:"file" env:"OC_LOG_FILE;AUTH_SERVICE_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"5.0"`
 }
 
 type Service struct {
@@ -46,11 +46,11 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"AUTH_SERVICE_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;AUTH_SERVICE_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OC_GRPC_PROTOCOL;AUTH_SERVICE_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
 }
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;AUTH_SERVICE_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ServiceAccountID     string `yaml:"service_account_id" env:"OC_SERVICE_ACCOUNT_ID;AUTH_SERVICE_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	ServiceAccountSecret string `yaml:"service_account_secret" env:"OC_SERVICE_ACCOUNT_SECRET;AUTH_SERVICE_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }

@@ -49,13 +49,13 @@ The NFS server setup can be optimized considering system administrative-, perfor
 
 ## oCIS Start using the NFS Share
 
-The oCIS server can be instructed to set up the decomposed FS at a certain path by setting the environment variable `OCIS_BASE_DATA_PATH`.
+The oCIS server can be instructed to set up the decomposed FS at a certain path by setting the environment variable `OC_BASE_DATA_PATH`.
 
 The test setup started an oCIS tech preview single binary release using this start command:
 
 ```bash
 ./ocis init
-OCIS_BASE_DATA_PATH=/mnt/ocisdata/ OCIS_LOG_LEVEL=debug OCIS_INSECURE=true PROXY_HTTP_ADDR=0.0.0.0:9200 OCIS_URL=https://hostname:9200  ./ocis server
+OC_BASE_DATA_PATH=/mnt/ocisdata/ OC_LOG_LEVEL=debug OC_INSECURE=true PROXY_HTTP_ADDR=0.0.0.0:9200 OC_URL=https://hostname:9200  ./ocis server
 ```
 
 This starts oCIS and a decomposed FS skeleton file system structure is set up on the NFS share.

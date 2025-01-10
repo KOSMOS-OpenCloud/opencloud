@@ -68,11 +68,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   ### oCIS settings ###
   # oCIS version. Defaults to "latest"
-  OCIS_DOCKER_TAG=
+  OC_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-  OCIS_DOMAIN=
+  OC_DOMAIN=
   # ownCloud Web openid connect client id. Defaults to "ocis-web"
-  OCIS_OIDC_CLIENT_ID=
+  OC_OIDC_CLIENT_ID=
 
   ### Keycloak ###
   # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
@@ -94,11 +94,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
+  Set your domain for the oCIS frontend in `OC_DOMAIN=`, e.g. `OC_DOMAIN=ocis.owncloud.test`.
 
-  If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
+  If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OC_OIDC_CLIENT_ID=`.
 
   Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` e.g. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 

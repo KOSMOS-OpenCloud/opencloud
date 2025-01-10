@@ -21,7 +21,7 @@ For debugging there are two workflows that work well, depending on your preferen
 
 #### Use the debug binary and attach to the process as needed
 
-Run the debug binary with `OCIS_LOG_LEVEL=debug bin/ocis-debug server` and then find the service you want to debug using:
+Run the debug binary with `OC_LOG_LEVEL=debug bin/ocis-debug server` and then find the service you want to debug using:
 
 ```console
 # ps ax | grep ocis
@@ -145,7 +145,7 @@ make debug-docker
 ```
 2. Change the tag label:
 ```bash
-export OCIS_DOCKER_TAG=debug
+export OC_DOCKER_TAG=debug
 ```
 3. Run docker compose
 Building the docker compose command depends on what you want to debug, for example `ocis` and `collaboration` with the `collabora` supports.

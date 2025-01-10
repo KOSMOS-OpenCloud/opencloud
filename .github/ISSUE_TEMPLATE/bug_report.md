@@ -28,8 +28,8 @@ Please describe how you started the server and provide a list of relevant enviro
 <p>
 
 ```console
-OCIS_XXX=somevalue
-OCIS_YYY=somevalue
+OC_XXX=somevalue
+OC_YYY=somevalue
 PROXY_XXX=somevalue
 ```
 

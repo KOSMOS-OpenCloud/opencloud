@@ -62,16 +62,16 @@ type Auth struct {
 
 // ServiceAccount is the configuration for the used service account
 type ServiceAccount struct {
-	ID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;OCM_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
-	Secret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;OCM_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+	ID     string `yaml:"service_account_id" env:"OC_SERVICE_ACCOUNT_ID;OCM_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
+	Secret string `yaml:"service_account_secret" env:"OC_SERVICE_ACCOUNT_SECRET;OCM_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;OCM_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	AllowedMethods   []string `yaml:"allow_methods" env:"OCIS_CORS_ALLOW_METHODS;OCM_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	AllowedHeaders   []string `yaml:"allow_headers" env:"OCIS_CORS_ALLOW_HEADERS;OCM_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
-	AllowCredentials bool     `yaml:"allow_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;OCM_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"5.0"`
+	AllowedOrigins   []string `yaml:"allow_origins" env:"OC_CORS_ALLOW_ORIGINS;OCM_CORS_ALLOW_ORIGINS" desc:"A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowedMethods   []string `yaml:"allow_methods" env:"OC_CORS_ALLOW_METHODS;OCM_CORS_ALLOW_METHODS" desc:"A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowedHeaders   []string `yaml:"allow_headers" env:"OC_CORS_ALLOW_HEADERS;OCM_CORS_ALLOW_HEADERS" desc:"A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details." introductionVersion:"5.0"`
+	AllowCredentials bool     `yaml:"allow_credentials" env:"OC_CORS_ALLOW_CREDENTIALS;OCM_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials." introductionVersion:"5.0"`
 }
 
 // GRPCConfig defines the available grpc configuration.
@@ -79,7 +79,7 @@ type GRPCConfig struct {
 	Addr      string                 `ocisConfig:"addr" env:"OCM_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"5.0"`
 	Namespace string                 `ocisConfig:"-" yaml:"-"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
-	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;OCM_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OC_GRPC_PROTOCOL;OCM_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"5.0"`
 }
 
 type ScienceMesh struct {
@@ -105,7 +105,7 @@ type OCMInviteManagerDrivers struct {
 }
 
 type OCMInviteManagerJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/ocm." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_INVITE_MANAGER_JSON_FILE" desc:"Path to the JSON file where OCM invite data will be stored. This file is maintained by the instance and must not be changed manually. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/ocm." introductionVersion:"5.0"`
 }
 
 type OCMProviderAuthorizerDrivers struct {
@@ -113,7 +113,7 @@ type OCMProviderAuthorizerDrivers struct {
 }
 
 type OCMProviderAuthorizerJSONDriver struct {
-	Providers string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json." introductionVersion:"5.0"`
+	Providers string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OC_CONFIG_DIR/ocmproviders.json." introductionVersion:"5.0"`
 }
 
 type OCMCore struct {
@@ -131,7 +131,7 @@ type OCMCoreDrivers struct {
 }
 
 type OCMCoreJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_CORE_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
 }
 
 type OCMShareProvider struct {
@@ -146,16 +146,16 @@ type OCMShareProviderDrivers struct {
 }
 
 type OCMShareProviderJSONDriver struct {
-	File string `yaml:"file" env:"OCM_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
+	File string `yaml:"file" env:"OCM_OCM_SHAREPROVIDER_JSON_FILE" desc:"Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage." introductionVersion:"5.0"`
 }
 
 // Events combine the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;OCM_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
-	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;OCM_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"pre5.0"`
-	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;OCM_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
-	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;OCM_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided OCM_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
-	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;OCM_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
-	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;OCM_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
-	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;OCM_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	Endpoint             string `yaml:"endpoint" env:"OC_EVENTS_ENDPOINT;OCM_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"pre5.0"`
+	Cluster              string `yaml:"cluster" env:"OC_EVENTS_CLUSTER;OCM_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system." introductionVersion:"pre5.0"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OC_INSECURE;OCM_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"pre5.0"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OC_EVENTS_TLS_ROOT_CA_CERTIFICATE;OCM_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided OCM_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"pre5.0"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OC_EVENTS_ENABLE_TLS;OCM_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"pre5.0"`
+	AuthUsername         string `yaml:"username" env:"OC_EVENTS_AUTH_USERNAME;OCM_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
+	AuthPassword         string `yaml:"password" env:"OC_EVENTS_AUTH_PASSWORD;OCM_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"5.0"`
 }

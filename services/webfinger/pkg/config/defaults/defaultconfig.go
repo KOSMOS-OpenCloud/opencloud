@@ -43,7 +43,7 @@ func DefaultConfig() *config.Config {
 			{
 				Claim: "sub",
 				Regex: ".+",
-				Href:  "{{.OCIS_URL}}",
+				Href:  "{{.OC_URL}}",
 				Titles: map[string]string{
 					"en": "oCIS Instance",
 				},

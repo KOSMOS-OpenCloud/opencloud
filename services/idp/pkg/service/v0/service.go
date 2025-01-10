@@ -152,10 +152,10 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 	for i, client := range clients {
 
 		for i, entry := range client.RedirectURIs {
-			client.RedirectURIs[i] = strings.ReplaceAll(entry, "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/"))
+			client.RedirectURIs[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(ocisURL, "/"))
 		}
 		for i, entry := range client.Origins {
-			client.Origins[i] = strings.ReplaceAll(entry, "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/"))
+			client.Origins[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(ocisURL, "/"))
 		}
 		clients[i] = client
 	}

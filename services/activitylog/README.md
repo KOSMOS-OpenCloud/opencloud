@@ -38,4 +38,4 @@ which is the source of the texts provided by the code.
 
 ## Default Language
 
-The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
+The default language can be defined via the `OC_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.

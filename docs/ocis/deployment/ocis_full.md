@@ -120,13 +120,13 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # For production releases: "owncloud/ocis"
   # For rolling releases:    "owncloud/ocis-rolling"
   # Defaults to production if not set otherwise
-  OCIS_DOCKER_IMAGE=owncloud/ocis-rolling
+  OC_DOCKER_IMAGE=owncloud/ocis-rolling
   # The oCIS container version.
   # Defaults to "latest" and points to the latest stable tag.
-  OCIS_DOCKER_TAG=
+  OC_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend.
   # Defaults to "ocis.owncloud.test"
-  OCIS_DOMAIN=
+  OC_DOMAIN=
   # oCIS admin user password. Defaults to "admin".
   ADMIN_PASSWORD=
   # Demo users should not be created on a production instance,
@@ -147,8 +147,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Leaving it default stores data in docker internal volumes.
   # For more details see:
   # https://doc.owncloud.com/ocis/next/deployment/general/general-info.html#default-paths
-  # OCIS_CONFIG_DIR=/your/local/ocis/config
-  # OCIS_DATA_DIR=/your/local/ocis/data
+  # OC_CONFIG_DIR=/your/local/ocis/config
+  # OC_DATA_DIR=/your/local/ocis/data
 
   # S3 Storage configuration - optional
   # Infinite Scale supports S3 storage as primary storage.
@@ -247,13 +247,13 @@ See also [example server setup]({{< ref "preparing_server" >}})
   By default oCIS will be started in the `latest` rolling version. Please note that this deployment does currently not work with the 5.x productions releases.
   The oCIS "collaboration" service, which is required by this deployment, is not part of the 5.x releases.
 
-  If you want to use a specific version of oCIS, set the version to a dedicated tag like `OCIS_DOCKER_TAG=6.3.0`. The minimal required oCIS Version to run this deployment is 6.3.0. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
+  If you want to use a specific version of oCIS, set the version to a dedicated tag like `OC_DOCKER_TAG=6.3.0`. The minimal required oCIS Version to run this deployment is 6.3.0. Available  production versions can be found on [Docker Hub Production](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated) and available rolling releases can be found on [Docker Hub Rolling](https://hub.docker.com/r/owncloud/ocis-rolling/tags?page=1&ordering=last_updated)
 
   {{< hint type=info title="oCIS Releases" >}}
   You can read more about the different oCIS releases in the [oCIS Release Lifecycle](../release_roadmap.md).
   {{< /hint >}}
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
+  Set your domain for the oCIS frontend in `OC_DOMAIN=`, e.g. `OC_DOMAIN=ocis.owncloud.test`.
 
   Set the initial admin user password in `ADMIN_PASSWORD=`, it defaults to `admin`.
 

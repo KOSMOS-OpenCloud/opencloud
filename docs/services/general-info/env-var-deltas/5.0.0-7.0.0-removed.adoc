@@ -9,22 +9,22 @@
 | Service | Variable | Description | Default
 
 | xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
-| OCIS_CACHE_SIZE
+| OC_CACHE_SIZE
 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 | 0
 
 | 
-| OCIS_DECOMPOSEDFS_METADATA_BACKEND
+| OC_DECOMPOSEDFS_METADATA_BACKEND
 | The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 | messagepack
 
 | 
-| OCIS_ENABLE_RESHARING
+| OC_ENABLE_RESHARING
 | Changing this value is NOT supported. Enables the support for re-sharing in the clients.
 | false
 
 | 
-| OCIS_PERSISTENT_STORE_SIZE
+| OC_PERSISTENT_STORE_SIZE
 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
 | 0
 
@@ -90,7 +90,7 @@
 
 | 
 | SETTINGS_DATA_PATH
-| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
+| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OC_BASE_DATA_PATH:/settings.
 | /var/lib/ocis/settings
 
 | 
@@ -109,7 +109,7 @@
 | 0
 
 | 
-| STORAGE_SYSTEM_OCIS_METADATA_BACKEND
+| STORAGE_SYSTEM_OC_METADATA_BACKEND
 | The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 | messagepack
 
@@ -135,7 +135,7 @@
 
 | The `Store` service has been removed completely
 | STORE_DATA_PATH
-| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
+| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OC_BASE_DATA_PATH:/store.
 | /var/lib/ocis/store
 
 | 

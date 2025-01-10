@@ -30,7 +30,7 @@ A local envvar always starts with the service name like `POSTPROCESSING_LOG_FILE
 
 ### Global Envvars
 
-A global envvar always starts with `OCIS_` like `OCIS_LOG_FILE`.
+A global envvar always starts with `OC_` like `OC_LOG_FILE`.
 
 Note that this envvar is the global representation of the local example from above.
 

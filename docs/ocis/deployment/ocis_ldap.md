@@ -63,15 +63,15 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   ### oCIS settings ###
   # oCIS version. Defaults to "latest"
-  OCIS_DOCKER_TAG=
+  OC_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-  OCIS_DOMAIN=
+  OC_DOMAIN=
   # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-  OCIS_JWT_SECRET=
+  OC_JWT_SECRET=
   # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
   STORAGE_TRANSFER_SECRET=
   # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-  OCIS_MACHINE_AUTH_API_KEY=
+  OC_MACHINE_AUTH_API_KEY=
 
   ### LDAP server settings ###
   # Password of LDAP user "cn=admin,dc=owncloud,dc=com". Defaults to "admin"
@@ -90,15 +90,15 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=cloud.owncloud.test`.
+  Set your domain for the oCIS frontend in `OC_DOMAIN=`, e.g. `OC_DOMAIN=cloud.owncloud.test`.
 
   The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep these examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
 
   Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, e.g. `ldap.owncloud.test`.
 
-  Grant the oCIS Admin role to the admin user from your LDAP in `OCIS_ADMIN_USER_ID:`. You need to enter the uuid of LDAP user.
+  Grant the oCIS Admin role to the admin user from your LDAP in `OC_ADMIN_USER_ID:`. You need to enter the uuid of LDAP user.
 
   {{< hint type=tip title=Encoding >}}
   In the .ldif file in this example, the admin user id is base64 encoded. You need to decode it to make it work.

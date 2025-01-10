@@ -260,7 +260,7 @@ class OcisHelper {
 	 * @return string
 	 */
 	private static function getOcisRevaDataRoot(): string {
-		$root = \getenv("OCIS_REVA_DATA_ROOT");
+		$root = \getenv("OC_REVA_DATA_ROOT");
 		if ($root === false || $root === "") {
 			$root = "/var/tmp/ocis/owncloud/";
 		}

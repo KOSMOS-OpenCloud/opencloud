@@ -18,7 +18,7 @@ Internal GRPC APIs:
 To enable OpenCloudMesh, you have to set the following environment variable.
 
 ```console
-OCIS_ENABLE_OCM=true
+OC_ENABLE_OCM=true
 ```
 
 ## Trust Between Instances

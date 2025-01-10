@@ -7,9 +7,9 @@ Since this service requires an external document server, it won't start by defau
 Because the collaboration service needs to be started manually, the following prerequisite applies: On collaboration service startup, particular environment variables are required to be populated. If environment variables have a default like the `MICRO_REGISTRY_ADDRESS`, the default will be used, if not set otherwise. Use for all others the instance values as defined. If these environment variables are not provided or misconfigured, the collaboration service will not start up.
 
 Required environment variables:
-* `OCIS_URL`
-* `OCIS_JWT_SECRET`
-* `OCIS_REVA_GATEWAY`
+* `OC_URL`
+* `OC_JWT_SECRET`
+* `OC_REVA_GATEWAY`
 * `MICRO_REGISTRY_ADDRESS`
 
 ## Requirements
@@ -64,7 +64,7 @@ Note: The service can only be scaled if not using `memory` store and the stores 
 Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
 
 Store specific notes:
-  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
-  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
-  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OC_CACHE_STORE_NODES` to the same value as `OC_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OC_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 

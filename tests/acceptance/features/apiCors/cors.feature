@@ -1,4 +1,4 @@
-# NOTE: set env OCIS_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
+# NOTE: set env OC_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
 @env-config
 Feature: CORS headers
   As a user
@@ -7,7 +7,7 @@ Feature: CORS headers
 
   Background:
     Given user "Alice" has been created with default attributes
-    And the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
+    And the config "OC_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
 
   @issue-5195
   Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header

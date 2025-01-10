@@ -73,7 +73,7 @@ Web applications are loaded, if added in the Infinite Scale source code, at buil
 Additionally, the administrator can provide custom applications by storing them in the path defined by the environment
 variable `WEB_ASSET_APPS_PATH`.
 
-This environment variable defaults to the Infinite Scale base data directory `$OCIS_BASE_DATA_PATH/web/assets/apps`,
+This environment variable defaults to the Infinite Scale base data directory `$OC_BASE_DATA_PATH/web/assets/apps`,
 but can be redefined with any path set manually.
 
 The final list of available applications is composed of the built-in and the custom applications provided by the
@@ -98,7 +98,7 @@ Everything else is skipped and not considered as an application.
 
 ### Application Configuration
 
-If a custom configuration is needed, the administrator must provide the required configuration inside the `$OCIS_BASE_DATA_PATH/config/apps.yaml` file.
+If a custom configuration is needed, the administrator must provide the required configuration inside the `$OC_BASE_DATA_PATH/config/apps.yaml` file.
 
 NOTE: An application manifest should _never_ be changed manually, see [Using Custom Assets](#using-custom-assets) for customisation.
 

@@ -4,9 +4,9 @@ services:
     working_dir: /drone/src
     command: /bin/bash /test/run-tests.sh
     environment:
-      OCIS_ROOT: /drone/src
+      OC_ROOT: /drone/src
       TEST_SERVER_URL: https://ocis-server:9200
-      OCIS_WRAPPER_URL: http://ocis-server:5200
+      OC_WRAPPER_URL: http://ocis-server:5200
       STORAGE_DRIVER: $STORAGE_DRIVER
       TEST_SOURCE: $TEST_SOURCE
       BEHAT_SUITE: ${BEHAT_SUITE:-}

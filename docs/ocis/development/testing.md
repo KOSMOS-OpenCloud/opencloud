@@ -96,8 +96,8 @@ To run the tests that require an antivirus service (tests tagged with `@antiviru
 
 ```bash
 START_ANTIVIRUS=true \
-OCIS_ASYNC_UPLOADS=true \
-OCIS_ADD_RUN_SERVICES=antivirus \
+OC_ASYNC_UPLOADS=true \
+OC_ADD_RUN_SERVICES=antivirus \
 POSTPROCESSING_STEPS=virusscan \
 BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
@@ -167,10 +167,10 @@ The test suites transferred from ownCloud core have `coreApi` prefixed
 
 ### oCIS Image to Be Tested (Skip Local Image Build)
 
-By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
+By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OC_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
 
 ```bash
-OCIS_IMAGE_TAG=latest \
+OC_IMAGE_TAG=latest \
 make -C tests/acceptance/docker localApiTests-apiGraph-ocis
 ```
 
@@ -206,7 +206,7 @@ To start oCIS:
 IDM_ADMIN_PASSWORD=admin \
 ocis/bin/ocis init --insecure true
 
-OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true \
+OC_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true \
 ocis/bin/ocis server
 ```
 
@@ -319,7 +319,7 @@ PROXY_ENABLE_BASIC_AUTH=true \
 ### Run the Tests
 
 ```bash
-OCIS_WRAPPER_URL=http://localhost:5200 \
+OC_WRAPPER_URL=http://localhost:5200 \
 TEST_SERVER_URL="https://localhost:9200" \
 BEHAT_FEATURE=tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature \
 make test-acceptance-api
@@ -356,7 +356,7 @@ ocis/bin/ocis init --insecure true
 
 # run oCIS
 PROXY_ENABLE_BASIC_AUTH=true \
-OCIS_ADD_RUN_SERVICES=notifications \
+OC_ADD_RUN_SERVICES=notifications \
 NOTIFICATIONS_SMTP_HOST=localhost \
 NOTIFICATIONS_SMTP_PORT=2500 \
 NOTIFICATIONS_SMTP_INSECURE=true \
@@ -399,7 +399,7 @@ ocis/bin/ocis init --insecure true
 
 # run oCIS
 PROXY_ENABLE_BASIC_AUTH=true \
-OCIS_INSECURE=true \
+OC_INSECURE=true \
 SEARCH_EXTRACTOR_TYPE=tika \
 SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://localhost:9998 \
 SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true \
@@ -481,8 +481,8 @@ PROXY_ENABLE_BASIC_AUTH=true \
 ANTIVIRUS_SCANNER_TYPE="clamav" \
 ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
 POSTPROCESSING_STEPS="virusscan" \
-OCIS_ASYNC_UPLOADS=true \
-OCIS_ADD_RUN_SERVICES="antivirus"
+OC_ASYNC_UPLOADS=true \
+OC_ADD_RUN_SERVICES="antivirus"
 ocis/bin/ocis server
 ```
 
@@ -516,11 +516,11 @@ IDM_ADMIN_PASSWORD=admin \
 ocis/bin/ocis init --insecure true
 
 # run oCIS
-OCIS_URL="https://localhost:9200" \
+OC_URL="https://localhost:9200" \
 PROXY_ENABLE_BASIC_AUTH=true \
-OCIS_ENABLE_OCM=true \
+OC_ENABLE_OCM=true \
 OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="tests/config/local/providers.json" \
-OCIS_ADD_RUN_SERVICES="ocm" \
+OC_ADD_RUN_SERVICES="ocm" \
 OCM_OCM_INVITE_MANAGER_INSECURE=true \
 OCM_OCM_SHARE_PROVIDER_INSECURE=true \
 OCM_OCM_STORAGE_PROVIDER_INSECURE=true \
@@ -552,8 +552,8 @@ The second oCIS instance should be available at: https://localhost:10200/
 
 {{< hint info >}}
 To enable ocm in the web interface, you need to set the following envs:
-`OCIS_ENABLE_OCM="true"`
-`OCIS_ADD_RUN_SERVICES="ocm"`
+`OC_ENABLE_OCM="true"`
+`OC_ADD_RUN_SERVICES="ocm"`
 {{< /hint>}}
 
 #### Run the Acceptance Test

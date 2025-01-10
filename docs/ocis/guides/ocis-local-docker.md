@@ -37,13 +37,13 @@ services:
     image: owncloud/ocis:latest
     environment:
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "true"
+      OC_INSECURE: "true"
 
-      # OCIS_URL: the external domain / ip address of oCIS (with protocol, must always be https)
-      OCIS_URL: "https://localhost:9200"
+      # OC_URL: the external domain / ip address of oCIS (with protocol, must always be https)
+      OC_URL: "https://localhost:9200"
 
-      # OCIS_LOG_LEVEL: error / info / ... / debug
-      OCIS_LOG_LEVEL: info
+      # OC_LOG_LEVEL: error / info / ... / debug
+      OC_LOG_LEVEL: info
 ```
 
 ### Initialize
@@ -275,13 +275,13 @@ services:
     # see also https://docs.docker.com/engine/reference/commandline/images/#list-image-digests
     environment:
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "true"
+      OC_INSECURE: "true"
 
-      # OCIS_URL: the external domain / ip address of oCIS (with protocol, must always be https)
-      OCIS_URL: "https://localhost:9200"
+      # OC_URL: the external domain / ip address of oCIS (with protocol, must always be https)
+      OC_URL: "https://localhost:9200"
 
-      # OCIS_LOG_LEVEL: error / info / ... / debug
-      OCIS_LOG_LEVEL: info
+      # OC_LOG_LEVEL: error / info / ... / debug
+      OC_LOG_LEVEL: info
     volumes:
       # mount the ocis config file inside the container
       - "./ocis.yaml:/etc/ocis/ocis.yaml"

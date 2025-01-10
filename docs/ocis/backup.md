@@ -13,9 +13,9 @@ Note, as a prerequisite backing up Infinite Scale, the instance has to be fully 
 
 ## Ocis Data Structure
 
-Ocis stores its data in a folder that can be configured via the environment variable `OCIS_BASE_DATA_PATH`. Without further configuration, services derive from that path when they store data, though individual settings for certain data types can be configured.
+Ocis stores its data in a folder that can be configured via the environment variable `OC_BASE_DATA_PATH`. Without further configuration, services derive from that path when they store data, though individual settings for certain data types can be configured.
 
-The default value for the `OCIS_BASE_DATA_PATH` variable is `$HOME/.ocis` (or `/var/lib/ocis` when using the docker container. Note: Configuration data is by default stored in `/etc/ocis/` in the container.).
+The default value for the `OC_BASE_DATA_PATH` variable is `$HOME/.ocis` (or `/var/lib/ocis` when using the docker container. Note: Configuration data is by default stored in `/etc/ocis/` in the container.).
 
 Inside this folder, Infinite Scale will store all its data in separate subdirectories. That includes metadata, configurations, queues and stores etc. The actual bytes of files (blobs) are handled by a so called blobstore, which also stores here by default. Depending on the used blobstore, the blobs need to be backed up separately, for example if S3 is used. Note: See special case for the `config` folder in a docker container.
 
@@ -42,7 +42,7 @@ The following sections describe the content and background of the subdirectories
 
 ### `config`
 
-Contains basic Infinite Scale configuration created by `ocis init`(Note: The location of the configuration folder can be specified with the `OCIS_CONFIG_DIR` environment variable, but for this document we will assume this variable is not set and the default is used.)
+Contains basic Infinite Scale configuration created by `ocis init`(Note: The location of the configuration folder can be specified with the `OC_CONFIG_DIR` environment variable, but for this document we will assume this variable is not set and the default is used.)
 
 ```bash
     ~/.ocis/config/:tree
@@ -57,9 +57,9 @@ BACKUP RECOMMENDED. Holds Infinite Scale configuration data. The contents can va
 
 | Field Name | Envvar Name | Description | If not backed up |
 | --- | --- | --- | --- |
-| `idp.ldap.bind_password` | `OCIS_LDAP_BIND_PASSWORD` | Password for the idp | no logins possible |
+| `idp.ldap.bind_password` | `OC_LDAP_BIND_PASSWORD` | Password for the idp | no logins possible |
 | `idm.service_user_passwords.idp_password`| `IDM_IDPSVC_PASSWORD` | Same as above | no logins possible |
-| `system_user_id` | `OCIS_SYSTEM_USER_ID` | The id of storage-system user | no logins possible |
+| `system_user_id` | `OC_SYSTEM_USER_ID` | The id of storage-system user | no logins possible |
 | `idm.service_user_passwords.reva_password`| `IDM_REVASVC_PASSWORD` | The reva password | no logins possible |
 | `auth_basic.auth_providers.ldap.bind_password` | `AUTH_BASIC_LDAP_BIND_PASSWORD` | Same as above | no logins possible |
 | `users.drivers.ldap.bind_password` | `USERS_LDAP_BIND_PASSWORD` | Same as above | no logins possible |
@@ -179,7 +179,7 @@ Contains Infinite Scale meta (and blob) data, depending on the blobstore. See th
 ```
 
 * `metadata`:\
-BACKUP REQUIRED. Contains system data. Path can be specified via `STORAGE_SYSTEM_OCIS_ROOT`. Not backing it up will remove shares from the system and will also remove custom settings.
+BACKUP REQUIRED. Contains system data. Path can be specified via `STORAGE_SYSTEM_OC_ROOT`. Not backing it up will remove shares from the system and will also remove custom settings.
 * `ocm`:\
 BACKUP REQUIRED/OMITABLE. Contains ocm share data. When not using ocm sharing, this folder does not need to be backed up.
 * `users`:\

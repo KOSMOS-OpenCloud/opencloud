@@ -6,7 +6,7 @@ The thumbnails service provides methods to generate thumbnails for various files
 
 The relevant environment variables defining file locations are:
 
--   (1) `OCIS_BASE_DATA_PATH`
+-   (1) `OC_BASE_DATA_PATH`
 -   (2) `STORAGE_USERS_OCIS_ROOT`
 -   (3) `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 

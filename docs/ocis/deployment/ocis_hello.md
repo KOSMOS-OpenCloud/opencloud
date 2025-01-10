@@ -63,9 +63,9 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   ### oCIS settings ###
   # oCIS version. Defaults to "latest"
-  OCIS_DOCKER_TAG=
+  OC_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-  OCIS_DOMAIN=
+  OC_DOMAIN=
   # oCIS admin user password. Defaults to "admin".
   ADMIN_PASSWORD=
   # The demo users should not be created on a production instance
@@ -74,7 +74,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   ### oCIS Hello settings ###
   # oCIS Hello version. Defaults to "latest"
-  OCIS_HELLO_DOCKER_TAG=
+  OC_HELLO_DOCKER_TAG=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -85,13 +85,13 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
+  Set your domain for the oCIS frontend in `OC_DOMAIN=`, e.g. `OC_DOMAIN=ocis.owncloud.test`.
 
   Set the initial admin user password in `ADMIN_PASSWORD=`, it defaults to `admin`.
 
-  By default the oCIS Hello extension will be started in the `latest` version. If you want to start a specific version of oCIS Hello set the version to `OCIS_HELLO_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis-hello/tags?page=1&ordering=last_updated).
+  By default the oCIS Hello extension will be started in the `latest` version. If you want to start a specific version of oCIS Hello set the version to `OC_HELLO_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis-hello/tags?page=1&ordering=last_updated).
 
   Now you have configured everything and can save the file.
 

@@ -67,8 +67,8 @@ func (l *ownCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceD
 		} else if value, ok := claims[oidc.Email].(string); ok {
 			jrd.Subject = "mailto:" + value
 		}
-		// allow referencing OCIS_URL in the template
-		claims["OCIS_URL"] = l.ocisURL
+		// allow referencing OC_URL in the template
+		claims["OC_URL"] = l.ocisURL
 		for _, instance := range l.instances {
 			if value, ok := claims[instance.Claim].(string); ok && instance.compiledRegex.MatchString(value) {
 				var tmplWriter strings.Builder

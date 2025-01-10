@@ -76,7 +76,7 @@ class OcisConfigHelper {
 	 * @return string
 	 */
 	public static function getWrapperUrl(): string {
-		$url = \getenv("OCIS_WRAPPER_URL");
+		$url = \getenv("OC_WRAPPER_URL");
 		if ($url === false) {
 			$url = "http://localhost:5200";
 		}

@@ -77,12 +77,12 @@ func DefaultConfig() *config.Config {
 				Name:    "ownCloud Web app",
 				Trusted: true,
 				RedirectURIs: []string{
-					"{{OCIS_URL}}/",
-					"{{OCIS_URL}}/oidc-callback.html",
-					"{{OCIS_URL}}/oidc-silent-redirect.html",
+					"{{OC_URL}}/",
+					"{{OC_URL}}/oidc-callback.html",
+					"{{OC_URL}}/oidc-silent-redirect.html",
 				},
 				Origins: []string{
-					"{{OCIS_URL}}",
+					"{{OC_URL}}",
 				},
 			},
 			{

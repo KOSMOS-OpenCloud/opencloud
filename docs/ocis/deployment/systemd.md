@@ -45,21 +45,21 @@ In the service definition we referenced `/etc/ocis/ocis.env` as our file contain
 In order to create the file we need first to create the folder `/etc/ocis/` and then we can add the actual `/etc/ocis/ocis.env` with following content:
 
 ```bash
-OCIS_URL=https://some-hostname-or-ip:9200
+OC_URL=https://some-hostname-or-ip:9200
 PROXY_HTTP_ADDR=0.0.0.0:9200
-OCIS_INSECURE=false
+OC_INSECURE=false
 
-OCIS_LOG_LEVEL=error
+OC_LOG_LEVEL=error
 
-OCIS_CONFIG_DIR=/etc/ocis
-OCIS_BASE_DATA_PATH=/var/lib/ocis
+OC_CONFIG_DIR=/etc/ocis
+OC_BASE_DATA_PATH=/var/lib/ocis
 ```
 
-Since we set `OCIS_CONFIG_DIR` to `/etc/ocis` you can also place configuration files in this directory.
+Since we set `OC_CONFIG_DIR` to `/etc/ocis` you can also place configuration files in this directory.
 
-Please change your `OCIS_URL` in order to reflect your actual deployment. If you are using self-signed certificates you need to set `OCIS_INSECURE=true` in `/etc/ocis/ocis.env`.
+Please change your `OC_URL` in order to reflect your actual deployment. If you are using self-signed certificates you need to set `OC_INSECURE=true` in `/etc/ocis/ocis.env`.
 
-oCIS will store all data in `/var/lib/ocis`, because we configured it so by setting `OCIS_BASE_DATA_PATH`. Therefore you need to create that directory and make it accessible to the user, you use to start oCIS.
+oCIS will store all data in `/var/lib/ocis`, because we configured it so by setting `OC_BASE_DATA_PATH`. Therefore you need to create that directory and make it accessible to the user, you use to start oCIS.
 
 ## Starting the oCIS service
 

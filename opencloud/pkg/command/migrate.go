@@ -35,7 +35,7 @@ import (
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
 	oclog "github.com/opencloud-eu/opencloud/ocis-pkg/log"
 	mregistry "github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	sharing "github.com/opencloud-eu/opencloud/services/sharing/pkg/config"
 	sharingparser "github.com/opencloud-eu/opencloud/services/sharing/pkg/config/parser"
 	"github.com/urfave/cli/v2"

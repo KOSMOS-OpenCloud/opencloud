@@ -15,7 +15,7 @@ import (
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
 	mregistry "github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	sharingparser "github.com/opencloud-eu/opencloud/services/sharing/pkg/config/parser"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/opencloud-eu/opencloud/ocis-pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,8 +17,8 @@ func Execute() error {
 	cfg := config.DefaultConfig()
 
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "ocis",
-		Usage: "ownCloud Infinite Scale",
+		Name:  "opencloud",
+		Usage: "opencloud",
 	})
 
 	for _, fn := range register.Commands {

@@ -11,7 +11,7 @@ import (
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 )
 
 const (

@@ -3,7 +3,7 @@ package backup_test
 import (
 	"testing"
 
-	"github.com/opencloud-eu/opencloud/ocis/pkg/backup"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/backup"
 	"github.com/test-go/testify/require"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/opencloud-eu/opencloud/ocis/pkg/runtime/config"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/runtime/config"
 	"github.com/spf13/cobra"
 )
 

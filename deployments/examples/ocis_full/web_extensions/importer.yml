@@ -32,7 +32,7 @@ services:
       COMPANION_DATADIR: /tmp/companion/
       COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
       COMPANION_PROTOCOL: https
-      COMPANION_UPLOAD_URLS: "^https://${OCIS_DOMAIN:-ocis.owncloud.test}/"
+      COMPANION_UPLOAD_URLS: "^https://${OC_DOMAIN:-ocis.owncloud.test}/"
       COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
       COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
     volumes:

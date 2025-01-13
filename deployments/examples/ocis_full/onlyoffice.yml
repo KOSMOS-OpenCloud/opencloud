@@ -8,7 +8,7 @@ services:
           - ${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}
 
   collaboration-oo:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    image: ${OC_DOCKER_IMAGE:-owncloud/ocis}:${OC_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     depends_on:
@@ -33,10 +33,10 @@ services:
       COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
       COLLABORATION_APP_PROOF_DISABLE: "true"
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OC_URL: https://${OC_DOMAIN:-ocis.owncloud.test}
     volumes:
       # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
+      - ${OC_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration-oo.entrypoints=https"

@@ -44,7 +44,7 @@ Feature: service health check
   Scenario: check extra services health
     Given the following configs have been set:
       | config                 | value                                           |
-      | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
+      | OC_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
       | AUDIT_DEBUG_ADDR       | 0.0.0.0:9229                                    |
       | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                                    |
       | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                                    |
@@ -98,7 +98,7 @@ Feature: service health check
   Scenario: check extra services readiness
     Given the following configs have been set:
       | config                 | value                                           |
-      | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
+      | OC_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
       | AUDIT_DEBUG_ADDR       | 0.0.0.0:9229                                    |
       | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                                    |
       | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149                                    |
@@ -125,7 +125,7 @@ Feature: service health check
   Scenario: check extra services readiness
     Given the following configs have been set:
       | config                 | value        |
-      | OCIS_ADD_RUN_SERVICES  | auth-bearer  |
+      | OC_ADD_RUN_SERVICES  | auth-bearer  |
       | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149 |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                               | service     |

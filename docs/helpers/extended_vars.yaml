@@ -124,10 +124,10 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
-- rawname: OCIS_BASE_DATA_PATH
+- rawname: OC_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
   foundincode: true
-  name: OCIS_BASE_DATA_PATH
+  name: OC_BASE_DATA_PATH
   type: string
   default_value: ""
   description: The base directory location used by several services and for user data.
@@ -135,10 +135,10 @@ variables:
     Services can have, if available, an individual setting with an own environment
     variable.
   do_ignore: false
-- rawname: OCIS_CONFIG_DIR
+- rawname: OC_CONFIG_DIR
   path: ocis-pkg/config/defaults/paths.go:56
   foundincode: true
-  name: OCIS_CONFIG_DIR
+  name: OC_CONFIG_DIR
   type: string
   default_value: ""
   description: The default directory location for config files. See the General Info

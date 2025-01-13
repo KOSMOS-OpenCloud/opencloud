@@ -30,9 +30,9 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: julian.koberg@kiteworks.com
-          OCIS_DOCKER_TAG: 6.6.1
-          OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
-          OCIS_DOMAIN: ocis.ocis-onlyoffice.rolling.owncloud.works
+          OC_DOCKER_TAG: 6.6.1
+          OC_DOCKER_IMAGE: owncloud/ocis-rolling
+          OC_DOMAIN: ocis.ocis-onlyoffice.rolling.owncloud.works
           COMPANION_DOMAIN: companion.ocis-onlyoffice.rolling.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
           WOPISERVER_ONLYOFFICE_DOMAIN: wopiserver-oo.ocis-onlyoffice.rolling.owncloud.works
@@ -48,5 +48,5 @@
           TELEMETRY_SERVE_DOMAIN: telemetry.ocis-onlyoffice.rolling.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_onlyoffice
-          OCIS_URL: ocis.ocis-onlyoffice.rolling.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-onlyoffice-rolling
+          OC_URL: ocis.ocis-onlyoffice.rolling.owncloud.works
+          OC_DEPLOYMENT_ID: continuous-deployment-ocis-onlyoffice-rolling

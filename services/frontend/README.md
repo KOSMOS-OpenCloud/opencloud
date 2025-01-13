@@ -59,9 +59,9 @@ Note: The service can only be scaled if not using `memory` store and the stores 
 Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
 
 Store specific notes:
-  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
-  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
-  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OC_CACHE_STORE_NODES` to the same value as `OC_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OC_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ### Auto-Accept Shares
 
@@ -79,23 +79,23 @@ With the password policy, mandatory criteria for the password can be defined via
 
 Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
-The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OCIS_CONFIG_DIR/OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
+The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OC_CONFIG_DIR/OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
 
 Following environment variables can be set to define the password policy behaviour:
 
--   `OCIS_PASSWORD_POLICY_DISABLED`
+-   `OC_PASSWORD_POLICY_DISABLED`
 Disable the password policy
--   `OCIS_PASSWORD_POLICY_MIN_CHARACTERS`
+-   `OC_PASSWORD_POLICY_MIN_CHARACTERS`
 Define the minimum password length.
--   `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
+-   `OC_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
 Define the minimum number of uppercase letters.
--   `OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
+-   `OC_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
 Define the minimum number of lowercase letters.
--   `OCIS_PASSWORD_POLICY_MIN_DIGITS`
+-   `OC_PASSWORD_POLICY_MIN_DIGITS`
 Define the minimum number of digits.
--   `OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
+-   `OC_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
 Define the minimum number of special characters.
--   `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
+-   `OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 Path to the 'banned passwords list' file.
 
 These variables are global ocis variables because they are used not only in the frontend service, but also in the sharing service.
@@ -129,14 +129,14 @@ The capabilities endpoint (e.g. https://ocis.test/ocs/v1.php/cloud/capabilities?
 
 For public accessible shares, independent if read only or writable, a password is enforced. To change this requirement, set the following environment variable to `false`:
 
-`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
+`OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
 
 ### Password Enforcement for Writeable Public Links
 
 For public accessible writable shares, a password can be enforced. To change the current setting, set the following environment variable to `true`:
 
-`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+`OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
 Note that changing this environment variable only makes sense if\
-`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`\
+`OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`\
 is set to `false`.

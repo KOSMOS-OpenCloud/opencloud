@@ -29,7 +29,7 @@ chmod +x ocis
 * Set some environment variables related to Uberspace (**Make sure you fill in YOUR domain!**)
 ```
 uberspace web backend set / --http --port 9200
-export OCIS_URL=https://ocis.uber.space
+export OC_URL=https://ocis.uber.space
 export PROXY_TLS=false
 export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug
@@ -55,7 +55,7 @@ To make it easier (and faster), here's the commands in a script called `ocis.ins
 curl https://download.owncloud.com/ocis/ocis/stable/4.0.3/ocis-4.0.3-linux-amd64 --output ocis
 chmod +x ocis
 uberspace web backend set / --http --port 9200
-export OCIS_URL=https://ocis.uber.space
+export OC_URL=https://ocis.uber.space
 export PROXY_TLS=false
 export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug
@@ -82,7 +82,7 @@ startsecs=60
 # This file is named ocis.start.
 # It sets environment variables needed for uber.space needed for Infinite Scale
 /usr/bin/uberspace web backend set / --http --port 9200 &
-export OCIS_URL=https://ocis.uber.space
+export OC_URL=https://ocis.uber.space
 export PROXY_TLS=false
 export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug
@@ -122,7 +122,7 @@ rm -rf .ocis
 curl https://download.owncloud.com/ocis/ocis/stable/4.0.3/ocis-4.0.3-linux-amd64 --output ocis
 chmod +x ocis
 uberspace web backend set / --http --port 9200
-export OCIS_URL=https://ocis.uber.space
+export OC_URL=https://ocis.uber.space
 export PROXY_TLS=false
 export PROXY_HTTP_ADDR=0.0.0.0:9200
 export PROXY_LOG_LEVEL=debug

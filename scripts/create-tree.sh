@@ -1,7 +1,7 @@
 #!/bin/bash
 DEPTH=${DEPTH:-3}
 WIDTH=${WIDTH:-10}
-OCIS_URL=${OCIS_URL:-https://localhost:9200}
+OC_URL=${OC_URL:-https://localhost:9200}
 ENDPOINT=${ENDPOINT:-/webdav}
 FOLDER=${FOLDER:-w$WIDTH x d$DEPTH folders}
 USER=${USER:-einstein}
@@ -30,8 +30,8 @@ create_tree()
         do {
             p="$3/w${w}d$2"
             COUNT=$(( COUNT + 1 ))
-            echo "creating $COUNT/$MAX $OCIS_URL$ENDPOINT/$FOLDER$p"
-            curl -X MKCOL "$OCIS_URL$ENDPOINT/$FOLDER$p" -u $USER:$PASSWORD -w "%{http_code}" $CURL_OPTS || { echo "could not create collection '$OCIS_URL$ENDPOINT/$FOLDER$p'" >&2; exit 1; } &
+            echo "creating $COUNT/$MAX $OC_URL$ENDPOINT/$FOLDER$p"
+            curl -X MKCOL "$OC_URL$ENDPOINT/$FOLDER$p" -u $USER:$PASSWORD -w "%{http_code}" $CURL_OPTS || { echo "could not create collection '$OC_URL$ENDPOINT/$FOLDER$p'" >&2; exit 1; } &
             create_tree $1 $(( $2 - 1 )) $p
         }
         done
@@ -49,6 +49,6 @@ create_tree()
 
 # w^d + 
 
-curl -X MKCOL "$OCIS_URL$ENDPOINT/$FOLDER" -u $USER:$PASSWORD -w "%{http_code}" $CURL_OPTS || { echo "could not create collection '$OCIS_URL$ENDPOINT/$FOLDER/'" >&2; exit 1; }
+curl -X MKCOL "$OC_URL$ENDPOINT/$FOLDER" -u $USER:$PASSWORD -w "%{http_code}" $CURL_OPTS || { echo "could not create collection '$OC_URL$ENDPOINT/$FOLDER/'" >&2; exit 1; }
 
 create_tree $WIDTH $DEPTH

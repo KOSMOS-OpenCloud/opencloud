@@ -58,7 +58,7 @@ services:
       - ocis-data:/var/lib/ocis
 
   ocis:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    image: owncloud/ocis:${OC_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     user: "33:33" # equals the user "www-data" for oC10
@@ -73,7 +73,7 @@ services:
     #  - /entrypoint-override.sh
     environment:
       # Keycloak IDP specific configuration
-      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
+      OC_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ocis-web
       WEB_OIDC_SCOPE: openid profile email owncloud
@@ -81,19 +81,19 @@ services:
       GRAPH_IDENTITY_BACKEND: ldap
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "false"
       # LDAP bind
-      OCIS_LDAP_URI: "ldaps://openldap"
-      OCIS_LDAP_INSECURE: "true"
-      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OC_LDAP_URI: "ldaps://openldap"
+      OC_LDAP_INSECURE: "true"
+      OC_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OC_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       # LDAP user settings
       PROXY_USER_OIDC_CLAIM: ocis.user.uuid # claim was added in Keycloak
       PROXY_USER_CS3_CLAIM: userid # equals LDAP_USER_SCHEMA_ID
-      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_SCHEMA_ID: "ownclouduuid"
-      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
-      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
-      OCIS_LDAP_USER_SCHEMA_ID: "ownclouduuid"
-      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      OC_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OC_LDAP_GROUP_SCHEMA_ID: "ownclouduuid"
+      OC_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OC_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OC_LDAP_USER_SCHEMA_ID: "ownclouduuid"
+      OC_LDAP_USER_FILTER: "(objectclass=owncloud)"
       # ownCloudSQL storage driver
       STORAGE_USERS_DRIVER: "owncloudsql"
       STORAGE_USERS_OWNCLOUDSQL_DATADIR: "/mnt/data/files"
@@ -112,20 +112,20 @@ services:
       SHARING_USER_OWNCLOUDSQL_DB_PORT: 3306
       SHARING_USER_OWNCLOUDSQL_DB_NAME: "owncloud"
       # ownCloud storage readonly
-      OCIS_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
+      OC_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
       # General oCIS config
-      # OCIS_RUN_SERVICES specifies to start all fullstack services except idm and idp. These are replaced by external services
-      OCIS_RUN_SERVICES: app-registry,app-provider,auth-basic,auth-machine,frontend,gateway,graph,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
+      # OC_RUN_SERVICES specifies to start all fullstack services except idm and idp. These are replaced by external services
+      OC_RUN_SERVICES: app-registry,app-provider,auth-basic,auth-machine,frontend,gateway,graph,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
+      OC_LOG_LEVEL: ${OC_LOG_LEVEL:-info}
+      OC_LOG_COLOR: "${OC_LOG_COLOR:-false}"
+      OC_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "${INSECURE:-false}"
+      OC_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for e.g., WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # password policies
-      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml

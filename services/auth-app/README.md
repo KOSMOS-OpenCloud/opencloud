@@ -15,7 +15,7 @@ ocis uses serveral authentication services for different use cases. All services
 
 Because this service is not started automatically, a manual start needs to be initiated which can be done in several ways. To configure the service usage, an environment variable for the proxy service needs to be set to allow app authentication.
 ```bash
-OCIS_ADD_RUN_SERVICES=auth-app  # deployment specific. Add the service to the manual startup list, use with binary deployments. Alternatively you can start the service explicitly via the command line.
+OC_ADD_RUN_SERVICES=auth-app  # deployment specific. Add the service to the manual startup list, use with binary deployments. Alternatively you can start the service explicitly via the command line.
 PROXY_ENABLE_APP_AUTH=true      # mandatory, allow app authentication. In case of a distributed environment, this envvar needs to be set in the proxy service.
 ```
 

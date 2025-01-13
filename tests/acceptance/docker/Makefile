@@ -19,16 +19,16 @@ COMPOSE_FILE ?= src/redis.yml:src/ocis-base.yml:src/acceptance.yml
 BEHAT_FEATURE ?=
 
 
-ifdef OCIS_IMAGE_TAG
+ifdef OC_IMAGE_TAG
 	BUILD_DEV_IMAGE := 0
 else
 	BUILD_DEV_IMAGE := 1
 endif
-OCIS_IMAGE_TAG ?= dev
+OC_IMAGE_TAG ?= dev
 
 # run tests with ociswrapper by default
 WITH_WRAPPER ?= true
-OCIS_WRAPPER := ../../ociswrapper/bin/ociswrapper
+OC_WRAPPER := ../../ociswrapper/bin/ociswrapper
 
 ifdef START_TIKA
 	ifeq ($(START_TIKA),true)
@@ -63,7 +63,7 @@ help:
 	@echo
 	@echo -e "The oCIS to be tested will be build from your current working state."
 	@echo -e "You also can select the oCIS Docker image for all tests by setting"
-	@echo -e "\tmake ... ${YELLOW}OCIS_IMAGE_TAG=latest${RESET}"
+	@echo -e "\tmake ... ${YELLOW}OC_IMAGE_TAG=latest${RESET}"
 	@echo -e "where ${YELLOW}latest${RESET} is an example for any valid Docker image tag from"
 	@echo -e "https://hub.docker.com/r/owncloud/ocis."
 	@echo
@@ -186,7 +186,7 @@ $(targets):
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: testSuite
-testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
+testSuite: $(OC_WRAPPER) build-dev-image clean-docker-container
 	@if [ -n "${START_CEPH}" ]; then \
 		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 		COMPOSE_FILE=src/ceph.yml \
@@ -212,11 +212,11 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
 	TEST_SOURCE=$(TEST_SOURCE) \
 	WITH_WRAPPER=$(WITH_WRAPPER) \
-	OCIS_ASYNC_UPLOADS=$(OCIS_ASYNC_UPLOADS) \
-	OCIS_ADD_RUN_SERVICES=$(OCIS_ADD_RUN_SERVICES) \
+	OC_ASYNC_UPLOADS=$(OC_ASYNC_UPLOADS) \
+	OC_ADD_RUN_SERVICES=$(OC_ADD_RUN_SERVICES) \
 	POSTPROCESSING_STEPS=$(POSTPROCESSING_STEPS) \
 	SEARCH_EXTRACTOR_TYPE=$(SEARCH_EXTRACTOR_TYPE) \
-	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
+	OC_IMAGE_TAG=$(OC_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	DIVIDE_INTO_NUM_PARTS=$(DIVIDE_INTO_NUM_PARTS) \
@@ -229,7 +229,7 @@ show-test-logs: ## show logs of test
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	docker-compose logs --no-log-prefix -f acceptance-tests | less
 
-$(OCIS_WRAPPER):
+$(OC_WRAPPER):
 	@if [ "$(WITH_WRAPPER)" == "true" ]; then \
 		$(MAKE) --no-print-directory -C ../../ociswrapper build \
 	; fi;
@@ -250,7 +250,7 @@ clean-docker-container: ## clean docker containers created during acceptance tes
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	BEHAT_SUITE="" \
 	DIVIDE_INTO_NUM_PARTS="" \
-	OCIS_IMAGE_TAG="" \
+	OC_IMAGE_TAG="" \
 	RUN_PART="" \
 	STORAGE_DRIVER="" \
 	TEST_SOURCE="" \
@@ -262,7 +262,7 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	BEHAT_SUITE="" \
 	DIVIDE_INTO_NUM_PARTS="" \
-	OCIS_IMAGE_TAG="" \
+	OC_IMAGE_TAG="" \
 	RUN_PART="" \
 	STORAGE_DRIVER="" \
 	TEST_SOURCE="" \

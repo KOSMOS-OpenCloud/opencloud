@@ -7,7 +7,7 @@ services:
     networks:
       ocis-net:
         aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${OC_DOMAIN:-ocis.owncloud.test}
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
       # letsencrypt configuration
@@ -47,7 +47,7 @@ services:
     restart: always
 
   ocis:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    image: ${OC_DOCKER_IMAGE:-owncloud/ocis}:${OC_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     depends_on:
@@ -60,36 +60,36 @@ services:
     command: [ "-c", "ocis init || true; ocis server" ]
     environment:
       # users/groups from ldap
-      OCIS_LDAP_URI: ldaps://ldap-server:1636
-      OCIS_LDAP_INSECURE: "true"
-      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
-      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
-      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
-      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
-      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      OC_LDAP_URI: ldaps://ldap-server:1636
+      OC_LDAP_INSECURE: "true"
+      OC_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OC_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OC_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OC_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OC_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OC_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OC_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      OC_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
-      OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+      OC_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
-      # OCIS_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
-      OCIS_EXCLUDE_RUN_SERVICES: idm
+      # OC_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
+      OC_EXCLUDE_RUN_SERVICES: idm
       # General oCIS config
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      OC_URL: https://${OC_DOMAIN:-ocis.owncloud.test}
+      OC_LOG_LEVEL: ${OC_LOG_LEVEL:-info}
+      OC_LOG_COLOR: "${OC_LOG_COLOR:-false}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "${INSECURE:-false}"
+      OC_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for e.g., WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # password policies
-      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ocis-config:/etc/ocis
@@ -97,7 +97,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      - "traefik.http.routers.ocis.rule=Host(`${OC_DOMAIN:-ocis.owncloud.test}`)"
       - "traefik.http.routers.ocis.tls.certresolver=http"
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"

@@ -149,7 +149,7 @@ def create_table(type_text, source_dict, from_version, to_version, date_today, t
 	# added and removed envvars
 		# first add all ocis_
 		for key, value in source_dict.items():
-			if key.startswith('OCIS_'):
+			if key.startswith('OC_'):
 				a += add_adoc_line_1(
 						'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
 						key,
@@ -158,7 +158,7 @@ def create_table(type_text, source_dict, from_version, to_version, date_today, t
 					)
 		# then add all others
 		for key, value in source_dict.items():
-			if not key.startswith('OCIS_'):
+			if not key.startswith('OC_'):
 				a += add_adoc_line_1(
 						'xref:{s-path}/xxx.adoc[xxx]',
 						key,
@@ -169,7 +169,7 @@ def create_table(type_text, source_dict, from_version, to_version, date_today, t
 	# deprecated envvars
 		# first add all ocis_
 		for key, value in source_dict.items():
-			if key.startswith('OCIS_'):
+			if key.startswith('OC_'):
 				a += add_adoc_line_2(
 						'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
 						key,
@@ -179,7 +179,7 @@ def create_table(type_text, source_dict, from_version, to_version, date_today, t
 					)
 		# then add all others
 		for key, value in source_dict.items():
-			if not key.startswith('OCIS_'):
+			if not key.startswith('OC_'):
 				a += add_adoc_line_2(
 						'xref:{s-path}/xxx.adoc[xxx]',
 						key,

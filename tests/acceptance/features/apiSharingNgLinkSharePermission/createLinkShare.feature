@@ -412,7 +412,7 @@ Feature: Create a link share for a resource
   Scenario Outline: create a link share of a file without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | textfile1.txt      |
@@ -478,7 +478,7 @@ Feature: Create a link share for a resource
   Scenario: set password on a file's link share using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
       | resource        | textfile1.txt |
@@ -507,7 +507,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | text.txt          |
@@ -764,7 +764,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a link share of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -824,7 +824,7 @@ Feature: Create a link share for a resource
   Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1104,7 +1104,7 @@ Feature: Create a link share for a resource
   Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1171,7 +1171,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a link share of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1225,7 +1225,7 @@ Feature: Create a link share for a resource
   Scenario: set password on a existing link share of a file inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1633,7 +1633,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1691,7 +1691,7 @@ Feature: Create a link share for a resource
   Scenario Outline: create a link share of a project-space without password using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API

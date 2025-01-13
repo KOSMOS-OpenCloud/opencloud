@@ -30,9 +30,9 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: julian.koberg@kiteworks.com
-          OCIS_DOCKER_TAG: master
-          OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
-          OCIS_DOMAIN: ocis.ocis.master.owncloud.works
+          OC_DOCKER_TAG: master
+          OC_DOCKER_IMAGE: owncloud/ocis-rolling
+          OC_DOMAIN: ocis.ocis.master.owncloud.works
           COMPANION_DOMAIN: companion.ocis.master.owncloud.works
           COMPANION_IMAGE: owncloud/uppy-companion:3.12.13-owncloud
           WOPISERVER_DOMAIN: wopiserver.ocis.master.owncloud.works
@@ -48,5 +48,5 @@
           TELEMETRY_SERVE_DOMAIN: telemetry.ocis.master.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_full
-          OCIS_URL: ocis.ocis.master.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-master
+          OC_URL: ocis.ocis.master.owncloud.works
+          OC_DEPLOYMENT_ID: continuous-deployment-ocis-master

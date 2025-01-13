@@ -7,7 +7,7 @@ services:
     networks:
       ocis-net:
         aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${OC_DOMAIN:-ocis.owncloud.test}
           - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
@@ -48,7 +48,7 @@ services:
     restart: always
 
   ocis:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    image: ${OC_DOCKER_IMAGE:-owncloud/ocis}:${OC_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:
@@ -61,24 +61,24 @@ services:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
-      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
+      OC_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
-      WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
+      WEB_OIDC_CLIENT_ID: ${OC_OIDC_CLIENT_ID:-web}
       # general config
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      OC_URL: https://${OC_DOMAIN:-ocis.owncloud.test}
+      OC_LOG_LEVEL: ${OC_LOG_LEVEL:-info}
+      OC_LOG_COLOR: "${OC_LOG_COLOR:-false}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       PROXY_USER_OIDC_CLAIM: "preferred_username"
       PROXY_USER_CS3_CLAIM: "username"
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "${INSECURE:-false}"
-      OCIS_ADMIN_USER_ID: ""
-      OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      OC_INSECURE: "${INSECURE:-false}"
+      OC_ADMIN_USER_ID: ""
+      OC_EXCLUDE_RUN_SERVICES: "idp"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
       # password policies
-      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
+      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
       KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
     volumes:
@@ -89,7 +89,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      - "traefik.http.routers.ocis.rule=Host(`${OC_DOMAIN:-ocis.owncloud.test}`)"
       - "traefik.http.routers.ocis.tls.certresolver=http"
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
@@ -121,7 +121,7 @@ services:
       - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
       - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
     environment:
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OC_DOMAIN: ${OC_DOMAIN:-ocis.owncloud.test}
       KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"

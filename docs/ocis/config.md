@@ -46,7 +46,7 @@ Let's explore with examples this approach.
 
 followed by the `<extension name>.yaml`, e.g. `proxy.yaml` for the extension configuration. You also can put an `ocis.yaml` config file to the expected loading location to use a single config file.
 
-You can set another directory as config path in the environment variable `OCIS_CONFIG_DIR`. It will then pick the same file names, but from the folder you configured.
+You can set another directory as config path in the environment variable `OC_CONFIG_DIR`. It will then pick the same file names, but from the folder you configured.
 
 #### Only config files
 

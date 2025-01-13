@@ -22,7 +22,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "insecure",
-				EnvVars: []string{"OCIS_INSECURE"},
+				EnvVars: []string{"OC_INSECURE"},
 				Value:   "ask",
 				Usage:   "Allow insecure oCIS config",
 			},
@@ -35,7 +35,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			&cli.BoolFlag{
 				Name:    "force-overwrite",
 				Aliases: []string{"f"},
-				EnvVars: []string{"OCIS_FORCE_CONFIG_OVERWRITE"},
+				EnvVars: []string{"OC_FORCE_CONFIG_OVERWRITE"},
 				Value:   false,
 				Usage:   "Force overwrite existing config file",
 			},
@@ -43,7 +43,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Name:    "config-path",
 				Value:   defaults.BaseConfigPath(),
 				Usage:   "Config path for the ocis runtime",
-				EnvVars: []string{"OCIS_CONFIG_DIR", "OCIS_BASE_DATA_PATH"},
+				EnvVars: []string{"OC_CONFIG_DIR", "OC_BASE_DATA_PATH"},
 			},
 			&cli.StringFlag{
 				Name:    "admin-password",

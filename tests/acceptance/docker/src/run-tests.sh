@@ -10,12 +10,12 @@ git config --global advice.detachedHead false
 if [ "$TEST_SOURCE" = "oc10" ]; then
     export ACCEPTANCE_TEST_TYPE='core-api'
     if [ "$STORAGE_DRIVER" = "ocis" ]; then
-        export OCIS_REVA_DATA_ROOT=''
+        export OC_REVA_DATA_ROOT=''
         export BEHAT_FILTER_TAGS='~@skipOnOcis-OCIS-Storage'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
     elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
-        export OCIS_REVA_DATA_ROOT=''
+        export OC_REVA_DATA_ROOT=''
     else
         echo "non existing STORAGE selected"
         exit 1
@@ -26,10 +26,10 @@ if [ "$TEST_SOURCE" = "oc10" ]; then
 elif [ "$TEST_SOURCE" = "ocis" ]; then
     if [ "$STORAGE_DRIVER" = "ocis" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OCIS-Storage'
-        export OCIS_REVA_DATA_ROOT=''
+        export OC_REVA_DATA_ROOT=''
     elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
-        export OCIS_REVA_DATA_ROOT=''
+        export OC_REVA_DATA_ROOT=''
     else
         echo "non existing storage selected"
         exit 1
@@ -61,7 +61,7 @@ if [[ -z "$TEST_SOURCE" ]]; then
     exit 1
 else
     sleep 10
-    make -C $OCIS_ROOT test-acceptance-api
+    make -C $OC_ROOT test-acceptance-api
 fi
 
 chmod -R 777 vendor-bin/**/vendor vendor-bin/**/composer.lock tests/acceptance/output

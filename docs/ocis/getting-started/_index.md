@@ -23,7 +23,7 @@ We are distributing oCIS as binaries and Docker images.
 {{< hint warning >}}
 The examples in this document assume that oCIS is accessed from the same host as it is running on (`localhost`). If you would like
 to access oCIS remotely please refer to the [Basic Remote Setup]({{< ref "../deployment/basic-remote-setup" >}}) section. Especially
-to the notes about setting the `PROXY_HTTP_ADDR` and `OCIS_URL` environment variables.
+to the notes about setting the `PROXY_HTTP_ADDR` and `OC_URL` environment variables.
 {{< /hint >}}
 
 You can find more deployment examples in the [deployment section]({{< ref "../deployment" >}}).
@@ -53,7 +53,7 @@ IDM_CREATE_DEMO_USERS=true ./ocis server
 The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
 
 {{< hint info >}}
-When you're using oCIS with self-signed certificates, you need to answer the question for certificate checking with "yes" or set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+When you're using oCIS with self-signed certificates, you need to answer the question for certificate checking with "yes" or set the environment variable `OC_INSECURE=true`, in order to make oCIS work.
 {{< /hint >}}
 
 {{< hint warning >}}
@@ -80,7 +80,7 @@ docker run --rm -p 9200:9200 -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis
 ```
 
 {{< hint info >}}
-When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+When you're using oCIS with self-signed certificates, you need to set the environment variable `OC_INSECURE=true`, in order to make oCIS work.
 {{< /hint >}}
 
 {{< hint warming >}}

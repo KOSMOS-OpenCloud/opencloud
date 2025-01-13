@@ -28,13 +28,13 @@ The graph service provides endpoints for querying users and groups. It features 
 
 The LDAP backend is configured using a set of environment variables. A detailed list of all the
 available configuration options can be found in the [documentation](https://owncloud.dev/services/graph/configuration/#environment-variables).
-The LDAP related options are prefixed with `OCIS_LDAP_` (or `GRAPH_LDAP_` for settings specific to graph service).
+The LDAP related options are prefixed with `OC_LDAP_` (or `GRAPH_LDAP_` for settings specific to graph service).
 
 #### Read-Only Access to Existing LDAP Servers
 
-To connect the graph service to an existing LDAP server, set `OCIS_LDAP_SERVER_WRITE_ENABLED` to
+To connect the graph service to an existing LDAP server, set `OC_LDAP_SERVER_WRITE_ENABLED` to
 `false` to prevent the graph service from sending write operations to the LDAP server. Also set the
-various `OCIS_LDAP_*` environment variables to match the configuration of the LDAP server you are connecting
+various `OC_LDAP_*` environment variables to match the configuration of the LDAP server you are connecting
 to. An example configuration for connecting oCIS to an instance of Microsoft Active Directory is
 available [here](https://owncloud.dev/ocis/identity-provider/ldap-active-directory/).
 
@@ -74,20 +74,20 @@ Note: The service can only be scaled if not using `memory` store and the stores 
 Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
 
 Store specific notes:
-  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
-  -   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
-  -   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+  -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+  -   When using `nats-js-kv` it is recommended to set `OC_CACHE_STORE_NODES` to the same value as `OC_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+  -   When using the `nats-js-kv` store, it is possible to set `OC_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ## Keycloak Configuration For The Personal Data Export
 
 If Keycloak is used for authentication, GDPR regulations require to add all personal identifiable information that Keycloak has about the user to the personal data export. To do this, the following environment variables must be set:
 
-*   `OCIS_KEYCLOAK_BASE_PATH` - The URL to the keycloak instance.
-*   `OCIS_KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data.
-*   `OCIS_KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
-*   `OCIS_KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
-*   `OCIS_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
-*   `OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
+*   `OC_KEYCLOAK_BASE_PATH` - The URL to the keycloak instance.
+*   `OC_KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data.
+*   `OC_KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
+*   `OC_KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
+*   `OC_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
+*   `OC_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
 
 For more details see the [User-Triggered GDPR Report](https://doc.owncloud.com/ocis/next/deployment/gdpr/gdpr.html) in the ocis admin documentation.
 
@@ -128,7 +128,7 @@ which is the source of the texts provided by the code.
 
 ## Default Language
 
-The default language can be defined via the `OCIS_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
+The default language can be defined via the `OC_DEFAULT_LANGUAGE` environment variable. See the `settings` service for a detailed description.
 
 ## Unified Role Management
 

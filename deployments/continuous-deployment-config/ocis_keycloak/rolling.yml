@@ -30,9 +30,9 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: julian.koberg@kiteworks.com
-          OCIS_DOCKER_TAG: 6.6.1
-          OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
-          OCIS_DOMAIN: ocis.ocis-keycloak.rolling.owncloud.works
+          OC_DOCKER_TAG: 6.6.1
+          OC_DOCKER_IMAGE: owncloud/ocis-rolling
+          OC_DOMAIN: ocis.ocis-keycloak.rolling.owncloud.works
           KEYCLOAK_DOMAIN: keycloak.ocis-keycloak.rolling.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
@@ -43,5 +43,5 @@
           TELEMETRY_SERVE_DOMAIN: telemetry.ocis-keycloak.rolling.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
-          OCIS_URL: ocis.ocis-keycloak.rolling.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-keycloak-rolling
+          OC_URL: ocis.ocis-keycloak.rolling.owncloud.works
+          OC_DEPLOYMENT_ID: continuous-deployment-ocis-keycloak-rolling

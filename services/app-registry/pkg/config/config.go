@@ -25,10 +25,10 @@ type Config struct {
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;APP_REGISTRY_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;APP_REGISTRY_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;APP_REGISTRY_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;APP_REGISTRY_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OC_LOG_LEVEL;APP_REGISTRY_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
+	Pretty bool   `yaml:"pretty" env:"OC_LOG_PRETTY;APP_REGISTRY_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
+	Color  bool   `yaml:"color" env:"OC_LOG_COLOR;APP_REGISTRY_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
+	File   string `yaml:"file" env:"OC_LOG_FILE;APP_REGISTRY_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
 }
 
 type Service struct {
@@ -46,7 +46,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"APP_REGISTRY_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OC_GRPC_PROTOCOL;APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service." introductionVersion:"pre5.0"`
 }
 
 type AppRegistry struct {

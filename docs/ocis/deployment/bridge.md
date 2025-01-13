@@ -93,7 +93,7 @@ basedn = "dc=ocis,dc=test"                               # base dn to construct 
 {{< hint >}}
 There is a bug in the config merging for environment variables, cli flags and config files causing log settings not to be picked up from the config file when specifying `--extensions`. That is why I will
 * configure most of the config in a file,
-* adjust logging using `OCIS_LOG_*` environment variables and
+* adjust logging using `OC_LOG_*` environment variables and
 * specify which extension to run using `ocis/bin/ocis server --extensions "comma, separated, list, of, extensions"`.
 {{< /hint >}}
 
@@ -101,7 +101,7 @@ There is a bug in the config merging for environment variables, cli flags and co
 
 For now, we only start the glauth extension:
 ```console
-$ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth"
+$ OC_LOG_PRETTY=true OC_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth"
 ```
 
 #### Check it is up and running
@@ -138,7 +138,7 @@ userschema = { uid = "uid", displayname = "givenname" } # TODO make glauth retur
 Now we can start all necessary services.
 
 ```console
-$ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth, storage-gateway, storage-authbasic, storage-userprovider"
+$ OC_LOG_PRETTY=true OC_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth, storage-gateway, storage-authbasic, storage-userprovider"
 ```
 
 
@@ -148,7 +148,7 @@ Here I ran out of time. I tried to verify this step with the reva cli:
 `login basic`
 but it tries to create the user home, which cannot be disabled in a config file: https://github.com/owncloud/ocis/issues/2416#issuecomment-901197053
 
-starting `STORAGE_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN=true OCIS_LOG_LEVEL=debug OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "storage-gateway, storage-authbasic, storage-userprovider"` let me login:
+starting `STORAGE_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN=true OC_LOG_LEVEL=debug OC_LOG_PRETTY=true OC_LOG_COLOR=true ocis/bin/ocis server --extensions "storage-gateway, storage-authbasic, storage-userprovider"` let me login:
 
 ```console
 ✗ cmd/reva/reva -insecure -host localhost:9142
@@ -193,7 +193,7 @@ ERROR:
 
 The built-in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
 ```console
-export OCIS_URL=https://ocis.ocis.test
+export OC_URL=https://ocis.ocis.test
 export IDP_LDAP_URI=ldap://127.0.0.1:9125
 export IDP_LDAP_BASE_DN="dc=ocis,dc=test"
 export IDP_LDAP_BIND_DN="cn=admin,dc=ocis,dc=test"

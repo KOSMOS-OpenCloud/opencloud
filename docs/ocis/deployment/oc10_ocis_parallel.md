@@ -75,13 +75,13 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   ### oCIS settings ###
   # oCIS version. Defaults to "latest"
-  OCIS_DOCKER_TAG=
+  OC_DOCKER_TAG=
   # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-  OCIS_JWT_SECRET=
+  OC_JWT_SECRET=
   # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
   STORAGE_TRANSFER_SECRET=
   # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-  OCIS_MACHINE_AUTH_API_KEY=
+  OC_MACHINE_AUTH_API_KEY=
 
   ### oCIS settings ###
   # oC10 version. Defaults to "latest"
@@ -118,7 +118,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oC10 and oCIS frontend in `CLOUD_DOMAIN=`, e.g. `CLOUD_DOMAIN=cloud.owncloud.test`.
 

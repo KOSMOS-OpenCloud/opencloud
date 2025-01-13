@@ -29,7 +29,7 @@ When using OpenID connect to authenticate requests, clients can look up the ownc
 *   Authentication is necessary to prevent leaking information about existing users.
 *   Basic auth is not supported.
 
-The default configuration will simply return the `OCIS_URL` and direct clients to that domain:
+The default configuration will simply return the `OC_URL` and direct clients to that domain:
 
 ```json
 {

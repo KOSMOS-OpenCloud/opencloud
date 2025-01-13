@@ -21,7 +21,7 @@ type Config struct {
 
 	Reva *shared.Reva `yaml:"reva"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OC_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`
 
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`
@@ -33,24 +33,24 @@ type Config struct {
 
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
-	URI       string `yaml:"uri" env:"OCIS_LDAP_URI;IDP_LDAP_URI" desc:"Url of the LDAP service to use as IDP." introductionVersion:"pre5.0"`
-	TLSCACert string `yaml:"cacert" env:"OCIS_LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp." introductionVersion:"pre5.0"`
+	URI       string `yaml:"uri" env:"OC_LDAP_URI;IDP_LDAP_URI" desc:"Url of the LDAP service to use as IDP." introductionVersion:"pre5.0"`
+	TLSCACert string `yaml:"cacert" env:"OC_LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OC_BASE_DATA_PATH/idp." introductionVersion:"pre5.0"`
 
-	BindDN       string `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
-	BindPassword string `yaml:"bind_password" env:"OCIS_LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
+	BindDN       string `yaml:"bind_dn" env:"OC_LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." introductionVersion:"pre5.0"`
+	BindPassword string `yaml:"bind_password" env:"OC_LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'." introductionVersion:"pre5.0"`
 
-	BaseDN string `yaml:"base_dn" env:"OCIS_LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
-	Scope  string `yaml:"scope" env:"OCIS_LDAP_USER_SCOPE;IDP_LDAP_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
+	BaseDN string `yaml:"base_dn" env:"OC_LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN" desc:"Search base DN for looking up LDAP users." introductionVersion:"pre5.0"`
+	Scope  string `yaml:"scope" env:"OC_LDAP_USER_SCOPE;IDP_LDAP_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." introductionVersion:"pre5.0"`
 
 	LoginAttribute    string `yaml:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE" desc:"LDAP User attribute to use for login like 'uid'." introductionVersion:"pre5.0"`
-	EmailAttribute    string `yaml:"email_attribute" env:"OCIS_LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE" desc:"LDAP User email attribute like 'mail'." introductionVersion:"pre5.0"`
-	NameAttribute     string `yaml:"name_attribute" env:"OCIS_LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE" desc:"LDAP User name attribute like 'displayName'." introductionVersion:"pre5.0"`
-	UUIDAttribute     string `yaml:"uuid_attribute" env:"OCIS_LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE" desc:"LDAP User UUID attribute like 'uid'." introductionVersion:"pre5.0"`
+	EmailAttribute    string `yaml:"email_attribute" env:"OC_LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE" desc:"LDAP User email attribute like 'mail'." introductionVersion:"pre5.0"`
+	NameAttribute     string `yaml:"name_attribute" env:"OC_LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE" desc:"LDAP User name attribute like 'displayName'." introductionVersion:"pre5.0"`
+	UUIDAttribute     string `yaml:"uuid_attribute" env:"OC_LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE" desc:"LDAP User UUID attribute like 'uid'." introductionVersion:"pre5.0"`
 	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE" desc:"LDAP User uuid attribute type like 'text'." introductionVersion:"pre5.0"`
 
-	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"OCIS_LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." introductionVersion:"pre5.0"`
-	Filter               string `yaml:"filter" env:"OCIS_LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'." introductionVersion:"pre5.0"`
-	ObjectClass          string `yaml:"objectclass" env:"OCIS_LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'." introductionVersion:"pre5.0"`
+	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"OC_LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." introductionVersion:"pre5.0"`
+	Filter               string `yaml:"filter" env:"OC_LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'." introductionVersion:"pre5.0"`
+	ObjectClass          string `yaml:"objectclass" env:"OC_LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'." introductionVersion:"pre5.0"`
 }
 
 // Asset defines the available asset configuration.
@@ -70,7 +70,7 @@ type Client struct {
 }
 
 type Settings struct {
-	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use." introductionVersion:"pre5.0"`
+	Iss string `yaml:"iss" env:"OC_URL;OC_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use." introductionVersion:"pre5.0"`
 
 	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'." introductionVersion:"pre5.0"`
 
@@ -82,7 +82,7 @@ type Settings struct {
 	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI" desc:"URL of the IDP endpoint." introductionVersion:"pre5.0"`
 	EndsessionEndpointURI    string `yaml:"-"` // unused, not supported by lico-idp
 
-	Insecure bool `yaml:"ldap_insecure" env:"OCIS_LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
+	Insecure bool `yaml:"ldap_insecure" env:"OC_LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." introductionVersion:"pre5.0"`
 
 	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 
@@ -90,7 +90,7 @@ type Settings struct {
 	AllowClientGuests              bool     `yaml:"allow_client_guests" env:"IDP_ALLOW_CLIENT_GUESTS" desc:"Allow guest clients to access oCIS." introductionVersion:"pre5.0"`
 	AllowDynamicClientRegistration bool     `yaml:"allow_dynamic_client_registration" env:"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION" desc:"Allow dynamic client registration." introductionVersion:"pre5.0"`
 
-	EncryptionSecretFile string `yaml:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET_FILE" desc:"Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp." introductionVersion:"pre5.0"`
+	EncryptionSecretFile string `yaml:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET_FILE" desc:"Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions. If not defined, the root directory derives from $OC_BASE_DATA_PATH/idp." introductionVersion:"pre5.0"`
 
 	Listen string
 
@@ -105,7 +105,7 @@ type Settings struct {
 
 	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID" desc:"Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key." introductionVersion:"pre5.0"`
 	SigningMethod          string   `yaml:"signing_method" env:"IDP_SIGNING_METHOD" desc:"Signing method of IDP requests like 'PS256'" introductionVersion:"pre5.0"`
-	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES" desc:"A list of private key files for signing IDP requests. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES" desc:"A list of private key files for signing IDP requests. If not defined, the root directory derives from $OC_BASE_DATA_PATH/idp. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 	ValidationKeysPath     string   `yaml:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH" desc:"Path to validation keys for IDP requests." introductionVersion:"pre5.0"`
 
 	CookieBackendURI string

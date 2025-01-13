@@ -26,10 +26,10 @@ type Config struct {
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;APP_PROVIDER_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;APP_PROVIDER_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;APP_PROVIDER_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;APP_PROVIDER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
+	Level  string `yaml:"level" env:"OC_LOG_LEVEL;APP_PROVIDER_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`
+	Pretty bool   `yaml:"pretty" env:"OC_LOG_PRETTY;APP_PROVIDER_LOG_PRETTY" desc:"Activates pretty log output." introductionVersion:"pre5.0"`
+	Color  bool   `yaml:"color" env:"OC_LOG_COLOR;APP_PROVIDER_LOG_COLOR" desc:"Activates colorized log output." introductionVersion:"pre5.0"`
+	File   string `yaml:"file" env:"OC_LOG_FILE;APP_PROVIDER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set." introductionVersion:"pre5.0"`
 }
 
 type Debug struct {
@@ -47,7 +47,7 @@ type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"APP_PROVIDER_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
-	Protocol  string                 `yaml:"protocol" env:"OCIS_GRPC_PROTOCOL;APP_PROVIDER_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service." introductionVersion:"pre5.0"`
+	Protocol  string                 `yaml:"protocol" env:"OC_GRPC_PROTOCOL;APP_PROVIDER_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service." introductionVersion:"pre5.0"`
 }
 
 type Drivers struct {
@@ -61,10 +61,10 @@ type WOPIDriver struct {
 	AppInternalURL            string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, like in your DMZ." introductionVersion:"pre5.0"`
 	AppName                   string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name." introductionVersion:"pre5.0"`
 	AppURL                    string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app." introductionVersion:"pre5.0"`
-	AppDisableChat            bool   `yaml:"app_disable_chat" env:"APP_PROVIDER_WOPI_DISABLE_CHAT;OCIS_WOPI_DISABLE_CHAT" desc:"Disable the chat functionality of the office app." introductionVersion:"pre5.0"`
+	AppDisableChat            bool   `yaml:"app_disable_chat" env:"APP_PROVIDER_WOPI_DISABLE_CHAT;OC_WOPI_DISABLE_CHAT" desc:"Disable the chat functionality of the office app." introductionVersion:"pre5.0"`
 	Insecure                  bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments." introductionVersion:"pre5.0"`
 	IopSecret                 string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"Shared secret of the CS3org WOPI server." introductionVersion:"pre5.0"`
 	WopiURL                   string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"External url of the CS3org WOPI server." introductionVersion:"pre5.0"`
-	WopiFolderURLBaseURL      string `yaml:"wopi_folder_url_base_url" env:"OCIS_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL" desc:"Base url to navigate back from the app to the containing folder in the file list." introductionVersion:"pre5.0"`
+	WopiFolderURLBaseURL      string `yaml:"wopi_folder_url_base_url" env:"OC_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL" desc:"Base url to navigate back from the app to the containing folder in the file list." introductionVersion:"pre5.0"`
 	WopiFolderURLPathTemplate string `yaml:"wopi_folder_url_path_template" env:"APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE" desc:"Path template to navigate back from the app to the containing folder in the file list. Supported template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}" introductionVersion:"pre5.0"`
 }

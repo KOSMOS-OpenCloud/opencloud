@@ -353,7 +353,7 @@ Feature: Create a link share for a resource
 
   @issue-7879
   Scenario Outline: try to create a link share of a project-space drive with a password that is listed in the Banned-Password-List using root endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -411,7 +411,7 @@ Feature: Create a link share for a resource
   Scenario Outline: create a link share of a project-space drive without password using root endpoint
     Given the following configs have been set:
       | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API

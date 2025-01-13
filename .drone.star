@@ -59,12 +59,12 @@ dirs = {
 }
 
 # OCIS URLs
-OCIS_SERVER_NAME = "ocis-server"
-OCIS_URL = "https://%s:9200" % OCIS_SERVER_NAME
-OCIS_DOMAIN = "%s:9200" % OCIS_SERVER_NAME
-FED_OCIS_SERVER_NAME = "federation-ocis-server"
-OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
-OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
+OC_SERVER_NAME = "ocis-server"
+OC_URL = "https://%s:9200" % OC_SERVER_NAME
+OC_DOMAIN = "%s:9200" % OC_SERVER_NAME
+FED_OC_SERVER_NAME = "federation-ocis-server"
+OC_FED_URL = "https://%s:10200" % FED_OC_SERVER_NAME
+OC_FED_DOMAIN = "%s:10200" % FED_OC_SERVER_NAME
 
 # configuration
 config = {
@@ -177,7 +177,7 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
+                "OC_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
@@ -195,8 +195,8 @@ config = {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "OC_ASYNC_UPLOADS": True,
+                "OC_ADD_RUN_SERVICES": "antivirus",
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
@@ -220,8 +220,8 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
-                "OCIS_ENABLE_OCM": True,
+                "OC_ADD_RUN_SERVICES": "ocm,notifications",
+                "OC_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
                 "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
@@ -250,7 +250,7 @@ config = {
             "skip": False,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
+                "OC_ADD_RUN_SERVICES": "auth-app",
                 "PROXY_ENABLE_APP_AUTH": True,
             },
         },
@@ -264,8 +264,8 @@ config = {
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "OC_ASYNC_UPLOADS": True,
+                "OC_ADD_RUN_SERVICES": "antivirus",
             },
         },
     },
@@ -1033,16 +1033,16 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
     environment = {
-        "TEST_SERVER_URL": OCIS_URL,
-        "TEST_SERVER_FED_URL": OCIS_FED_URL,
-        "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+        "TEST_SERVER_URL": OC_URL,
+        "TEST_SERVER_FED_URL": OC_FED_URL,
+        "OC_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
         "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-        "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
+        "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
         "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
     }
@@ -1079,7 +1079,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          "image": OC_CS3_API_VALIDATOR,
                          "environment": {},
                          "commands": [
-                             "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=%s:9142" % OCIS_SERVER_NAME,
+                             "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=%s:9142" % OC_SERVER_NAME,
                          ],
                      },
                  ],
@@ -1129,7 +1129,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         ]
     else:
         extra_server_environment = {
-            "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
+            "OC_EXCLUDE_RUN_SERVICES": "app-provider",
         }
 
         wopiServer = wopiCollaborationService("fakeoffice")
@@ -1187,10 +1187,10 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                          "image": OC_CI_ALPINE,
                          "environment": {},
                          "commands": [
-                             "curl -v -X PUT '%s/remote.php/webdav/test.wopitest' -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin -D headers.txt" % OCIS_URL,
+                             "curl -v -X PUT '%s/remote.php/webdav/test.wopitest' -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin -D headers.txt" % OC_URL,
                              "cat headers.txt",
                              "export FILE_ID=$(cat headers.txt | sed -n -e 's/^.*Oc-Fileid: //p')",
-                             "export URL=\"%s/app/open?app_name=FakeOffice&file_id=$FILE_ID\"" % OCIS_URL,
+                             "export URL=\"%s/app/open?app_name=FakeOffice&file_id=$FILE_ID\"" % OC_URL,
                              "export URL=$(echo $URL | tr -d '[:cntrl:]')",
                              "curl -v -X POST \"$URL\" -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin > open.json",
                              "cat open.json",
@@ -1232,8 +1232,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                          "name": "oC10ApiTests-%s" % part_number,
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
-                             "TEST_SERVER_URL": OCIS_URL,
-                             "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+                             "TEST_SERVER_URL": OC_URL,
+                             "OC_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": filterTags,
@@ -1242,7 +1242,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                              "ACCEPTANCE_TEST_TYPE": "core-api",
                              "EXPECTED_FAILURES_FILE": expected_failures_file,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                             "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
+                             "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
                              "WITH_REMOTE_PHP": with_remote_php,
                          },
                          "commands": [
@@ -1293,7 +1293,7 @@ def e2eTestPipeline(ctx):
     }
 
     extra_server_environment = {
-        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
     }
 
     e2e_trigger = {
@@ -1353,7 +1353,7 @@ def e2eTestPipeline(ctx):
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "environment": {
-                "BASE_URL_OCIS": OCIS_DOMAIN,
+                "BASE_URL_OCIS": OC_DOMAIN,
                 "HEADLESS": "true",
                 "RETRY": "1",
                 "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
@@ -1424,28 +1424,28 @@ def multiServiceE2ePipeline(ctx):
         return pipelines
 
     extra_server_environment = {
-        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
-        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
-        "OCIS_SERVICE_ACCOUNT_ID": "service-account-id",
-        "OCIS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
-        "OCIS_EXCLUDE_RUN_SERVICES": "storage-users",
-        "OCIS_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OC_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_SERVICE_ACCOUNT_ID": "service-account-id",
+        "OC_SERVICE_ACCOUNT_SECRET": "service-account-secret",
+        "OC_EXCLUDE_RUN_SERVICES": "storage-users",
+        "OC_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "SETTINGS_GRPC_ADDR": "0.0.0.0:9191",
         "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-id",
     }
 
     storage_users_environment = {
-        "OCIS_CORS_ALLOW_ORIGINS": "%s,https://%s:9201" % (OCIS_URL, OCIS_SERVER_NAME),
+        "OC_CORS_ALLOW_ORIGINS": "%s,https://%s:9201" % (OC_URL, OC_SERVER_NAME),
         "STORAGE_USERS_JWT_SECRET": "some-ocis-jwt-secret",
         "STORAGE_USERS_MOUNT_ID": "storage-users-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_ID": "service-account-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
-        "STORAGE_USERS_GATEWAY_GRPC_ADDR": "%s:9142" % OCIS_SERVER_NAME,
-        "STORAGE_USERS_EVENTS_ENDPOINT": "%s:9233" % OCIS_SERVER_NAME,
-        "STORAGE_USERS_DATA_GATEWAY_URL": "%s/data" % OCIS_URL,
-        "OCIS_CACHE_STORE": "nats-js-kv",
-        "OCIS_CACHE_STORE_NODES": "%s:9233" % OCIS_SERVER_NAME,
-        "MICRO_REGISTRY_ADDRESS": "%s:9233" % OCIS_SERVER_NAME,
+        "STORAGE_USERS_GATEWAY_GRPC_ADDR": "%s:9142" % OC_SERVER_NAME,
+        "STORAGE_USERS_EVENTS_ENDPOINT": "%s:9233" % OC_SERVER_NAME,
+        "STORAGE_USERS_DATA_GATEWAY_URL": "%s/data" % OC_URL,
+        "OC_CACHE_STORE": "nats-js-kv",
+        "OC_CACHE_STORE_NODES": "%s:9233" % OC_SERVER_NAME,
+        "MICRO_REGISTRY_ADDRESS": "%s:9233" % OC_SERVER_NAME,
     }
     storage_users1_environment = {
         "STORAGE_USERS_GRPC_ADDR": "storageusers1:9157",
@@ -1501,7 +1501,7 @@ def multiServiceE2ePipeline(ctx):
                 "name": "e2e-tests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
-                    "BASE_URL_OCIS": OCIS_DOMAIN,
+                    "BASE_URL_OCIS": OC_DOMAIN,
                     "HEADLESS": "true",
                     "RETRY": "1",
                 },
@@ -2320,24 +2320,24 @@ def notify(ctx):
 
 def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
-    container_name = OCIS_SERVER_NAME
+    container_name = OC_SERVER_NAME
     environment = {
-        "OCIS_URL": OCIS_URL,
-        "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
+        "OC_URL": OC_URL,
+        "OC_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-        "OCIS_LOG_LEVEL": "error",
+        "OC_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
-        "OCIS_ASYNC_UPLOADS": True,
-        "OCIS_EVENTS_ENABLE_TLS": False,
+        "OC_ASYNC_UPLOADS": True,
+        "OC_EVENTS_ENABLE_TLS": False,
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
-        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
-        "OCIS_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
+        "OC_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
         # debug addresses required for running services health tests
         "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
         "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
@@ -2384,7 +2384,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
 
     if deploy_type == "cs3api_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  #  make gateway available to cs3api-validator
-        environment["OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD"] = False
+        environment["OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD"] = False
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
@@ -2394,12 +2394,12 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
         environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
         environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopi-fakeoffice:9300"
-        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
+        environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OC_URL
 
     if deploy_type == "federation":
-        environment["OCIS_URL"] = OCIS_FED_URL
-        environment["PROXY_HTTP_ADDR"] = OCIS_FED_DOMAIN
-        container_name = FED_OCIS_SERVER_NAME
+        environment["OC_URL"] = OC_FED_URL
+        environment["PROXY_HTTP_ADDR"] = OC_FED_DOMAIN
+        container_name = FED_OC_SERVER_NAME
 
     if tika_enabled:
         environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
@@ -2421,7 +2421,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
+        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OC_URL"]),
     ]
 
     wait_for_ocis = {
@@ -2430,7 +2430,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "commands": [
             # wait for ocis-server to be ready (5 minutes)
             "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
-            "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
+            "%s/graph/v1.0/users/admin " % environment["OC_URL"] +
             "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
         ],
         "depends_on": depends_on,
@@ -2445,7 +2445,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
             "user": user,
             "commands": [
                 "%s init --insecure true" % ocis_bin,
-                "cat $OCIS_CONFIG_DIR/ocis.yaml",
+                "cat $OC_CONFIG_DIR/ocis.yaml",
                 "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
             ] + (wrapper_commands),
             "volumes": volumes,
@@ -2872,7 +2872,7 @@ def litmus(ctx, storage):
                          "environment": environment,
                          "commands": [
                              "source .env",
-                             'export LITMUS_URL="%s/remote.php/webdav"' % OCIS_URL,
+                             'export LITMUS_URL="%s/remote.php/webdav"' % OC_URL,
                              litmusCommand,
                          ],
                      },
@@ -2882,7 +2882,7 @@ def litmus(ctx, storage):
                          "environment": environment,
                          "commands": [
                              "source .env",
-                             'export LITMUS_URL="%s/remote.php/dav/files/admin"' % OCIS_URL,
+                             'export LITMUS_URL="%s/remote.php/dav/files/admin"' % OC_URL,
                              litmusCommand,
                          ],
                      },
@@ -2892,7 +2892,7 @@ def litmus(ctx, storage):
                          "environment": environment,
                          "commands": [
                              "source .env",
-                             'export LITMUS_URL="%s/remote.php/dav/files/admin/Shares/new_folder/"' % OCIS_URL,
+                             'export LITMUS_URL="%s/remote.php/dav/files/admin/Shares/new_folder/"' % OC_URL,
                              litmusCommand,
                          ],
                      },
@@ -2902,7 +2902,7 @@ def litmus(ctx, storage):
                          "environment": environment,
                          "commands": [
                              "source .env",
-                             'export LITMUS_URL="%s/remote.php/webdav/Shares/new_folder/"' % OCIS_URL,
+                             'export LITMUS_URL="%s/remote.php/webdav/Shares/new_folder/"' % OC_URL,
                              litmusCommand,
                          ],
                      },
@@ -2916,7 +2916,7 @@ def litmus(ctx, storage):
                      #      },
                      #      "commands": [
                      #          "source .env",
-                     #          "export LITMUS_URL='%s/remote.php/dav/public-files/'$PUBLIC_TOKEN" % OCIS_URL,
+                     #          "export LITMUS_URL='%s/remote.php/dav/public-files/'$PUBLIC_TOKEN" % OC_URL,
                      #          litmusCommand,
                      #      ],
                      #  },
@@ -2926,7 +2926,7 @@ def litmus(ctx, storage):
                          "environment": environment,
                          "commands": [
                              "source .env",
-                             "export LITMUS_URL='%s/remote.php/dav/spaces/'$SPACE_ID" % OCIS_URL,
+                             "export LITMUS_URL='%s/remote.php/dav/spaces/'$SPACE_ID" % OC_URL,
                              litmusCommand,
                          ],
                      },
@@ -2949,7 +2949,7 @@ def setupForLitmus():
         "name": "setup-for-litmus",
         "image": OC_UBUNTU,
         "environment": {
-            "TEST_SERVER_URL": OCIS_URL,
+            "TEST_SERVER_URL": OC_URL,
         },
         "commands": [
             "bash ./tests/config/drone/setup-for-litmus.sh",
@@ -3155,7 +3155,7 @@ def wopiCollaborationService(name):
 
     environment = {
         "MICRO_REGISTRY": "nats-js-kv",
-        "MICRO_REGISTRY_ADDRESS": "%s:9233" % OCIS_SERVER_NAME,
+        "MICRO_REGISTRY_ADDRESS": "%s:9233" % OC_SERVER_NAME,
         "COLLABORATION_LOG_LEVEL": "debug",
         "COLLABORATION_GRPC_ADDR": "0.0.0.0:9301",
         "COLLABORATION_HTTP_ADDR": "0.0.0.0:9300",
@@ -3163,7 +3163,7 @@ def wopiCollaborationService(name):
         "COLLABORATION_APP_PROOF_DISABLE": "true",
         "COLLABORATION_APP_INSECURE": "true",
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
-        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-ocis-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
     }
 
@@ -3216,13 +3216,13 @@ def logRequests():
 
 def k6LoadTests(ctx):
     ocis_remote_environment = {
-        "SSH_OCIS_REMOTE": {
+        "SSH_OC_REMOTE": {
             "from_secret": "k6_ssh_ocis_remote",
         },
-        "SSH_OCIS_USERNAME": {
+        "SSH_OC_USERNAME": {
             "from_secret": "k6_ssh_ocis_user",
         },
-        "SSH_OCIS_PASSWORD": {
+        "SSH_OC_PASSWORD": {
             "from_secret": "k6_ssh_ocis_pass",
         },
         "TEST_SERVER_URL": {
@@ -3342,7 +3342,7 @@ def collaboraService():
             "detach": True,
             "environment": {
                 "DONT_GEN_SSL_CERT": "set",
-                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=%s" % OCIS_URL,
+                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=%s" % OC_URL,
             },
             "commands": [
                 "coolconfig generate-proof-key",

@@ -21,7 +21,7 @@ L10N_MODULES := \
 	services/settings
 
 # if you add a module here please also add it to the .drone.star file
-OCIS_MODULES = \
+OC_MODULES = \
 	services/activitylog \
 	services/antivirus \
 	services/app-provider \
@@ -143,19 +143,19 @@ composer.lock: composer.json
 
 .PHONY: generate
 generate:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) -C $$mod generate || exit 1; \
     done
 
 .PHONY: vet
 vet:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod vet  || exit 1; \
     done
 
 .PHONY: clean
 clean:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
 
@@ -164,7 +164,7 @@ docs-generate:
 	# empty the folders first to only have files that are generated without remnants
 	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" ! -name "_*" \) -delete || exit 1
 
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
 
@@ -177,20 +177,20 @@ check-env-var-annotations:
 
 .PHONY: ci-go-generate
 ci-go-generate:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod ci-go-generate || exit 1; \
     done
 
 .PHONY: ci-node-generate
 ci-node-generate:
 	@if [ $(MAKE_DEPTH) -le 1 ]; then \
-	for mod in $(OCIS_MODULES); do \
+	for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod ci-node-generate || exit 1; \
     done; fi;
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod go-mod-tidy || exit 1; \
     done
 
@@ -201,7 +201,7 @@ test:
 .PHONY: go-coverage
 go-coverage:
 	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage || exit 1; \
     done
 
@@ -213,7 +213,7 @@ protobuf:
 
 .PHONY: golangci-lint
 golangci-lint:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod golangci-lint; \
     done
 
@@ -223,7 +223,7 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 
 .PHONY: golangci-lint-fix
 golangci-lint-fix:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod golangci-lint-fix; \
     done
 
@@ -251,7 +251,7 @@ ci-go-check-licenses: $(GO_LICENSES)
 
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         echo -e "% check-license $$mod:"; $(MAKE) --no-print-directory -C $$mod ci-node-check-licenses || exit 1; \
     done
 
@@ -263,7 +263,7 @@ ci-go-save-licenses: $(GO_LICENSES)
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in $(OC_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod ci-node-save-licenses || exit 1; \
     done
 

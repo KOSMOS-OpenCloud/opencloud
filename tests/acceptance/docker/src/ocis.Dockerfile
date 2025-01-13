@@ -1,8 +1,8 @@
 # custom Dockerfile required to run ociswrapper command
 # mounting 'ociswrapper' binary doesn't work with image 'amd64/alpine:3.17' (busybox based)
 
-ARG OCIS_IMAGE_TAG
-FROM owncloud/ocis:${OCIS_IMAGE_TAG} as ocis
+ARG OC_IMAGE_TAG
+FROM owncloud/ocis:${OC_IMAGE_TAG} as ocis
 
 FROM ubuntu:22.04
 COPY --from=ocis /usr/bin/ocis /usr/bin/ocis

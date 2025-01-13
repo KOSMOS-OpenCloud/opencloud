@@ -20,7 +20,7 @@ The type of registry to use can be configured with the `MICRO_REGISTRY` environm
 
 Set the environment variable to `nats-js-kv` or leave it empty to use a nats-js key value store as registry.
 
-- Note: If not running build-in nats, `MICRO_REGISTRY_ADDRESS` needs to be set to the address of the nats-js cluster, which is the same value as `OCIS_EVENTS_ENDPOINT`.
+- Note: If not running build-in nats, `MICRO_REGISTRY_ADDRESS` needs to be set to the address of the nats-js cluster, which is the same value as `OC_EVENTS_ENDPOINT`.
 - Optional: Use `MICRO_REGISTRY_AUTH_USERNAME` and `MICRO_REGISTRY_AUTH_PASSWORD` to authenticate with the nats cluster.
 
 ### `kubernetes`

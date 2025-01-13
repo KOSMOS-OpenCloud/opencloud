@@ -9,8 +9,8 @@ import (
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/backup"
-	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/backup"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

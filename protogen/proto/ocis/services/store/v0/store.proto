@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 package ocis.services.store.v0;
-	
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/service/store/v0";
+
+option go_package = "github.com/opencloud-eu/opencloud/protogen/gen/ocis/service/store/v0";
 
 import "ocis/messages/store/v0/store.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -13,12 +13,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     version: "1.0.0";
     contact: {
       name: "ownCloud GmbH";
-      url: "https://github.com/owncloud/ocis";
+      url: "https://github.com/opencloud-eu/opencloud";
       email: "support@owncloud.com";
     };
     license: {
       name: "Apache-2.0";
-      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+      url: "https://github.com/opencloud-eu/opencloud/blob/master/LICENSE";
     };
   };
   schemes: HTTP;

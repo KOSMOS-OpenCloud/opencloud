@@ -3,12 +3,12 @@ filename: "{{.InterfaceName | snakecase }}.go"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend:
+    github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend:
         config:
           dir: "pkg/user/backend/mocks"
         interfaces:
             UserBackend:
-    github.com/owncloud/ocis/v2/services/proxy/pkg/userroles:
+    github.com/opencloud-eu/opencloud/services/proxy/pkg/userroles:
         config:
           dir: "pkg/userroles/mocks"
         interfaces:

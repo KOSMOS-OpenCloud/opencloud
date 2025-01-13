@@ -8,8 +8,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 )
 

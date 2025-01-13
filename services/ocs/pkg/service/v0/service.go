@@ -7,9 +7,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/account"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	opkgm "github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/pkg/account"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	opkgm "github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
 	ocsm "github.com/opencloud-eu/opencloud/services/ocs/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/data"

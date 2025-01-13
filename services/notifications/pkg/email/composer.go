@@ -3,11 +3,12 @@ package email
 import (
 	"bytes"
 	"embed"
-	"github.com/pkg/errors"
 	"strings"
 	"text/template"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	"github.com/pkg/errors"
+
+	"github.com/opencloud-eu/opencloud/pkg/l10n"
 )
 
 var (

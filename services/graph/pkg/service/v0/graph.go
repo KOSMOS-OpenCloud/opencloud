@@ -19,7 +19,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/keycloak"
+	"github.com/opencloud-eu/opencloud/pkg/keycloak"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"

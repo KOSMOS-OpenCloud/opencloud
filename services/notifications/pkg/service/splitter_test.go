@@ -2,16 +2,17 @@ package service
 
 import (
 	"context"
+	"strings"
+	"testing"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
-	"strings"
-	"testing"
 )
 
 func Test_intervalSplitter_execute(t *testing.T) {

@@ -3,10 +3,11 @@ package command
 import (
 	"context"
 	"fmt"
+	"reflect"
+
 	"github.com/cs3org/reva/v2/pkg/store"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	microstore "go-micro.dev/v4/store"
-	"reflect"
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
@@ -15,10 +16,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/service/grpc"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"

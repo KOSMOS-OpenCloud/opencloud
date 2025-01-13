@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"
 )
 

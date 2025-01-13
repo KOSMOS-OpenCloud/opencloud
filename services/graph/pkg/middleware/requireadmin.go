@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/roles"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/roles"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	settings "github.com/opencloud-eu/opencloud/services/settings/pkg/service/v0"
 )

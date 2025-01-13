@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/oklog/run"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/logging"

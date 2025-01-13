@@ -9,7 +9,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/audit/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/audit/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/audit/pkg/logging"

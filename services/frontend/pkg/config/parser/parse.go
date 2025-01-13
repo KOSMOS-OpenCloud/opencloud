@@ -3,13 +3,13 @@ package parser
 import (
 	"errors"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config/defaults"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.

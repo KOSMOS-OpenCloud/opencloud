@@ -1,7 +1,7 @@
 // Package query provides functions to work with the different search query flavours.
 package query
 
-import "github.com/opencloud-eu/opencloud/ocis-pkg/ast"
+import "github.com/opencloud-eu/opencloud/pkg/ast"
 
 // Builder is the interface that wraps the basic Build method.
 type Builder interface {

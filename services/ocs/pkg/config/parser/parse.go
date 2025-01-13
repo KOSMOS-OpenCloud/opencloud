@@ -6,10 +6,10 @@ import (
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config/defaults"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.

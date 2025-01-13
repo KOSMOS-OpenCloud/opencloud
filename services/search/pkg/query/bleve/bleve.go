@@ -4,7 +4,7 @@ package bleve
 import (
 	bQuery "github.com/blevesearch/bleve/v2/search/query"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/kql"
+	"github.com/opencloud-eu/opencloud/pkg/kql"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/query"
 )
 

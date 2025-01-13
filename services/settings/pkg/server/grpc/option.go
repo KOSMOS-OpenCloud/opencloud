@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/metrics"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"

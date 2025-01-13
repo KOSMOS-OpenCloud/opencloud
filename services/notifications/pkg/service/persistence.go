@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"encoding/json"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/pkg/errors"

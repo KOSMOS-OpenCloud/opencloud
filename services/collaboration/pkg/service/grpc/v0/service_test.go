@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/collaboration/mocks"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	service "github.com/opencloud-eu/opencloud/services/collaboration/pkg/service/grpc/v0"

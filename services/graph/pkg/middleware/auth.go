@@ -10,9 +10,9 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/account"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	opkgm "github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/pkg/account"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	opkgm "github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 

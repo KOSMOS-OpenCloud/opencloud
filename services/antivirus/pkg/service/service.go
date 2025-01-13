@@ -19,7 +19,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/scanners"
 )

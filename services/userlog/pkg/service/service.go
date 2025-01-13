@@ -17,9 +17,9 @@ import (
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/roles"
+	"github.com/opencloud-eu/opencloud/pkg/l10n"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/roles"
 	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"

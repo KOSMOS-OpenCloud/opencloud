@@ -3,7 +3,7 @@ package revaconfig
 import (
 	"path/filepath"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 )
 

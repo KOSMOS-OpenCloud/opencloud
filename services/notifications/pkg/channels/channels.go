@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	mail "github.com/xhit/go-simple-mail/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"
 )
 

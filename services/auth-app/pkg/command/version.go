@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"

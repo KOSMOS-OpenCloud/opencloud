@@ -1,6 +1,6 @@
 package config
 
-import "github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+import "github.com/opencloud-eu/opencloud/pkg/shared"
 
 // CS3Api defines the available configuration in order to access to the CS3 gateway.
 type CS3Api struct {

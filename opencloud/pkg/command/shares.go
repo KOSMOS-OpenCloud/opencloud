@@ -11,11 +11,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
-	mregistry "github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
+	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/parser"
+	mregistry "github.com/opencloud-eu/opencloud/pkg/registry"
 	sharingparser "github.com/opencloud-eu/opencloud/services/sharing/pkg/config/parser"
 )
 

@@ -3,9 +3,9 @@ package parser
 import (
 	"errors"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config/defaults"
 )

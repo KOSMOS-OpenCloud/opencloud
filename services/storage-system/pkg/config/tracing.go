@@ -1,6 +1,6 @@
 package config
 
-import "github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+import "github.com/opencloud-eu/opencloud/pkg/tracing"
 
 // Tracing holds Tracing config
 type Tracing struct {

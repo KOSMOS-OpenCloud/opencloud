@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 )
 

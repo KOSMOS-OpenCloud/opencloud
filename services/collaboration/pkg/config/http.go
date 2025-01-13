@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 )
 
 // HTTP defines the available http configuration.

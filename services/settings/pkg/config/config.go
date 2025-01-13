@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 	"go-micro.dev/v4/client"
 )

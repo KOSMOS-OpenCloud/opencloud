@@ -3,7 +3,7 @@ package defaults
 import (
 	"path"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config"
 )
 

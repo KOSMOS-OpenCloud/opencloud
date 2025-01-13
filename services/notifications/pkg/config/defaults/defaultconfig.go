@@ -1,10 +1,11 @@
 package defaults
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
-	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"
 	"time"
+
+	"github.com/opencloud-eu/opencloud/pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/structs"
+	"github.com/opencloud-eu/opencloud/services/notifications/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration

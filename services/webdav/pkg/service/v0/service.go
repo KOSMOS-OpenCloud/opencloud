@@ -24,9 +24,9 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	thumbnailsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"

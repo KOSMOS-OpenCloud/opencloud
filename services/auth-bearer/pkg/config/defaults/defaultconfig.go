@@ -1,8 +1,8 @@
 package defaults
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
 )
 

@@ -10,8 +10,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/riandyrn/otelchi"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config"
 	tjwt "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/jwt"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail"

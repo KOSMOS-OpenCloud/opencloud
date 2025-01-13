@@ -23,8 +23,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/conversions"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/conversions"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	svc "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"

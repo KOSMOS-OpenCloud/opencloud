@@ -13,8 +13,8 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/io/fsx"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/path/filepathx"
+	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/pkg/x/path/filepathx"
 )
 
 // ServiceOptions defines the options to configure the Service.

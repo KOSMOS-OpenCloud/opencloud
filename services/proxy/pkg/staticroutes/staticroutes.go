@@ -5,8 +5,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend"
 	microstore "go-micro.dev/v4/store"

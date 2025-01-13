@@ -23,8 +23,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
@@ -32,6 +31,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/linktype"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )

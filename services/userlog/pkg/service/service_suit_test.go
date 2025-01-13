@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	mRegistry "go-micro.dev/v4/registry"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
 )
 
 func init() {

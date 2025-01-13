@@ -3,8 +3,8 @@ package assets
 import (
 	"net/http"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
 	"github.com/opencloud-eu/opencloud/services/idp"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/config"
 )

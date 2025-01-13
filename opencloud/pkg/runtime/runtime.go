@@ -3,8 +3,8 @@ package runtime
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/runtime/service"
+	"github.com/opencloud-eu/opencloud/pkg/config"
 )
 
 // Runtime represents an oCIS runtime environment.

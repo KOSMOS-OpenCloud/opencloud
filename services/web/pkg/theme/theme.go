@@ -3,7 +3,7 @@ package theme
 import (
 	"path"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/capabilities"
+	"github.com/opencloud-eu/opencloud/pkg/capabilities"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 

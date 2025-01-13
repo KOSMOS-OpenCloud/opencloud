@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"go.opentelemetry.io/otel/trace"
 )

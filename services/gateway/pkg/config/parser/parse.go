@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	defaults2 "github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	defaults2 "github.com/opencloud-eu/opencloud/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/gateway/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/gateway/pkg/config/defaults"
 )

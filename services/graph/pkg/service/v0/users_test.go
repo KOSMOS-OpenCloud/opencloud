@@ -26,7 +26,7 @@ import (
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0/mocks"

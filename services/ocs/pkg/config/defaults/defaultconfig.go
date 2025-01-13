@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
 )
 

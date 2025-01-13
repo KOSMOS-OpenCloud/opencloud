@@ -10,10 +10,10 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/capabilities"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/capabilities"
+	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
 )
 

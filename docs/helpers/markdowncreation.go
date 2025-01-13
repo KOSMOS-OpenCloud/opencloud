@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/markdown"
+	"github.com/opencloud-eu/opencloud/pkg/markdown"
 )
 
 var _configMarkdown = `{{< include file="services/_includes/%s-config-example.yaml"  language="yaml" >}}

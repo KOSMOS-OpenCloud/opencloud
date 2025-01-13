@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine"
 	"go.opentelemetry.io/otel/trace"
 )
 

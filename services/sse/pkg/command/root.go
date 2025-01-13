@@ -5,8 +5,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
-	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/clihelper"
+	"github.com/opencloud-eu/opencloud/services/sse/pkg/config"
 )
 
 // GetCommands provides all commands for this service

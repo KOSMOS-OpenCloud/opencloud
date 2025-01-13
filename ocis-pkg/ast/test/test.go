@@ -4,7 +4,7 @@ package test
 import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
 )
 
 // DiffAst returns a human-readable report of the differences between two values

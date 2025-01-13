@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/router"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/webdav"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"

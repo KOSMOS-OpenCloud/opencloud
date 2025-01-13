@@ -25,12 +25,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/linktype"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 // BaseGraphProvider is the interface that wraps shared methods between the different graph providers

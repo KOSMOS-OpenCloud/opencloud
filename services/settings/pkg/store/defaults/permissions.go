@@ -1,6 +1,6 @@
 package defaults
 
-import settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+import settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 
 var (
 	// All is a convenience variable to set constraint to all

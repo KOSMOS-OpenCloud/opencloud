@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 type contextKey int

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/kovidgoyal/imaging"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 )
 
 // Generator generates a web friendly file version.

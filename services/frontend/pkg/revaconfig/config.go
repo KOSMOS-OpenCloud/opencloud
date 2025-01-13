@@ -10,11 +10,11 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/capabilities"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/capabilities"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

@@ -3,8 +3,8 @@ package command
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
-	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/clihelper"
+	"github.com/opencloud-eu/opencloud/services/app-provider/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

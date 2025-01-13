@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/metrics"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 )

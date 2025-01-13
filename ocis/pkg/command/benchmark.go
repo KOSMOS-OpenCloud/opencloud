@@ -15,9 +15,9 @@ import (
 	"time"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/urfave/cli/v2"

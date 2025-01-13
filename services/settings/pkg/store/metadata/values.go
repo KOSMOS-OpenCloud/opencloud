@@ -8,8 +8,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
-	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.

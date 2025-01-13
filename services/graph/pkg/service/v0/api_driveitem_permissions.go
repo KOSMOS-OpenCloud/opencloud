@@ -27,16 +27,16 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	l10n_pkg "github.com/opencloud-eu/opencloud/services/graph/pkg/l10n"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/validate"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/conversions"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/validate"
 )
 
 const (

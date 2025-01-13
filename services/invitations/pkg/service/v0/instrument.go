@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/metrics"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

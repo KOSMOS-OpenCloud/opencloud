@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
-	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/storage-publiclink/pkg/command"
+	"github.com/opencloud-eu/opencloud/services/storage-publiclink/pkg/config/defaults"
 )
 
 func main() {

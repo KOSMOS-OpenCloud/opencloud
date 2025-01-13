@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 func TestRoleFilterIDs(t *testing.T) {

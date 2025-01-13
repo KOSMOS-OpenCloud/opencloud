@@ -10,7 +10,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"

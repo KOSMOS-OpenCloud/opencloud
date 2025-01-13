@@ -7,7 +7,7 @@ import (
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 )
 
 var _ = Describe("SpaceDebouncer", func() {

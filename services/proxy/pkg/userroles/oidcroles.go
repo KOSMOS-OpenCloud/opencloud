@@ -8,9 +8,9 @@ import (
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4/metadata"
 )
 

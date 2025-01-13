@@ -18,7 +18,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/task"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/task"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )

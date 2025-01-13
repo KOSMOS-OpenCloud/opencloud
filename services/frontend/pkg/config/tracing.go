@@ -1,6 +1,6 @@
 package config
 
-import "github.com/owncloud/ocis/v2/ocis-pkg/tracing"
+import "github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
 
 // Tracing sets the tracing parameters for the frontend service.
 type Tracing struct {

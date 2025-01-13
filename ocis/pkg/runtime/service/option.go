@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
 )
 
 // Log configures a structure logger.

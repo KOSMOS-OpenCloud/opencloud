@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/sharing/pkg/config"
 )
 
 // SharingConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

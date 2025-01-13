@@ -3,7 +3,7 @@ package decorators
 import (
 	"context"
 
-	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
+	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 // DecoratedService is an interface acting as facade, holding all the interfaces that this

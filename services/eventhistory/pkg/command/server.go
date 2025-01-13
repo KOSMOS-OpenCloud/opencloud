@@ -10,16 +10,16 @@ import (
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/logging"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	ogrpc "github.com/opencloud-eu/opencloud/ocis-pkg/service/grpc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/logging"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/metrics"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/server/grpc"
 )
 
 // Server is the entrypoint for the server command.

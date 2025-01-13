@@ -9,8 +9,8 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 // ListSharedWithMe lists the files shared with the current user.

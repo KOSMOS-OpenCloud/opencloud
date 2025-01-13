@@ -10,11 +10,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
-	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
-	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	olog "github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 )
 
 var (

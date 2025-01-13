@@ -3,7 +3,7 @@ package l10n
 import (
 	"embed"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
 )
 
 var (

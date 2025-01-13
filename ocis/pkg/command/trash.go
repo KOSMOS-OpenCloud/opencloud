@@ -2,12 +2,12 @@ package command
 
 import (
 	"fmt"
-	"github.com/owncloud/ocis/v2/ocis/pkg/trash"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/trash"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

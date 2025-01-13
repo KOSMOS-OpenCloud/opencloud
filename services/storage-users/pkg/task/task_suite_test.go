@@ -3,7 +3,7 @@ package task_test
 import (
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
 	mRegistry "go-micro.dev/v4/registry"
 
 	. "github.com/onsi/ginkgo/v2"

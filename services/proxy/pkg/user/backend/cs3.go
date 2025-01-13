@@ -15,10 +15,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	utils "github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"go-micro.dev/v4/selector"
 )
 

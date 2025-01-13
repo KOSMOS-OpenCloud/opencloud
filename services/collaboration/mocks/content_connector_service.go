@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	connector "github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+	connector "github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector"
 
 	http "net/http"
 

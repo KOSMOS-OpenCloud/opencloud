@@ -24,15 +24,15 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	thumbnailsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/thumbnails/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/constants"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/dav/requests"
 )
 
 var (

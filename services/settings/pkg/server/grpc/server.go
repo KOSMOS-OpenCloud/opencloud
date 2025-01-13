@@ -4,9 +4,9 @@ import (
 	"context"
 
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/service/grpc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4/api"
 	"go-micro.dev/v4/server"
 )

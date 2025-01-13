@@ -15,14 +15,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/riandyrn/otelchi"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/account"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
-	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
-	"github.com/owncloud/ocis/v2/services/web/pkg/config"
-	"github.com/owncloud/ocis/v2/services/web/pkg/theme"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/account"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/assets"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/theme"
 )
 
 // ErrConfigInvalid is returned when the config parse is invalid.

@@ -6,7 +6,7 @@ import (
 	"github.com/kovidgoyal/imaging"
 	tAssert "github.com/stretchr/testify/assert"
 
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail"
 )
 
 func TestProcessorFor(t *testing.T) {

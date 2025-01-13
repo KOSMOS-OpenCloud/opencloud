@@ -1,6 +1,6 @@
 package revaconfig
 
-import "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+import "github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
 
 // StorageProviderDrivers are the drivers for the storage provider
 func StorageProviderDrivers(cfg *config.Config) map[string]interface{} {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
-	svc "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
+	svc "github.com/opencloud-eu/opencloud/services/webfinger/pkg/service/v0"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
 )

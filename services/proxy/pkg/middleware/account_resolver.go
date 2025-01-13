@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/jellydator/ttlcache/v3"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/userroles"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
 )
 
 // AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based

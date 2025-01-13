@@ -11,7 +11,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 	"google.golang.org/grpc"
 )
 

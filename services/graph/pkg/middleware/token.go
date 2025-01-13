@@ -5,7 +5,7 @@ import (
 	"crypto/subtle"
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
 var (

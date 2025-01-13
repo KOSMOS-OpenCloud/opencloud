@@ -3,7 +3,7 @@ package defaults
 import (
 	"time"
 
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
 )
 
 // FullDefaultConfig returns a full sanitized config

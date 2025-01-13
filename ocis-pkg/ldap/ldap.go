@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 )
 
 const (

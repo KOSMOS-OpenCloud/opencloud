@@ -8,10 +8,10 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 var (

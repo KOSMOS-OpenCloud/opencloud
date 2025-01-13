@@ -16,14 +16,14 @@ import (
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/idm"
-	"github.com/owncloud/ocis/v2/services/idm/pkg/config"
-	"github.com/owncloud/ocis/v2/services/idm/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/idm/pkg/logging"
-	"github.com/owncloud/ocis/v2/services/idm/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	pkgcrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/idm"
+	"github.com/opencloud-eu/opencloud/services/idm/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/idm/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/idm/pkg/logging"
+	"github.com/opencloud-eu/opencloud/services/idm/pkg/server/debug"
 )
 
 // Server is the entrypoint for the server command.

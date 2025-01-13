@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	ic "github.com/egirna/icap-client"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners/mocks"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/scanners"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/scanners/mocks"
 )
 
 func TestICAP_Scan(t *testing.T) {

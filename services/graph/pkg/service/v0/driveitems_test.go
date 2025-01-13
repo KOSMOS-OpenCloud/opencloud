@@ -25,12 +25,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	"github.com/owncloud/ocis/v2/services/graph/mocks"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
-	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/services/graph/mocks"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
+	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 )
 
 type itemsList struct {

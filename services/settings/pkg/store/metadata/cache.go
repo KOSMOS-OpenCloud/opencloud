@@ -5,8 +5,8 @@ import (
 	"path"
 
 	"github.com/cs3org/reva/v2/pkg/store"
-	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	olog "github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/config"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 )

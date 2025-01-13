@@ -5,8 +5,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 )
 
 // Option defines a single option function.

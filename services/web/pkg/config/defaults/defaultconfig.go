@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration

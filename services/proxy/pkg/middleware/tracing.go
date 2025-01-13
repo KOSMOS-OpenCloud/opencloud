@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	pkgtrace "github.com/owncloud/ocis/v2/ocis-pkg/tracing"
+	pkgtrace "github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"

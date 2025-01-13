@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/data"
+	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/response"
 	"go-micro.dev/v4/store"
 )
 

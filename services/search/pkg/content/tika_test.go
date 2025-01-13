@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	conf "github.com/owncloud/ocis/v2/services/search/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	conf "github.com/opencloud-eu/opencloud/services/search/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
+	contentMocks "github.com/opencloud-eu/opencloud/services/search/pkg/content/mocks"
 )
 
 var _ = Describe("Tika", func() {

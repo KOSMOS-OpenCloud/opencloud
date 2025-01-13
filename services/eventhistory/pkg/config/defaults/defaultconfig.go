@@ -3,8 +3,8 @@ package defaults
 import (
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 )
 
 // FullDefaultConfig returns the full default config

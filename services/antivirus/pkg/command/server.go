@@ -7,13 +7,13 @@ import (
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/services/antivirus/pkg/service"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/service"
 )
 
 // Server is the entrypoint for the server command.

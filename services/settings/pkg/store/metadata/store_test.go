@@ -8,9 +8,9 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	. "github.com/onsi/gomega"
-	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
-	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/config/defaults"
+	rdefaults "github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 )
 
 const (

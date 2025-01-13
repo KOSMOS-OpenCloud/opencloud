@@ -28,10 +28,10 @@ import (
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
+	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchService "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
+	searchQuery "github.com/opencloud-eu/opencloud/services/search/pkg/query"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.

@@ -10,11 +10,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/riandyrn/otelchi"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
-	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config"
+	tjwt "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/jwt"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail"
 )
 
 type contextKey string

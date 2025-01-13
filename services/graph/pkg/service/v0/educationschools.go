@@ -11,8 +11,8 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

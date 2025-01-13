@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/open-policy-agent/opa/rego"
 
-	"github.com/owncloud/ocis/v2/services/policies/pkg/engine/opa"
+	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine/opa"
 )
 
 var _ = Describe("opa ocis mimetype functions", func() {

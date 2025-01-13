@@ -23,11 +23,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/graph/mocks"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/conversions"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/graph/mocks"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	svc "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 )
 
 var _ = Describe("DrivesDriveItemService", func() {

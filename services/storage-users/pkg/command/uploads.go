@@ -17,11 +17,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/event"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/revaconfig"
 )
 
 // Session contains the information of an upload session

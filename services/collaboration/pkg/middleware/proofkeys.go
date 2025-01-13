@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/proofkeys"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/proofkeys"
 	"github.com/rs/zerolog"
 )
 

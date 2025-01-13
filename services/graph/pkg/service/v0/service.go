@@ -22,15 +22,15 @@ import (
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
-	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	ocisldap "github.com/opencloud-eu/opencloud/ocis-pkg/ldap"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/roles"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/service/grpc"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/ldap"
+	graphm "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 )
 
 const (

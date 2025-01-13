@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )

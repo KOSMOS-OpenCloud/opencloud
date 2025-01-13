@@ -28,11 +28,11 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	settingsServiceExt "github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 )
 
 const (

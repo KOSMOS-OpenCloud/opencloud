@@ -7,13 +7,13 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/account"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
-	ocsm "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
-	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/account"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	opkgm "github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
+	ocsm "github.com/opencloud-eu/opencloud/services/ocs/pkg/middleware"
+	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/data"
+	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/response"
 	microstore "go-micro.dev/v4/store"
 )
 

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
 )
 
 // StorageUsersConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

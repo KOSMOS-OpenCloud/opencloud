@@ -6,11 +6,11 @@ import (
 
 	"github.com/ggwhite/go-masker"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
-	"github.com/owncloud/ocis/v2/ocis-pkg/version"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/checks"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/handlers"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/service/debug"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 )
 
 // Server initializes the debug service and server.

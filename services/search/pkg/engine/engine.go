@@ -7,9 +7,9 @@ import (
 	"github.com/blevesearch/bleve/v2/search"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
-	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchService "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 )
 
 var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)

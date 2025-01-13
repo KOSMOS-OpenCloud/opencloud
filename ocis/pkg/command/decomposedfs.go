@@ -22,8 +22,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )

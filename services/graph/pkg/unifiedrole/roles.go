@@ -10,7 +10,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/conversions"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
 )
 
 const (

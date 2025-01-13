@@ -1,8 +1,8 @@
 package roles
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4/store"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	. "github.com/stretchr/testify/assert"
 
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 )
 
 func TestCleanContent(t *testing.T) {

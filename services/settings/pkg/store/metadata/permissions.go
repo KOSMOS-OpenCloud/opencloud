@@ -1,9 +1,9 @@
 package store
 
 import (
-	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/util"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/util"
 )
 
 // ListPermissionsByResource collects all permissions from the provided roleIDs that match the requested resource

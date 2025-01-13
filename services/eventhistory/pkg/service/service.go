@@ -8,10 +8,10 @@ import (
 	"regexp"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
-	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
-	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
+	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 	"go-micro.dev/v4/store"
 )
 

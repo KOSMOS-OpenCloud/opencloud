@@ -29,15 +29,15 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/graph/mocks"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	"github.com/opencloud-eu/opencloud/services/graph/mocks"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 
 var _ = Describe("Graph", func() {

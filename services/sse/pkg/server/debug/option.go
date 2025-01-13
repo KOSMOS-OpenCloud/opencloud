@@ -3,8 +3,8 @@ package debug
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/sse/pkg/config"
 )
 
 // Option defines a single option function.

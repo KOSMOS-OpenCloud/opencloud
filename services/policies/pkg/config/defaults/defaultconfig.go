@@ -3,8 +3,8 @@ package defaults
 import (
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/services/policies/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/services/policies/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration which is needed for doc generation.

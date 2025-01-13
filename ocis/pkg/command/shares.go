@@ -11,12 +11,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
-	mregistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis/pkg/register"
-	sharingparser "github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
+	mregistry "github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/ocis/pkg/register"
+	sharingparser "github.com/opencloud-eu/opencloud/services/sharing/pkg/config/parser"
 )
 
 // SharesCommand is the entrypoint for the groups command.

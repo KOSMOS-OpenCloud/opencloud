@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/keycloak"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
 )
 
 const (

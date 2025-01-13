@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/davidbyttow/govips/v2/vips"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 	"golang.org/x/image/bmp"
 )
 

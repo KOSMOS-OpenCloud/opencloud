@@ -22,12 +22,12 @@ import (
 	"google.golang.org/grpc"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
-	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 )
 
 type schoolList struct {

@@ -8,15 +8,15 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/preprocessor"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail/storage"
 )
 
 type NoOpManager struct {

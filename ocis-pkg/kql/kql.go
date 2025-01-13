@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
 )
 
 // The operator node value definition

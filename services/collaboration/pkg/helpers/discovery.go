@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/pkg/errors"
 )
 

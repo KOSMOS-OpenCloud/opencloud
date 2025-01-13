@@ -3,8 +3,8 @@ package engine_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
-	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
+	pMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/policies/v0"
+	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine"
 )
 
 var _ = Describe("Engine", func() {

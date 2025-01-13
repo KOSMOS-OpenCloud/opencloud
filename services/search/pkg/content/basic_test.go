@@ -7,8 +7,8 @@ import (
 	cs3Types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 )
 
 var _ = Describe("Basic", func() {

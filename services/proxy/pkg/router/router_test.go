@@ -9,10 +9,10 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config/defaults"
 	"go-micro.dev/v4/selector"
 )
 

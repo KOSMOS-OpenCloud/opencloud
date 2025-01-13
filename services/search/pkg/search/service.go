@@ -25,12 +25,12 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/config"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
 )
 
 const (

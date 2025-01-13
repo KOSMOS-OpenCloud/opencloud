@@ -3,10 +3,10 @@ package http
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/metrics"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/metrics"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
 )

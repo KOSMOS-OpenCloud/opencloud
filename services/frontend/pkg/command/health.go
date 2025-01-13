@@ -7,10 +7,10 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
-	"github.com/owncloud/ocis/v2/services/frontend/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/frontend/pkg/logging"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/frontend/pkg/logging"
 )
 
 // Health is the entrypoint for the health command.

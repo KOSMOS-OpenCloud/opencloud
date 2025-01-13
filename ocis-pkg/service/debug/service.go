@@ -11,11 +11,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/zpages"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/cors"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/handlers"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	graphMiddleware "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 )
 
 var handleProbe = func(mux *http.ServeMux, pattern string, h http.Handler, name string, logger log.Logger) {

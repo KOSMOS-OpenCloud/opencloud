@@ -2,7 +2,7 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/app-provider/pkg/config"
 )
 
 // AppProviderConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/davidbyttow/govips/v2/vips"
-	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 )
 
 // PngEncoder encodes to png

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
 	"github.com/urfave/cli/v2"
 	"go.opentelemetry.io/otel/trace"
 )

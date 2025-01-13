@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/errors"
-	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/errors"
+	"github.com/opencloud-eu/opencloud/services/webdav/pkg/prop"
 )
 
 type countingReader struct {

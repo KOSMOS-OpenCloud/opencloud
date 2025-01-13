@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
 	"golang.org/x/sync/errgroup"
 )
 

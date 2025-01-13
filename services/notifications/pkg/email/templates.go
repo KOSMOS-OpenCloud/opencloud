@@ -1,6 +1,6 @@
 package email
 
-import "github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+import "github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
 
 const (
 	_textTemplate = "templates/text/email.text.tmpl"

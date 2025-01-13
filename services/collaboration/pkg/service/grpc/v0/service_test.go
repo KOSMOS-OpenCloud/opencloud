@@ -20,10 +20,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/collaboration/mocks"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
-	service "github.com/owncloud/ocis/v2/services/collaboration/pkg/service/grpc/v0"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/services/collaboration/mocks"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
+	service "github.com/opencloud-eu/opencloud/services/collaboration/pkg/service/grpc/v0"
 )
 
 // Based on https://github.com/cs3org/reva/blob/b99ad4865401144a981d4cfd1ae28b5a018ea51d/pkg/token/manager/jwt/jwt.go#L82

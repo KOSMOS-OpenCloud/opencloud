@@ -3,7 +3,7 @@ package query
 import (
 	"fmt"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
 )
 
 // StartsWithBinaryOperatorError records an error and the operation that caused it.

@@ -3,7 +3,7 @@ filename: "{{.InterfaceName | snakecase }}.go"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/services/settings/pkg/settings:
+    github.com/opencloud-eu/opencloud/services/settings/pkg/settings:
         config:
           dir: "pkg/settings/mocks"
         interfaces:

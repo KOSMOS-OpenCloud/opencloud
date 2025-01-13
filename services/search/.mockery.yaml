@@ -4,13 +4,13 @@ dir: "pkg/{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/services/search/pkg/engine:
+    github.com/opencloud-eu/opencloud/services/search/pkg/engine:
         interfaces:
             Engine:
-    github.com/owncloud/ocis/v2/services/search/pkg/content:
+    github.com/opencloud-eu/opencloud/services/search/pkg/content:
         interfaces:
             Extractor:
             Retriever:
-    github.com/owncloud/ocis/v2/services/search/pkg/search:
+    github.com/opencloud-eu/opencloud/services/search/pkg/search:
         interfaces:
             Searcher:

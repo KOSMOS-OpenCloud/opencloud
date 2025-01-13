@@ -4,6 +4,6 @@ dir: "pkg/{{.PackageName}}/mocks"
 mockname: "{{.InterfaceName}}"
 outpkg: "mocks"
 packages:
-    github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners:
+    github.com/opencloud-eu/opencloud/services/antivirus/pkg/scanners:
         interfaces:
             Scanner:

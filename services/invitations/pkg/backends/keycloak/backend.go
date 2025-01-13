@@ -5,10 +5,10 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/keycloak"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/keycloak"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 const (

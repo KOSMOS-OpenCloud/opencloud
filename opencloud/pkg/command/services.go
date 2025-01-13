@@ -3,11 +3,11 @@ package command
 import (
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/command/helper"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
+	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/parser"
 	activitylog "github.com/opencloud-eu/opencloud/services/activitylog/pkg/command"
 	antivirus "github.com/opencloud-eu/opencloud/services/antivirus/pkg/command"
 	appprovider "github.com/opencloud-eu/opencloud/services/app-provider/pkg/command"

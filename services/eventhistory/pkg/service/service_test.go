@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/service"

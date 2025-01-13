@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/checks"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/handlers"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/service/debug"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/checks"
+	"github.com/opencloud-eu/opencloud/pkg/handlers"
+	"github.com/opencloud-eu/opencloud/pkg/service/debug"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 )
 
 // Server initializes the debug service and server.

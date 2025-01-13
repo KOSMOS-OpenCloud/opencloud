@@ -20,7 +20,7 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
 	terrors "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/preprocessor"

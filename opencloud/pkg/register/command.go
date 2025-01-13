@@ -1,7 +1,7 @@
 package register
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

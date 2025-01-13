@@ -3,7 +3,7 @@ package opa
 import (
 	"github.com/open-policy-agent/opa/topdown/print"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 )
 
 type logPrinter struct {

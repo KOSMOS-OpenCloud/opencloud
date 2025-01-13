@@ -8,7 +8,7 @@ import (
 	"regexp"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"

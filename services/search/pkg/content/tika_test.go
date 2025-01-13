@@ -14,11 +14,11 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	conf "github.com/opencloud-eu/opencloud/services/search/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	contentMocks "github.com/opencloud-eu/opencloud/services/search/pkg/content/mocks"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 var _ = Describe("Tika", func() {

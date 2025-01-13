@@ -1,6 +1,6 @@
 package defaults
 
-import "github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+import "github.com/opencloud-eu/opencloud/pkg/l10n"
 
 // Translatable configuration options
 var (

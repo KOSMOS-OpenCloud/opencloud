@@ -14,11 +14,11 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	utils "github.com/cs3org/reva/v2/pkg/utils"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"go-micro.dev/v4/selector"
 )
 

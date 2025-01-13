@@ -16,7 +16,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	"github.com/opencloud-eu/opencloud/pkg/l10n"
 )
 
 // Translations

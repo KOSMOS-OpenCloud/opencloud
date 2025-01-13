@@ -28,7 +28,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/l10n"
+	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"

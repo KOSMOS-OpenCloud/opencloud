@@ -8,10 +8,10 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 type educationConfig struct {

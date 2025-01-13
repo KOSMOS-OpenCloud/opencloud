@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/theme"

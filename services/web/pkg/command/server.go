@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/logging"

@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/proxy/policy"
 	"go-micro.dev/v4/selector"

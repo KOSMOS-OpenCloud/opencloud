@@ -5,7 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/clihelper"
+	"github.com/opencloud-eu/opencloud/pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/services/sse/pkg/config"
 )
 

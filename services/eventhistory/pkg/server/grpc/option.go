@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/metrics"
 	"go-micro.dev/v4/store"

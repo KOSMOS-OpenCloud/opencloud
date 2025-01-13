@@ -18,7 +18,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"

@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/middleware"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/middleware"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	micrometadata "go-micro.dev/v4/metadata"
 )

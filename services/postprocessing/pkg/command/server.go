@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/logging"

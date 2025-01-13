@@ -15,14 +15,14 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/linktype"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 )
 

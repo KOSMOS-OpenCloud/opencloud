@@ -7,7 +7,7 @@ import (
 
 	"github.com/onsi/gomega"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/apps"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 )

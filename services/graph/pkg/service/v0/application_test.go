@@ -13,8 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
@@ -22,6 +21,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )

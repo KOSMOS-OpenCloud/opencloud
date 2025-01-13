@@ -7,7 +7,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/logging"

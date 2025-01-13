@@ -3,7 +3,7 @@ package defaults
 import (
 	"time"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/structs"
+	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 )
 

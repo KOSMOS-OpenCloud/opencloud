@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/thejerf/suture/v4"
 )
 

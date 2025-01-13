@@ -3,7 +3,7 @@ package svc
 import (
 	"net/http"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
 	"go-micro.dev/v4/store"
 )

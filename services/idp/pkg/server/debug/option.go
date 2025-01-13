@@ -3,7 +3,7 @@ package debug
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/config"
 )
 

@@ -13,8 +13,8 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 )
 
 // AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based

@@ -7,8 +7,8 @@ import (
 	"context"
 	"testing"
 
-	kcpkg "github.com/opencloud-eu/opencloud/ocis-pkg/keycloak"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	kcpkg "github.com/opencloud-eu/opencloud/pkg/keycloak"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/backends/keycloak"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/backends/keycloak/mocks"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"

@@ -15,7 +15,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
 )

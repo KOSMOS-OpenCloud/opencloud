@@ -5,7 +5,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 	"github.com/urfave/cli/v2"

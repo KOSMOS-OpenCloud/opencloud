@@ -1,6 +1,6 @@
 package config
 
-import "github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+import "github.com/opencloud-eu/opencloud/pkg/shared"
 
 // CORS defines the available cors configuration.
 type CORS struct {

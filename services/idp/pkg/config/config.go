@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 )
 
 // Config combines all available configuration parts.

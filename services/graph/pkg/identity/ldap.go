@@ -16,7 +16,7 @@ import (
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )

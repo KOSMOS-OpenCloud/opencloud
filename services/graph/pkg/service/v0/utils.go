@@ -18,7 +18,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"

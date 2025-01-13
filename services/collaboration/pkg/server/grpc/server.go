@@ -2,7 +2,7 @@ package grpc
 
 import (
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	svc "github.com/opencloud-eu/opencloud/services/collaboration/pkg/service/grpc/v0"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"

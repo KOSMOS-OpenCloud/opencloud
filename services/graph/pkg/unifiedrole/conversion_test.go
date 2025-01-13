@@ -9,7 +9,7 @@ import (
 	"github.com/onsi/gomega/types"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/conversions"
+	"github.com/opencloud-eu/opencloud/pkg/conversions"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
 

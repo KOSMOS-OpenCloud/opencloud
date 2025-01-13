@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/audit/pkg/types"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"

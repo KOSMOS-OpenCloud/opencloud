@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/service/v0"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"

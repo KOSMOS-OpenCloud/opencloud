@@ -22,8 +22,8 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
 	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"

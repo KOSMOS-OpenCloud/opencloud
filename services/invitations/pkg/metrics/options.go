@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 )
 
 // Option defines a single option function.

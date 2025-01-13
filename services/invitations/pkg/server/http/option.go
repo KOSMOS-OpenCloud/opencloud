@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/config"
 	svc "github.com/opencloud-eu/opencloud/services/invitations/pkg/service/v0"
 	"github.com/urfave/cli/v2"

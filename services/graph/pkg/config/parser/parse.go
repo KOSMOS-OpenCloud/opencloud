@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	ociscfg "github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	defaults2 "github.com/opencloud-eu/opencloud/ocis-pkg/config/defaults"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/envdecode"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	defaults2 "github.com/opencloud-eu/opencloud/pkg/config/defaults"
+	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"

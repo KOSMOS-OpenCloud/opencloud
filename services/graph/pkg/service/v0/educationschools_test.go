@@ -21,13 +21,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 type schoolList struct {

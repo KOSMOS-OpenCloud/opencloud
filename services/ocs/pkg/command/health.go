@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/logging"

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/blevesearch/bleve/v2/search/query"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/ast"
+	"github.com/opencloud-eu/opencloud/pkg/ast"
 	tAssert "github.com/stretchr/testify/assert"
 )
 

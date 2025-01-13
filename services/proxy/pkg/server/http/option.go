@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/metrics"
 	"github.com/urfave/cli/v2"

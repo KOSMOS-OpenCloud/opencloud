@@ -25,7 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"

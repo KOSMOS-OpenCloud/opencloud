@@ -8,7 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 	searchMocks "github.com/opencloud-eu/opencloud/services/search/pkg/search/mocks"

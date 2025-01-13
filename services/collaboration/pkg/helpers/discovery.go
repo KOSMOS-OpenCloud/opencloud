@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/pkg/errors"
 )

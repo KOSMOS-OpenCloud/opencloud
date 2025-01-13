@@ -9,10 +9,10 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

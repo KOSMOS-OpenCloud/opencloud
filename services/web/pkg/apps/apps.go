@@ -10,8 +10,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/maps"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/x/path/filepathx"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/x/path/filepathx"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
 )
 

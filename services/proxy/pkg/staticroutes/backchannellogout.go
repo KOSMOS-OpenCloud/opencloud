@@ -8,7 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"

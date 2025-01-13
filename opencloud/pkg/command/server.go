@@ -1,11 +1,11 @@
 package command
 
 import (
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/runtime"
+	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/parser"
 	"github.com/urfave/cli/v2"
 )
 

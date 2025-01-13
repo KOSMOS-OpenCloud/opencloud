@@ -20,8 +20,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -33,7 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"

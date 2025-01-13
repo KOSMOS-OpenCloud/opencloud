@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/oidc"
+	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"
 )

@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"go-micro.dev/v4/client"
 )
 

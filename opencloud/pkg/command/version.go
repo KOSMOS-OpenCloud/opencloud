@@ -8,10 +8,10 @@ import (
 	"github.com/urfave/cli/v2"
 	mreg "go-micro.dev/v4/registry"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
+	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 )
 
 const (

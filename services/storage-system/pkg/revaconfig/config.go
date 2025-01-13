@@ -2,7 +2,7 @@ package revaconfig
 
 import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	pkgconfig "github.com/opencloud-eu/opencloud/ocis-pkg/config"
+	pkgconfig "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/config"
 )
 

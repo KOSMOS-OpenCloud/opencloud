@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	pkgcrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/service/http"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/shared"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	pkgcrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
+	"github.com/opencloud-eu/opencloud/pkg/service/http"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 	"go-micro.dev/v4"
 )
 

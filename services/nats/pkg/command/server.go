@@ -10,8 +10,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	pkgcrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	pkgcrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/logging"

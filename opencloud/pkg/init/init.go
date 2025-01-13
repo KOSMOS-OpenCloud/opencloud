@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/gofrs/uuid"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/generators"
+	"github.com/opencloud-eu/opencloud/pkg/generators"
 	"gopkg.in/yaml.v2"
 )
 

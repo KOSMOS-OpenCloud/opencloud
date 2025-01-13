@@ -3,7 +3,7 @@ package search_test
 import (
 	"testing"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
 	mRegistry "go-micro.dev/v4/registry"
 
 	. "github.com/onsi/ginkgo/v2"

@@ -5,7 +5,7 @@ import (
 	"image"
 	"mime"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail/storage"
 )

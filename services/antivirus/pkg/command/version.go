@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 
 	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config"
 	"github.com/urfave/cli/v2"

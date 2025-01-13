@@ -10,9 +10,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/mime"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/registry"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/version"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 )
 

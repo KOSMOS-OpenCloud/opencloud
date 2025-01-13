@@ -4,7 +4,7 @@ import (
 	"math"
 	"net/url"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/ocm/pkg/config"
 )
 

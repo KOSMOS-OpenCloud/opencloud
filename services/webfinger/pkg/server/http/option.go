@@ -2,9 +2,10 @@ package http
 
 import (
 	"context"
+
 	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
 	svc "github.com/opencloud-eu/opencloud/services/webfinger/pkg/service/v0"
 	"github.com/urfave/cli/v2"

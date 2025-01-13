@@ -14,7 +14,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"

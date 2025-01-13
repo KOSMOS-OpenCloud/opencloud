@@ -16,9 +16,9 @@ import (
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/opencloud-eu/opencloud/ocis-pkg/config/configlog"
-	pkgcrypto "github.com/opencloud-eu/opencloud/ocis-pkg/crypto"
-	"github.com/opencloud-eu/opencloud/ocis-pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	pkgcrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
+	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/idm"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config/parser"

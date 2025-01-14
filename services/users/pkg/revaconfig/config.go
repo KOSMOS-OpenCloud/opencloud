@@ -47,7 +47,7 @@ func UsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			"interceptors": map[string]interface{}{
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "users",
 				},
 			},

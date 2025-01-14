@@ -84,7 +84,7 @@ func Server(cfg *config.Config) *cli.Command {
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server
 					ocdav.MetricsEnabled(true),
-					ocdav.MetricsNamespace("ocis"),
+					ocdav.MetricsNamespace("opencloud"),
 					ocdav.Tracing("Adding these strings is a workaround for ->", "https://github.com/cs3org/reva/issues/4131"),
 					ocdav.WithTraceProvider(traceProvider),
 					ocdav.RegisterTTL(registry.GetRegisterTTL()),

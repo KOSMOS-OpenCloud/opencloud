@@ -140,7 +140,7 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"password":         cfg.Events.AuthPassword,
 				},
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "sharing",
 				},
 			},

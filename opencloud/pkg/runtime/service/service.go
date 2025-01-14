@@ -368,7 +368,7 @@ func Start(ctx context.Context, o ...Option) error {
 	totalBackoff := 0
 
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
-	s.Supervisor = suture.New("ocis", suture.Spec{
+	s.Supervisor = suture.New("opencloud", suture.Spec{
 		EventHook: func(e suture.Event) {
 			if e.Type() == suture.EventTypeBackoff {
 				totalBackoff++

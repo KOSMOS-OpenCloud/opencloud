@@ -62,7 +62,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"password":         cfg.Events.AuthPassword,
 				},
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "storage_users",
 				},
 			},

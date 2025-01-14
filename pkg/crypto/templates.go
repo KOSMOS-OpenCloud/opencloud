@@ -14,7 +14,7 @@ var acmeTemplate = x509.Certificate{
 	SerialNumber: serialNumber,
 	Subject: pkix.Name{
 		Organization: []string{"Acme Corp"},
-		CommonName:   "OCIS",
+		CommonName:   "OpenCloud",
 	},
 	NotBefore: time.Now(),
 	NotAfter:  time.Now().Add(24 * time.Hour * 365),

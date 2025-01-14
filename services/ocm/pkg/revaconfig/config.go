@@ -49,7 +49,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
 				},
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "ocm",
 				},
 				"requestid": map[string]interface{}{},
@@ -61,7 +61,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"ocmprovider": map[string]interface{}{
 						"ocm_prefix":    cfg.OCMD.Prefix,
 						"endpoint":      cfg.Commons.OcisURL,
-						"provider":      "oCIS",
+						"provider":      "OpenCloud",
 						"webdav_root":   "/dav/ocm",
 						"webapp_root":   cfg.ScienceMesh.Prefix,
 						"enable_webapp": false,

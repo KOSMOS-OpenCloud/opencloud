@@ -24,7 +24,7 @@ func StoragePublicLinkConfigFromStruct(cfg *config.Config) map[string]interface{
 			"interceptors": map[string]interface{}{
 				"log": map[string]interface{}{},
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "storage_publiclink",
 				},
 			},

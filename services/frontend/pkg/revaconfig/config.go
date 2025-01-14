@@ -114,7 +114,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
 				},
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "frontend",
 				},
 				"requestid": map[string]interface{}{},

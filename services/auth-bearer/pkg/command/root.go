@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -42,7 +42,7 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new auth-bearer.SutureService
-func NewSutureService(cfg *ociscfg.Config) suture.Service {
+func NewSutureService(cfg *occfg.Config) suture.Service {
 	cfg.AuthBearer.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.AuthBearer,

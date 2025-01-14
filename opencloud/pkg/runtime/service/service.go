@@ -22,7 +22,7 @@ import (
 	notifications "github.com/opencloud-eu/opencloud/services/notifications/pkg/command"
 	"github.com/thejerf/suture/v4"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	ogrpc "github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
@@ -71,10 +71,10 @@ var (
 	runset map[string]struct{}
 
 	// wait funcs run after the service group has been started.
-	_waitFuncs = []func(*ociscfg.Config) error{pingNats, pingGateway, nil, wait(time.Second), nil}
+	_waitFuncs = []func(*occfg.Config) error{pingNats, pingGateway, nil, wait(time.Second), nil}
 )
 
-type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
+type serviceFuncMap map[string]func(*occfg.Config) suture.Service
 
 // Service represents a RPC service.
 type Service struct {
@@ -86,7 +86,7 @@ type Service struct {
 	serviceToken map[string][]suture.ServiceToken
 	context      context.Context
 	cancel       context.CancelFunc
-	cfg          *ociscfg.Config
+	cfg          *occfg.Config
 }
 
 // NewService returns a configured service with a controller and a default logger.
@@ -121,7 +121,7 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	}
 
 	// populate services
-	reg := func(priority int, name string, exec func(context.Context, *ociscfg.Config) error) {
+	reg := func(priority int, name string, exec func(context.Context, *occfg.Config) error) {
 		if s.Services[priority] == nil {
 			s.Services[priority] = make(serviceFuncMap)
 		}
@@ -129,14 +129,14 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	}
 
 	// nats is in priority group 0. It needs to start before all other services
-	reg(0, opts.Config.Nats.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(0, opts.Config.Nats.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Nats.Context = ctx
 		cfg.Nats.Commons = cfg.Commons
 		return nats.Execute(cfg.Nats)
 	})
 
 	// gateway is in priority group 1. It needs to start before the reva services
-	reg(1, opts.Config.Gateway.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(1, opts.Config.Gateway.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Gateway.Context = ctx
 		cfg.Gateway.Commons = cfg.Commons
 		return gateway.Execute(cfg.Gateway)
@@ -145,157 +145,157 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	// priority group 2 is empty for now
 
 	// most services are in priority group 3
-	reg(3, opts.Config.Activitylog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Activitylog.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Activitylog.Context = ctx
 		cfg.Activitylog.Commons = cfg.Commons
 		return activitylog.Execute(cfg.Activitylog)
 	})
-	reg(3, opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.AppProvider.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AppProvider.Context = ctx
 		cfg.AppProvider.Commons = cfg.Commons
 		return appProvider.Execute(cfg.AppProvider)
 	})
-	reg(3, opts.Config.AppRegistry.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.AppRegistry.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AppRegistry.Context = ctx
 		cfg.AppRegistry.Commons = cfg.Commons
 		return appRegistry.Execute(cfg.AppRegistry)
 	})
-	reg(3, opts.Config.AuthBasic.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.AuthBasic.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AuthBasic.Context = ctx
 		cfg.AuthBasic.Commons = cfg.Commons
 		return authbasic.Execute(cfg.AuthBasic)
 	})
-	reg(3, opts.Config.AuthMachine.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.AuthMachine.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AuthMachine.Context = ctx
 		cfg.AuthMachine.Commons = cfg.Commons
 		return authmachine.Execute(cfg.AuthMachine)
 	})
-	reg(3, opts.Config.AuthService.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.AuthService.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AuthService.Context = ctx
 		cfg.AuthService.Commons = cfg.Commons
 		return authservice.Execute(cfg.AuthService)
 	})
-	reg(3, opts.Config.Clientlog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Clientlog.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Clientlog.Context = ctx
 		cfg.Clientlog.Commons = cfg.Commons
 		return clientlog.Execute(cfg.Clientlog)
 	})
-	reg(3, opts.Config.EventHistory.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.EventHistory.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.EventHistory.Context = ctx
 		cfg.EventHistory.Commons = cfg.Commons
 		return eventhistory.Execute(cfg.EventHistory)
 	})
-	reg(3, opts.Config.Graph.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Graph.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Graph.Context = ctx
 		cfg.Graph.Commons = cfg.Commons
 		return graph.Execute(cfg.Graph)
 	})
-	reg(3, opts.Config.Groups.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Groups.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Groups.Context = ctx
 		cfg.Groups.Commons = cfg.Commons
 		return groups.Execute(cfg.Groups)
 	})
-	reg(3, opts.Config.IDM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.IDM.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.IDM.Context = ctx
 		cfg.IDM.Commons = cfg.Commons
 		return idm.Execute(cfg.IDM)
 	})
-	reg(3, opts.Config.OCDav.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.OCDav.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.OCDav.Context = ctx
 		cfg.OCDav.Commons = cfg.Commons
 		return ocdav.Execute(cfg.OCDav)
 	})
-	reg(3, opts.Config.OCS.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.OCS.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.OCS.Context = ctx
 		cfg.OCS.Commons = cfg.Commons
 		return ocs.Execute(cfg.OCS)
 	})
-	reg(3, opts.Config.Postprocessing.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Postprocessing.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Postprocessing.Context = ctx
 		cfg.Postprocessing.Commons = cfg.Commons
 		return postprocessing.Execute(cfg.Postprocessing)
 	})
-	reg(3, opts.Config.Search.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Search.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Search.Context = ctx
 		cfg.Search.Commons = cfg.Commons
 		return search.Execute(cfg.Search)
 	})
-	reg(3, opts.Config.Settings.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Settings.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Settings.Context = ctx
 		cfg.Settings.Commons = cfg.Commons
 		return settings.Execute(cfg.Settings)
 	})
-	reg(3, opts.Config.StoragePublicLink.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.StoragePublicLink.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.StoragePublicLink.Context = ctx
 		cfg.StoragePublicLink.Commons = cfg.Commons
 		return storagepublic.Execute(cfg.StoragePublicLink)
 	})
-	reg(3, opts.Config.StorageShares.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.StorageShares.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.StorageShares.Context = ctx
 		cfg.StorageShares.Commons = cfg.Commons
 		return storageshares.Execute(cfg.StorageShares)
 	})
-	reg(3, opts.Config.StorageSystem.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.StorageSystem.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.StorageSystem.Context = ctx
 		cfg.StorageSystem.Commons = cfg.Commons
 		return storageSystem.Execute(cfg.StorageSystem)
 	})
-	reg(3, opts.Config.StorageUsers.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.StorageUsers.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.StorageUsers.Context = ctx
 		cfg.StorageUsers.Commons = cfg.Commons
 		return storageusers.Execute(cfg.StorageUsers)
 	})
-	reg(3, opts.Config.Thumbnails.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Thumbnails.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Thumbnails.Context = ctx
 		cfg.Thumbnails.Commons = cfg.Commons
 		return thumbnails.Execute(cfg.Thumbnails)
 	})
-	reg(3, opts.Config.Userlog.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Userlog.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Userlog.Context = ctx
 		cfg.Userlog.Commons = cfg.Commons
 		return userlog.Execute(cfg.Userlog)
 	})
-	reg(3, opts.Config.Users.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Users.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Users.Context = ctx
 		cfg.Users.Commons = cfg.Commons
 		return users.Execute(cfg.Users)
 	})
-	reg(3, opts.Config.Web.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Web.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Web.Context = ctx
 		cfg.Web.Commons = cfg.Commons
 		return web.Execute(cfg.Web)
 	})
-	reg(3, opts.Config.WebDAV.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.WebDAV.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.WebDAV.Context = ctx
 		cfg.WebDAV.Commons = cfg.Commons
 		return webdav.Execute(cfg.WebDAV)
 	})
-	reg(3, opts.Config.Webfinger.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Webfinger.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Webfinger.Context = ctx
 		cfg.Webfinger.Commons = cfg.Commons
 		return webfinger.Execute(cfg.Webfinger)
 	})
-	reg(3, opts.Config.IDP.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.IDP.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.IDP.Context = ctx
 		cfg.IDP.Commons = cfg.Commons
 		return idp.Execute(cfg.IDP)
 	})
-	reg(3, opts.Config.Proxy.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Proxy.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Proxy.Context = ctx
 		cfg.Proxy.Commons = cfg.Commons
 		return proxy.Execute(cfg.Proxy)
 	})
-	reg(3, opts.Config.Sharing.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.Sharing.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Sharing.Context = ctx
 		cfg.Sharing.Commons = cfg.Commons
 		return sharing.Execute(cfg.Sharing)
 	})
-	reg(3, opts.Config.SSE.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.SSE.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.SSE.Context = ctx
 		cfg.SSE.Commons = cfg.Commons
 		return sse.Execute(cfg.SSE)
 	})
-	reg(3, opts.Config.OCM.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(3, opts.Config.OCM.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.OCM.Context = ctx
 		cfg.OCM.Commons = cfg.Commons
 		return ocm.Execute(cfg.OCM)
@@ -304,42 +304,42 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	// out of some unknown reason ci gets angry when frontend service starts in priority group 3
 	// this is not reproducible locally, it can start when nats and gateway are already running
 	// FIXME: find out why
-	reg(4, opts.Config.Frontend.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	reg(4, opts.Config.Frontend.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Frontend.Context = ctx
 		cfg.Frontend.Commons = cfg.Commons
 		return frontend.Execute(cfg.Frontend)
 	})
 
 	// populate optional services
-	areg := func(name string, exec func(context.Context, *ociscfg.Config) error) {
+	areg := func(name string, exec func(context.Context, *occfg.Config) error) {
 		s.Additional[name] = NewSutureServiceBuilder(exec)
 	}
-	areg(opts.Config.Antivirus.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.Antivirus.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Antivirus.Context = ctx
 		// cfg.Antivirus.Commons = cfg.Commons // antivirus holds no Commons atm
 		return antivirus.Execute(cfg.Antivirus)
 	})
-	areg(opts.Config.Audit.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.Audit.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Audit.Context = ctx
 		cfg.Audit.Commons = cfg.Commons
 		return audit.Execute(cfg.Audit)
 	})
-	areg(opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AuthApp.Context = ctx
 		cfg.AuthApp.Commons = cfg.Commons
 		return authapp.Execute(cfg.AuthApp)
 	})
-	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Policies.Context = ctx
 		cfg.Policies.Commons = cfg.Commons
 		return policies.Execute(cfg.Policies)
 	})
-	areg(opts.Config.Invitations.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.Invitations.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Invitations.Context = ctx
 		cfg.Invitations.Commons = cfg.Commons
 		return invitations.Execute(cfg.Invitations)
 	})
-	areg(opts.Config.Notifications.Service.Name, func(ctx context.Context, cfg *ociscfg.Config) error {
+	areg(opts.Config.Notifications.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Notifications.Context = ctx
 		cfg.Notifications.Commons = cfg.Commons
 		return notifications.Execute(cfg.Notifications)
@@ -447,13 +447,13 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 		}
 
 		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(funcSet[name](swap.(*ociscfg.Config))))
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(funcSet[name](swap.(*occfg.Config))))
 	}
 }
 
 // generateRunSet interprets the cfg.Runtime.Services config option to cherry-pick which services to start using
 // the runtime.
-func (s *Service) generateRunSet(cfg *ociscfg.Config) {
+func (s *Service) generateRunSet(cfg *occfg.Config) {
 	runset = make(map[string]struct{})
 	if cfg.Runtime.Services != nil {
 		for _, name := range cfg.Runtime.Services {
@@ -520,14 +520,14 @@ func trap(s *Service, ctx context.Context) {
 }
 
 // pingNats will attempt to connect to nats, blocking until a connection is established
-func pingNats(cfg *ociscfg.Config) error {
+func pingNats(cfg *occfg.Config) error {
 	// We need to get a natsconfig from somewhere. We can use any one.
 	evcfg := cfg.Postprocessing.Postprocessing.Events
 	_, err := stream.NatsFromConfig("initial", true, stream.NatsConfig(evcfg))
 	return err
 }
 
-func pingGateway(cfg *ociscfg.Config) error {
+func pingGateway(cfg *occfg.Config) error {
 	// init grpc connection
 	_, err := ogrpc.NewClient()
 	if err != nil {
@@ -548,8 +548,8 @@ func pingGateway(cfg *ociscfg.Config) error {
 	return err
 }
 
-func wait(d time.Duration) func(cfg *ociscfg.Config) error {
-	return func(cfg *ociscfg.Config) error {
+func wait(d time.Duration) func(cfg *occfg.Config) error {
+	return func(cfg *occfg.Config) error {
 		time.Sleep(d)
 		return nil
 	}

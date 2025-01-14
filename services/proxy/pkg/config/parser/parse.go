@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config/defaults"
@@ -14,7 +14,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}

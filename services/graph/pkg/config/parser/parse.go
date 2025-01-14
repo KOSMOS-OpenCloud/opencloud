@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	defaults2 "github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
@@ -17,7 +17,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func Validate(cfg *config.Config) error {
 	if cfg.Application.ID == "" {
 		return fmt.Errorf("The application ID has not been configured for %s. "+
 			"Make sure your %s config contains the proper values "+
-			"(e.g. by running ocis init or setting it manually in "+
+			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable).",
 			"graph", defaults2.BaseConfigPath())
 	}
@@ -61,7 +61,7 @@ func Validate(cfg *config.Config) error {
 	default:
 		return fmt.Errorf("The username match validator is invalid for %s. "+
 			"Make sure your %s config contains the proper values "+
-			"(e.g. by running ocis init or setting it manually in "+
+			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable).",
 			"graph", defaults2.BaseConfigPath())
 	}

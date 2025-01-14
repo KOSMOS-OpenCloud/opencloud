@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	ocisdefaults "github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
@@ -15,7 +15,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
@@ -47,14 +47,14 @@ func Validate(cfg *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("The WOPI Src has not been set properly in your config for %s. "+
 			"Make sure your %s config contains the proper values "+
-			"(e.g. by running ocis init or setting it manually in "+
+			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable): %s",
 			cfg.Service.Name, ocisdefaults.BaseConfigPath(), err.Error())
 	}
 	if url.Path != "" {
 		return fmt.Errorf("The WOPI Src must not contain a path in your config for %s. "+
 			"Make sure your %s config contains the proper values "+
-			"(e.g. by running ocis init or setting it manually in "+
+			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable)",
 			cfg.Service.Name, ocisdefaults.BaseConfigPath())
 	}

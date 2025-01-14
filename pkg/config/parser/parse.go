@@ -121,19 +121,19 @@ func EnsureCommons(cfg *config.Config) {
 // is missing an error will be returned.
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError("ocis")
+		return shared.MissingJWTTokenError("opencloud")
 	}
 
 	if cfg.TransferSecret == "" {
-		return shared.MissingRevaTransferSecretError("ocis")
+		return shared.MissingRevaTransferSecretError("opencloud")
 	}
 
 	if cfg.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError("ocis")
+		return shared.MissingMachineAuthApiKeyError("opencloud")
 	}
 
 	if cfg.SystemUserID == "" {
-		return shared.MissingSystemUserID("ocis")
+		return shared.MissingSystemUserID("opencloud")
 	}
 
 	return nil

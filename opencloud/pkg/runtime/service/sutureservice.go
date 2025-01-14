@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -13,8 +13,8 @@ type SutureService struct {
 }
 
 // NewSutureServiceBuilder creates a new suture service
-func NewSutureServiceBuilder(f func(context.Context, *ociscfg.Config) error) func(*ociscfg.Config) suture.Service {
-	return func(cfg *ociscfg.Config) suture.Service {
+func NewSutureServiceBuilder(f func(context.Context, *occfg.Config) error) func(*occfg.Config) suture.Service {
+	return func(cfg *occfg.Config) suture.Service {
 		return SutureService{
 			exec: func(ctx context.Context) error {
 				return f(ctx, cfg)

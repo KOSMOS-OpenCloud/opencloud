@@ -3,7 +3,7 @@ package parser
 import (
 	"errors"
 
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
@@ -12,7 +12,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	// apps are a special case, as they are not part of the main config, but are loaded from a separate config file
-	err = ociscfg.BindSourcesToStructs("apps", &cfg.Apps)
+	err = occfg.BindSourcesToStructs("apps", &cfg.Apps)
 	if err != nil {
 		return err
 	}

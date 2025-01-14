@@ -274,13 +274,13 @@ changelog: $(CALENS)
 ifndef CHANGELOG_VERSION
 	$(error CHANGELOG_VERSION is undefined)
 endif
-	mkdir -p ocis/dist
-	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
+	mkdir -p opencloud/dist
+	$(CALENS) --version $(CHANGELOG_VERSION) -o opencloud/dist/CHANGELOG.md
 
 .PHONY: changelog-csv
 changelog-csv: $(CALENS)
-	mkdir -p ocis/dist
-	$(CALENS) -t changelog/changelog-csv.tmpl -o ocis/dist/changelog.csv
+	mkdir -p opencloud/dist
+	$(CALENS) -t changelog/changelog-csv.tmpl -o opencloud/dist/changelog.csv
 
 .PHONY: govulncheck
 govulncheck: $(GOVULNCHECK)

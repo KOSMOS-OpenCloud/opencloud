@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	ociscfg "github.com/opencloud-eu/opencloud/pkg/config"
+	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/defaults"
 
@@ -15,7 +15,7 @@ import (
 
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}

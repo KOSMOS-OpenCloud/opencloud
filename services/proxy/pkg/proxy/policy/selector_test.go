@@ -38,9 +38,9 @@ func TestLoadSelector(t *testing.T) {
 }
 
 func TestStaticSelector(t *testing.T) {
-	sel := NewStaticSelector(&config.StaticSelectorConf{Policy: "ocis"})
+	sel := NewStaticSelector(&config.StaticSelectorConf{Policy: "opencloud"})
 	req := httptest.NewRequest("GET", "https://example.org/foo", nil)
-	want := "ocis"
+	want := "opencloud"
 	got, err := sel(req)
 	if got != want {
 		t.Errorf("Expected policy %v got %v", want, got)
@@ -105,11 +105,11 @@ func TestRegexSelector(t *testing.T) {
 	sel := NewRegexSelector(&config.RegexSelectorConf{
 		DefaultPolicy: "default",
 		MatchesPolicies: []config.RegexRuleConf{
-			{Priority: 10, Property: "mail", Match: "marie@example.org", Policy: "ocis"},
+			{Priority: 10, Property: "mail", Match: "marie@example.org", Policy: "opencloud"},
 			{Priority: 20, Property: "mail", Match: "[^@]+@example.org", Policy: "oc10"},
-			{Priority: 30, Property: "username", Match: "(einstein|feynman)", Policy: "ocis"},
+			{Priority: 30, Property: "username", Match: "(einstein|feynman)", Policy: "opencloud"},
 			{Priority: 40, Property: "username", Match: ".+", Policy: "oc10"},
-			{Priority: 50, Property: "id", Match: "4c510ada-c86b-4815-8820-42cdf82c3d51", Policy: "ocis"},
+			{Priority: 50, Property: "id", Match: "4c510ada-c86b-4815-8820-42cdf82c3d51", Policy: "opencloud"},
 			{Priority: 60, Property: "id", Match: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", Policy: "oc10"},
 		},
 		UnauthenticatedPolicy: "unauthenticated",
@@ -118,13 +118,13 @@ func TestRegexSelector(t *testing.T) {
 	var tests = []testCase{
 		{"unauthenticated", context.Background(), nil, "unauthenticated"},
 		{"default", revactx.ContextSetUser(context.Background(), &userv1beta1.User{}), nil, "default"},
-		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), nil, "ocis"},
+		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), nil, "opencloud"},
 		{"mail-oc10", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), nil, "oc10"},
-		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), nil, "ocis"},
-		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), nil, "ocis"},
+		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), nil, "opencloud"},
+		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), nil, "opencloud"},
 		{"username-marie", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "marie"}), nil, "oc10"},
 		{"id-nil", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{}}), nil, "default"},
-		{"id-1", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), nil, "ocis"},
+		{"id-1", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), nil, "opencloud"},
 		{"id-2", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}}), nil, "oc10"},
 	}
 

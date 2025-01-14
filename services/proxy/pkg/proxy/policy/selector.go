@@ -99,7 +99,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 // Configuration:
 //
 //	"policy_selector": {
-//	   "static": {"policy" : "ocis"}
+//	   "static": {"policy" : "opencloud"}
 //	 },
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
@@ -112,7 +112,7 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 //
 //	"policy_selector": {
 //	   "migration": {
-//	     "default_policy" : "ocis",
+//	     "default_policy" : "opencloud",
 //	     "unauthenticated_policy": "oc10"
 //	   }
 //	 },
@@ -160,11 +160,11 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 //	"policy_selector": {
 //	   "regex": {
 //	     "matches_policies": [
-//	       {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},
+//	       {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "opencloud"},
 //	       {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
-//	       {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "ocis"},
+//	       {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "opencloud"},
 //	       {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
-//	       {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "ocis"},
+//	       {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "opencloud"},
 //	       {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"}
 //	     ],
 //	     "unauthenticated_policy": "oc10"

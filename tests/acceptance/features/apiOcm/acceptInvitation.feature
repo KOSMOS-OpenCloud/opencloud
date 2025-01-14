@@ -1,7 +1,7 @@
 @ocm
 Feature: accepting invitation
   As a user
-  I can accept invitations from users of other ocis instances
+  I can accept invitations from users of other OpenCloud instances
 
   Background:
     Given user "Alice" has been created with default attributes

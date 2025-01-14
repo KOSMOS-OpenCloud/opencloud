@@ -34,12 +34,7 @@ use Psr\Http\Message\ResponseInterface;
 class UploadHelper extends Assert {
 	/**
 	 *
-	 * @param string|null $baseUrl URL of owncloud
-	 *                             e.g. http://localhost:8080
-	 *                             should include the subfolder
-	 *                             if owncloud runs in a subfolder
-	 *                             e.g. http://localhost:8080/owncloud-core
-	 * @param string|null $user
+	 * @param string|null $baseUrl URL of OpenCloud
 	 * @param string|null $password
 	 * @param string|null $source
 	 * @param string|null $destination

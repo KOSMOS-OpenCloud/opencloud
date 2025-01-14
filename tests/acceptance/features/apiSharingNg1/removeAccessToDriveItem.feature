@@ -1,5 +1,5 @@
 Feature: Remove access to a drive item
-  https://owncloud.dev/libre-graph-api/#/drives.permissions/DeletePermission
+  https://docs.opencloud.eu/libre-graph-api/#/drives.permissions/DeletePermission
 
   Background:
     Given these users have been created with default attributes:

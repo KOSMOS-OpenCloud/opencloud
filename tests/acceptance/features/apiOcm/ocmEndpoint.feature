@@ -32,7 +32,7 @@ Feature: ocm well-known URI
             "pattern": "^%base_url%/ocm"
           },
           "provider": {
-            "const": "oCIS"
+            "const": "OpenCloud"
           },
           "resourceTypes": {
             "type": "array",

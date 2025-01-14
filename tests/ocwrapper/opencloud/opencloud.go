@@ -1,4 +1,4 @@
-package ocis
+package opencloud
 
 import (
 	"bufio"
@@ -15,9 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"ociswrapper/common"
-	"ociswrapper/log"
-	"ociswrapper/ocis/config"
+	"ocwrapper/common"
+	"ocwrapper/log"
+	"ocwrapper/opencloud/config"
 
 	"github.com/creack/pty"
 )
@@ -62,7 +62,7 @@ func Start(envMap []string) {
 	outputScanner := bufio.NewScanner(output)
 	outChan := make(chan string)
 
-	// Read the logs when the 'ocis server' command is running
+	// Read the logs when the 'OpenCloud server' command is running
 	go func() {
 		defer wg.Done()
 		for logScanner.Scan() {
@@ -87,20 +87,20 @@ func Start(envMap []string) {
 	if err := cmd.Wait(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			status := exitErr.Sys().(syscall.WaitStatus)
-			// retry only if oCIS server exited with code > 0
+			// retry only if opencloud server exited with code > 0
 			// -1 exit code means that the process was killed by a signal (syscall.SIGINT)
 			if status.ExitStatus() > 0 && !stopSignal {
 				waitUntilCompleteShutdown()
 
-				log.Println(fmt.Sprintf("oCIS server exited with code %v", status.ExitStatus()))
+				log.Println(fmt.Sprintf("opencloud server exited with code %v", status.ExitStatus()))
 
-				// retry to start oCIS server
+				// retry to start opencloud server
 				retryCount++
 				maxRetry, _ := strconv.Atoi(config.Get("retry"))
 				if retryCount <= maxRetry {
 					wg.Wait()
 					close(outChan)
-					log.Println(fmt.Sprintf("Retry starting oCIS server... (retry %v)", retryCount))
+					log.Println(fmt.Sprintf("Retry starting opencloud server... (retry %v)", retryCount))
 					// wait 500 milliseconds before retrying
 					time.Sleep(500 * time.Millisecond)
 					Start(envMap)
@@ -114,11 +114,11 @@ func Start(envMap []string) {
 }
 
 func Stop() (bool, string) {
-	log.Println("Stopping oCIS server...")
+	log.Println("Stopping OpenCloud server...")
 	stopSignal = true
 
 	if cmd == nil {
-		return true, "oCIS server is not running"
+		return true, "OpenCloud server is not running"
 	}
 
 	err := cmd.Process.Signal(syscall.SIGINT)
@@ -126,7 +126,7 @@ func Stop() (bool, string) {
 		if !strings.HasSuffix(err.Error(), "process already finished") {
 			log.Fatalln(err)
 		} else {
-			return true, "oCIS server is already stopped"
+			return true, "OpenCloud server is already stopped"
 		}
 	}
 	cmd.Process.Wait()
@@ -139,14 +139,14 @@ func Stop() (bool, string) {
 func Restart(envMap []string) (bool, string) {
 	Stop()
 
-	log.Println("Restarting oCIS server...")
+	log.Println("Restarting OpenCloud server...")
 	common.Wg.Add(1)
 	go Start(envMap)
 
 	return WaitForConnection()
 }
 
-func IsOcisRunning() bool {
+func IsOpencloudRunning() bool {
 	if cmd != nil {
 		return cmd.Process.Pid > 0
 	}
@@ -195,10 +195,10 @@ func WaitForConnection() (bool, string) {
 	for {
 		select {
 		case <-timeout:
-			log.Println(fmt.Sprintf("%v seconds timeout waiting for oCIS server", int64(timeoutValue.Seconds())))
-			return false, "Timeout waiting for oCIS server to start"
+			log.Println(fmt.Sprintf("%v seconds timeout waiting for OpenCloud server", int64(timeoutValue.Seconds())))
+			return false, "Timeout waiting for OpenCloud server to start"
 		default:
-			req.Header.Set("X-Request-ID", "ociswrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
+			req.Header.Set("X-Request-ID", "ocwrapper-"+strconv.Itoa(int(time.Now().UnixMilli())))
 
 			res, err := client.Do(req)
 			if err != nil || res.StatusCode != 200 {
@@ -207,8 +207,8 @@ func WaitForConnection() (bool, string) {
 				continue
 			}
 
-			log.Println("oCIS server is ready to accept requests")
-			return true, "oCIS server is up and running"
+			log.Println("OpenCloud server is ready to accept requests")
+			return true, "OpenCloud server is up and running"
 		}
 	}
 }
@@ -217,7 +217,7 @@ func waitUntilCompleteShutdown() (bool, string) {
 	timeout := 30 * time.Second
 	startTime := time.Now()
 
-	c := exec.Command("sh", "-c", "ps ax | grep 'ocis server' | grep -v grep | awk '{print $1}'")
+	c := exec.Command("sh", "-c", "ps ax | grep 'opencloud server' | grep -v grep | awk '{print $1}'")
 	output, err := c.CombinedOutput()
 	if err != nil {
 		log.Println(err.Error())
@@ -227,11 +227,11 @@ func waitUntilCompleteShutdown() (bool, string) {
 		log.Println("Process found. Waiting...")
 
 		if time.Since(startTime) >= timeout {
-			log.Println(fmt.Sprintf("Unable to kill oCIS server after %v seconds", int64(timeout.Seconds())))
-			return false, "Timeout waiting for oCIS server to stop"
+			log.Println(fmt.Sprintf("Unable to kill OpenCloud server after %v seconds", int64(timeout.Seconds())))
+			return false, "Timeout waiting for OpenCloud server to stop"
 		}
 	}
-	return true, "oCIS server stopped successfully"
+	return true, "OpenCloud server stopped successfully"
 }
 
 func RunCommand(command string, inputs []string) (int, string) {

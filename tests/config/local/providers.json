@@ -1,10 +1,10 @@
 [
   {
-    "name": "ocis-server",
-    "full_name": "first-ocis-instance",
-    "organization": "Owncloud",
+    "name": "opencloud-server",
+    "full_name": "first-opencloud-instance",
+    "organization": "OpenCloud",
     "domain": "localhost:9200",
-    "homepage": "https://owncloud.com",
+    "homepage": "https://opencloud.eu",
     "services": [
       {
         "endpoint": {
@@ -22,11 +22,11 @@
     ]
   },
   {
-    "name": "federation-ocis-server",
-    "full_name": "Federation ocis",
-    "organization": "Owncloud",
+    "name": "federation-opencloud-server",
+    "full_name": "Federation opencloud",
+    "organization": "OpenCloud",
     "domain": "localhost:10200",
-    "homepage": "https://owncloud.com",
+    "homepage": "https://opencloud.eu",
     "services": [
       {
         "endpoint": {

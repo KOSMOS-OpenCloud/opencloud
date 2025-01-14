@@ -30,13 +30,13 @@ Feature: content search
   Scenario Outline: search files by different content types
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "Using k6, you can test the reliability and performance of your systems" to "wordWithNumber.md"
-    And user "Alice" has uploaded file with content "see our web site https://owncloud.com/infinite-scale-4-0" to "findByWebSite.txt"
+    And user "Alice" has uploaded file with content "see our web site https://opencloud.eu/en/contact-us" to "findByWebSite.txt"
     And user "Alice" has uploaded file with content "einstein@example.org want to say hello" to "findByEmail.docs"
     When user "Alice" searches for "Content:k6" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | wordWithNumber.md |
-    When user "Alice" searches for "Content:https://owncloud.com/" using the WebDAV API
+    When user "Alice" searches for "Content:https://opencloud.eu/" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | findByWebSite.txt |

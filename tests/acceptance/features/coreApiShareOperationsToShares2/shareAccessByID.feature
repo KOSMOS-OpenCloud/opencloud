@@ -13,7 +13,7 @@ Feature: share access by ID
 
   Scenario Outline: get a share with a valid share ID
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     And user "Alice" gets share with id "%last_share_id%" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -30,7 +30,7 @@ Feature: share access by ID
       | mimetype               | text/plain            |
       | storage_id             | ANY_VALUE             |
       | share_type             | user                  |
-    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -57,7 +57,7 @@ Feature: share access by ID
 
   Scenario Outline: accept a share using the share Id
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -102,7 +102,7 @@ Feature: share access by ID
 
   Scenario Outline: decline a share using the share Id
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |

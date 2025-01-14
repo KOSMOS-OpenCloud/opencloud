@@ -1,5 +1,5 @@
 Feature: List a sharing permissions
-  https://owncloud.dev/libre-graph-api/#/drives.permissions/ListPermissions
+  https://docs.opencloud.eu/libre-graph-api/#/drives.permissions/ListPermissions
 
   Background:
     Given these users have been created with default attributes:

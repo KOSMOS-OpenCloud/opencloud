@@ -1,4 +1,4 @@
-# NOTE: set env OC_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
+# NOTE: set env OC_CORS_ALLOW_ORIGINS=https://aphno.badal while running OpenCloud server
 @env-config
 Feature: CORS headers
   As a user

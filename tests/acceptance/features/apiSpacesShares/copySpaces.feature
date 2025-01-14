@@ -673,7 +673,7 @@ Feature: copy file
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Alice" has a share "testshare" synced
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/textfile0.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should not be able to download file "/testshare/textfile0.txt" from space "Shares"
@@ -682,8 +682,8 @@ Feature: copy file
   Scenario: copying a file to overwrite a file into a folder with no permissions
     Given using spaces DAV path
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "ownCloud test text file 1" to "/testshare/overwritethis.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Brian" has uploaded file with content "OpenCloud test text file 1" to "/testshare/overwritethis.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
@@ -693,12 +693,12 @@ Feature: copy file
     And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/overwritethis.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares" should be "ownCloud test text file 1"
+    And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares" should be "OpenCloud test text file 1"
 
   @issue-7208
   Scenario: copy a file over the top of an existing folder received as a user share
     Given using spaces DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "/textfile1.txt"
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
     And user "Brian" has sent the following resource share invitation:

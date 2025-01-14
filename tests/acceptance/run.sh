@@ -84,7 +84,7 @@ fi
 # --tags - specify tags for scenarios to run (or not)
 # --remote - the server under test is remote, so we cannot locally enable the
 #            testing app. We have to assume it is already enabled.
-# --show-oc-logs - tail the ownCloud log after the test run
+# --show-oc-logs - tail the OpenCloud log after the test run
 # --loop - loop tests for given number of times. Only use it for debugging purposes
 # --part - run a subset of scenarios, need two numbers.
 #          first number: which part to run

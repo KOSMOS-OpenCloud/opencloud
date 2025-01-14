@@ -57,8 +57,8 @@ trait Sharing {
 
 	/**
 	 * Defines the fields that are known and can be tested in a share response.
-	 * Note that ownCloud10 also provides file_parent in responses.
-	 * file_parent is not provided by OCIS/reva.
+	 * Note that OpenCloud also provides file_parent in responses.
+	 * file_parent is not provided by opencloud/reva.
 	 * There are no known clients that use file_parent.
 	 * The acceptance tests do not test for file_parent.
 	 *

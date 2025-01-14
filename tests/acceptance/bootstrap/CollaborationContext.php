@@ -31,7 +31,7 @@ use TestHelpers\CollaborationHelper;
 use TestHelpers\BehatHelper;
 
 /**
- * steps needed to re-configure oCIS server
+ * steps needed to re-configure OpenCloud server
  */
 class CollaborationContext implements Context {
 	private FeatureContext $featureContext;

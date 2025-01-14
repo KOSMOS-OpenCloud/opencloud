@@ -1,21 +1,21 @@
 services:
-  ocis-server:
+  opencloud-server:
     build:
-      dockerfile: ocis.Dockerfile
+      dockerfile: opencloud.Dockerfile
       context: ./
       args:
         OC_IMAGE_TAG: $OC_IMAGE_TAG
     user: root
     environment:
       WITH_WRAPPER: $WITH_WRAPPER
-      OC_URL: "https://ocis-server:9200"
+      OC_URL: "https://opencloud-server:9200"
       STORAGE_USERS_DRIVER: $STORAGE_DRIVER
-      STORAGE_USERS_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
-      STORAGE_USERS_DRIVER_OC_ROOT: /srv/app/tmp/ocis/storage/users
-      STORAGE_SYSTEM_DRIVER_OC_ROOT: /srv/app/tmp/ocis/storage/metadata
-      SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
+      STORAGE_USERS_DRIVER_LOCAL_ROOT: /srv/app/tmp/opencloud/local/root
+      STORAGE_USERS_DRIVER_OC_ROOT: /srv/app/tmp/opencloud/storage/users
+      STORAGE_SYSTEM_DRIVER_OC_ROOT: /srv/app/tmp/opencloud/storage/metadata
+      SHARING_USER_JSON_FILE: /srv/app/tmp/opencloud/shares.json
       PROXY_ENABLE_BASIC_AUTH: "true"
-      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
+      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/opencloud-config.json
       ACCOUNTS_HASH_DIFFICULTY: 4
       OC_INSECURE: "true"
       IDM_CREATE_DEMO_USERS: "true"
@@ -34,7 +34,7 @@ services:
       NOTIFICATIONS_SMTP_HOST: email
       NOTIFICATIONS_SMTP_PORT: 2500
       NOTIFICATIONS_SMTP_INSECURE: "true"
-      NOTIFICATIONS_SMTP_SENDER: "owncloud <noreply@example.com>"
+      NOTIFICATIONS_SMTP_SENDER: "opencloud <noreply@example.com>"
 
       # antivirus
       ANTIVIRUS_SCANNER_TYPE: "clamav"
@@ -52,4 +52,4 @@ services:
       THUMBNAILS_TXT_FONTMAP_FILE: "/drone/src/tests/config/drone/fontsMap.json"
     volumes:
       - ../../../config:/drone/src/tests/config
-      - ../../../ociswrapper/bin/ociswrapper:/usr/bin/ociswrapper
+      - ../../../ocwrapper/bin/ocwrapper:/usr/bin/ocwrapper

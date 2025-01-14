@@ -1,10 +1,10 @@
 {
-  "server": "https://localhost:10200",
-  "theme": "https://localhost:10200/themes/owncloud/theme.json",
+  "server": "https://opencloud-server:9200",
+  "theme": "https://opencloud-server:9200/themes/opencloud/theme.json",
   "version": "0.1.0",
   "openIdConnect": {
-    "metadata_url": "https://localhost:10200/.well-known/openid-configuration",
-    "authority": "https://localhost:10200",
+    "metadata_url": "https://opencloud-server:9200/.well-known/openid-configuration",
+    "authority": "https://opencloud-server:9200",
     "client_id": "web",
     "response_type": "code",
     "scope": "openid profile email"
@@ -20,7 +20,6 @@
   },
   "apps": [
     "files",
-    "ocm",
     "text-editor",
     "preview",
     "pdf-viewer",

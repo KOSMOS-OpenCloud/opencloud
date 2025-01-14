@@ -29,9 +29,9 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * A helper class for configuring oCIS server
+ * A helper class for configuring OpenCloud server
  */
-class OcisConfigHelper {
+class OcConfigHelper {
 	/**
 	 * @param string $url
 	 * @param string $method
@@ -57,8 +57,8 @@ class OcisConfigHelper {
 			$response = $client->send($request);
 		} catch (ConnectException $e) {
 			throw new \Error(
-				"Cannot connect to the ociswrapper at the moment,"
-				. "make sure that ociswrapper is running before proceeding with the test run.\n"
+				"Cannot connect to the ocwrapper at the moment,"
+				. "make sure that ocwrapper is running before proceeding with the test run.\n"
 				. $e->getMessage()
 			);
 		} catch (GuzzleException $ex) {
@@ -89,7 +89,7 @@ class OcisConfigHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function reConfigureOcis(array $envs): ResponseInterface {
+	public static function reConfigureOc(array $envs): ResponseInterface {
 		$url = self::getWrapperUrl() . "/config";
 		return self::sendRequest($url, "PUT", \json_encode($envs));
 	}
@@ -98,7 +98,7 @@ class OcisConfigHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function rollbackOcis(): ResponseInterface {
+	public static function rollbackOc(): ResponseInterface {
 		$url = self::getWrapperUrl() . "/rollback";
 		return self::sendRequest($url, "DELETE");
 	}
@@ -107,7 +107,7 @@ class OcisConfigHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function stopOcis(): ResponseInterface {
+	public static function stopOpencloud(): ResponseInterface {
 		$url = self::getWrapperUrl() . "/stop";
 		return self::sendRequest($url, "POST");
 	}
@@ -116,7 +116,7 @@ class OcisConfigHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function startOcis(): ResponseInterface {
+	public static function startOpencloud(): ResponseInterface {
 		$url = self::getWrapperUrl() . "/start";
 		return self::sendRequest($url, "POST");
 	}

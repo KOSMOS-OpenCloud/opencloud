@@ -147,7 +147,7 @@ class SearchContext implements Context {
 		?string    $limit = null,
 		?TableNode $properties = null
 	): void {
-		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
+		// NOTE: because indexing of newly uploaded files or directories with OpenCloud is decoupled and occurs asynchronously
 		// short wait is necessary before searching
 		sleep(5);
 		$response = $this->searchFiles($user, $pattern, $limit, null, null, null, $properties);
@@ -270,7 +270,7 @@ class SearchContext implements Context {
 		string  $scope,
 		?string $spaceName = null,
 	): void {
-		// NOTE: since indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously,
+		// NOTE: since indexing of newly uploaded files or directories with OpenCloud is decoupled and occurs asynchronously,
 		// a short wait is necessary before searching
 		sleep(5);
 		$response = $this-> searchFiles($user, $pattern, null, $scopeType, $scope, $spaceName);

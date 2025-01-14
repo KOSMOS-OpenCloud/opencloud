@@ -358,11 +358,7 @@ class PublicWebDavContext implements Context {
 
 	/**
 	 *
-	 * @param string $baseUrl URL of owncloud
-	 *                        e.g. http://localhost:8080
-	 *                        should include the subfolder
-	 *                        if owncloud runs in a subfolder
-	 *                        e.g. http://localhost:8080/owncloud-core
+	 * @param string $baseUrl URL of OpenCloud
 	 * @param string $source
 	 * @param string $destination
 	 *

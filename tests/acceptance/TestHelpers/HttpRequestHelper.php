@@ -56,7 +56,7 @@ class HttpRequestHelper {
 	 * @return int
 	 */
 	public static function numRetriesOnHttpTooEarly(): int {
-		// Currently reva and oCIS may return HTTP_TOO_EARLY
+		// Currently reva and OpenCloud may return HTTP_TOO_EARLY
 		// So try up to 10 times before giving up.
 		return 10;
 	}
@@ -105,7 +105,7 @@ class HttpRequestHelper {
 			);
 		}
 
-		if (WebdavHelper::isDAVRequest($url) && \str_starts_with($url, OcisHelper::getServerUrl())) {
+		if (WebdavHelper::isDAVRequest($url) && \str_starts_with($url, OcHelper::getServerUrl())) {
 			$urlHasRemotePhp = \str_contains($url, 'remote.php');
 			if (!WebDavHelper::withRemotePhp() && $urlHasRemotePhp) {
 				throw new Exception("remote.php is disabled but found in the URL: $url");

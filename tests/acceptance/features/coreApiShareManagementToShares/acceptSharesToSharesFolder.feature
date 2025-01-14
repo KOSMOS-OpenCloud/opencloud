@@ -14,7 +14,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
 
 
   Scenario: accept an incoming file share
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     And user "Brian" has disabled auto-accepting
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -25,13 +25,13 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
 
 
   Scenario: accept an incoming folder share
     Given user "Alice" has created folder "/PARENT"
     And user "Brian" has disabled auto-accepting
-    And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -39,11 +39,11 @@ Feature: accept/decline shares coming from internal users to the Shares folder
       | shareType       | user     |
       | permissionsRole | Viewer   |
     When user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
-    Then the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "ownCloud test text file parent"
+    Then the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "OpenCloud test text file parent"
 
 
   Scenario: accept an incoming file share and check the response
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     And user "Brian" has disabled auto-accepting
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -66,13 +66,13 @@ Feature: accept/decline shares coming from internal users to the Shares folder
       | mimetype               | text/plain            |
       | storage_id             | ANY_VALUE             |
       | share_type             | user                  |
-    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
 
 
   Scenario: accept an incoming folder share and check the response
     Given user "Alice" has created folder "/PARENT"
     And user "Brian" has disabled auto-accepting
-    And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -94,4 +94,4 @@ Feature: accept/decline shares coming from internal users to the Shares folder
       | mimetype               | httpd/unix-directory |
       | storage_id             | ANY_VALUE            |
       | share_type             | user                 |
-    And the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "ownCloud test text file parent"
+    And the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "OpenCloud test text file parent"

@@ -85,7 +85,7 @@ class CapabilitiesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function getAdminUsernameForCapabilitiesCheck(): string {
-		if (\TestHelpers\OcisHelper::isTestingOnReva()) {
+		if (\TestHelpers\OcHelper::isTestingOnReva()) {
 			// When testing on reva we don't have a user called "admin" to use
 			// to access the capabilities. So create an ordinary user on-the-fly
 			// with a default password. That user should be able to get a
@@ -255,7 +255,7 @@ class CapabilitiesContext implements Context {
 		$jsonExpectedDecoded['product'] = $product;
 		$jsonExpectedDecoded['productname'] = $productName;
 
-		// We are on oCIS or reva or some other implementation. We cannot do "occ status".
+		// We are on OpenCloud or reva or some other implementation. We cannot do "occ status".
 		// So get the expected version values by looking in the capabilities response.
 		$version = $this->getParameterValueFromXml(
 			$responseXmlObject,

@@ -3,7 +3,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
   I want to get resources shared with me when auto-sync is disabled
   So that I can know about what resources I have access to
 
-  https://owncloud.dev/libre-graph-api/#/me.drive/ListSharedWithMe
+  https://docs.opencloud.eu/libre-graph-api/#/me.drive/ListSharedWithMe
 
   Background:
     Given these users have been created with default attributes:

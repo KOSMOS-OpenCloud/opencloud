@@ -26,7 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use TestHelpers\UserHelper;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\OcisHelper;
+use TestHelpers\OcHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\GraphHelper;
 use Laminas\Ldap\Exception\LdapException;
@@ -52,8 +52,7 @@ trait Provisioning {
 	private array $createdGroups = [];
 
 	/**
-	 * Check if this is the admin group. That group is always a local group in
-	 * ownCloud10, even if other groups come from LDAP.
+	 * Check if this is the admin group.
 	 *
 	 * @param string $groupname
 	 *
@@ -315,15 +314,15 @@ trait Provisioning {
 	 * @throws \LdapException
 	 */
 	public function connectToLdap(array $suiteParameters): void {
-		$this->ldapBaseDN = OcisHelper::getBaseDN();
-		$this->ldapUsersOU = OcisHelper::getUsersOU();
-		$this->ldapGroupsOU = OcisHelper::getGroupsOU();
-		$this->ldapGroupSchema = OcisHelper::getGroupSchema();
-		$this->ldapHost = OcisHelper::getHostname();
-		$this->ldapPort = OcisHelper::getLdapPort();
-		$useSsl = OcisHelper::useSsl();
-		$this->ldapAdminUser = OcisHelper::getBindDN();
-		$this->ldapAdminPassword = OcisHelper::getBindPassword();
+		$this->ldapBaseDN = OcHelper::getBaseDN();
+		$this->ldapUsersOU = OcHelper::getUsersOU();
+		$this->ldapGroupsOU = OcHelper::getGroupsOU();
+		$this->ldapGroupSchema = OcHelper::getGroupSchema();
+		$this->ldapHost = OcHelper::getHostname();
+		$this->ldapPort = OcHelper::getLdapPort();
+		$useSsl = OcHelper::useSsl();
+		$this->ldapAdminUser = OcHelper::getBindDN();
+		$this->ldapAdminPassword = OcHelper::getBindPassword();
 		$this->skipImportLdif = (\getenv("REVA_LDAP_SKIP_LDIF_IMPORT") === "true");
 		if ($useSsl === true) {
 			\putenv('LDAPTLS_REQCERT=never');
@@ -385,7 +384,7 @@ trait Provisioning {
 			} elseif ($setDefaultAttributes) {
 				$userAttribute['email'] = $this->getEmailAddressForUser($row['username']);
 				if ($userAttribute['email'] === null) {
-					$userAttribute['email'] = $row['username'] . '@owncloud.com';
+					$userAttribute['email'] = $row['username'] . '@opencloud.eu';
 				}
 			} else {
 				$userAttribute['email'] = null;
@@ -439,13 +438,13 @@ trait Provisioning {
 		}
 		if (isset($setting["email"])) {
 			$entry['mail'] = $setting["email"];
-		} elseif (!OcisHelper::isTestingOnReva()) {
-			$entry['mail'] = $userId . '@owncloud.com';
+		} elseif (!OcHelper::isTestingOnReva()) {
+			$entry['mail'] = $userId . '@opencloud.eu';
 		}
 		$entry['gidNumber'] = 5000;
 		$entry['uidNumber'] = $uidNumber;
 
-		if (!OcisHelper::isTestingOnReva()) {
+		if (!OcHelper::isTestingOnReva()) {
 			$entry['objectclass'][] = 'ownCloud';
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
@@ -461,7 +460,7 @@ trait Provisioning {
 						LDAP_ESCAPE_DN
 					) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
 				);
-				OcisHelper::deleteRevaUserData([$entry['uid']]);
+				OcHelper::deleteRevaUserData([$entry['uid']]);
 				$this->ldap->add($newDN, $entry);
 			}
 		}
@@ -490,7 +489,7 @@ trait Provisioning {
 			$entry['objectclass'][] = 'groupOfNames';
 			$entry['member'] = "";
 		}
-		if (!OcisHelper::isTestingOnReva()) {
+		if (!OcHelper::isTestingOnReva()) {
 			$entry['objectclass'][] = 'ownCloud';
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
@@ -585,7 +584,7 @@ trait Provisioning {
 						$userAttributes,
 						__METHOD__ . " userAttributes array does not have key 'userid'"
 					);
-					$attributesToCreateUser['email'] = $userAttributes['userid'] . '@owncloud.com';
+					$attributesToCreateUser['email'] = $userAttributes['userid'] . '@opencloud.eu';
 				} else {
 					$attributesToCreateUser['email'] = $userAttributes['email'];
 				}
@@ -958,7 +957,7 @@ trait Provisioning {
 	public function initializeUser(string $user, string $password): void {
 		$url = $this->getBaseUrl() . "/graph/v1.0/users/$user";
 
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$url = $this->getBaseUrl()
 				. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
 		}
@@ -1123,7 +1122,7 @@ trait Provisioning {
 
 			if ($email === null) {
 				// escape @ & space if present in userId
-				$email = \str_replace(["@", " "], "", $user) . '@owncloud.com';
+				$email = \str_replace(["@", " "], "", $user) . '@opencloud.eu';
 			}
 		}
 		$user = $this->getActualUsername($user);
@@ -1183,7 +1182,7 @@ trait Provisioning {
 	 */
 	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$this->response = UserHelper::removeUserFromGroup(
 				$this->getBaseUrl(),
 				$user,
@@ -1274,12 +1273,12 @@ trait Provisioning {
 	 * @throws JsonException
 	 */
 	public function userExists(string $user): bool {
-		$path = (!OcisHelper::isTestingOnReva())
+		$path = (!OcHelper::isTestingOnReva())
 			? "/graph/v1.0"
 			: "/ocs/v2.php/cloud";
 		$fullUrl = $this->getBaseUrl() . $path . "/users/$user";
 
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$requestingUser = $this->getActualUsername($user);
 			$requestingPassword = $this->getPasswordForUser($user);
 		} else {
@@ -1310,7 +1309,7 @@ trait Provisioning {
 	 */
 	public function userShouldBelongToGroup(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$this->userGetsAllTheGroupsOfUser($this->getAdminUsername(), $user);
 			$respondedArray = $this->getArrayOfGroupsResponded($this->response);
 			\sort($respondedArray);
@@ -1351,7 +1350,7 @@ trait Provisioning {
 		foreach ($rows as $row) {
 			$user = $this->getActualUsername($row["username"]);
 			$group = $row["groupname"];
-			if (OcisHelper::isTestingOnReva()) {
+			if (OcHelper::isTestingOnReva()) {
 				$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
 				$response = HttpRequestHelper::get(
 					$fullUrl,
@@ -1748,7 +1747,7 @@ trait Provisioning {
 	 */
 	public function adminHasDisabledUserUsingTheProvisioningApi(?string $user): void {
 		$user = $this->getActualUsername($user);
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$response = $this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
 		} else {
 			$response = $this->graphContext->editUserUsingTheGraphApi(
@@ -1778,7 +1777,7 @@ trait Provisioning {
 	 */
 	public function deleteUser(string $user): ResponseInterface {
 		// Always try to delete the user
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$response = UserHelper::deleteUser(
 				$this->getBaseUrl(),
 				$user,
@@ -1868,7 +1867,7 @@ trait Provisioning {
 			$this->TheHTTPStatusCodeShouldBe(204, '', $response);
 		}
 
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
 			$response = HttpRequestHelper::get(
 				$fullUrl,
@@ -1979,8 +1978,8 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function afterScenario(): void {
-		if (OcisHelper::isTestingOnReva()) {
-			OcisHelper::deleteRevaUserData($this->getCreatedUsers());
+		if (OcHelper::isTestingOnReva()) {
+			OcHelper::deleteRevaUserData($this->getCreatedUsers());
 		}
 
 		if ($this->isTestingWithLdap()) {

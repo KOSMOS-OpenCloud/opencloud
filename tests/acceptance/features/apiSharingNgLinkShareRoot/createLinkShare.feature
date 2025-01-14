@@ -1,5 +1,5 @@
 Feature: Create a link share for a resource
-  https://owncloud.dev/libre-graph-api/#/drives.permissions/CreateLink
+  https://docs.opencloud.eu/libre-graph-api/#/drives.permissions/CreateLink
 
   Background:
     Given these users have been created with default attributes:
@@ -393,19 +393,19 @@ Feature: Create a link share for a resource
       | banned-password | permissions-role |
       | 123             | view             |
       | password        | view             |
-      | ownCloud        | view             |
+      | OpenCloud        | view             |
       | 123             | edit             |
       | password        | edit             |
-      | ownCloud        | edit             |
+      | OpenCloud        | edit             |
       | 123             | upload           |
       | password        | upload           |
-      | ownCloud        | upload           |
+      | OpenCloud        | upload           |
       | 123             | createOnly       |
       | password        | createOnly       |
-      | ownCloud        | createOnly       |
+      | OpenCloud        | createOnly       |
       | 123             | blocksDownload   |
       | password        | blocksDownload   |
-      | ownCloud        | blocksDownload   |
+      | OpenCloud        | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a project-space drive without password using root endpoint

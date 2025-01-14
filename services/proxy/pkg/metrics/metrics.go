@@ -6,7 +6,7 @@ import (
 
 var (
 	// Namespace defines the namespace for the defines metrics.
-	Namespace = "ocis"
+	Namespace = "opencloud"
 
 	// Subsystem defines the subsystem for the defines metrics.
 	Subsystem = "proxy"

@@ -41,7 +41,7 @@ func AppRegistryConfigFromStruct(cfg *config.Config, logger log.Logger) map[stri
 			},
 			"interceptors": map[string]interface{}{
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "app_registry",
 				},
 			},

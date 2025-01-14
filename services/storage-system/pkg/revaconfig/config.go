@@ -103,7 +103,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			"interceptors": map[string]interface{}{
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "storage_system",
 				},
 			},
@@ -138,7 +138,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			"middlewares": map[string]interface{}{
 				"prometheus": map[string]interface{}{
-					"namespace": "ocis",
+					"namespace": "opencloud",
 					"subsystem": "storage_system",
 				},
 			},

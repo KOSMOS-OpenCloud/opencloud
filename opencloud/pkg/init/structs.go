@@ -13,7 +13,7 @@ package init
 // - recurse through the nodes and delete empty / default ones
 // - marshal it to yaml
 
-// OcisConfig is the configuration for the oCIS services
+// OcisConfig is the configuration for the OpenCloud services
 type OcisConfig struct {
 	TokenManager      TokenManager          `yaml:"token_manager"`
 	MachineAuthAPIKey string                `yaml:"machine_auth_api_key"`

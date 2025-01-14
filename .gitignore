@@ -16,7 +16,7 @@ yarn.lock
 # build artifacts
 */bin
 services/*/bin
-/ocis/dist/
+/opencloud/dist/
 services/*/assets
 ocis/ocis
 ocis/cmd/ocis/__debug_bin

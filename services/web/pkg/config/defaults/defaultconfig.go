@@ -87,7 +87,7 @@ func DefaultConfig() *config.Config {
 		GatewayAddress: "com.owncloud.api.gateway",
 		Web: config.Web{
 			ThemeServer: "https://localhost:9200",
-			ThemePath:   "/themes/owncloud/theme.json",
+			ThemePath:   "/themes/opencloud/theme.json",
 			Config: config.WebConfig{
 				Server: "https://localhost:9200",
 				Theme:  "",
@@ -111,6 +111,9 @@ func DefaultConfig() *config.Config {
 					Upload:                 &config.Upload{},
 					TokenStorageLocal:      true,
 					UserListRequiresFilter: false,
+				},
+				Styles: []config.CustomStyle{
+					{Href: "/themes/opencloud/font.css"},
 				},
 			},
 		},

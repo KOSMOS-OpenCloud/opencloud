@@ -124,10 +124,6 @@ Infinite Scale is carefully internationalized so that everyone, no matter what l
 
 Please always refer to our [Contribution Guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md).
 
-## End User License Agreement
-
-Some builds of stable ownCloud Infinite Scale releases provided by ownCloud GmbH are subject to an [End User License Agreement](https://owncloud.com/license-owncloud-infinite-scale/).
-
 ## Copyright
 
 ```console

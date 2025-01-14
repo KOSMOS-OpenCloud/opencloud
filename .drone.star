@@ -1804,7 +1804,6 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C ocis release-finish",
-                    "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
                 ],
                 "when": {
                     "ref": [

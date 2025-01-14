@@ -18,9 +18,9 @@ yarn.lock
 services/*/bin
 /opencloud/dist/
 services/*/assets
-ocis/ocis
-ocis/cmd/ocis/__debug_bin
-ocis/cmd/ocis/config/
+opencloud/opencloud
+opencloud/cmd/opencloud/__debug_bin
+opencloud/cmd/opencloud/config/
 
 # docs
 /hugo

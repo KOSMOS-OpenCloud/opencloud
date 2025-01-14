@@ -64,8 +64,8 @@ OC_MODULES = \
 	services/web \
 	services/webdav\
 	services/webfinger\
-	ocis \
-	ocis-pkg
+	opencloud \
+	pkg
 
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer

@@ -5,8 +5,8 @@ package mocks
 import (
 	context "context"
 
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	keycloak "github.com/opencloud-eu/opencloud/pkg/keycloak"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	mock "github.com/stretchr/testify/mock"
 )

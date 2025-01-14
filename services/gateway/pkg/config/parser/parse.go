@@ -46,7 +46,7 @@ func Validate(cfg *config.Config) error {
 	if cfg.StorageRegistry.StorageUsersMountID == "" {
 		return fmt.Errorf("The storage users mount ID has not been configured for %s. "+
 			"Make sure your %s config contains the proper values "+
-			"(e.g. by running ocis init or setting it manually in "+
+			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable).",
 			"gateway", defaults2.BaseConfigPath())
 	}

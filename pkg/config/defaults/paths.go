@@ -6,13 +6,11 @@ import (
 	"path"
 )
 
-const ()
-
 var (
 	// switch between modes
 	BaseDataPathType = "homedir" // or "path"
 	// default data path
-	BaseDataPathValue = "/var/lib/ocis"
+	BaseDataPathValue = "/var/lib/opencloud"
 )
 
 func BaseDataPath() string {
@@ -32,7 +30,7 @@ func BaseDataPath() string {
 			// fallback to BaseDatapathValue for users without home
 			return BaseDataPathValue
 		}
-		return path.Join(dir, ".ocis")
+		return path.Join(dir, ".opencloud")
 	case "path":
 		return BaseDataPathValue
 	default:
@@ -45,7 +43,7 @@ var (
 	// switch between modes
 	BaseConfigPathType = "homedir" // or "path"
 	// default config path
-	BaseConfigPathValue = "/etc/ocis"
+	BaseConfigPathValue = "/etc/opencloud"
 )
 
 func BaseConfigPath() string {
@@ -65,7 +63,7 @@ func BaseConfigPath() string {
 			// fallback to BaseConfigPathValue for users without home
 			return BaseConfigPathValue
 		}
-		return path.Join(dir, ".ocis", "config")
+		return path.Join(dir, ".opencloud", "config")
 	case "path":
 		return BaseConfigPathValue
 	default:

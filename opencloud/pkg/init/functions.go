@@ -77,7 +77,7 @@ func writeConfig(configPath, ocisAdminServicePassword, targetBackupConfig string
 // writePatch writes the diff to a file
 func writePatch(configPath string, yamlOutput []byte) error {
 	fmt.Println("running in diff mode")
-	tmpFile := path.Join(configPath, "ocis.yaml.tmp")
+	tmpFile := path.Join(configPath, "opencloud.yaml.tmp")
 	err := os.WriteFile(tmpFile, yamlOutput, 0600)
 	if err != nil {
 		return err

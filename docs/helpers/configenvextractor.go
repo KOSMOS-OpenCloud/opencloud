@@ -67,8 +67,8 @@ func generateIntermediateCode(templatePath string, intermediateCodePath string, 
 
 func runIntermediateCode(intermediateCodePath string) {
 	fmt.Println("Running intermediate go code for " + intermediateCodePath)
-	defaultConfigPath := "/etc/ocis"
-	defaultDataPath := "/var/lib/ocis"
+	defaultConfigPath := "/etc/opencloud"
+	defaultDataPath := "/var/lib/opencloud"
 	os.Setenv("OC_BASE_DATA_PATH", defaultDataPath)
 	os.Setenv("OC_CONFIG_DIR", defaultConfigPath)
 	out, err := exec.Command("go", "run", intermediateCodePath).CombinedOutput()

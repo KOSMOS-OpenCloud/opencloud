@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9150",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
@@ -41,11 +41,11 @@ func DefaultConfig() *config.Config {
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:  "com.owncloud.api.storage-system",
+				ProviderAddr:  "eu.opencloud.api.storage-system",
 				SystemUserIDP: "internal",
 			},
 			JSONCS3: config.UserSharingJSONCS3Driver{
-				ProviderAddr:   "com.owncloud.api.storage-system",
+				ProviderAddr:   "eu.opencloud.api.storage-system",
 				SystemUserIDP:  "internal",
 				MaxConcurrency: 1,
 			},
@@ -62,11 +62,11 @@ func DefaultConfig() *config.Config {
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:  "com.owncloud.api.storage-system", // system storage
+				ProviderAddr:  "eu.opencloud.api.storage-system", // system storage
 				SystemUserIDP: "internal",
 			},
 			JSONCS3: config.PublicSharingJSONCS3Driver{
-				ProviderAddr:  "com.owncloud.api.storage-system", // system storage
+				ProviderAddr:  "eu.opencloud.api.storage-system", // system storage
 				SystemUserIDP: "internal",
 			},
 			// TODO implement and add owncloudsql publicshare driver

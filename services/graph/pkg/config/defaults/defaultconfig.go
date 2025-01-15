@@ -42,7 +42,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9120",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Root:      "/graph",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
@@ -65,7 +65,7 @@ func DefaultConfig() *config.Config {
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
-			StorageUsersAddress: "com.owncloud.api.storage-users",
+			StorageUsersAddress: "eu.opencloud.api.storage-users",
 			WebDavBase:          "https://localhost:9200",
 			WebDavPath:          "/dav/spaces/",
 			DefaultQuota:        "1000000000",

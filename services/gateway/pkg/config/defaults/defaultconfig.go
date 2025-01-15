@@ -27,7 +27,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9142",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
@@ -51,19 +51,19 @@ func DefaultConfig() *config.Config {
 
 		FrontendPublicURL: "https://localhost:9200",
 
-		AppRegistryEndpoint:       "com.owncloud.api.app-registry",
-		AuthAppEndpoint:           "com.owncloud.api.auth-app",
-		AuthBasicEndpoint:         "com.owncloud.api.auth-basic",
-		AuthMachineEndpoint:       "com.owncloud.api.auth-machine",
-		AuthServiceEndpoint:       "com.owncloud.api.auth-service",
-		GroupsEndpoint:            "com.owncloud.api.groups",
-		PermissionsEndpoint:       "com.owncloud.api.settings",
-		SharingEndpoint:           "com.owncloud.api.sharing",
-		StoragePublicLinkEndpoint: "com.owncloud.api.storage-publiclink",
-		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",
-		StorageUsersEndpoint:      "com.owncloud.api.storage-users",
-		UsersEndpoint:             "com.owncloud.api.users",
-		OCMEndpoint:               "com.owncloud.api.ocm",
+		AppRegistryEndpoint:       "eu.opencloud.api.app-registry",
+		AuthAppEndpoint:           "eu.opencloud.api.auth-app",
+		AuthBasicEndpoint:         "eu.opencloud.api.auth-basic",
+		AuthMachineEndpoint:       "eu.opencloud.api.auth-machine",
+		AuthServiceEndpoint:       "eu.opencloud.api.auth-service",
+		GroupsEndpoint:            "eu.opencloud.api.groups",
+		PermissionsEndpoint:       "eu.opencloud.api.settings",
+		SharingEndpoint:           "eu.opencloud.api.sharing",
+		StoragePublicLinkEndpoint: "eu.opencloud.api.storage-publiclink",
+		StorageSharesEndpoint:     "eu.opencloud.api.storage-shares",
+		StorageUsersEndpoint:      "eu.opencloud.api.storage-users",
+		UsersEndpoint:             "eu.opencloud.api.users",
+		OCMEndpoint:               "eu.opencloud.api.ocm",
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",

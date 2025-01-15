@@ -5,7 +5,7 @@ import (
 )
 
 var defaultRevaConfig = Reva{
-	Address: "com.owncloud.api.gateway",
+	Address: "eu.opencloud.api.gateway",
 }
 
 func DefaultRevaConfig() *Reva {

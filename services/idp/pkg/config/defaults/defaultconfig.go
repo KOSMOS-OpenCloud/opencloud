@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9130",
 			Root:      "/",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			TLSCert:   filepath.Join(defaults.BaseDataPath(), "idp", "server.crt"),
 			TLSKey:    filepath.Join(defaults.BaseDataPath(), "idp", "server.key"),
 			TLS:       false,

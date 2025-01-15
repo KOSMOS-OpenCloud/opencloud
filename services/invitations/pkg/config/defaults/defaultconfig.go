@@ -24,7 +24,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9265",
 			Root:      "/graph/v1.0",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			CORS: config.CORS{
 				AllowedOrigins: []string{"https://localhost:9200"},
 			},

@@ -29,12 +29,12 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9215",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 			Protocol:  "tcp",
 		},
 		HTTP: config.HTTPConfig{
 			Addr:      "127.0.0.1:9216",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{

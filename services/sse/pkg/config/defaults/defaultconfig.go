@@ -31,7 +31,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9135",
 			Root:      "/",
-			Namespace: "com.owncloud.sse",
+			Namespace: "eu.opencloud.sse",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET"},

@@ -17,12 +17,12 @@ import (
 var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func() {
 	var authenticator Authenticator
 	BeforeEach(func() {
-		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+		pool.RemoveSelector("GatewaySelector" + "eu.opencloud.api.gateway")
 		authenticator = AppAuthAuthenticator{
 			Logger: log.NewLogger(),
 			RevaGatewaySelector: pool.GetSelector[gateway.GatewayAPIClient](
 				"GatewaySelector",
-				"com.owncloud.api.gateway",
+				"eu.opencloud.api.gateway",
 				func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 					return mockGatewayClient{
 						AuthenticateFunc: func(authType, clientID, clientSecret string) (string, rpcv1beta1.Code) {

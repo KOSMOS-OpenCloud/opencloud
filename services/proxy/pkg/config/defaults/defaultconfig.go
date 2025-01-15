@@ -31,7 +31,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "0.0.0.0:9200",
 			Root:      "/",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			TLSCert:   path.Join(defaults.BaseDataPath(), "proxy", "server.crt"),
 			TLSKey:    path.Join(defaults.BaseDataPath(), "proxy", "server.key"),
 			TLS:       true,
@@ -111,79 +111,79 @@ func DefaultPolicies() []config.Policy {
 			Routes: []config.Route{
 				{
 					Endpoint:    "/",
-					Service:     "com.owncloud.web.web",
+					Service:     "eu.opencloud.web.web",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/.well-known/ocm",
-					Service:     "com.owncloud.web.ocm",
+					Service:     "eu.opencloud.web.ocm",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/.well-known/webfinger",
-					Service:     "com.owncloud.web.webfinger",
+					Service:     "eu.opencloud.web.webfinger",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/.well-known/openid-configuration",
-					Service:     "com.owncloud.web.idp",
+					Service:     "eu.opencloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/branding/logo",
-					Service:  "com.owncloud.web.web",
+					Service:  "eu.opencloud.web.web",
 				},
 				{
 					Endpoint:    "/konnect/",
-					Service:     "com.owncloud.web.idp",
+					Service:     "eu.opencloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/signin/",
-					Service:     "com.owncloud.web.idp",
+					Service:     "eu.opencloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/archiver",
-					Service:  "com.owncloud.web.frontend",
+					Service:  "eu.opencloud.web.frontend",
 				},
 				{
 					// reroute oc10 notifications endpoint to userlog service
 					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications/sse",
-					Service:  "com.owncloud.sse.sse",
+					Service:  "eu.opencloud.sse.sse",
 				},
 				{
 					// reroute oc10 notifications endpoint to userlog service
 					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications",
-					Service:  "com.owncloud.web.userlog",
+					Service:  "eu.opencloud.web.userlog",
 				},
 				{
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
-					Service:  "com.owncloud.web.ocs",
+					Service:  "eu.opencloud.web.ocs",
 				},
 				{
 					Type:        config.RegexRoute,
 					Endpoint:    "/ocs/v[12].php/config",
-					Service:     "com.owncloud.web.frontend",
+					Service:     "eu.opencloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/sciencemesh/",
-					Service:  "com.owncloud.web.ocm",
+					Service:  "eu.opencloud.web.ocm",
 				},
 				{
 					Endpoint: "/ocm/",
-					Service:  "com.owncloud.web.ocm",
+					Service:  "eu.opencloud.web.ocm",
 				},
 				{
 					Endpoint: "/ocs/",
-					Service:  "com.owncloud.web.frontend",
+					Service:  "eu.opencloud.web.frontend",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/remote.php/?preview=1",
-					Service:  "com.owncloud.web.webdav",
+					Service:  "eu.opencloud.web.webdav",
 				},
 				// TODO the actual REPORT goes to /dav/files/{username}, which is user specific ... how would this work in a spaces world?
 				// TODO what paths are returned? the href contains the full path so it should be possible to return urls from other spaces?
@@ -193,81 +193,81 @@ func DefaultPolicies() []config.Policy {
 					Type:     config.RegexRoute,
 					Method:   "REPORT",
 					Endpoint: "(/remote.php)?/(web)?dav",
-					Service:  "com.owncloud.web.webdav",
+					Service:  "eu.opencloud.web.webdav",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/dav/?preview=1",
-					Service:  "com.owncloud.web.webdav",
+					Service:  "eu.opencloud.web.webdav",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/webdav/?preview=1",
-					Service:  "com.owncloud.web.webdav",
+					Service:  "eu.opencloud.web.webdav",
 				},
 				{
 					Endpoint: "/remote.php/",
-					Service:  "com.owncloud.web.ocdav",
+					Service:  "eu.opencloud.web.ocdav",
 				},
 				{
 					Endpoint: "/dav/",
-					Service:  "com.owncloud.web.ocdav",
+					Service:  "eu.opencloud.web.ocdav",
 				},
 				{
 					Endpoint: "/webdav/",
-					Service:  "com.owncloud.web.ocdav",
+					Service:  "eu.opencloud.web.ocdav",
 				},
 				{
 					Endpoint:    "/status",
-					Service:     "com.owncloud.web.ocdav",
+					Service:     "eu.opencloud.web.ocdav",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/status.php",
-					Service:     "com.owncloud.web.ocdav",
+					Service:     "eu.opencloud.web.ocdav",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/index.php/",
-					Service:  "com.owncloud.web.ocdav",
+					Service:  "eu.opencloud.web.ocdav",
 				},
 				{
 					Endpoint: "/apps/",
-					Service:  "com.owncloud.web.ocdav",
+					Service:  "eu.opencloud.web.ocdav",
 				},
 				{
 					Endpoint:    "/data",
-					Service:     "com.owncloud.web.frontend",
+					Service:     "eu.opencloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/app/list",
-					Service:     "com.owncloud.web.frontend",
+					Service:     "eu.opencloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
-					Service:  "com.owncloud.web.frontend",
+					Service:  "eu.opencloud.web.frontend",
 				},
 				{
 					Endpoint: "/graph/v1beta1/extensions/org.libregraph/activities",
-					Service:  "com.owncloud.web.activitylog",
+					Service:  "eu.opencloud.web.activitylog",
 				},
 				{
 					Endpoint: "/graph/v1.0/invitations",
-					Service:  "com.owncloud.web.invitations",
+					Service:  "eu.opencloud.web.invitations",
 				},
 				{
 					Endpoint: "/graph/",
-					Service:  "com.owncloud.web.graph",
+					Service:  "eu.opencloud.web.graph",
 				},
 				{
 					Endpoint: "/api/v0/settings",
-					Service:  "com.owncloud.web.settings",
+					Service:  "eu.opencloud.web.settings",
 				},
 				{
 					Endpoint: "/auth-app/tokens",
-					Service:  "com.owncloud.web.auth-app",
+					Service:  "eu.opencloud.web.auth-app",
 				},
 			},
 		},

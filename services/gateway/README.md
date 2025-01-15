@@ -42,7 +42,7 @@ The scheme for this setup is the following. Note that there is, except storage, 
 |------|------|------|
 | OC_GRPC_PROTOCOL or <br> `<service>`_GRPC_PROTOCOL | tcp | unix |
 | `<service>`_GRPC_ADDR | 127.0.0.1:`<port>` | /var/run/ocis/`<service>`.sock |
-| GATEWAY_`<service>`_ENDPOINT | com.owncloud.api.`<service>` | unix:/var/run/ocis/`<service>`.sock <br> dns: ... <br> kubernetes: ... |
+| GATEWAY_`<service>`_ENDPOINT | eu.opencloud.api.`<service>` | unix:/var/run/ocis/`<service>`.sock <br> dns: ... <br> kubernetes: ... |
 
 ```console
 USERS_GRPC_PROTOCOL=unix"
@@ -108,7 +108,7 @@ In order to add another storage provider the CS3 storage registry that is runnin
 
 ```json
 {
-  "com.owncloud.api.storage-users": {
+  "eu.opencloud.api.storage-users": {
     "providerid": "{storage-users-mount-uuid}",
     "spaces": {
       "personal": {
@@ -121,7 +121,7 @@ In order to add another storage provider the CS3 storage registry that is runnin
       }
     }
   },
-  "com.owncloud.api.storage-shares": {
+  "eu.opencloud.api.storage-shares": {
     "providerid": "a0ca6a90-a365-4782-871e-d44447bbc668",
     "spaces": {
       "virtual": {
@@ -136,7 +136,7 @@ In order to add another storage provider the CS3 storage registry that is runnin
       }
     }
   },
-  "com.owncloud.api.storage-publiclink": {
+  "eu.opencloud.api.storage-publiclink": {
     "providerid": "7993447f-687f-490d-875c-ac95e89a62a4",
     "spaces": {
       "grant": {
@@ -148,7 +148,7 @@ In order to add another storage provider the CS3 storage registry that is runnin
       }
     }
   },
-  "com.owncloud.api.ocm": {
+  "eu.opencloud.api.ocm": {
     "providerid": "89f37a33-858b-45fa-8890-a1f2b27d90e1",
     "spaces": {
       "grant": {
@@ -160,7 +160,7 @@ In order to add another storage provider the CS3 storage registry that is runnin
       }
     }
   },
-  "com.owncloud.api.storage-hello": {
+  "eu.opencloud.api.storage-hello": {
     "providerid": "hello-storage-id",
     "spaces": {
       "project": {
@@ -172,4 +172,4 @@ In order to add another storage provider the CS3 storage registry that is runnin
 }
 ```
 
-In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `com.owncloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.
+In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `eu.opencloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.

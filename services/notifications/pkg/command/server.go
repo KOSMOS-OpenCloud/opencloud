@@ -120,8 +120,8 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
 			}
-			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
-			historyClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
+			valueService := settingssvc.NewValueService("eu.opencloud.api.settings", grpcClient)
+			historyClient := ehsvc.NewEventHistoryService("eu.opencloud.api.eventhistory", grpcClient)
 
 			notificationStore := store.Create(
 				store.Store(cfg.Store.Store),

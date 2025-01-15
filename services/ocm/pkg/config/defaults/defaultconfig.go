@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTPConfig{
 			Addr:      "127.0.0.1:9280",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",
 			CORS: config.CORS{
@@ -79,7 +79,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9282",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Service: config.Service{

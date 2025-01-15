@@ -247,8 +247,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 	userProvider backend.UserBackend, publisher events.Publisher,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient], serviceSelector selector.Selector) alice.Chain {
 
-	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", cfg.GrpcClient)
-	policiesProviderClient := policiessvc.NewPoliciesProviderService("com.owncloud.api.policies", cfg.GrpcClient)
+	rolesClient := settingssvc.NewRoleService("eu.opencloud.api.settings", cfg.GrpcClient)
+	policiesProviderClient := policiessvc.NewPoliciesProviderService("eu.opencloud.api.policies", cfg.GrpcClient)
 
 	var roleAssigner userroles.UserRoleAssigner
 	switch cfg.RoleAssignment.Driver {

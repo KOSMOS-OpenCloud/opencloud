@@ -15,7 +15,7 @@ The following request authentication schemes are implemented:
 
 ## Configuring Routes
 
-The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.com/owncloud/ocis/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
+The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.eu.opencloud.ocis/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
 
 Due to the complexity when defining routes, these can only be defined in the yaml file but not via environment variables.
 
@@ -26,9 +26,9 @@ policies:
   - name: ocis
     routes:
       - endpoint: /
-        service: com.owncloud.web.web
+        service: eu.opencloud.web.web
       - endpoint: /dav/
-        service: com.owncloud.web.ocdav
+        service: eu.opencloud.web.ocdav
 ```
 
 For adding _additional_ routes to the default routes use:
@@ -38,7 +38,7 @@ additional_policies:
   - name: ocis
     routes:
       - endpoint: /custom/endpoint
-        service: com.owncloud.custom.custom
+        service: eu.opencloud.custom.custom
 ```
 
 A route has the following configurable parameters:
@@ -140,14 +140,14 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
+* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare.
 
 #### Impacts
 
 For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:
 
 * There is no user notification about the inability accessing the resource.
-* The user will only experience rejected access. 
+* The user will only experience rejected access.
 * This also applies for connected apps like the Desktop, iOS or Android app!
 
 To give access for rejected users on a resource, one with rights to share must update the group information.
@@ -266,7 +266,7 @@ Store specific notes:
 To authenticate presigned URLs the proxy service needs to read signing keys from a store that is populated by the ocs service. Possible stores are:
   -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `ocisstoreservice`:  Stores data in the legacy ocis store service. Requires setting `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `com.owncloud.api.store`.
+  -   `ocisstoreservice`:  Stores data in the legacy ocis store service. Requires setting `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `eu.opencloud.api.store`.
 
 The `memory` store cannot be used as it does not share the memory from the ocs service signing key memory store, even in a single process.
 
@@ -276,7 +276,7 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to the same value as `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`. That way the ocs uses the same nats instance as the proxy service.
   -   When using the `nats-js-kv` store, it is possible to set `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE` to instruct nats to not persist signing key data on disc.
-  -   When using `ocisstoreservice` the `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` must be set to the service name `com.owncloud.api.store`. It does not support TTL and stores the presigning keys indefinitely. Also, the store service needs to be started.
+  -   When using `ocisstoreservice` the `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` must be set to the service name `eu.opencloud.api.store`. It does not support TTL and stores the presigning keys indefinitely. Also, the store service needs to be started.
 
 
 ## Special Settings

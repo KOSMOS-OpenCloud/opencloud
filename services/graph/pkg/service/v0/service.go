@@ -170,7 +170,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		if err != nil {
 			return svc, err
 		}
-		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpcClient)
+		svc.permissionsService = settingssvc.NewPermissionService("eu.opencloud.api.settings", grpcClient)
 	} else {
 		svc.permissionsService = options.PermissionService
 	}

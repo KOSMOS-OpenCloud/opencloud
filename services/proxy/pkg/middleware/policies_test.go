@@ -146,12 +146,12 @@ func prepare(q string) (http.Handler, *mocks.PoliciesProviderService, *cs3mocks.
 	gatewayClient := &cs3mocks.GatewayAPIClient{}
 	gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
 		"GatewaySelector",
-		"com.owncloud.api.gateway",
+		"eu.opencloud.api.gateway",
 		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 			return gatewayClient
 		},
 	)
-	defer pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+	defer pool.RemoveSelector("GatewaySelector" + "eu.opencloud.api.gateway")
 
 	// mocked policiesProviderService
 	policiesProviderService := &mocks.PoliciesProviderService{}

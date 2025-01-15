@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9100",
 			Root:      "/",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			CacheTTL:  604800, // 7 days
 
 			CORS: config.CORS{
@@ -84,7 +84,7 @@ func DefaultConfig() *config.Config {
 			AppsPath:   filepath.Join(defaults.BaseDataPath(), "web/assets/apps"),
 			ThemesPath: filepath.Join(defaults.BaseDataPath(), "web/assets/themes"),
 		},
-		GatewayAddress: "com.owncloud.api.gateway",
+		GatewayAddress: "eu.opencloud.api.gateway",
 		Web: config.Web{
 			ThemeServer: "https://localhost:9200",
 			ThemePath:   "/themes/opencloud/theme.json",

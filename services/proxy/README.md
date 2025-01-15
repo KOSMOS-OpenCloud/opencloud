@@ -15,7 +15,7 @@ The following request authentication schemes are implemented:
 
 ## Configuring Routes
 
-The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.eu.opencloud.ocis/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
+The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.com/opencloud-eu/opencloud/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
 
 Due to the complexity when defining routes, these can only be defined in the yaml file but not via environment variables.
 

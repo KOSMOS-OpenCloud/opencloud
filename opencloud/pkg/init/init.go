@@ -6,12 +6,13 @@ import (
 	"path"
 
 	"github.com/gofrs/uuid"
-	"github.com/opencloud-eu/opencloud/pkg/generators"
 	"gopkg.in/yaml.v2"
+
+	"github.com/opencloud-eu/opencloud/pkg/generators"
 )
 
 const (
-	configFilename = "ocis.yaml"
+	configFilename = "opencloud.yaml"
 	passwordLength = 32
 )
 

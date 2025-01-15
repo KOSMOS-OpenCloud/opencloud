@@ -9,11 +9,11 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/structs"
 )
 
-// ParseConfig loads the ocis configuration and
+// ParseConfig loads the opencloud configuration and
 // copies applicable parts into the commons part, from
 // where the services can copy it into their own config
 func ParseConfig(cfg *config.Config, skipValidate bool) error {
-	err := config.BindSourcesToStructs("ocis", cfg)
+	err := config.BindSourcesToStructs("opencloud", cfg)
 	if err != nil {
 		return err
 	}

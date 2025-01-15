@@ -46,14 +46,14 @@ var _ = Describe("FileConnector", func() {
 	BeforeEach(func() {
 		cfg = &config.Config{
 			Commons: &shared.Commons{
-				OcisURL: "https://ocis.example.prv",
+				OcisURL: "https://cloud.opencloud.test",
 			},
 			App: config.App{
 				Name:    "test",
 				Product: "Microsoft",
 			},
 			Wopi: config.Wopi{
-				WopiSrc: "https://ocis.server.prv",
+				WopiSrc: "https://wopi.opencloud.test",
 				Secret:  "topsecret",
 			},
 			TokenManager: &config.TokenManager{JWTSecret: "secret"},
@@ -956,9 +956,9 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
-			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
-			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
+			Expect(rBody["Url"]).To(HavePrefix("https://wopi.opencloud.test/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested success only extension", func() {
@@ -1011,9 +1011,9 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("file.pdf"))
-			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
-			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
+			Expect(rBody["Url"]).To(HavePrefix("https://wopi.opencloud.test/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested success conflict", func() {
@@ -1083,9 +1083,9 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
-			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
-			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
+			Expect(rBody["Url"]).To(HavePrefix("https://wopi.opencloud.test/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested put file fails", func() {
@@ -1207,9 +1207,9 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers).To(BeNil())
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
-			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
-			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
+			Expect(rBody["Url"]).To(HavePrefix("https://wopi.opencloud.test/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileRelative conflict", func() {
@@ -1266,9 +1266,9 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Headers[connector.HeaderWopiValidRT]).To(MatchRegexp(`[a-zA-Z0-9_-] convFile\.pdf`))
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("convFile.pdf"))
-			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
-			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
-			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
+			Expect(rBody["Url"]).To(HavePrefix("https://wopi.opencloud.test/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://cloud.opencloud.test/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileRelative put file fails", func() {
@@ -1704,7 +1704,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				BreadcrumbFolderName:       "/path/to",
-				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				BreadcrumbFolderURL:        "https://cloud.opencloud.test/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative:    false,
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
@@ -1716,10 +1716,10 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:              true,
 				UserID:                     "61646d696e40637573746f6d496470", // hex of admin@customIdp
 				UserFriendlyName:           "Pet Shaft",
-				FileSharingURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
-				FileVersionURL:             "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
-				HostEditURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
-				HostViewURL:                "https://ocis.example.prv/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
+				FileSharingURL:             "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:             "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:                "https://cloud.opencloud.test/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				HostViewURL:                "https://cloud.opencloud.test/external-test/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=view",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1791,7 +1791,7 @@ var _ = Describe("FileConnector", func() {
 				SupportsRename:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
-				PostMessageOrigin:       "https://ocis.example.prv",
+				PostMessageOrigin:       "https://cloud.opencloud.test",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1879,7 +1879,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/s/ABC123",
+				BreadcrumbFolderURL:     "https://cloud.opencloud.test/s/ABC123",
 				DisablePrint:            true,
 				UserCanNotWriteRelative: false,
 				SupportsLocks:           true,
@@ -1892,10 +1892,10 @@ var _ = Describe("FileConnector", func() {
 				EnableInsertRemoteImage: false,
 				UserID:                  "guest-zzz000",
 				UserFriendlyName:        "guest zzz000",
-				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
-				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
-				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
-				PostMessageOrigin:       "https://ocis.example.prv",
+				FileSharingURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://cloud.opencloud.test/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				PostMessageOrigin:       "https://cloud.opencloud.test",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1974,7 +1974,7 @@ var _ = Describe("FileConnector", func() {
 				SupportsRename:          true,
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
-				PostMessageOrigin:       "https://ocis.example.prv",
+				PostMessageOrigin:       "https://cloud.opencloud.test",
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2032,7 +2032,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
+				BreadcrumbFolderURL:     "https://cloud.opencloud.test/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative: false,
 				SupportsLocks:           true,
 				SupportsUpdate:          true,
@@ -2041,10 +2041,10 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           true,
 				UserID:                  "61646d696e40637573746f6d496470", // hex of admin@customIdp
 				UserFriendlyName:        "Pet Shaft",
-				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
-				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
-				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
-				PostMessageOrigin:       "https://ocis.example.prv",
+				FileSharingURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://cloud.opencloud.test/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				PostMessageOrigin:       "https://cloud.opencloud.test",
 			}
 
 			// change wopi app provider
@@ -2057,7 +2057,7 @@ var _ = Describe("FileConnector", func() {
 
 			returnedFileInfo := response.Body.(*fileinfo.OnlyOffice)
 			templateSource := returnedFileInfo.TemplateSource
-			expectedTemplateSource := "https://ocis.server.prv/wopi/templates/a340d017568d0d579ee061a9ac02109e32fb07082d35c40aa175864303bd9107?access_token="
+			expectedTemplateSource := "https://wopi.opencloud.test/wopi/templates/a340d017568d0d579ee061a9ac02109e32fb07082d35c40aa175864303bd9107?access_token="
 
 			// take TemplateSource out of the response for easier comparison
 			returnedFileInfo.TemplateSource = ""

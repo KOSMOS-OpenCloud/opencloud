@@ -16,7 +16,7 @@ var _ = Describe("Wopisrc Test", func() {
 		BeforeEach(func() {
 			c = &config.Config{
 				Wopi: config.Wopi{
-					WopiSrc:     "https://ocis.team/wopi/files",
+					WopiSrc:     "https://cloud.example.test/wopi/files",
 					ProxyURL:    "https://cloud.proxy.com",
 					ProxySecret: "secret",
 				},
@@ -25,7 +25,7 @@ var _ = Describe("Wopisrc Test", func() {
 		When("WopiSrc URL is incorrect", func() {
 			c = &config.Config{
 				Wopi: config.Wopi{
-					WopiSrc: "https:&//ocis.team/wopi/files",
+					WopiSrc: "https:&//cloud.example.test/wopi/files",
 				},
 			}
 			url, err := wopisrc.GenerateWopiSrc("123456", c)
@@ -35,7 +35,7 @@ var _ = Describe("Wopisrc Test", func() {
 		When("proxy URL is incorrect", func() {
 			c = &config.Config{
 				Wopi: config.Wopi{
-					WopiSrc:     "https://ocis.team/wopi/files",
+					WopiSrc:     "https://cloud.example.test/wopi/files",
 					ProxyURL:    "cloud",
 					ProxySecret: "secret",
 				},
@@ -48,7 +48,7 @@ var _ = Describe("Wopisrc Test", func() {
 			It("should generate a WOPI src URL as a jwt token", func() {
 				url, err := wopisrc.GenerateWopiSrc("123456", c)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(url.String()).To(Equal("https://cloud.proxy.com/wopi/files/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1IjoiaHR0cHM6Ly9vY2lzLnRlYW0vd29waS9maWxlcy8iLCJmIjoiMTIzNDU2In0.6ol9PQXGKktKfAri8tsJ4X_a9rIeosJ7id6KTQW6Ui0"))
+				Expect(url.String()).To(Equal("https://cloud.proxy.com/wopi/files/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1IjoiaHR0cHM6Ly9jbG91ZC5leGFtcGxlLnRlc3Qvd29waS9maWxlcy8iLCJmIjoiMTIzNDU2In0.LzyGPanHKxjLlIPoyfGU4cAUxzy3FAmBqMIqLCSHclg"))
 			})
 		})
 		When("proxy URL and proxy secret are not configured", func() {
@@ -57,7 +57,7 @@ var _ = Describe("Wopisrc Test", func() {
 				c.Wopi.ProxySecret = ""
 				url, err := wopisrc.GenerateWopiSrc("123456", c)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(url.String()).To(Equal("https://ocis.team/wopi/files/123456"))
+				Expect(url.String()).To(Equal("https://cloud.example.test/wopi/files/123456"))
 			})
 		})
 	})

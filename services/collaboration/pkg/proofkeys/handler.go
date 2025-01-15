@@ -59,7 +59,7 @@ func NewVerifyHandler(discoveryURL string, insecure bool, cachedDur time.Duratio
 // All the provided parameters are strings:
 // * accessToken: The access token used for this request (targeting this collaboration service)
 // * url: The full url for this request, including scheme, host and all query parameters,
-// something like "https://wopiserver.test.private/wopi/file/abcbcbd?access_token=oiuiu" or
+// something like "https://wopi.opencloud.test/wopi/file/abcbcbd?access_token=oiuiu" or
 // "http://wopiserver:8888/wopi/file/abcdef?access_token=zzxxyy"
 // * timestamp: The timestamp provided by the WOPI app in the "X-WOPI-TimeStamp" header, as string
 // * sig64: The base64-encoded signature, which should come directly from the "X-WOPI-Proof" header

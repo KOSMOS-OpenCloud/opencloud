@@ -1,8 +1,8 @@
 # Collaboration
 
-The collaboration service connects ocis with document servers such as Collabora, ONLYOFFICE or Microsoft using the WOPI protocol.
+The collaboration service connects opencloud with document servers such as Collabora, ONLYOFFICE or Microsoft using the WOPI protocol.
 
-Since this service requires an external document server, it won't start by default when using `ocis server`. You must start it manually with the `ocis collaboration server` command.
+Since this service requires an external document server, it won't start by default when using `opencloud server`. You must start it manually with the `opencloud collaboration server` command.
 
 Because the collaboration service needs to be started manually, the following prerequisite applies: On collaboration service startup, particular environment variables are required to be populated. If environment variables have a default like the `MICRO_REGISTRY_ADDRESS`, the default will be used, if not set otherwise. Use for all others the instance values as defined. If these environment variables are not provided or misconfigured, the collaboration service will not start up.
 
@@ -20,7 +20,7 @@ The collaboration service requires the target document server (ONLYOFFICE, Colla
 * The gateway service.
 * The app-registry service.
 
-If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of Infinite Scale, check with the `ocis list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
+If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of Infinite Scale, check with the `opencloud list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
 
 ## WOPI Configuration
 

@@ -21,7 +21,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "collaboration",
-		Usage:    "Serve WOPI for oCIS",
+		Usage:    "Serve WOPI for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

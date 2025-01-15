@@ -1,13 +1,11 @@
 <!--
-Thanks for submitting a change to ownCloud!
+Thanks for submitting a change to OpenCloud!
 
-This is the bug tracker for the oCIS component. Find other components at https://github.com/owncloud/core/blob/master/.github/CONTRIBUTING.md#guidelines
-
-For fixing potential security issues please see https://owncloud.org/security/
+For fixing potential security issues please see https://opencloud.eu/security/
 
 To make it possible for us to get your change reviewed and merged please carefully fill out the requested information below.
 
-Please note that any kind of change needs first be submitted to the master branch which holds the next version of oCIS.
+Please note that any kind of change needs first be submitted to the main branch which holds the next version of OpenCloud.
 
 Please set the following labels:
 
@@ -50,7 +48,7 @@ Please set the following labels:
 
 ## Checklist:
 <!-- Tick the checkboxes when done. -->
-<!-- Raise documentation ticket in owncloud.github.io/ -->
+<!-- Raise documentation ticket in opencloud.github.io/ -->
 - [ ] Code changes
 - [ ] Unit tests added
 - [ ] Acceptance tests added

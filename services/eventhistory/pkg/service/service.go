@@ -9,8 +9,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
-	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
+	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/eventhistory/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 	"go-micro.dev/v4/store"
 )

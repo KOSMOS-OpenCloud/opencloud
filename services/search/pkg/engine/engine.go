@@ -7,8 +7,8 @@ import (
 	"github.com/blevesearch/bleve/v2/search"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
-	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
-	searchService "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
+	searchService "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 )
 

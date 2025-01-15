@@ -6,7 +6,7 @@ import (
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"go-micro.dev/v4/api"
 	"go-micro.dev/v4/server"
 )

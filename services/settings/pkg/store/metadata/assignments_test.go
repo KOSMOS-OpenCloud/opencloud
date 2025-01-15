@@ -8,7 +8,7 @@ import (
 	"github.com/gofrs/uuid"
 	olog "github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
-	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/config/defaults"
 	"github.com/stretchr/testify/require"
 )

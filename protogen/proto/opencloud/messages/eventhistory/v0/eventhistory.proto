@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package opencloud.messages.eventhistory.v0;
+
+option go_package = "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/eventhistory/v0";
+
+message Event {
+    // REQUIRED.
+    string type = 1;
+    // REQUIRED.
+    string id = 2;
+    // REQUIRED
+    bytes event = 3;
+
+}
+

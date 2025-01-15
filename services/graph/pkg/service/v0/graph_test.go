@@ -30,8 +30,8 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/opencloud-eu/opencloud/pkg/shared"
-	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"

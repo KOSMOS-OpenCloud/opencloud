@@ -25,8 +25,8 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"

@@ -20,9 +20,9 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/service/http"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
-	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	graphMiddleware "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 	svc "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 )

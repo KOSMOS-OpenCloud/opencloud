@@ -10,7 +10,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/pkg/oidc"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"go-micro.dev/v4/metadata"
 )
 

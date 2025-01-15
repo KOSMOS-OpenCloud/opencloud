@@ -8,7 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	micrometadata "go-micro.dev/v4/metadata"
 )

@@ -21,8 +21,8 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/ast"
 	"github.com/opencloud-eu/opencloud/pkg/kql"
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
-	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/eventhistory/v0"
-	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
+	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/eventhistory/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 

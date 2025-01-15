@@ -25,7 +25,7 @@ geekdocRepo: https://github.com/opencloud-eu/opencloud
 | ----- | ---- | ----- | ----------- |
 {{ range .Fields -}}
 {{- $loca := printf "#%s" (.LongType | lower | replace "." "") -}}
-{{- if and (hasPrefix "ocis." .LongType) (ge (len $filenameParts) 3) -}}
+{{- if and (hasPrefix "opencloud." .LongType) (ge (len $filenameParts) 3) -}}
 	{{- $ltypeSpl := .LongType | splitList "." -}}
 	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $loca = printf "/apis/grpc_apis/%s/#%s" $ltypePkg (.Type | lower) -}}
@@ -72,12 +72,12 @@ geekdocRepo: https://github.com/opencloud-eu/opencloud
 {{ range .Methods -}}
 {{- $reqLoca := printf "#%s" (.RequestLongType | lower | replace "." "") -}}
 {{- $respLoca := printf "#%s" (.ResponseLongType | lower | replace "." "") -}}
-{{- if and (hasPrefix ".ocis." .RequestLongType) (ge (len $filenameParts) 3) }}
+{{- if and (hasPrefix ".opencloud." .RequestLongType) (ge (len $filenameParts) 3) }}
 	{{- $ltypeSpl := .RequestLongType | substr 1 -1 | splitList "." -}}
 	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $reqLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.RequestType | lower) -}}
 {{- end -}}
-{{- if and (hasPrefix ".ocis." .ResponseLongType) (ge (len $filenameParts) 3) }}
+{{- if and (hasPrefix ".opencloud." .ResponseLongType) (ge (len $filenameParts) 3) }}
 	{{- $ltypeSpl := .ResponseLongType | substr 1 -1 | splitList "." -}}
 	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $respLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.ResponseType | lower) -}}

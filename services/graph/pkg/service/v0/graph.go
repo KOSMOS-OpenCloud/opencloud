@@ -20,9 +20,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/opencloud-eu/opencloud/pkg/keycloak"
-	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/eventhistory/v0"
-	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 )

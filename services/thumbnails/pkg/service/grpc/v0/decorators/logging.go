@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
+	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/thumbnails/v0"
 	merrors "go-micro.dev/v4/errors"
 )
 

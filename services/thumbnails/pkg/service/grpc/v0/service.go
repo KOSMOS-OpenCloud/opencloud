@@ -21,7 +21,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
+	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/thumbnails/v0"
 	terrors "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/preprocessor"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/grpc/v0/decorators"

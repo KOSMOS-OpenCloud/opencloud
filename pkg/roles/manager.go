@@ -6,8 +6,8 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	microstore "go-micro.dev/v4/store"
 	"google.golang.org/protobuf/encoding/protojson"
 )

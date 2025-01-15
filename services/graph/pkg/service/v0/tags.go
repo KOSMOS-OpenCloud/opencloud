@@ -11,9 +11,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/go-chi/render"
-	libregraph "github.com/owncloud/libre-graph-api-go"
-	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"go-micro.dev/v4/metadata"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
-	ocisdefaults "github.com/opencloud-eu/opencloud/pkg/config/defaults"
+	ocdefaults "github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
@@ -49,14 +49,14 @@ func Validate(cfg *config.Config) error {
 			"Make sure your %s config contains the proper values "+
 			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable): %s",
-			cfg.Service.Name, ocisdefaults.BaseConfigPath(), err.Error())
+			cfg.Service.Name, ocdefaults.BaseConfigPath(), err.Error())
 	}
 	if url.Path != "" {
 		return fmt.Errorf("The WOPI Src must not contain a path in your config for %s. "+
 			"Make sure your %s config contains the proper values "+
 			"(e.g. by running opencloud init or setting it manually in "+
 			"the config/corresponding environment variable)",
-			cfg.Service.Name, ocisdefaults.BaseConfigPath())
+			cfg.Service.Name, ocdefaults.BaseConfigPath())
 	}
 
 	return nil

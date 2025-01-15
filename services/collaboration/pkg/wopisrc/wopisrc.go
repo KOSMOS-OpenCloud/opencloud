@@ -19,7 +19,7 @@ import (
 // If no proxy URL and proxy secret are configured, the URL will be generated
 // as a direct URL that contains the file reference.
 // Example:
-// https:/ocis.team/wopi/files/12312678470610632091729803710923
+// https:/cloud.example.test/wopi/files/12312678470610632091729803710923
 func GenerateWopiSrc(fileRef string, cfg *config.Config) (*url.URL, error) {
 	wopiSrcURL, err := url.Parse(cfg.Wopi.WopiSrc)
 	if err != nil {

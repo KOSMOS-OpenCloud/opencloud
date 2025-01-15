@@ -44,7 +44,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			// prepare components
-			if err := helpers.RegisterOcisService(ctx, cfg, logger); err != nil {
+			if err := helpers.RegisterOpenCloudService(ctx, cfg, logger); err != nil {
 				return err
 			}
 

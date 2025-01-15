@@ -31,19 +31,19 @@ func CollaborationTracingMiddleware(next http.Handler) http.Handler {
 		wopiFile := wopiContext.FileReference
 
 		attrs := []attribute.KeyValue{
-			attribute.String("ocis.wopi.sessionid", r.Header.Get("X-WOPI-SessionId")),
-			attribute.String("ocis.wopi.method", wopiMethod),
-			attribute.String("ocis.wopi.resource.id.storage", wopiFile.GetResourceId().GetStorageId()),
-			attribute.String("ocis.wopi.resource.id.opaque", wopiFile.GetResourceId().GetOpaqueId()),
-			attribute.String("ocis.wopi.resource.id.space", wopiFile.GetResourceId().GetSpaceId()),
-			attribute.String("ocis.wopi.resource.path", wopiFile.GetPath()),
+			attribute.String("wopi.session.id", r.Header.Get("X-WOPI-SessionId")),
+			attribute.String("wopi.method", wopiMethod),
+			attribute.String("cs3.resource.id.storage", wopiFile.GetResourceId().GetStorageId()),
+			attribute.String("cs3.resource.id.opaque", wopiFile.GetResourceId().GetOpaqueId()),
+			attribute.String("cs3.resource.id.space", wopiFile.GetResourceId().GetSpaceId()),
+			attribute.String("cs3.resource.path", wopiFile.GetPath()),
 		}
 
 		if wopiUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 			attrs = append(attrs, []attribute.KeyValue{
-				attribute.String("ocis.wopi.user.idp", wopiUser.GetId().GetIdp()),
-				attribute.String("ocis.wopi.user.opaque", wopiUser.GetId().GetOpaqueId()),
-				attribute.String("ocis.wopi.user.type", wopiUser.GetId().GetType().String()),
+				attribute.String("cs3.user.idp", wopiUser.GetId().GetIdp()),
+				attribute.String("cs3.user.opaque", wopiUser.GetId().GetOpaqueId()),
+				attribute.String("cs3.user.type", wopiUser.GetId().GetType().String()),
 			}...)
 		}
 		span.SetAttributes(attrs...)

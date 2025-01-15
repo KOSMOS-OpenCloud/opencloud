@@ -1215,7 +1215,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
 	}
 
-	ocisURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	ocURL, err := url.Parse(f.cfg.Commons.OcisURL)
 	if err != nil {
 		return nil, err
 	}
@@ -1224,17 +1224,17 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		return nil, err
 	}
 	privateLinkURL := &url.URL{}
-	*privateLinkURL = *ocisURL
-	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
+	*privateLinkURL = *ocURL
+	privateLinkURL.Path = path.Join(ocURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
 	parentFolderURL := &url.URL{}
-	*parentFolderURL = *ocisURL
+	*parentFolderURL = *ocURL
 	if !isPublicShare {
-		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+		parentFolderURL.Path = path.Join(ocURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
 			publicShare := &link.PublicShare{}
 			if err := f.getScopeByKeyPrefix(scopes, "publicshare:", publicShare); err == nil {
-				parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
+				parentFolderURL.Path = path.Join(ocURL.Path, "s", publicShare.GetToken())
 			} else {
 				logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
 			}
@@ -1253,8 +1253,8 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
 		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
 
-		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
-		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
+		fileinfo.KeyHostViewURL:    createHostUrl("view", ocURL, f.cfg.App.Name, statRes.GetInfo()),
+		fileinfo.KeyHostEditURL:    createHostUrl("write", ocURL, f.cfg.App.Name, statRes.GetInfo()),
 		fileinfo.KeyFileSharingURL: createShareUrl(privateLinkURL),
 		fileinfo.KeyFileVersionURL: createVersionsUrl(privateLinkURL),
 
@@ -1328,20 +1328,20 @@ func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, co
 	return downloadURL.String(), nil
 }
 
-func createHostUrl(mode string, ocisUrl *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {
-	webUrl := createAppExternalURL(ocisUrl, appName, info)
+func createHostUrl(mode string, u *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {
+	webUrl := createAppExternalURL(u, appName, info)
 	addURLParams(webUrl, map[string]string{"view_mode": mode})
 	return webUrl.String()
 }
 
-func createShareUrl(ocisURL *url.URL) string {
-	shareURL := *ocisURL
+func createShareUrl(u *url.URL) string {
+	shareURL := *u
 	addURLParams(&shareURL, map[string]string{"details": "sharing"})
 	return shareURL.String()
 }
 
-func createVersionsUrl(ocisURL *url.URL) string {
-	versionsURL := *ocisURL
+func createVersionsUrl(u *url.URL) string {
+	versionsURL := *u
 	addURLParams(&versionsURL, map[string]string{"details": "versions"})
 	return versionsURL.String()
 }
@@ -1354,11 +1354,11 @@ func addURLParams(u *url.URL, params map[string]string) {
 	u.RawQuery = q.Encode()
 }
 
-func createAppExternalURL(ocisURL *url.URL, appName string, info *providerv1beta1.ResourceInfo) *url.URL {
+func createAppExternalURL(u *url.URL, appName string, info *providerv1beta1.ResourceInfo) *url.URL {
 	spaceAlias := utils.ReadPlainFromOpaque(info.GetSpace().GetOpaque(), "spaceAlias")
-	appExternalURL := *ocisURL
-	appExternalURL.Path = path.Join(ocisURL.Path, "external-"+strings.ToLower(appName), spaceAlias, info.GetPath())
-	q := ocisURL.Query()
+	appExternalURL := *u
+	appExternalURL.Path = path.Join(u.Path, "external-"+strings.ToLower(appName), spaceAlias, info.GetPath())
+	q := u.Query()
 	q.Add("fileId", storagespace.FormatResourceID(info.GetId()))
 	appExternalURL.RawQuery = q.Encode()
 	return &appExternalURL

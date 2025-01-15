@@ -68,7 +68,7 @@ OC_MODULES = \
 	pkg
 
 # bin file definitions
-PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
+PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/opencloud-codestyle/vendor/bin/php-cs-fixer
 PHP_CODESNIFFER=vendor-bin/php_codesniffer/vendor/bin/phpcs
 PHP_CODEBEAUTIFIER=vendor-bin/php_codesniffer/vendor/bin/phpcbf
 PHAN=php -d zend.enable_gc=0 vendor-bin/phan/vendor/bin/phan
@@ -85,7 +85,7 @@ help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo
 	@echo -e "${GREEN}Testing with test suite natively installed:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://opencloud.dev/opencloud/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
 	@echo -e "\tmake test-acceptance-api\t\t${BLUE}run API acceptance tests${RESET}"
 	@echo -e "\tmake clean-tests\t\t\t${BLUE}delete API tests framework dependencies${RESET}"
 	@echo
@@ -93,18 +93,18 @@ help:
 	@echo
 	@echo -e "${RED}You also should have a look at other available Makefiles:${RESET}"
 	@echo
-	@echo -e "${GREEN}oCIS:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build/${RESET}\n"
-	@echo -e "\tsee ./ocis/Makefile"
-	@echo -e "\tor run ${YELLOW}make -C ocis help${RESET}"
+	@echo -e "${GREEN}opencloud:${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://opencloud.dev/opencloud/development/build/${RESET}\n"
+	@echo -e "\tsee ./opencloud/Makefile"
+	@echo -e "\tor run ${YELLOW}make -C opencloud help${RESET}"
 	@echo
 	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build-docs/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://opencloud.dev/opencloud/development/build-docs/${RESET}\n"
 	@echo -e "\tsee ./docs/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C docs help${RESET}"
 	@echo
 	@echo -e "${GREEN}Testing with test suite in docker:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://opencloud.dev/opencloud/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo -e "\tsee ./tests/acceptance/docker/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C tests/acceptance/docker help${RESET}"
 	@echo
@@ -257,9 +257,9 @@ ci-node-check-licenses:
 
 .PHONY: ci-go-save-licenses
 ci-go-save-licenses: $(GO_LICENSES)
-	@mkdir -p ./third-party-licenses/go/ocis/third-party-licenses
-	$(GO_LICENSES) csv ./... > ./third-party-licenses/go/ocis/third-party-licenses.csv
-	$(GO_LICENSES) save ./... --force --save_path="./third-party-licenses/go/ocis/third-party-licenses"
+	@mkdir -p ./third-party-licenses/go/opencloud/third-party-licenses
+	$(GO_LICENSES) csv ./... > ./third-party-licenses/go/opencloud/third-party-licenses.csv
+	$(GO_LICENSES) save ./... --force --save_path="./third-party-licenses/go/opencloud/third-party-licenses"
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
@@ -321,26 +321,26 @@ ci-format: $(BUILDIFIER)
 	$(BUILDIFIER) --mode=fix .drone.star
 
 .PHONY: test-php-style
-test-php-style: vendor-bin/owncloud-codestyle/vendor vendor-bin/php_codesniffer/vendor
+test-php-style: vendor-bin/opencloud-codestyle/vendor vendor-bin/php_codesniffer/vendor
 	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes --dry-run
 	$(PHP_CODESNIFFER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance tests/acceptance/TestHelpers
 
 .PHONY: test-php-style-fix
-test-php-style-fix: vendor-bin/owncloud-codestyle/vendor
+test-php-style-fix: vendor-bin/opencloud-codestyle/vendor
 	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes
 	$(PHP_CODEBEAUTIFIER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance
 
 .PHONY: vendor-bin-codestyle
-vendor-bin-codestyle: vendor-bin/owncloud-codestyle/vendor
+vendor-bin-codestyle: vendor-bin/opencloud-codestyle/vendor
 
 .PHONY: vendor-bin-codesniffer
 vendor-bin-codesniffer: vendor-bin/php_codesniffer/vendor
 
-vendor-bin/owncloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/owncloud-codestyle/composer.lock
-	composer bin owncloud-codestyle install --no-progress
+vendor-bin/opencloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/opencloud-codestyle/composer.lock
+	composer bin opencloud-codestyle install --no-progress
 
-vendor-bin/owncloud-codestyle/composer.lock: vendor-bin/owncloud-codestyle/composer.json
-	@echo owncloud-codestyle composer.lock is not up to date.
+vendor-bin/opencloud-codestyle/composer.lock: vendor-bin/opencloud-codestyle/composer.json
+	@echo opencloud-codestyle composer.lock is not up to date.
 
 vendor-bin/php_codesniffer/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/php_codesniffer/composer.lock
 	composer bin php_codesniffer install --no-progress

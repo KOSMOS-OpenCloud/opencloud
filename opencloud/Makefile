@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocis
+NAME := opencloud
 
 TAGS := disable_crypt
 
@@ -33,13 +33,13 @@ docs-generate: config-docs-generate
 .PHONY: dev-docker
 dev-docker:
 	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
-	docker build -f docker/Dockerfile.linux.$(GOARCH) -t owncloud/ocis:dev .
+	docker build -f docker/Dockerfile.linux.$(GOARCH) -t opencloud-eu/opencloud:dev .
 
 ############ debug-docker ############
 .PHONY: debug-docker
 debug-docker:
 	$(MAKE) --no-print-directory debug-linux-docker-$(GOARCH)
-	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t owncloud/ocis:debug .
+	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t opencloud-eu/opencloud:debug .
 
 ############ generate ############
 include ../.make/generate.mk
@@ -48,7 +48,7 @@ include ../.make/generate.mk
 ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
-ci-node-generate: # ocis needs assets of all other modules
+ci-node-generate: # opencloud needs assets of all other modules
 	@if [ $(MAKE_DEPTH) -le 1 ]; then \
 	$(MAKE) --no-print-directory -C .. ci-node-generate \
 	; fi;

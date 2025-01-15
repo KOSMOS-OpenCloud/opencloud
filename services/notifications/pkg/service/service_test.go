@@ -20,11 +20,11 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
+	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/service"
 	"github.com/stretchr/testify/mock"
-	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 )
 
@@ -32,7 +32,7 @@ var _ = Describe("Notifications", func() {
 	var (
 		gatewayClient   *cs3mocks.GatewayAPIClient
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		vs              *settingssvc.MockValueService
+		vs              *settingsmocks.ValueService
 		sharer          = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharer",
@@ -69,25 +69,23 @@ var _ = Describe("Notifications", func() {
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharee}, nil).Once()
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
 		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "secrets of the board", Space: &provider.StorageSpace{Name: "secret space"}}}, nil)
-		vs = &settingssvc.MockValueService{}
-		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return &settingssvc.GetValueResponse{
-				Value: &settingsmsg.ValueWithIdentifier{
-					Value: &settingsmsg.Value{
-						Value: &settingsmsg.Value_CollectionValue{
-							CollectionValue: &settingsmsg.CollectionValue{
-								Values: []*settingsmsg.CollectionOption{
-									{
-										Key:    "mail",
-										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
-									},
+		vs = &settingsmocks.ValueService{}
+		vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(&settingssvc.GetValueResponse{
+			Value: &settingsmsg.ValueWithIdentifier{
+				Value: &settingsmsg.Value{
+					Value: &settingsmsg.Value_CollectionValue{
+						CollectionValue: &settingsmsg.CollectionValue{
+							Values: []*settingsmsg.CollectionOption{
+								{
+									Key:    "mail",
+									Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
 								},
 							},
 						},
 					},
 				},
-			}, nil
-		}
+			},
+		}, nil)
 	})
 
 	DescribeTable("Sending userEventIds",
@@ -242,7 +240,7 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 	var (
 		gatewayClient   *cs3mocks.GatewayAPIClient
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-		vs              *settingssvc.MockValueService
+		vs              *settingsmocks.ValueService
 		sharer          = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharer",
@@ -284,25 +282,23 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 				Name:  "<script>alert('secrets of the board');</script>",
 				Space: &provider.StorageSpace{Name: "<script>alert('secret space');</script>"}},
 		}, nil)
-		vs = &settingssvc.MockValueService{}
-		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return &settingssvc.GetValueResponse{
-				Value: &settingsmsg.ValueWithIdentifier{
-					Value: &settingsmsg.Value{
-						Value: &settingsmsg.Value_CollectionValue{
-							CollectionValue: &settingsmsg.CollectionValue{
-								Values: []*settingsmsg.CollectionOption{
-									{
-										Key:    "mail",
-										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
-									},
+		vs = &settingsmocks.ValueService{}
+		vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(&settingssvc.GetValueResponse{
+			Value: &settingsmsg.ValueWithIdentifier{
+				Value: &settingsmsg.Value{
+					Value: &settingsmsg.Value_CollectionValue{
+						CollectionValue: &settingsmsg.CollectionValue{
+							Values: []*settingsmsg.CollectionOption{
+								{
+									Key:    "mail",
+									Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
 								},
 							},
 						},
 					},
 				},
-			}, nil
-		}
+			},
+		}, nil)
 	})
 
 	DescribeTable("Sending userEventIds",

@@ -1,6 +1,6 @@
 SHELL := bash
 NAME := web
-WEB_ASSETS_VERSION = v11.1.0
+WEB_ASSETS_VERSION = 552ff3c3f8e9543de653537087161c070698661e
 
 include ../../.make/recursion.mk
 
@@ -33,7 +33,11 @@ ci-node-generate: pull-assets
 .PHONY: pull-assets
 pull-assets:
 	git clean -xfd assets
-	curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
+	rm -rf _web && git clone -b theming --single-branch git@github.com:opencloud-eu/web.git _web
+	make -C _web release
+	tar xfv _web/release/web.tar.gz -C assets/core/
+	cp -r _web/dev/docker/ocis-themes/opencloud assets/core/themes/ && rm -rf assets/core/themes/owncloud
+	rm -rf _web
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses

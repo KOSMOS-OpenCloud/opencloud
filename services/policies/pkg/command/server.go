@@ -13,7 +13,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	svcProtogen "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/policies/v0"
+	svcProtogen "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/policies/v0"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine/opa"

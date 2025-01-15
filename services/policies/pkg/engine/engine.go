@@ -6,7 +6,7 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/policies/v0"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/policies/v0"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

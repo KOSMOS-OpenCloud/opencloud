@@ -7,7 +7,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc/handler/ratelimiter"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/thumbnails/v0"
+	thumbnailssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/thumbnails/v0"
 	svc "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/grpc/v0"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/grpc/v0/decorators"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail/imgsource"

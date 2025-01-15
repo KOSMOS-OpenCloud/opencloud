@@ -16,7 +16,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
+	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
 )
 

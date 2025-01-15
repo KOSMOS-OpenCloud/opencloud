@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
-	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
-	v0 "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings/mocks"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	"github.com/stretchr/testify/assert"

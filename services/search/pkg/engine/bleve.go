@@ -28,8 +28,8 @@ import (
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/search/v0"
-	searchService "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	searchMessage "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
+	searchService "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	searchQuery "github.com/opencloud-eu/opencloud/services/search/pkg/query"
 )

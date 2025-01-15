@@ -27,9 +27,9 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/opencloud-eu/opencloud/pkg/shared"
-	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/settings/v0"
-	settings "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0"
-	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/settings/v0/mocks"
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
+	settings "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
+	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"

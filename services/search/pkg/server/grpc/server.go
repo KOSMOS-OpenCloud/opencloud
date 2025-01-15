@@ -3,7 +3,7 @@ package grpc
 import (
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/search/v0"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	svc "github.com/opencloud-eu/opencloud/services/search/pkg/service/grpc/v0"
 )
 

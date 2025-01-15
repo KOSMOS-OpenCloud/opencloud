@@ -3,7 +3,7 @@ package engine_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	pMessage "github.com/opencloud-eu/opencloud/protogen/gen/ocis/messages/policies/v0"
+	pMessage "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/policies/v0"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine"
 )
 

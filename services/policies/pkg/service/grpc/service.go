@@ -3,7 +3,7 @@ package grpcSVC
 import (
 	"context"
 
-	"github.com/opencloud-eu/opencloud/protogen/gen/ocis/services/policies/v0"
+	v0 "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/policies/v0"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine"
 )
 

@@ -1,20 +1,20 @@
 package init
 
-// TODO: use the oCIS config struct instead of this custom struct
+// TODO: use the opencloud config struct instead of this custom struct
 // We can't use it right now, because it would need  "omitempty" on
 // all elements, in order to produce a slim config file with `opencloud init`.
 // We can't just add these "omitempty" tags, since we want to generate
 // full example configuration files with that struct, too.
 // Proposed solution to  get rid of this temporary solution:
-// - use the oCIS config struct
+// - use the opencloud config struct
 // - set the needed values like below
 // - marshal it to yaml
 // - unmarshal it into yaml.Node
 // - recurse through the nodes and delete empty / default ones
 // - marshal it to yaml
 
-// OcisConfig is the configuration for the OpenCloud services
-type OcisConfig struct {
+// OpenCloudConfig is the configuration for the OpenCloud services
+type OpenCloudConfig struct {
 	TokenManager      TokenManager          `yaml:"token_manager"`
 	MachineAuthAPIKey string                `yaml:"machine_auth_api_key"`
 	SystemUserAPIKey  string                `yaml:"system_user_api_key"`

@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	ocisinit "github.com/opencloud-eu/opencloud/opencloud/pkg/init"
+	ocinit "github.com/opencloud-eu/opencloud/opencloud/pkg/init"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
@@ -18,13 +18,13 @@ import (
 func InitCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "init",
-		Usage: "initialise an ocis config",
+		Usage: "initialise an opencloud config",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "insecure",
 				EnvVars: []string{"OC_INSECURE"},
 				Value:   "ask",
-				Usage:   "Allow insecure oCIS config",
+				Usage:   "Allow insecure opencloud config",
 			},
 			&cli.BoolFlag{
 				Name:    "diff",
@@ -42,7 +42,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:    "config-path",
 				Value:   defaults.BaseConfigPath(),
-				Usage:   "Config path for the ocis runtime",
+				Usage:   "Config path for the opencloud runtime",
 				EnvVars: []string{"OC_CONFIG_DIR", "OC_BASE_DATA_PATH"},
 			},
 			&cli.StringFlag{
@@ -63,7 +63,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
-			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.Bool("diff"), c.String("config-path"), c.String("admin-password"))
+			err := ocinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.Bool("diff"), c.String("config-path"), c.String("admin-password"))
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}

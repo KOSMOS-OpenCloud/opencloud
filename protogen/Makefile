@@ -9,5 +9,8 @@ endif
 include ../.make/generate.mk
 
 .PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
+
+.PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
 	$(MOCKERY)

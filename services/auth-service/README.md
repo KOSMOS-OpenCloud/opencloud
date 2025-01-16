@@ -1,10 +1,10 @@
 # Auth-Service
 
-The ocis Auth Service is used to authenticate service accounts. Compared to normal accounts, service accounts are ocis internal only and not available as ordinary users like via LDAP.
+The OpenCloud Auth Service is used to authenticate service accounts. Compared to normal accounts, service accounts are OpenCloud internal only and not available as ordinary users like via LDAP.
 
 ## The `auth` Service Family
 
-ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
   -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication

@@ -1,10 +1,10 @@
 # Auth-Bearer
 
-The oCIS Auth Bearer service communicates with the configured OpenID Connect identity provider to authenticate requests. OpenID Connect is the default authentication mechanism for all clients: web, desktop and mobile. Basic auth is only used for testing and has to be explicity enabled.
+The OpenCloud Auth Bearer service communicates with the configured OpenID Connect identity provider to authenticate requests. OpenID Connect is the default authentication mechanism for all clients: web, desktop and mobile. Basic auth is only used for testing and has to be explicity enabled.
 
 ## The `auth` Service Family
 
-ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
   -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
@@ -13,7 +13,7 @@ ocis uses serveral authentication services for different use cases. All services
 
 ## Built in OpenID Connect Identity Provider
 
-A default oCIS deployment will start a [built in OpenID Connect identity provider](https://github.com/owncloud/ocis/tree/master/services/idp) but can be configured to use an external one as well.
+A default OpenCloud deployment will start a [built in OpenID Connect identity provider](https://github.com/opencloud-eu/opencloud/tree/master/services/idp) but can be configured to use an external one as well.
 
 ## Scalability
 

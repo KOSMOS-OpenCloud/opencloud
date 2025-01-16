@@ -1,14 +1,14 @@
 # Auth-Basic
 
-The oCIS Auth Basic service provides basic authentication for those clients who cannot handle OpenID Connect. This should only be enabled for tests and development.
+The OpenCloud Auth Basic service provides basic authentication for those clients who cannot handle OpenID Connect. This should only be enabled for tests and development.
 
-The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will use the configured `auth manager`, see the `Auth Managers` section. Only HTTP basic auth requests to ocis will involve the `auth-basic` service.
+The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will use the configured `auth manager`, see the `Auth Managers` section. Only HTTP basic auth requests to OpenCloud will involve the `auth-basic` service.
 
 To enable `auth-basic`, you first must set `PROXY_ENABLE_BASIC_AUTH` to `true`.
 
 ## The `auth` Service Family
 
-ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
   -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
@@ -21,11 +21,11 @@ Since the `auth-basic` service does not do any validation itself, it needs to be
 
 ### LDAP Auth Manager
 
-Setting `AUTH_BASIC_AUTH_MANAGER` to `"ldap"` will configure the `auth-basic` service to use LDAP as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
+Setting `AUTH_BASIC_AUTH_MANAGER` to `"ldap"` will configure the `auth-basic` service to use LDAP as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with OpenCloud can be found in the admin docs.
 
 ### Other Auth Managers
 
-oCIS currently supports no other auth manager
+OpenCloud currently supports no other auth manager
 
 ## Scalability
 

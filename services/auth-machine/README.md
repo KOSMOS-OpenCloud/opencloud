@@ -1,8 +1,8 @@
 # Auth-Machine
 
-The oCIS Auth Machine is used for interservice communication when using user impersonation.
+The OpenCloud Auth Machine is used for interservice communication when using user impersonation.
 
-ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
   -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
@@ -11,7 +11,7 @@ ocis uses serveral authentication services for different use cases. All services
 
 ## User Impersonation
 
-When one ocis service is trying to talk to other ocis services, it needs to authenticate itself. To do so, it will impersonate a user using the `auth-machine` service. It will then act on behalf of this user. Any action will show up as action of this specific user, which gets visible when e.g. logged in the audit log.
+When one OpenCloud service is trying to talk to other OpenCloud services, it needs to authenticate itself. To do so, it will impersonate a user using the `auth-machine` service. It will then act on behalf of this user. Any action will show up as action of this specific user, which gets visible when e.g. logged in the audit log.
 
 ## Deprecation
 

@@ -735,7 +735,7 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		Str("FinalReference", wopiContext.FileReference.String()).
 		Msg("PutRelativeFileSuggested: success")
 
-	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	webURL, err := url.Parse(f.cfg.Commons.OpenCloudURL)
 	if err != nil {
 		return nil, err
 	}
@@ -827,7 +827,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	}
 
 	var newInfo *providerv1beta1.ResourceInfo
-	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	webURL, err := url.Parse(f.cfg.Commons.OpenCloudURL)
 	if err != nil {
 		return nil, err
 	}
@@ -1215,7 +1215,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
 	}
 
-	ocURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	ocURL, err := url.Parse(f.cfg.Commons.OpenCloudURL)
 	if err != nil {
 		return nil, err
 	}
@@ -1270,7 +1270,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyUserFriendlyName: userFriendlyName,
 		fileinfo.KeyUserID:           userId,
 
-		fileinfo.KeyPostMessageOrigin:            f.cfg.Commons.OcisURL,
+		fileinfo.KeyPostMessageOrigin:            f.cfg.Commons.OpenCloudURL,
 		fileinfo.KeyLicenseCheckForEditIsEnabled: f.cfg.App.LicenseCheckEnable,
 	}
 

@@ -69,9 +69,9 @@ type Config struct {
 	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`
 	Reva           *shared.Reva           `yaml:"reva"`
 
-	Mode    Mode // DEPRECATED
-	File    string
-	OcisURL string `yaml:"ocis_url" env:"OC_URL" desc:"URL, where oCIS is reachable for users." introductionVersion:"pre5.0"`
+	Mode         Mode // DEPRECATED
+	File         string
+	OpenCloudURL string `yaml:"opencloud_url" env:"OC_URL" desc:"URL, where OpenCloudURL is reachable for users." introductionVersion:"pre5.0"`
 
 	Registry          string               `yaml:"registry"`
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`

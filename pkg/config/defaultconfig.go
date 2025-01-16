@@ -48,7 +48,7 @@ import (
 
 func DefaultConfig() *Config {
 	return &Config{
-		OcisURL: "https://localhost:9200",
+		OpenCloudURL: "https://localhost:9200",
 		Runtime: Runtime{
 			Port: "9250",
 			Host: "localhost",

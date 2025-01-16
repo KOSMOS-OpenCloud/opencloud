@@ -25,12 +25,12 @@ type compiledInstance struct {
 
 type ownCloudInstance struct {
 	instances    []compiledInstance
-	ocisURL      string
+	openCloudURL string
 	instanceHost string
 }
 
 // OwnCloudInstance adds one or more ownCloud instance relations
-func OwnCloudInstance(instances []config.Instance, ocisURL string) (service.RelationProvider, error) {
+func OwnCloudInstance(instances []config.Instance, openCloudURL string) (service.RelationProvider, error) {
 	compiledInstances := make([]compiledInstance, 0, len(instances))
 	var err error
 	for _, instance := range instances {
@@ -46,13 +46,13 @@ func OwnCloudInstance(instances []config.Instance, ocisURL string) (service.Rela
 		compiledInstances = append(compiledInstances, compiled)
 	}
 
-	u, err := url.Parse(ocisURL)
+	u, err := url.Parse(openCloudURL)
 	if err != nil {
 		return nil, err
 	}
 	return &ownCloudInstance{
 		instances:    compiledInstances,
-		ocisURL:      ocisURL,
+		openCloudURL: openCloudURL,
 		instanceHost: u.Host + u.Path,
 	}, nil
 }
@@ -68,7 +68,7 @@ func (l *ownCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceD
 			jrd.Subject = "mailto:" + value
 		}
 		// allow referencing OC_URL in the template
-		claims["OC_URL"] = l.ocisURL
+		claims["OC_URL"] = l.openCloudURL
 		for _, instance := range l.instances {
 			if value, ok := claims[instance.Claim].(string); ok && instance.compiledRegex.MatchString(value) {
 				var tmplWriter strings.Builder

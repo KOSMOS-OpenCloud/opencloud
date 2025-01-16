@@ -46,7 +46,7 @@ var _ = Describe("FileConnector", func() {
 	BeforeEach(func() {
 		cfg = &config.Config{
 			Commons: &shared.Commons{
-				OcisURL: "https://cloud.opencloud.test",
+				OpenCloudURL: "https://cloud.opencloud.test",
 			},
 			App: config.App{
 				Name:    "test",

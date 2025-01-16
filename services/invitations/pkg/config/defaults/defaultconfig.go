@@ -78,11 +78,11 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if (cfg.Commons != nil && cfg.Commons.OcisURL != "") &&
+	if (cfg.Commons != nil && cfg.Commons.OpenCloudURL != "") &&
 		(cfg.HTTP.CORS.AllowedOrigins == nil ||
 			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
 				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
-		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
+		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OpenCloudURL}
 	}
 }
 

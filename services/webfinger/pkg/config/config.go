@@ -18,11 +18,11 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Instances []Instance `yaml:"instances"`
-	Relations []string   `yaml:"relations" env:"WEBFINGER_RELATIONS" desc:"A list of relation URIs or registered relation types to add to webfinger responses. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
-	IDP       string     `yaml:"idp" env:"OC_URL;OC_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation." introductionVersion:"pre5.0"`
-	OcisURL   string     `yaml:"ocis_url" env:"OC_URL;WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL" desc:"The URL for the legacy ownCloud server instance relation (not to be confused with the product ownCloud Server). It defaults to the OC_URL but can be overridden to support some reverse proxy corner cases. To shard the deployment, multiple instances can be configured in the configuration file." introductionVersion:"pre5.0"`
-	Insecure  bool       `yaml:"insecure" env:"OC_INSECURE;WEBFINGER_INSECURE" desc:"Allow insecure connections to the WEBFINGER service." introductionVersion:"pre5.0"`
+	Instances    []Instance `yaml:"instances"`
+	Relations    []string   `yaml:"relations" env:"WEBFINGER_RELATIONS" desc:"A list of relation URIs or registered relation types to add to webfinger responses. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
+	IDP          string     `yaml:"idp" env:"OC_URL;OC_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation." introductionVersion:"pre5.0"`
+	OpenCloudURL string     `yaml:"opencloud_url" env:"OC_URL;WEBFINGER_OPENCLOUD_SERVER_INSTANCE_URL" desc:"The URL for the legacy OpenCloud server instance relation (not to be confused with the product OpenCloud Server). It defaults to the OC_URL but can be overridden to support some reverse proxy corner cases. To shard the deployment, multiple instances can be configured in the configuration file." introductionVersion:"pre5.0"`
+	Insecure     bool       `yaml:"insecure" env:"OC_INSECURE;WEBFINGER_INSECURE" desc:"Allow insecure connections to the WEBFINGER service." introductionVersion:"pre5.0"`
 
 	Context context.Context `yaml:"-"`
 }

@@ -75,7 +75,7 @@ type Commons struct {
 	GRPCClientTLS     *GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS    *GRPCServiceTLS `yaml:"grpc_service_tls"`
 	HTTPServiceTLS    HTTPServiceTLS  `yaml:"http_service_tls"`
-	OcisURL           string          `yaml:"ocis_url" env:"OC_URL" desc:"URL, where oCIS is reachable for users." introductionVersion:"pre5.0"`
+	OpenCloudURL      string          `yaml:"opencloud_url" env:"OC_URL" desc:"URL, where OpenCloud is reachable for users." introductionVersion:"pre5.0"`
 	TokenManager      *TokenManager   `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva           `yaml:"reva"`
 	MachineAuthAPIKey string          `mask:"password" yaml:"machine_auth_api_key" env:"OC_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"pre5.0"`

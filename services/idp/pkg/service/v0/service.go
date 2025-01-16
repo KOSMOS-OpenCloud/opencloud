@@ -48,7 +48,7 @@ func NewService(opts ...Option) Service {
 
 	if err := createTemporaryClientsConfig(
 		options.Config.IDP.IdentifierRegistrationConf,
-		options.Config.Commons.OcisURL,
+		options.Config.Commons.OpenCloudURL,
 		options.Config.Clients,
 	); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
@@ -141,7 +141,7 @@ type temporaryClientConfig struct {
 	Clients []config.Client `yaml:"clients"`
 }
 
-func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Client) error {
+func createTemporaryClientsConfig(filePath, openCloudURL string, clients []config.Client) error {
 	folder := path.Dir(filePath)
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
 		if err := os.MkdirAll(folder, 0o700); err != nil {
@@ -152,10 +152,10 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 	for i, client := range clients {
 
 		for i, entry := range client.RedirectURIs {
-			client.RedirectURIs[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(ocisURL, "/"))
+			client.RedirectURIs[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(openCloudURL, "/"))
 		}
 		for i, entry := range client.Origins {
-			client.Origins[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(ocisURL, "/"))
+			client.Origins[i] = strings.ReplaceAll(entry, "{{OC_URL}}", strings.TrimRight(openCloudURL, "/"))
 		}
 		clients[i] = client
 	}

@@ -25,7 +25,7 @@ type Config struct {
 	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE" desc:"The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally." introductionVersion:"pre5.0"`
 	OCMNamespace    string `yaml:"ocm_namespace" env:"OCDAV_OCM_NAMESPACE" desc:"The human readable path prefix for the ocm shares." introductionVersion:"5.0"`
 	// PublicURL used to redirect /s/{token} URLs to
-	PublicURL string `yaml:"public_url" env:"OC_URL;OCDAV_PUBLIC_URL" desc:"URL where oCIS is reachable for users." introductionVersion:"pre5.0"`
+	PublicURL string `yaml:"public_url" env:"OC_URL;OCDAV_PUBLIC_URL" desc:"URL where OpenCloud is reachable for users." introductionVersion:"pre5.0"`
 
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OC_INSECURE;OCDAV_INSECURE" desc:"Allow insecure connections to the GATEWAY service." introductionVersion:"pre5.0"`
@@ -81,5 +81,5 @@ type Status struct {
 	Product        string
 	ProductName    string
 	ProductVersion string
-	Edition        string `yaml:"edition" env:"OC_EDITION;OCDAV_EDITION" desc:"Edition of oCIS. Used for branding purposes." introductionVersion:"pre5.0"`
+	Edition        string `yaml:"edition" env:"OC_EDITION;OCDAV_EDITION" desc:"Edition of OpenCloud. Used for branding purposes." introductionVersion:"pre5.0"`
 }

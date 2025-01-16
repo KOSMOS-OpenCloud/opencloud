@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-ocdav command.
+// Execute is the entry point for the OpenCloud ocdav command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "ocdav",
-		Usage:    "Provide a WebDav API for oCIS",
+		Usage:    "Provide a WebDav API for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

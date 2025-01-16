@@ -90,8 +90,8 @@ func DefaultConfig() *config.Config {
 			Version:        version.Legacy,
 			VersionString:  version.LegacyString,
 			ProductVersion: version.GetString(),
-			Product:        "Infinite Scale",
-			ProductName:    "Infinite Scale",
+			Product:        "OpenCloud",
+			ProductName:    "OpenCloud",
 			Edition:        "Community",
 		},
 	}

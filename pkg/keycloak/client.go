@@ -13,8 +13,8 @@ import (
 // Some attribute constants.
 // TODO: Make these configurable in the future.
 const (
-	_idAttr       = "OWNCLOUD_ID"
-	_userTypeAttr = "OWNCLOUD_USER_TYPE"
+	_idAttr       = "OPENCLOUD_ID"
+	_userTypeAttr = "OPENCLOUD_USER_TYPE"
 )
 
 // ConcreteClient represents a concrete implementation of a keycloak client

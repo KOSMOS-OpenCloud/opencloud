@@ -1,6 +1,6 @@
 {
     "id": "c59e5222-f0b8-4169-a7a2-0cb6bfed8d33",
-    "realm": "ocis",
+    "realm": "opencloud",
     "notBefore": 0,
     "defaultSignatureAlgorithm": "RS256",
     "revokeRefreshToken": false,
@@ -45,7 +45,7 @@
     "failureFactor": 30,
     "defaultRole": {
         "id": "66d42d82-e003-4dca-931d-ac25fe27fcdc",
-        "name": "default-roles-ocis",
+        "name": "default-roles-opencloud",
         "description": "${role_default-roles}",
         "composite": true,
         "clientRole": false,
@@ -129,13 +129,13 @@
             "clientId": "account",
             "name": "${client_account}",
             "rootUrl": "${authBaseUrl}",
-            "baseUrl": "/realms/ocis/account/",
+            "baseUrl": "/realms/opencloud/account/",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "redirectUris": [
-                "/realms/ocis/account/*"
+                "/realms/opencloud/account/*"
             ],
             "webOrigins": [],
             "notBefore": 0,
@@ -173,13 +173,13 @@
             "clientId": "account-console",
             "name": "${client_account-console}",
             "rootUrl": "${authBaseUrl}",
-            "baseUrl": "/realms/ocis/account/",
+            "baseUrl": "/realms/opencloud/account/",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "redirectUris": [
-                "/realms/ocis/account/*"
+                "/realms/opencloud/account/*"
             ],
             "webOrigins": [],
             "notBefore": 0,
@@ -656,13 +656,13 @@
             "clientId": "security-admin-console",
             "name": "${client_security-admin-console}",
             "rootUrl": "${authAdminUrl}",
-            "baseUrl": "/admin/ocis/console/",
+            "baseUrl": "/admin/opencloud/console/",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "redirectUris": [
-                "/admin/ocis/console/*"
+                "/admin/opencloud/console/*"
             ],
             "webOrigins": [
                 "+"
@@ -718,17 +718,17 @@
         {
             "id": "06dc1405-3631-4714-b4b1-19580e7c0465",
             "clientId": "web",
-            "name": "ownCloud Web",
+            "name": "OpenCloud Web",
             "description": "",
-            "rootUrl": "https://ocis.schule.owncloud.works",
-            "adminUrl": "https://ocis.schule.owncloud.works",
-            "baseUrl": "https://ocis.schule.owncloud.works",
+            "rootUrl": "https://cloud.schule.opencloud.eu",
+            "adminUrl": "https://cloud.schule.opencloud.eu",
+            "baseUrl": "https://cloud.schule.opencloud.eu",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "redirectUris": [
-                "https://ocis.schule.owncloud.works/*"
+                "https://cloud.schule.opencloud.eu/*"
             ],
             "webOrigins": [
                 "+"
@@ -745,7 +745,7 @@
             "protocol": "openid-connect",
             "attributes": {
                 "oidc.ciba.grant.enabled": "false",
-                "post.logout.redirect.uris": "https://ocis.schule.owncloud.works/*",
+                "post.logout.redirect.uris": "https://cloud.schule.opencloud.eu/*",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "backchannel.logout.session.required": "true",
                 "backchannel.logout.revoke.offline.tokens": "false"
@@ -934,7 +934,7 @@
             "protocolMappers": [
                 {
                     "id": "596f067b-ae2f-4771-96c5-d0c3942b04da",
-                    "name": "owncloud-uuid",
+                    "name": "opencloud-uuid",
                     "protocol": "openid-connect",
                     "protocolMapper": "oidc-usermodel-attribute-mapper",
                     "consentRequired": false,
@@ -945,7 +945,7 @@
                         "user.attribute": "LDAP_ID",
                         "id.token.claim": "true",
                         "access.token.claim": "true",
-                        "claim.name": "ocis\\.user\\.uuid"
+                        "claim.name": "opencloud\\.user\\.uuid"
                     }
                 }
             ]
@@ -1699,7 +1699,7 @@
                                     "uid"
                                 ],
                                 "groups.dn": [
-                                    "ou=groups,dc=owncloud,dc=com"
+                                    "ou=groups,dc=opencloud,dc=eu"
                                 ],
                                 "mode": [
                                     "LDAP_ONLY"
@@ -1821,7 +1821,7 @@
                         },
                         {
                             "id": "92aa0407-daed-4780-89b5-72b23f4ddbca",
-                            "name": "owncloud-uuid",
+                            "name": "opencloud-uuid",
                             "providerId": "user-attribute-ldap-mapper",
                             "subComponents": {},
                             "config": {
@@ -1844,13 +1844,13 @@
                                     "false"
                                 ],
                                 "user.model.attribute": [
-                                    "OWNCLOUD_ID"
+                                    "OPENCLOUD_ID"
                                 ]
                             }
                         },
                         {
                             "id": "b5d0c6e6-2b2c-4403-ba2f-7e7ea711cbdc",
-                            "name": "owncloud-usertype",
+                            "name": "opencloud-usertype",
                             "providerId": "user-attribute-ldap-mapper",
                             "subComponents": {},
                             "config": {
@@ -1876,7 +1876,7 @@
                                     "true"
                                 ],
                                 "user.model.attribute": [
-                                    "OWNCLOUD_USER_TYPE"
+                                    "OPENCLOUD_USER_TYPE"
                                 ]
                             }
                         }
@@ -1896,7 +1896,7 @@
                         "false"
                     ],
                     "usersDn": [
-                        "ou=users,dc=owncloud,dc=com"
+                        "ou=users,dc=opencloud,dc=eu"
                     ],
                     "cachePolicy": [
                         "EVICT_DAILY"
@@ -1923,7 +1923,7 @@
                         "-1"
                     ],
                     "bindDn": [
-                        "cn=admin,dc=owncloud,dc=com"
+                        "cn=admin,dc=opencloud,dc=eu"
                     ],
                     "lastSync": [
                         "1679575179"

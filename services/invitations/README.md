@@ -19,7 +19,7 @@ The default and currently only available backend used to handle invitations is [
 
 <!--- Note that the link below must be an absolute URL and not a relative file path --->
 
-See the [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/md-sources/example-realm.json) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
+See the [example configuration json file](https://github.com/opencloud-eu/opencloud/blob/master/services/invitations/md-sources/example-realm.json) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
 
 To use the example json, set the `INVITATIONS_KEYCLOAK_CLIENT_ID` setting to `invitations`, though any other client ID can be configured. 
 
@@ -27,7 +27,7 @@ Importing this example into Keycloak will give you a realm that federates with a
 clients configured and all mappers correctly set. Be sure to set all the credentials after the import,
 as they will be disabled.
 
-The most relevant bits are the mappers for the `OWNCLOUD_ID` and `OWNCLOUD_USER_TYPE` user properties.
+The most relevant bits are the mappers for the `OPENCLOUD_ID` and `OPENCLOUD_USER_TYPE` user properties.
 
 ## Backend Configuration
 
@@ -36,8 +36,8 @@ After Keycloak has been configured, the invitation service needs to be configure
 * `INVITATIONS_KEYCLOAK_BASE_PATH`: The URL to access Keycloak.
 * `INVITATIONS_KEYCLOAK_CLIENT_ID`: The client ID of the client to use. In the above example, `invitations` is used.
 * `INVITATIONS_KEYCLOAK_CLIENT_SECRET`: The client secret used to authenticate. This can be found in the Keycloak UI.
-* `INVITATIONS_KEYCLOAK_CLIENT_REALM`: The realm where the client was added. In the example above, `ocis` is used.
-* `INVITATIONS_KEYCLOAK_USER_REALM`: The realm where to add the users. In the example above, `ocis` is used.
+* `INVITATIONS_KEYCLOAK_CLIENT_REALM`: The realm where the client was added. In the example above, `opencloud` is used.
+* `INVITATIONS_KEYCLOAK_USER_REALM`: The realm where to add the users. In the example above, `opencloud` is used.
 * `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY`: If set to true, the verification of the Keycloak HTTPS certificate is skipped. This is not recommended in production environments.
 
 ## Bridging Provisioning Delay

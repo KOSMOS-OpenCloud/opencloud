@@ -55,8 +55,8 @@ type Drivers struct {
 	LDAP        LDAPDriver        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
 
-	JSON JSONDriver   `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
-	REST RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	JSON JSONDriver   `yaml:"json,omitempty"` // not supported by OpenCloud, therefore not part of docs
+	REST RESTProvider `yaml:"rest,omitempty"` // not supported by OpenCloud, therefore not part of docs
 }
 
 type LDAPDriver struct {

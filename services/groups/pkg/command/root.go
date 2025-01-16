@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-group command.
+// Execute is the entry point for the opencloud group command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "group",
-		Usage:    "Provide groups for oCIS",
+		Usage:    "Provide groups for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

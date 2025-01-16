@@ -42,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			// the reva runtime calls os.Exit in the case of a failure and there is no way for the oCIS
+			// the reva runtime calls os.Exit in the case of a failure and there is no way for the OpenCloud
 			// runtime to catch it and restart a reva service. Therefore we need to ensure the service has
 			// everything it needs, before starting the service.
 			// In this case: CA certificates

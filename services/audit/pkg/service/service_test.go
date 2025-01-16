@@ -564,11 +564,11 @@ var testCases = []struct {
 		SystemEvent: events.Event{
 			Event: events.ScienceMeshInviteTokenGenerated{
 				Sharer:        userID("sharer-user-id"),
-				RecipientMail: "mail@ocis.test",
+				RecipientMail: "mail@opencloud.test",
 				Token:         "token-123",
 				Description:   "some-description",
 				Expiration:    uint64(10e8),
-				InviteLink:    "http://ocis.test/invite",
+				InviteLink:    "http://opencloud.test/invite",
 				Timestamp:     timestamp(10e8),
 			},
 		},
@@ -579,11 +579,11 @@ var testCases = []struct {
 			// AuditEvent fields
 			checkBaseAuditEvent(t, ev.AuditEvent, "sharer-user-id", "2001-09-09T01:46:40Z", "user 'sharer-user-id' generated a ScienceMesh invite with token 'token-123'", "science_mesh_invite_token_generated")
 			// AuditEventScienceMeshInviteTokenGenerated fields
-			require.Equal(t, "mail@ocis.test", ev.RecipientMail)
+			require.Equal(t, "mail@opencloud.test", ev.RecipientMail)
 			require.Equal(t, "token-123", ev.Token)
 			require.Equal(t, "some-description", ev.Description)
 			require.Equal(t, uint64(10e8), ev.Expiration)
-			require.Equal(t, "http://ocis.test/invite", ev.InviteLink)
+			require.Equal(t, "http://opencloud.test/invite", ev.InviteLink)
 		},
 	},
 }

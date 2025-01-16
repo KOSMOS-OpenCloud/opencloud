@@ -74,7 +74,7 @@ func DefaultConfig() *config.Config {
 		Clients: []config.Client{
 			{
 				ID:      "web",
-				Name:    "ownCloud Web app",
+				Name:    "OpenCloud Web app",
 				Trusted: true,
 				RedirectURIs: []string{
 					"{{OC_URL}}/",

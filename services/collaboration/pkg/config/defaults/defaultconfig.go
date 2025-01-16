@@ -105,14 +105,6 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.CS3Api.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.CS3Api.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
-
-	// Copy the app name into the product name if empty.
-	// This is for the upgrade from OCIS 6 to 7 where we didn't have product
-	// name and the app name was acting as such. From OCIS 7, the product name
-	// should be set manually in the configuration.
-	if cfg.App.Product == "" {
-		cfg.App.Product = cfg.App.Name
-	}
 }
 
 // Sanitize sanitized the configuration

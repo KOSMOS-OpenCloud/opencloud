@@ -14,13 +14,13 @@ Required environment variables:
 
 ## Requirements
 
-The collaboration service requires the target document server (ONLYOFFICE, Collabora, etc.) to be up and running. Additionally, some Infinite Scale services are also required to be running in order to register the GRPC service for the `open in app` action in the webUI. The following internal and external services need to be available:
+The collaboration service requires the target document server (ONLYOFFICE, Collabora, etc.) to be up and running. Additionally, some OpenCloud services are also required to be running in order to register the GRPC service for the `open in app` action in the webUI. The following internal and external services need to be available:
 
 * External document server.
 * The gateway service.
 * The app-registry service.
 
-If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of Infinite Scale, check with the `opencloud list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
+If any of the named services above have not been started or are not reachable, the collaboration service won't start. For the binary or the docker release of OpenCloud, check with the `opencloud list` command if they have been started. If not, you must start them manually upfront before starting the collaboration service.
 
 ## WOPI Configuration
 
@@ -41,7 +41,7 @@ There are a few variables that you need to set:
   In case you are using a self signed certificate for the WOPI app you can tell the collaboration service to allow an insecure connection.
 
 * `COLLABORATION_WOPI_SRC`:\
-  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale.\
+  The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from OpenCloud.\
   For example: `https://wopi.example.com`.
 
 * `COLLABORATION_WOPI_SHORTTOKENS`:\

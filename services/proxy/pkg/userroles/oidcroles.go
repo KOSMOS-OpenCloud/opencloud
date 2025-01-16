@@ -92,19 +92,19 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	}
 
 	// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
-	// down to the lowest privileged role. Since ocis currently only can handle a single role assignment we
+	// down to the lowest privileged role. Since OpenCloud currently only can handle a single role assignment we
 	// pick the highest privileged role that matches a value from the claims
 	roleIDFromClaim := ""
 	for _, mapping := range ra.Options.roleMapping {
 		if _, ok := claimRoles[mapping.ClaimValue]; ok {
-			logger.Debug().Str("ocisRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
+			logger.Debug().Str("opencloudRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
 			roleIDFromClaim = roleNamesToRoleIDs[mapping.RoleName]
 			break
 		}
 	}
 
 	if roleIDFromClaim == "" {
-		err := errors.New("no role in claim maps to an ocis role")
+		err := errors.New("no role in claim maps to an OpenCloud role")
 		logger.Error().Err(err).Msg("")
 		return nil, err
 	}

@@ -128,7 +128,7 @@ func TestRouter(t *testing.T) {
 			Routes: []config.Route{
 				{Type: config.PrefixRoute, Endpoint: "/web/unprotected/demo/", Backend: "http://web", Unprotected: true},
 				{Type: config.PrefixRoute, Endpoint: "/dav", Backend: "http://ocdav"},
-				{Type: config.PrefixRoute, Method: "REPORT", Endpoint: "/dav", Backend: "http://ocis-webdav"},
+				{Type: config.PrefixRoute, Method: "REPORT", Endpoint: "/dav", Backend: "http://opencloud-webdav"},
 			},
 		},
 	}
@@ -139,7 +139,7 @@ func TestRouter(t *testing.T) {
 
 	table := []matchertest{
 		{method: "PROPFIND", endpoint: "/dav/files/demo/", target: "ocdav"},
-		{method: "REPORT", endpoint: "/dav/files/demo/", target: "ocis-webdav"},
+		{method: "REPORT", endpoint: "/dav/files/demo/", target: "opencloud-webdav"},
 		{method: "GET", endpoint: "/web/unprotected/demo/", target: "web", unprotected: true},
 	}
 

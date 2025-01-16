@@ -49,6 +49,7 @@ class OcHelper {
 	public const STORAGE_DRIVERS = [
 		StorageDriver::OCIS,
 		StorageDriver::EOS,
+		StorageDriver::OWNCLOUD,
 		StorageDriver::S3NG,
 		StorageDriver::POSIX
 	];
@@ -139,7 +140,7 @@ class OcHelper {
 				$user = $user["actualUsername"];
 			}
 			if ($deleteCmd === false) {
-				if (self::getStorageDriver() === StorageDriver::OCIS) {
+				if (self::getStorageDriver() === StorageDriver::OWNCLOUD) {
 					self::recurseRmdir(self::getOcRevaDataRoot() . $user);
 				}
 				continue;
@@ -205,7 +206,7 @@ class OcHelper {
 	 */
 	public static function getBaseDN(): string {
 		$dn = \getenv("REVA_LDAP_BASE_DN");
-		return $dn ?: "dc=opencloud,dc=com";
+		return $dn ?: "dc=owncloud,dc=com";
 	}
 
 	/**
@@ -244,7 +245,7 @@ class OcHelper {
 	 */
 	public static function getBindDN(): string {
 		$dn = \getenv("REVA_LDAP_BIND_DN");
-		return $dn ?: "cn=admin,dc=opencloud,dc=com";
+		return $dn ?: "cn=admin,dc=owncloud,dc=com";
 	}
 
 	/**

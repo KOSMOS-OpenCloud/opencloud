@@ -752,7 +752,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getStorageUsersRoot(): string {
 		$ocDataPath = getenv("OC_BASE_DATA_PATH") ? getenv("OC_BASE_DATA_PATH") : getenv("HOME") . '/.opencloud';
-		return getenv("STORAGE_USERS_OC_ROOT") ? getenv("STORAGE_USERS_OC_ROOT") : $ocDataPath . "/storage/users";
+		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocDataPath . "/storage/users";
 	}
 
 	/**

@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export const InfiniteScaleContext = createContext({
+export const OpenCloudContext = createContext({
     theme: null,
     config: null,
 });

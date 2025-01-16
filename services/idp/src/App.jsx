@@ -9,7 +9,7 @@ import 'kpop/static/css/scrollbar.css';
 
 import Spinner from './components/Spinner';
 import * as version from './version';
-import { InfiniteScaleContext } from './infiniteScaleContext';
+import { OpenCloudContext } from './openCloudContext';
 
 const LazyMain = lazy(() => import(/* webpackChunkName: "identifier-main" */ './Main'));
 
@@ -47,7 +47,7 @@ const App = ({ bgImg }): ReactElement => {
 
 
   return (
-      <InfiniteScaleContext.Provider value={{ theme, config }}>
+      <OpenCloudContext.Provider value={{ theme, config }}>
         <div
             className='oc-login-bg'
             style={{ backgroundImage: bgImg ? `url(${bgImg})` : undefined }}
@@ -58,7 +58,7 @@ const App = ({ bgImg }): ReactElement => {
             </Suspense>
           </MuiThemeProvider>
         </div>
-      </InfiniteScaleContext.Provider>
+      </OpenCloudContext.Provider>
   );
 }
 

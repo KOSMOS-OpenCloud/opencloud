@@ -74,7 +74,7 @@ func DefaultConfig() *config.Config {
 		Clients: []config.Client{
 			{
 				ID:      "web",
-				Name:    "ownCloud Web app",
+				Name:    "OpenCloud Web app",
 				Trusted: true,
 				RedirectURIs: []string{
 					"{{OC_URL}}/",
@@ -88,7 +88,7 @@ func DefaultConfig() *config.Config {
 			{
 				ID:              "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
 				Secret:          "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh",
-				Name:            "ownCloud desktop app",
+				Name:            "OpenCloud desktop app",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"http://127.0.0.1",
@@ -98,7 +98,7 @@ func DefaultConfig() *config.Config {
 			{
 				ID:              "e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD",
 				Secret:          "dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD",
-				Name:            "ownCloud Android app",
+				Name:            "OpenCloud Android app",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"oc://android.owncloud.com",
@@ -107,7 +107,7 @@ func DefaultConfig() *config.Config {
 			{
 				ID:              "mxd5OQDk6es5LzOzRvidJNfXLUZS2oN3oUFeXPP8LpPrhx3UroJFduGEYIBOxkY1",
 				Secret:          "KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx",
-				Name:            "ownCloud iOS app",
+				Name:            "OpenCloud iOS app",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"oc://ios.owncloud.com",

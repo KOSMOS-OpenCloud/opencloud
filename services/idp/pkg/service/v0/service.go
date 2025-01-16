@@ -258,7 +258,7 @@ type IDP struct {
 	tp     trace.TracerProvider
 }
 
-// initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
+// initMux initializes the internal idp gorilla mux and mounts it in to an OpenCloud chi-router
 func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler, options Options) {
 	gm := mux.NewRouter()
 	for _, route := range r {

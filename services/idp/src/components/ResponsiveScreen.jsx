@@ -9,7 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import DialogContent from '@material-ui/core/DialogContent';
 
 import Loading from './Loading';
-import { InfiniteScaleContext } from "../infiniteScaleContext";
+import { OpenCloudContext } from "../openCloudContext";
 
 const styles = theme => ({
   root: {
@@ -45,10 +45,10 @@ const ResponsiveScreen = (props) => {
     className,
     ...other
   } = props;
-  const { theme } = useContext(InfiniteScaleContext);
+  const { theme } = useContext(OpenCloudContext);
 
   const logo = (theme && !withoutLogo) ? (
-        <img src={'/' + theme.common?.logo} className="oc-logo" alt="ownCloud Logo"/>
+        <img src={'/' + theme.common?.logo} className="oc-logo" alt="OpenCloud Logo"/>
     ) : null;
 
   const content = loading ? <Loading/> : (withoutPadding ? children : <DialogContent>{children}</DialogContent>);
@@ -63,7 +63,7 @@ const ResponsiveScreen = (props) => {
             </div>
         </div>
         <footer className="oc-footer-message">
-              <Trans i18nKey="konnect.footer.slogan"><strong>ownCloud</strong> - a safe home for all your data</Trans>
+              <Trans i18nKey="konnect.footer.slogan"><strong>OpenCloud</strong> - a safe home for all your data</Trans>
         </footer>
     </Grid>
   );

@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-idp command.
+// Execute is the entry point for the opencloud-idp command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "idp",
-		Usage:    "Serve IDP API for oCIS",
+		Usage:    "Serve IDP API for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

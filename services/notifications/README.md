@@ -23,10 +23,10 @@ In addition, the notifications service supports custom templates. Custom email t
 {NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/email.html.tmpl
 {NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/img/
 ```
-The source templates provided by ocis you can derive from are located in the following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `templates/text` and `templates/html`.
+The source templates provided by OpenCloud you can derive from are located in the following base folder [https://github.com/opencloud-eu/opencloud/tree/master/services/notifications/pkg/email/templates](https://github.com/opencloud-eu/opencloud/tree/master/services/notifications/pkg/email/templates) with subfolders `templates/text` and `templates/html`.
 
--   [text/email.text.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl)
--   [html/email.html.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
+-   [text/email.text.tmpl](https://github.com/opencloud-eu/opencloud/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl)
+-   [html/email.html.tmpl](https://github.com/opencloud-eu/opencloud/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
 
 ### Templates subfolder hierarchy
 ```text
@@ -43,7 +43,7 @@ templates
 ```
 
 Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolder `templates/text` and `templates/html` and must have the same names as the embedded templates. It is important that the names of these files and folders match the embedded ones.
-The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
+The `templates/html` subfolder contains a default HTML template provided by OpenCloud. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/opencloud-eu/opencloud/master/opencloud/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
 Consider that embedding images via a CID resource may not be fully supported in all email web clients.
 
 ## Sending Grouped Emails
@@ -54,7 +54,7 @@ Grouped events are stored for the TTL defined in `OC_PERSISTENT_STORE_TTL`. This
 
 Grouped events that have passed the TTL are removed automatically without further notice or sending!
 
-To initiate sending grouped emails like via a cron job, use the `ocis notifications send-email` command. Note that the command mandatory requires at least one option which is `--daily` or `--weekly`. Note that both options can be used together.
+To initiate sending grouped emails like via a cron job, use the `opencloud notifications send-email` command. Note that the command mandatory requires at least one option which is `--daily` or `--weekly`. Note that both options can be used together.
 
 ### Storing
 
@@ -92,7 +92,7 @@ For example, for the language `de`, one needs to place the corresponding transla
 
 <!-- also see the userlog readme -->
 
-Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
+Important: For the time being, the embedded OpenCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 

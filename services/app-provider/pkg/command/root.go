@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-app-provider command.
+// Execute is the entry point for the opencloud app-provider command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "app-provider",
-		Usage:    "Provide apps for oCIS",
+		Usage:    "Provide apps for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

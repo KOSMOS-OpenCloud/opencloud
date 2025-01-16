@@ -29,7 +29,7 @@ type Config struct {
 	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES" desc:"Expiry for the gateway tokens." introductionVersion:"pre5.0"`
 	Cache                      Cache  `yaml:"cache"`
 
-	FrontendPublicURL string `yaml:"frontend_public_url" env:"OC_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend." introductionVersion:"pre5.0"`
+	FrontendPublicURL string `yaml:"frontend_public_url" env:"OC_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the OpenCloud frontend." introductionVersion:"pre5.0"`
 
 	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT" desc:"The endpoint of the users service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"7.0.0"`
 	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT" desc:"The endpoint of the groups service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol." introductionVersion:"7.0.0"`

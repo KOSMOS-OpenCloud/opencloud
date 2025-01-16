@@ -23,11 +23,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-idm command.
+// Execute is the entry point for the opencloud idm command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "idm",
-		Usage:    "Embedded LDAP service for oCIS",
+		Usage:    "Embedded LDAP service for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

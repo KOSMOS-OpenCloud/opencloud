@@ -76,7 +76,7 @@ func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, use
 		Timeout: 1 * time.Millisecond,
 	}
 	if err := bdb.Configure(servercfg.Logger, servercfg.LDAPBaseDN, servercfg.BoltDBFile, &opts); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to open database: '%s'. Please stop any running ocis/idm instance, as this tool requires exclusive access to the database.\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to open database: '%s'. Please stop any running OpenCloud idm instance, as this tool requires exclusive access to the database.\n", err)
 		return err
 	}
 	defer bdb.Close()

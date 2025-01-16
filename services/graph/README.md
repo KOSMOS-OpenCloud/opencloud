@@ -1,6 +1,6 @@
 # Graph
 
-The graph service provides the Graph API which is a RESTful web API used to access Infinite Scale
+The graph service provides the Graph API which is a RESTful web API used to access OpenCloud
 resources. It is inspired by the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/use-the-api)
 and can be used by clients or other services or extensions. Visit the [Libre Graph API](https://docs.opencloud.eu/libre-graph-api/)
 for a detailed specification of the API implemented by the graph service.

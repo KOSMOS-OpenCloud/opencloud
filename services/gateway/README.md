@@ -41,65 +41,65 @@ The scheme for this setup is the following. Note that there is, except storage, 
 | **envvar** | **default** | **alternative** |
 |------|------|------|
 | OC_GRPC_PROTOCOL or <br> `<service>`_GRPC_PROTOCOL | tcp | unix |
-| `<service>`_GRPC_ADDR | 127.0.0.1:`<port>` | /var/run/ocis/`<service>`.sock |
-| GATEWAY_`<service>`_ENDPOINT | eu.opencloud.api.`<service>` | unix:/var/run/ocis/`<service>`.sock <br> dns: ... <br> kubernetes: ... |
+| `<service>`_GRPC_ADDR | 127.0.0.1:`<port>` | /var/run/opencloud/`<service>`.sock |
+| GATEWAY_`<service>`_ENDPOINT | eu.opencloud.api.`<service>` | unix:/var/run/opencloud/`<service>`.sock <br> dns: ... <br> kubernetes: ... |
 
 ```console
 USERS_GRPC_PROTOCOL=unix"
-USERS_GRPC_ADDR=/var/run/ocis/users.sock"
-GATEWAY_USERS_ENDPOINT=unix:/var/run/ocis/users.sock"
+USERS_GRPC_ADDR=/var/run/opencloud/users.sock"
+GATEWAY_USERS_ENDPOINT=unix:/var/run/opencloud/users.sock"
 
 GROUPS_GRPC_PROTOCOL=unix"
-GROUPS_GRPC_ADDR=/var/run/ocis/groups.sock"
-GATEWAY_GROUPS_ENDPOINT=unix:/var/run/ocis/groups.sock"
+GROUPS_GRPC_ADDR=/var/run/opencloud/groups.sock"
+GATEWAY_GROUPS_ENDPOINT=unix:/var/run/opencloud/groups.sock"
 
 AUTH_APP_GRPC_PROTOCOL=unix"
-AUTH_APP_GRPC_ADDR=/var/run/ocis/auth-app.sock"
-GATEWAY_AUTH_APP_ENDPOINT=unix:/var/run/ocis/auth-app.sock"
+AUTH_APP_GRPC_ADDR=/var/run/opencloud/auth-app.sock"
+GATEWAY_AUTH_APP_ENDPOINT=unix:/var/run/opencloud/auth-app.sock"
 
 AUTH_BASIC_GRPC_PROTOCOL=unix"
-AUTH_BASIC_GRPC_ADDR=/var/run/ocis/auth-basic.sock"
-GATEWAY_AUTH_BASIC_ENDPOINT=unix:/var/run/ocis/auth-basic.sock"
+AUTH_BASIC_GRPC_ADDR=/var/run/opencloud/auth-basic.sock"
+GATEWAY_AUTH_BASIC_ENDPOINT=unix:/var/run/opencloud/auth-basic.sock"
 
 AUTH_MACHINE_GRPC_PROTOCOL=unix"
-AUTH_MACHINE_GRPC_ADDR=/var/run/ocis/auth-machine.sock"
-GATEWAY_AUTH_MACHINE_ENDPOINT=unix:/var/run/ocis/auth-machine.sock"
+AUTH_MACHINE_GRPC_ADDR=/var/run/opencloud/auth-machine.sock"
+GATEWAY_AUTH_MACHINE_ENDPOINT=unix:/var/run/opencloud/auth-machine.sock"
 
 AUTH_SERVICE_GRPC_PROTOCOL=unix"
-AUTH_SERVICE_GRPC_ADDR=/var/run/ocis/auth-service.sock"
-GATEWAY_AUTH_SERVICE_ENDPOINT=unix:/var/run/ocis/auth-service.sock"
+AUTH_SERVICE_GRPC_ADDR=/var/run/opencloud/auth-service.sock"
+GATEWAY_AUTH_SERVICE_ENDPOINT=unix:/var/run/opencloud/auth-service.sock"
 
 STORAGE_PUBLIC_LINK_GRPC_PROTOCOL=unix"
-STORAGE_PUBLIC_LINK_GRPC_ADDR=/var/run/ocis/storage-public-link.sock"
-GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT=unix:/var/run/ocis/storage-public-link.sock"
+STORAGE_PUBLIC_LINK_GRPC_ADDR=/var/run/opencloud/storage-public-link.sock"
+GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT=unix:/var/run/opencloud/storage-public-link.sock"
 
 STORAGE_USERS_GRPC_PROTOCOL=unix"
-STORAGE_USERS_GRPC_ADDR=/var/run/ocis/storage-users.sock"
-GATEWAY_STORAGE_USERS_ENDPOINT=unix:/var/run/ocis/storage-users.sock"
+STORAGE_USERS_GRPC_ADDR=/var/run/opencloud/storage-users.sock"
+GATEWAY_STORAGE_USERS_ENDPOINT=unix:/var/run/opencloud/storage-users.sock"
 // graph sometimes bypasses the gateway so we need to configure the socket here as wel
-GRAPH_SPACES_STORAGE_USERS_ADDRESS=unix:/var/run/ocis/storage-users.sock"
+GRAPH_SPACES_STORAGE_USERS_ADDRESS=unix:/var/run/opencloud/storage-users.sock"
 
 STORAGE_SHARES_GRPC_PROTOCOL=unix"
-STORAGE_SHARES_GRPC_ADDR=/var/run/ocis/storage-shares.sock"
-GATEWAY_STORAGE_SHARES_ENDPOINT=unix:/var/run/ocis/storage-shares.sock"
+STORAGE_SHARES_GRPC_ADDR=/var/run/opencloud/storage-shares.sock"
+GATEWAY_STORAGE_SHARES_ENDPOINT=unix:/var/run/opencloud/storage-shares.sock"
 
 APP_REGISTRY_GRPC_PROTOCOL=unix"
-APP_REGISTRY_GRPC_ADDR=/var/run/ocis/app-registry.sock"
-GATEWAY_APP_REGISTRY_ENDPOINT=unix:/var/run/ocis/app-registry.sock"
+APP_REGISTRY_GRPC_ADDR=/var/run/opencloud/app-registry.sock"
+GATEWAY_APP_REGISTRY_ENDPOINT=unix:/var/run/opencloud/app-registry.sock"
 
 OCM_GRPC_PROTOCOL=unix"
-OCM_GRPC_ADDR=/var/run/ocis/ocm.sock"
-GATEWAY_OCM_ENDPOINT=unix:/var/run/ocis/ocm.sock"
+OCM_GRPC_ADDR=/var/run/opencloud/ocm.sock"
+GATEWAY_OCM_ENDPOINT=unix:/var/run/opencloud/ocm.sock"
 
 // storage related
-SETTINGS_STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
-SETTINGS_STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
+SETTINGS_STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/opencloud/storage-system.sock"
+SETTINGS_STORAGE_GRPC_ADDR="unix:/var/run/opencloud/storage-system.sock"
 STORAGE_SYSTEM_GRPC_PROTOCOL="unix"
-STORAGE_SYSTEM_GRPC_ADDR="/var/run/ocis/storage-system.sock"
-SHARING_USER_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
-SHARING_USER_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
-SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
-SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
+STORAGE_SYSTEM_GRPC_ADDR="/var/run/opencloud/storage-system.sock"
+SHARING_USER_CS3_PROVIDER_ADDR="unix:/var/run/opencloud/storage-system.sock"
+SHARING_USER_JSONCS3_PROVIDER_ADDR="unix:/var/run/opencloud/storage-system.sock"
+SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/opencloud/storage-system.sock"
+SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR="unix:/var/run/opencloud/storage-system.sock"
 ```
 
 ## Storage Registry
@@ -172,4 +172,4 @@ In order to add another storage provider the CS3 storage registry that is runnin
 }
 ```
 
-In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `ocis init`. The last entry `eu.opencloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.
+In the above replace `{storage-users-mount-uuid}` with the mount UUID that was generated for the storage-users service. You can find it in the `config.yaml` generated on by `opencloud init`. The last entry `eu.opencloud.api.storage-hello` and its `providerid` `"hello-storage-id"` are an example for in additional storage provider, in this case running `hellofs`, an example minimal storage driver.

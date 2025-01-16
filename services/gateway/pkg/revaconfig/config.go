@@ -11,7 +11,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/gateway/pkg/config"
 )
 
-// GatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// GatewayConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
 	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
 

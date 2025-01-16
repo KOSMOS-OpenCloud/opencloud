@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-gateway command.
+// Execute is the entry point for the opencloud-gateway command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "gateway",
-		Usage:    "Provide a CS3api gateway for oCIS",
+		Usage:    "Provide a CS3api gateway for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

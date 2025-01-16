@@ -1,18 +1,15 @@
 # Graph
 
-The graph service provides the Graph API which is a RESTful web API used to access Infinite Scale
+The graph service provides the Graph API which is a RESTful web API used to access OpenCloud
 resources. It is inspired by the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/use-the-api)
-and can be used by clients or other services or extensions. Visit the [Libre Graph API](https://owncloud.dev/libre-graph-api/)
+and can be used by clients or other services or extensions. Visit the [Libre Graph API](https://docs.opencloud.eu/libre-graph-api/)
 for a detailed specification of the API implemented by the graph service.
 
 ## Sequence Diagram
 
 The following image gives an overview of the scenario when a client requests to list available spaces the user has access to. To do so, the client is directed with his request automatically via the proxy service to the graph service.
 
-<!-- referencing: https://github.com/owncloud/ocis/pull/3816 ([docs-only] add client protocol overview) -->
-<!-- The image source needs to be the raw source !! -->
-
-<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />
+<img src="https://raw.githubusercontent.com/opencloud-eu/opencloud/master/services/graph/images/mermaid-graph.svg" width="500" />
 
 ## Users and Groups API
 
@@ -27,7 +24,7 @@ The graph service provides endpoints for querying users and groups. It features 
 ### LDAP Configuration
 
 The LDAP backend is configured using a set of environment variables. A detailed list of all the
-available configuration options can be found in the [documentation](https://owncloud.dev/services/graph/configuration/#environment-variables).
+available configuration options can be found in the [documentation](https://docs.opencloud.eu/services/graph/configuration/#environment-variables).
 The LDAP related options are prefixed with `OC_LDAP_` (or `GRAPH_LDAP_` for settings specific to graph service).
 
 #### Read-Only Access to Existing LDAP Servers
@@ -35,28 +32,28 @@ The LDAP related options are prefixed with `OC_LDAP_` (or `GRAPH_LDAP_` for sett
 To connect the graph service to an existing LDAP server, set `OC_LDAP_SERVER_WRITE_ENABLED` to
 `false` to prevent the graph service from sending write operations to the LDAP server. Also set the
 various `OC_LDAP_*` environment variables to match the configuration of the LDAP server you are connecting
-to. An example configuration for connecting oCIS to an instance of Microsoft Active Directory is
-available [here](https://owncloud.dev/ocis/identity-provider/ldap-active-directory/).
+to. An example configuration for connecting OpenCloud to an instance of Microsoft Active Directory is
+available [here](https://docs.opencloud.eu/opencloud/identity-provider/ldap-active-directory/).
 
 #### Using a Write Enabled LDAP Server
 
 To use the graph service for managing (create, update, delete) users and groups, a write enabled LDAP
 server is required. In the default configuration, the graph service will use the simple LDAP server
-that is bundled with oCIS in the `idm` service which provides all the required features.
-It is also possible to setup up an external LDAP server with write access for use with oCIS. It is
+that is bundled with OpenCloud in the `idm` service which provides all the required features.
+It is also possible to setup up an external LDAP server with write access for use with OpenCloud. It is
 recommend to use OpenLDAP for this. The LDAP server needs to fulfill a couple of requirements with
 respect to the available schema:
   * The LDAP server must provide the `inetOrgPerson` object class for users and the `groupOfNames`
     object class for groups.
   * The graph service maintains a few additional attributes for users and groups that are not
     available in the standard LDAP schema. An schema file, ready to use with OpenLDAP, defining those
-    additional attributes is available [here](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_ldap/config/ldap/schemas/10_owncloud_schema.ldif).
+    additional attributes is available [here](https://github.com/opencloud-eu/opencloud/blob/master/deployments/examples/opencloud_ldap/config/ldap/schemas/10_owncloud_schema.ldif).
 
 ## Query Filters Provided by the Graph API
 
 Some API endpoints provided by the graph service allow to specify query filters. The filter syntax
 is based on the [OData Specification](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter).
-See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples
+See the [Libre Graph API](https://docs.opencloud.eu/libre-graph-api/#/users/ListUsers) for examples
 on the filters supported when querying users.
 
 ## Caching
@@ -86,14 +83,12 @@ If Keycloak is used for authentication, GDPR regulations require to add all pers
 *   `OC_KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data.
 *   `OC_KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
 *   `OC_KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
-*   `OC_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
+*   `OC_KEYCLOAK_USER_REALM` - The realm the OpenCloud users are defined in.
 *   `OC_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
-
-For more details see the [User-Triggered GDPR Report](https://doc.owncloud.com/ocis/next/deployment/gdpr/gdpr.html) in the ocis admin documentation.
 
 ### Keycloak Client Configuration
 
-The client that is used to authenticate with keycloak has to be able to list users and get the credential data. To do this, the following  roles have to be assigned to the client and they have to be about the realm that contains the oCIS users:
+The client that is used to authenticate with keycloak has to be able to list users and get the credential data. To do this, the following  roles have to be assigned to the client and they have to be about the realm that contains the OpenCloud users:
 
 *   `view-users`
 *   `view-identity-providers`
@@ -118,7 +113,7 @@ For example, for the language `de`, one needs to place the corresponding transla
 
 <!-- also see the notifications readme -->
 
-Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
+Important: For the time being, the embedded OpenCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 
@@ -160,7 +155,7 @@ To enable disabled roles like the `UnifiedRoleSecureViewer`, you must provide th
 The following CLI command simplifies the process of finding out which UID belongs to which role:
 
 ```bash
-ocis graph list-unified-roles
+opencloud graph list-unified-roles
 ```
 
 The output of this command includes the following information for each role:

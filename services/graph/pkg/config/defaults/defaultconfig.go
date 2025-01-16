@@ -55,7 +55,7 @@ func DefaultConfig() *config.Config {
 			Name: "graph",
 		},
 		Application: config.Application{
-			DisplayName: "ownCloud Infinite Scale",
+			DisplayName: "OpenCloud",
 		},
 		API: config.API{
 			GroupMembersPatchLimit:  20,

@@ -22,7 +22,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
 
-	ocisldap "github.com/opencloud-eu/opencloud/pkg/ldap"
+	ocldap "github.com/opencloud-eu/opencloud/pkg/ldap"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/roles"
@@ -436,7 +436,7 @@ func setIdentityBackends(options Options, svc *Graph) error {
 			}
 
 			if options.Config.Identity.LDAP.CACert != "" {
-				if err := ocisldap.WaitForCA(options.Logger,
+				if err := ocldap.WaitForCA(options.Logger,
 					options.Config.Identity.LDAP.Insecure,
 					options.Config.Identity.LDAP.CACert); err != nil {
 					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")

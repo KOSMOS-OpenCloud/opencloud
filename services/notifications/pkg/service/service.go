@@ -53,7 +53,7 @@ func NewEventsNotifier(
 	logger log.Logger,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
-	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL, translationPath, emailSender string,
+	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, openCloudURL, translationPath, emailSender string,
 	store store.Store,
 	historyClient ehsvc.EventHistoryService,
 	registeredEvents map[string]events.Unmarshaller) Service {
@@ -70,7 +70,7 @@ func NewEventsNotifier(
 		emailTemplatePath:    emailTemplatePath,
 		defaultLanguage:      defaultLanguage,
 		defaultEmailSender:   emailSender,
-		ocisURL:              ocisURL,
+		openCloudURL:         openCloudURL,
 		translationPath:      translationPath,
 		filter:               newNotificationFilter(logger, valueService),
 		splitter:             newIntervalSplitter(logger, valueService),
@@ -90,7 +90,7 @@ type eventsNotifier struct {
 	translationPath      string
 	defaultLanguage      string
 	defaultEmailSender   string
-	ocisURL              string
+	openCloudURL         string
 	serviceAccountID     string
 	serviceAccountSecret string
 	filter               *notificationFilter

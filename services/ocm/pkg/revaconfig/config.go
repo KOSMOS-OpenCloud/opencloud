@@ -13,7 +13,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 
 	// Construct the ocm provider domain from the oCIS URL
 	providerDomain := ""
-	u, err := url.Parse(cfg.Commons.OcisURL)
+	u, err := url.Parse(cfg.Commons.OpenCloudURL)
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Msg("could not parse oCIS URL")
@@ -60,7 +60,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"prefix": ".well-known",
 					"ocmprovider": map[string]interface{}{
 						"ocm_prefix":    cfg.OCMD.Prefix,
-						"endpoint":      cfg.Commons.OcisURL,
+						"endpoint":      cfg.Commons.OpenCloudURL,
 						"provider":      "OpenCloud",
 						"webdav_root":   "/dav/ocm",
 						"webapp_root":   cfg.ScienceMesh.Prefix,
@@ -157,7 +157,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 					"gatewaysvc":      cfg.Reva.Address,
 					"provider_domain": providerDomain,
-					"webdav_endpoint": cfg.Commons.OcisURL,
+					"webdav_endpoint": cfg.Commons.OpenCloudURL,
 					"webapp_template": cfg.OCMShareProvider.WebappTemplate,
 					"client_insecure": cfg.OCMShareProvider.Insecure,
 				},

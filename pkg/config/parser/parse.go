@@ -110,8 +110,8 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons.AdminUserID = cfg.AdminUserID
 	}
 
-	if cfg.OcisURL != "" {
-		cfg.Commons.OcisURL = cfg.OcisURL
+	if cfg.OpenCloudURL != "" {
+		cfg.Commons.OpenCloudURL = cfg.OpenCloudURL
 	}
 
 	cfg.Commons.Reva = structs.CopyOrZeroValue(cfg.Reva)

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -70,7 +71,7 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 	}
 	shareFolder = resourceInfo.Name
 
-	shareLink, err = urlJoinPath(s.ocisURL, "files/shares/with-me")
+	shareLink, err = urlJoinPath(s.openCloudURL, "files/shares/with-me")
 	if err != nil {
 		logger.Error().
 			Err(err).

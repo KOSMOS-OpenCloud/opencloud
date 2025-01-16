@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -85,7 +86,7 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 	}
 	spaceName = resourceInfo.GetSpace().GetName()
 
-	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
+	shareLink, err = urlJoinPath(s.openCloudURL, "f", e.ID.OpaqueId)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -170,7 +171,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 	}
 	spaceName = resourceInfo.GetSpace().GetName()
 
-	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
+	shareLink, err = urlJoinPath(s.openCloudURL, "f", e.ID.OpaqueId)
 	if err != nil {
 		logger.Error().
 			Err(err).

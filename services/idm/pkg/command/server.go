@@ -153,7 +153,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 	if cfg.AdminUserID != "" {
 		serviceUsers = append(serviceUsers, svcUser{
 			Name:     "admin",
-			Password: cfg.ServiceUserPasswords.OcisAdmin,
+			Password: cfg.ServiceUserPasswords.OCAdmin,
 			ID:       cfg.AdminUserID,
 			Issuer:   cfg.DemoUsersIssuerUrl,
 		})

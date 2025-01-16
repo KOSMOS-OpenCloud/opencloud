@@ -41,7 +41,7 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDM")
 	}
 
-	if cfg.AdminUserID != "" && cfg.ServiceUserPasswords.OcisAdmin == "" {
+	if cfg.AdminUserID != "" && cfg.ServiceUserPasswords.OCAdmin == "" {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "admin")
 	}
 

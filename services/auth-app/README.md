@@ -4,7 +4,7 @@ The auth-app service provides authentication for 3rd party apps.
 
 ## The `auth` Service Family
 
-ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
   -   `auth-app` handles authentication of external 3rd party apps
   -   `auth-basic` handles basic authentication
   -   `auth-bearer` handles oidc authentication
@@ -28,16 +28,16 @@ App Tokens are used to authenticate 3rd party access via https like when using c
 Replace the `user-name` with an existing user. For the `token-expiration`, you can use any time abbreviation from the following list: `h, m, s`. Examples: `72h` or `1h` or `1m` or `1s.` Default is `72h`.
 
 ```bash
-ocis auth-app create --user-name={user-name} --expiration={token-expiration}
+opencloud auth-app create --user-name={user-name} --expiration={token-expiration}
 ```
 
-Once generated, these tokens can be used to authenticate requests to ocis. They are passed as part of the request as `Basic Auth` header.
+Once generated, these tokens can be used to authenticate requests to OpenCloud. They are passed as part of the request as `Basic Auth` header.
 
 ### Via API
 
 The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at the `/auth-app/tokens` endpoint.
 
-When using curl for the respective command, you need to authenticate with a header. To do so, get from the browsers developer console the currently active bearer token. Consider that this token has a short lifetime. In any example, replace `<your host[:port]>` with the URL:port of your Infinite Scale instance, and `{token}`  `{value}` accordingly. Note that the active bearer token authenticates the user the token was issued for.
+When using curl for the respective command, you need to authenticate with a header. To do so, get from the browsers developer console the currently active bearer token. Consider that this token has a short lifetime. In any example, replace `<your host[:port]>` with the URL:port of your OpenCloud instance, and `{token}`  `{value}` accordingly. Note that the active bearer token authenticates the user the token was issued for.
 
 * **Create a token**\
   The POST request requires:

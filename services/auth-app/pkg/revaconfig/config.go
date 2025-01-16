@@ -7,7 +7,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 )
 
-// AuthAppConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// AuthAppConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func AuthAppConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	appAuthJSON := filepath.Join(defaults.BaseDataPath(), "appauth.json")
 

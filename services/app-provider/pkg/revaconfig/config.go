@@ -5,7 +5,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/app-provider/pkg/config"
 )
 
-// AppProviderConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// AppProviderConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func AppProviderConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{

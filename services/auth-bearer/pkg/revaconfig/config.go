@@ -5,7 +5,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
 )
 
-// AuthBearerConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// AuthBearerConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func AuthBearerConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"shared": map[string]interface{}{

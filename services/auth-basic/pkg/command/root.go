@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-auth-basic command.
+// Execute is the entry point for the opencloud auth-basic command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "auth-basic",
-		Usage:    "Provide basic authentication for oCIS",
+		Usage:    "Provide basic authentication for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-auth-machine command.
+// Execute is the entry point for the opencloud auth-machine command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "auth-machine",
-		Usage:    "Provide machine authentication for oCIS",
+		Usage:    "Provide machine authentication for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

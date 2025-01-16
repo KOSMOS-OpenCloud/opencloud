@@ -25,11 +25,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-auth-bearer command.
+// Execute is the entry point for the opencloud auth-bearer command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "auth-bearer",
-		Usage:    "Provide bearer authentication for oCIS",
+		Usage:    "Provide bearer authentication for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

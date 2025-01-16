@@ -4,7 +4,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/auth-service/pkg/config"
 )
 
-// AuthMachineConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// AuthMachineConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func AuthMachineConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{

@@ -21,7 +21,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "antivirus",
-		Usage:    "Serve ownCloud antivirus for oCIS",
+		Usage:    "Antivirus service for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

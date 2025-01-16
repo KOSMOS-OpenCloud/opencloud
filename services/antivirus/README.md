@@ -40,7 +40,7 @@ The number of concurrent scans can be increased by setting `ANTIVIRUS_WORKERS`. 
 The antivirus service allows three different ways of handling infected files. Those can be set via the `ANTIVIRUS_INFECTED_FILE_HANDLING` environment variable:
 
   -   `delete`: (default): Infected files will be deleted immediately, further postprocessing is cancelled.
-  -   `abort`:  (advanced option): Infected files will be kept, further postprocessing is cancelled. Files can be manually retrieved and inspected by an admin. To identify the file for further investigation, the antivirus service logs the abort/infected state including the file ID. The file is located in the `storage/users/uploads` folder of the ocis data directory and persists until it is manually deleted by the admin via the [Manage Unfinished Uploads](https://doc.owncloud.com/ocis/next/deployment/services/s-list/storage-users.html#manage-unfinished-uploads) command.
+  -   `abort`:  (advanced option): Infected files will be kept, further postprocessing is cancelled. Files can be manually retrieved and inspected by an admin. To identify the file for further investigation, the antivirus service logs the abort/infected state including the file ID. The file is located in the `storage/users/uploads` folder of the OpenCloud data directory and persists until it is manually deleted by the admin via the [Manage Unfinished Uploads](https://github.com/opencloud-eu/opencloud/tree/main/services/storage-users#manage-unfinished-uploads) command.
   -   `continue`:  (obviously not recommended): Infected files will be marked via metadata as infected but postprocessing continues normally. Note: Infected Files are moved to their final destination and therefore not prevented from download which includes the risk of spreading viruses.
 
 In all cases, a log entry is added declaring the infection and handling method and a notification via the `userlog` service sent.
@@ -55,7 +55,7 @@ The antivirus service can scan files during `postprocessing`. `on demand` scanni
 
 ### Postprocessing
 
-The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) for more details.
+The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/opencloud-eu/opencloud/tree/master/services/postprocessing) for more details.
 
 The number of concurrent scans can be increased by setting `ANTIVIRUS_WORKERS`, but be aware that this will also increase the memory usage.
 

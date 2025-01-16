@@ -1,1 +1,4 @@
 .pnpm-store/
+
+# TypeScript cache
+*.tsbuildinfo

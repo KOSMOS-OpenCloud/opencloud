@@ -56,7 +56,7 @@ func Index(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
+			c := searchsvc.NewSearchProviderService("eu.opencloud.api.search", grpcClient)
 			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })

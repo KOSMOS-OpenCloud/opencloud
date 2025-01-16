@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9125",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 		},
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",

@@ -25,14 +25,14 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9164",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "app-provider",
 		},
 		Reva:         shared.DefaultRevaConfig(),
-		ExternalAddr: "com.owncloud.api.app-provider",
+		ExternalAddr: "eu.opencloud.api.app-provider",
 		Driver:       "",
 		Drivers: config.Drivers{
 			WOPI: config.WOPIDriver{

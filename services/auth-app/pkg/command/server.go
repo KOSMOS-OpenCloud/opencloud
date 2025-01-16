@@ -128,7 +128,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			rClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
+			rClient := settingssvc.NewRoleService("eu.opencloud.api.settings", grpcClient)
 			server, err := http.Server(
 				http.Logger(logger),
 				http.Context(ctx),

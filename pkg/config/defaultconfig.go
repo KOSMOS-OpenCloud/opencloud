@@ -54,7 +54,7 @@ func DefaultConfig() *Config {
 			Host: "localhost",
 		},
 		Reva: &shared.Reva{
-			Address: "com.owncloud.api.gateway",
+			Address: "eu.opencloud.api.gateway",
 		},
 
 		Activitylog:       activitylog.DefaultConfig(),

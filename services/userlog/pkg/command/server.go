@@ -105,9 +105,9 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("could not get reva client selector: %s", err)
 			}
 
-			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
-			vClient := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
-			rClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
+			hClient := ehsvc.NewEventHistoryService("eu.opencloud.api.eventhistory", grpcClient)
+			vClient := settingssvc.NewValueService("eu.opencloud.api.settings", grpcClient)
+			rClient := settingssvc.NewRoleService("eu.opencloud.api.settings", grpcClient)
 
 			{
 				server, err := http.Server(

@@ -80,7 +80,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 		return err
 	}
 
-	valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
+	valueService := settingssvc.NewValueService("eu.opencloud.api.settings", grpcClient)
 
 	wg := sync.WaitGroup{}
 	for i := 0; i < cfg.MaxConcurrency; i++ {

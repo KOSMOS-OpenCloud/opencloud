@@ -27,7 +27,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTPConfig{
 			Addr:      "127.0.0.1:9140",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",
 			CORS: config.CORS{
@@ -94,7 +94,7 @@ func DefaultConfig() *config.Config {
 		},
 		AppHandler: config.AppHandler{
 			Prefix:            "app",
-			SecureViewAppAddr: "com.owncloud.api.collaboration",
+			SecureViewAppAddr: "eu.opencloud.api.collaboration",
 		},
 		Archiver: config.Archiver{
 			Insecure:    false,

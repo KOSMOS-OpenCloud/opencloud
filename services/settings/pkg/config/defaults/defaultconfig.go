@@ -34,7 +34,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9190",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Root:      "/",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
@@ -45,12 +45,12 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9191",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 		},
 		SetupDefaultAssignments: false,
 		Metadata: config.Metadata{
-			GatewayAddress: "com.owncloud.api.storage-system",
-			StorageAddress: "com.owncloud.api.storage-system",
+			GatewayAddress: "eu.opencloud.api.storage-system",
+			StorageAddress: "eu.opencloud.api.storage-system",
 			SystemUserIDP:  "internal",
 			Cache: &config.Cache{
 				Store:          "memory",

@@ -29,13 +29,13 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:                  "127.0.0.1:9185",
-			Namespace:             "com.owncloud.api",
+			Namespace:             "eu.opencloud.api",
 			MaxConcurrentRequests: 0,
 		},
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:9186",
 			Root:      "/thumbnails",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},

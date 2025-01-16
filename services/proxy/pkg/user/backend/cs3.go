@@ -427,7 +427,7 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpda
 
 func (c cs3backend) setupLibregraphClient(_ context.Context, cs3token string) (*libregraph.APIClient, error) {
 	// Use micro registry to resolve next graph service endpoint
-	next, err := c.graphSelector.Select("com.owncloud.web.graph")
+	next, err := c.graphSelector.Select("eu.opencloud.web.graph")
 	if err != nil {
 		c.logger.Debug().Err(err).Msg("setupLibregraphClient: error during Select")
 		return nil, err

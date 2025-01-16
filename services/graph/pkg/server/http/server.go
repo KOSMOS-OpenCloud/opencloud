@@ -95,8 +95,8 @@ func Server(opts ...Option) (http.Service, error) {
 				account.Logger(options.Logger),
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
-		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-		valueService = settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
+		roleService = settingssvc.NewRoleService("eu.opencloud.api.settings", grpcClient)
+		valueService = settingssvc.NewValueService("eu.opencloud.api.settings", grpcClient)
 		gatewaySelector, err = pool.GatewaySelector(
 			options.Config.Reva.Address,
 			append(
@@ -126,7 +126,7 @@ func Server(opts ...Option) (http.Service, error) {
 		keyCloakClient = keycloak.New(kcc.BasePath, kcc.ClientID, kcc.ClientSecret, kcc.ClientRealm, kcc.InsecureSkipVerify)
 	}
 
-	hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
+	hClient := ehsvc.NewEventHistoryService("eu.opencloud.api.eventhistory", grpcClient)
 
 	var handle svc.Service
 	handle, err = svc.NewService(
@@ -140,7 +140,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithValueService(valueService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewaySelector(gatewaySelector),
-		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
+		svc.WithSearchService(searchsvc.NewSearchProviderService("eu.opencloud.api.search", grpcClient)),
 		svc.KeycloakClient(keyCloakClient),
 		svc.EventHistoryClient(hClient),
 		svc.TraceProvider(options.TraceProvider),

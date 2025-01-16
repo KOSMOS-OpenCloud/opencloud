@@ -60,11 +60,11 @@ var _ = Describe("AppRoleAssignments", func() {
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
 
-		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+		pool.RemoveSelector("GatewaySelector" + "eu.opencloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
 			"GatewaySelector",
-			"com.owncloud.api.gateway",
+			"eu.opencloud.api.gateway",
 			func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
 				return gatewayClient
 			},

@@ -83,8 +83,8 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
-		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", conf.GrpcClient),
-		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", conf.GrpcClient),
+		searchClient:     searchsvc.NewSearchProviderService("eu.opencloud.api.search", conf.GrpcClient),
+		thumbnailsClient: thumbnailssvc.NewThumbnailService("eu.opencloud.api.thumbnails", conf.GrpcClient),
 		gatewaySelector:  gatewaySelector,
 	}
 

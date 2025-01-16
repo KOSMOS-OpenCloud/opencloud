@@ -25,7 +25,7 @@ func DefaultConfig() *config.Config {
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9154",
-			Namespace: "com.owncloud.api",
+			Namespace: "eu.opencloud.api",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
@@ -34,7 +34,7 @@ func DefaultConfig() *config.Config {
 		Reva:                   shared.DefaultRevaConfig(),
 		MountID:                "7639e57c-4433-4a12-8201-722fd0009154",
 		ReadOnly:               false,
-		SharesProviderEndpoint: "com.owncloud.api.sharing",
+		SharesProviderEndpoint: "eu.opencloud.api.sharing",
 	}
 }
 

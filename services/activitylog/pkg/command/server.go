@@ -109,8 +109,8 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
-			vClient := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
+			hClient := ehsvc.NewEventHistoryService("eu.opencloud.api.eventhistory", grpcClient)
+			vClient := settingssvc.NewValueService("eu.opencloud.api.settings", grpcClient)
 
 			{
 				svc, err := http.Server(

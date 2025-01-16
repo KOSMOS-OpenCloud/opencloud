@@ -26,7 +26,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTPConfig{
 			Addr:      "127.0.0.1:9350",
-			Namespace: "com.owncloud.web",
+			Namespace: "eu.opencloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",
 			CORS: config.CORS{

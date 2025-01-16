@@ -88,7 +88,7 @@ func (s ICAP) Scan(in Input) (Result, error) {
 	}
 	result.ScanTime = time.Now()
 
-	// TODO: make header configurable. See oc10 documentation: https://doc.owncloud.com/server/10.12/admin_manual/configuration/server/virus-scanner-support.html
+	// TODO: make header configurable
 	if data, infected := res.Header["X-Infection-Found"]; infected {
 		result.Infected = infected
 

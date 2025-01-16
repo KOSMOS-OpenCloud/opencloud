@@ -8,17 +8,17 @@ import (
 	"github.com/opencloud-eu/opencloud/services/ocm/pkg/config"
 )
 
-// OCMConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// OCMConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
 
-	// Construct the ocm provider domain from the oCIS URL
+	// Construct the ocm provider domain from the OpenCloud URL
 	providerDomain := ""
 	u, err := url.Parse(cfg.Commons.OpenCloudURL)
 	switch {
 	case err != nil:
-		logger.Error().Err(err).Msg("could not parse oCIS URL")
-	case u.Host == "":
-		logger.Error().Msg("oCIS URL has no host")
+		logger.Error().Err(err).Msg("could not parse OpenCloud URL")
+	case u.Host == "OpenCloud":
+		logger.Error().Msg("OpenCloud URL has no host")
 	default:
 		providerDomain = u.Host
 	}

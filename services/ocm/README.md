@@ -25,80 +25,80 @@ OC_ENABLE_OCM=true
 
 The `ocm` services implements an invitation workflow which needs to be followed before creating federated shares. Invitations are limited to trusted instances, however.
 
-The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk. Note that the `ocmproviders.json` file, which holds that configuration, is expected to be located in the root of the ocis config directory if not otherwise defined. See the `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` envvar for more details.
+The list of trusted instances is managed by the `ocmproviderauthorizer` service. The only supported backend currently is `json` which stores the list in a json file on disk. Note that the `ocmproviders.json` file, which holds that configuration, is expected to be located in the root of the OpenCloud config directory if not otherwise defined. See the `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE` envvar for more details.
 
 When all instances of a federation should trust each other, an `ocmproviders.json` file like this can be used for all instances:
 ```json
 [
     {
-        "name": "oCIS Test",
-        "full_name": "oCIS Test provider",
-        "organization": "oCIS",
-        "domain": "cloud.ocis.test",
-        "homepage": "https://ocis.test",
-        "description": "oCIS Example cloud storage",
+        "name": "OpenCloud Test 1",
+        "full_name": "OpenCloud Test provider 1",
+        "organization": "OpenCloud One",
+        "domain": "cloud1.opencloud.test",
+        "homepage": "https://cloud1.opencloud.test",
+        "description": "First OpenCloud Example cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "cloud.ocis.test Open Cloud Mesh API"
+                        "description": "cloud1.opencloud.test Open Cloud Mesh API"
                     },
-                    "name": "cloud.ocis.test - OCM API",
-                    "path": "https://cloud.ocis.test/ocm/",
+                    "name": "cloud1.opencloud.test - OCM API",
+                    "path": "https://cloud1.opencloud.test/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "http://cloud.ocis.test"
+                "host": "http://cloud1.opencloud.test"
             },
             {
                 "endpoint": {
                     "type": {
                         "name": "Webdav",
-                        "description": "cloud.ocis.test Webdav API"
+                        "description": "cloud1.opencloud.test Webdav API"
                     },
-                    "name": "cloud.ocis.test Example - Webdav API",
-                    "path": "https://cloud.ocis.test/dav/",
+                    "name": "cloud1.opencloud.test Example - Webdav API",
+                    "path": "https://cloud1.opencloud.test/dav/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "https://cloud.ocis.test/"
+                "host": "https://cloud1.opencloud.test/"
             }
         ]
     },
     {
-        "name": "ownCloud Test",
-        "full_name": "ownCloud Test provider",
-        "organization": "ownCloud",
-        "domain": "cloud.owncloud.test",
-        "homepage": "https://owncloud.test",
-        "description": "ownCloud Example cloud storage",
+        "name": "OpenCloud Test 2",
+        "full_name": "OpenCloud Test provider 2",
+        "organization": "OpenCloud Two",
+        "domain": "cloud2.opencloud.test",
+        "homepage": "https://cloud2.opencloud.test",
+        "description": "Second OpenCloud Example cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "cloud.owncloud.test Open Cloud Mesh API"
+                        "description": "cloud2.opencloud.test Open Cloud Mesh API"
                     },
-                    "name": "cloud.owncloud.test - OCM API",
-                    "path": "https://cloud.owncloud.test/ocm/",
+                    "name": "cloud2.opencloud.test - OCM API",
+                    "path": "https://cloud2.opencloud.test/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "http://cloud.owncloud.test"
+                "host": "http://cloud2.opencloud.test"
             },
             {
                 "endpoint": {
                     "type": {
                         "name": "Webdav",
-                        "description": "cloud.owncloud.test Webdav API"
+                        "description": "cloud2.opencloud.test Webdav API"
                     },
-                    "name": "cloud.owncloud.test Example - Webdav API",
-                    "path": "https://cloud.owncloud.test/dav/",
+                    "name": "cloud2.opencloud.test Example - Webdav API",
+                    "path": "https://cloud2.opencloud.test/dav/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "https://cloud.owncloud.test/"
+                "host": "https://cloud2.opencloud.test/"
             }
         ]
     }
@@ -109,7 +109,7 @@ When all instances of a federation should trust each other, an `ocmproviders.jso
 Note: the `domain` must not contain the protocol as it has to match the [GOCDB site object domain](https://developer.sciencemesh.io/docs/technical-documentation/central-database/#site-object).
 {{< /hint >}}
 
-The above federation consists of two instances: `cloud.owncloud.test` and `cloud.ocis.test` that can use the Invitation workflow described below to generate, send and accept invitations.
+The above federation consists of two instances: `cloud1.opencloud.test` and `cloud2.opencloud.test` that can use the Invitation workflow described below to generate, send and accept invitations.
 
 ## Invitation Workflow
 

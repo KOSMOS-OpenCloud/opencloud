@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-app-registry command.
+// Execute is the entry point for the opencloud app-registry command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "app-registry",
-		Usage:    "Provide a app registry for oCIS",
+		Usage:    "Provide an app registry for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

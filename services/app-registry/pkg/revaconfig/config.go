@@ -6,7 +6,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/app-registry/pkg/config"
 )
 
-// AppRegistryConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// AppRegistryConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func AppRegistryConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{

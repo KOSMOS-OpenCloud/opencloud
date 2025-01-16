@@ -17,7 +17,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/frontend/pkg/config"
 )
 
-// FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// FrontendConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]interface{}, error) {
 	webURL, err := url.Parse(cfg.PublicURL)
 	if err != nil {
@@ -123,7 +123,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 			"services": map[string]interface{}{
 				// this reva service called "appprovider" comes from
 				// `internal/http/services/appprovider` and is a translation
-				// layer from the grpc app registry to http, used by e.g. ownCloud Web
+				// layer from the grpc app registry to http, used by e.g. OpenCloud Web
 				// It should not be confused with `internal/grpc/services/appprovider`
 				// which is currently only the driver for the CS3org WOPI server
 				"appprovider": map[string]interface{}{
@@ -140,7 +140,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							"app":    "appname",
 						},
 						"staticurlparams": map[string]string{
-							"contextRouteName": "files-spaces-personal", // TODO: remove when https://github.com/owncloud/web/pull/7437 arrived in oCIS
+							"contextRouteName": "files-spaces-personal", // FIXME: remove when https://github.com/owncloud/web/pull/7437 arrived in OpenCloud
 						},
 					},
 					"secure_view_app_addr": cfg.AppHandler.SecureViewAppAddr,
@@ -191,7 +191,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 					},
 					"config": map[string]interface{}{
 						"version": "1.7",
-						"website": "ownCloud",
+						"website": "OpenCloud",
 						"host":    cfg.PublicURL,
 						"contact": "",
 						"ssl":     "false",
@@ -209,8 +209,8 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"version":        version.Legacy,
 									"versionstring":  version.LegacyString,
 									"edition":        cfg.Edition,
-									"productname":    "Infinite Scale",
-									"product":        "Infinite Scale",
+									"productname":    "OpenCloud",
+									"product":        "OpenCloud",
 									"productversion": version.GetString(),
 									"hostname":       "",
 								},
@@ -338,7 +338,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 						},
 						"version": map[string]interface{}{
-							"product":        "Infinite Scale",
+							"product":        "OpenCloud",
 							"edition":        "Community",
 							"major":          version.ParsedLegacy().Major(),
 							"minor":          version.ParsedLegacy().Minor(),

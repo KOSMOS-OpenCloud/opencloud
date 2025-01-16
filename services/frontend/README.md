@@ -1,6 +1,6 @@
 # Frontend
 
-The frontend service translates various owncloud related HTTP APIs to CS3 requests.
+The frontend service translates various OpenCloud related HTTP APIs to CS3 requests.
 
 ## Endpoints Overview
 
@@ -16,11 +16,11 @@ The archiver endpoint, by default `/archiver`, implements zip and tar download f
 
 ### datagateway
 
-The datagateway endpoint, by default `/data`, forwards file up- and download requests to the correct CS3 data provider. OCIS starts a dataprovider as part of the storage-* services. The routing happens based on the JWT that was created by a storage provider in response to an `InitiateFileDownload` or `InitiateFileUpload` request.
+The datagateway endpoint, by default `/data`, forwards file up- and download requests to the correct CS3 data provider. OpenCloud starts a dataprovider as part of the storage-* services. The routing happens based on the JWT that was created by a storage provider in response to an `InitiateFileDownload` or `InitiateFileUpload` request.
 
 ### ocs
 
-The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
+The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/opencloud-eu/opencloud/tree/master/services/ocs) service.
 
 #### Event Handler
 
@@ -28,7 +28,7 @@ The `frontend` service contains an eventhandler for handling `ocs` related event
 
 ### Sharing
 
-Aggregating share information is one of the most time consuming operations in OCIS. The service fetches a list of either received or created shares and has to stat every resource individually. While stats are fast, the default behavior scales linearly with the number of shares.
+Aggregating share information is one of the most time consuming operations in OpenCloud. The service fetches a list of either received or created shares and has to stat every resource individually. While stats are fast, the default behavior scales linearly with the number of shares.
 
 To save network trips the sharing implementation can cache the stat requests with an in memory cache or in Redis. It will shorten the response time by the network round-trip overhead at the cost of the API only eventually being updated.
 
@@ -40,9 +40,9 @@ While the frontend service does not persist any data, it does cache information 
 
 ## Define Read-Only Attributes
 
-A lot of user management is made via the standardized libregraph API. Depending on how the system is configured, there might be some user attributes that an ocis instance admin can't change because of properties coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To ease life for admins, there are hints as capabilites telling the frontend which attributes are read-only to enable a different optical representation like being grayed out. To configure these hints, use the environment variable `FRONTEND_READONLY_USER_ATTRIBUTES`, which takes a comma separated list of attributes, see the envvar for supported values.
+A lot of user management is made via the standardized libregraph API. Depending on how the system is configured, there might be some user attributes that an OpenCloud instance admin can't change because of properties coming from an external LDAP server, or similar. This can be the case when the OpenCloud admin is not the LDAP admin. To ease life for admins, there are hints as capabilites telling the frontend which attributes are read-only to enable a different optical representation like being grayed out. To configure these hints, use the environment variable `FRONTEND_READONLY_USER_ATTRIBUTES`, which takes a comma separated list of attributes, see the envvar for supported values.
 
-You can find more details regarding available attributes at the [libre-graph-api openapi-spec](https://github.com/owncloud/libre-graph-api/blob/main/api/openapi-spec/v1.0.yaml) and on [owncloud.dev](https://owncloud.dev/libre-graph-api/).
+You can find more details regarding available attributes at the [libre-graph-api openapi-spec](https://github.com/owncloud/libre-graph-api/blob/main/api/openapi-spec/v1.0.yaml) and on [docs.opencloud.eu](https://docs.opencloud.eu/libre-graph-api/).
 
 ## Caching
 
@@ -73,13 +73,13 @@ When setting the `FRONTEND_AUTO_ACCEPT_SHARES` to `true`, all incoming shares wi
 
 Note that the password policy currently impacts only **public link password validation**.
 
-In Infinite Scale, the password policy is always enabled because the max-length restriction is always applying and should be taken into account by the clients.
+In OpenCloud, the password policy is always enabled because the max-length restriction is always applying and should be taken into account by the clients.
 
 With the password policy, mandatory criteria for the password can be defined via the environment variables listed below.
 
 Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
-The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OC_CONFIG_DIR/OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
+The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, OpenCloud tries to load a file from the `OC_CONFIG_DIR/OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
 
 Following environment variables can be set to define the password policy behaviour:
 
@@ -98,13 +98,13 @@ Define the minimum number of special characters.
 -   `OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 Path to the 'banned passwords list' file.
 
-These variables are global ocis variables because they are used not only in the frontend service, but also in the sharing service.
+These variables are global OpenCloud variables because they are used not only in the frontend service, but also in the sharing service.
 
 Note that a password can have a maximum length of **72 bytes**. Depending on the alphabet used, a character is encoded by 1 to 4 bytes, defining the maximum length of a password indirectly. While US-ASCII will only need one byte, Latin alphabets and also Greek or Cyrillic ones need two bytes. Three bytes are needed for characters in Chinese, Japanese and Korean etc.
 
 ### The Password Policy Capability
 
-The capabilities endpoint (e.g. https://ocis.test/ocs/v1.php/cloud/capabilities?format=json) gives you following capabilities which are relevant for the password policy:
+The capabilities endpoint (e.g. https://cloud.opencloud.test/ocs/v1.php/cloud/capabilities?format=json) gives you following capabilities which are relevant for the password policy:
 
 ```json
 {

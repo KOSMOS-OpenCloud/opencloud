@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-frontend command.
+// Execute is the entry point for the opencloud-frontend command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "frontend",
-		Usage:    "Provide various ownCloud apis for oCIS",
+		Usage:    "Provide various HTTP apis for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

@@ -11,7 +11,7 @@ func Test_appendSender(t *testing.T) {
 		a      mail.Address
 	}
 
-	a1, err := mail.ParseAddress("ownCloud <noreply@example.com>")
+	a1, err := mail.ParseAddress("OpenCloud <noreply@example.com>")
 	if err != nil {
 		t.Error(err)
 	}
@@ -29,25 +29,25 @@ func Test_appendSender(t *testing.T) {
 		{
 			name:   "empty sender",
 			sender: "",
-			want1:  `"ownCloud" <noreply@example.com>`,
+			want1:  `"OpenCloud" <noreply@example.com>`,
 			want2:  `<noreply@example.com>`,
 		},
 		{
 			name:   "not empty sender",
 			sender: `Joe Q. Public`,
-			want1:  `"Joe Q. Public via ownCloud" <noreply@example.com>`,
+			want1:  `"Joe Q. Public via OpenCloud" <noreply@example.com>`,
 			want2:  `"Joe Q. Public via" <noreply@example.com>`,
 		},
 		{
 			name:   "sender whit comma and semicolon",
 			sender: `Joe, Q; Public:`,
-			want1:  `"Joe, Q; Public: via ownCloud" <noreply@example.com>`,
+			want1:  `"Joe, Q; Public: via OpenCloud" <noreply@example.com>`,
 			want2:  `"Joe, Q; Public: via" <noreply@example.com>`,
 		},
 		{
 			name:   "sender with quotes",
 			sender: `Joe Q. "Public"`,
-			want1:  `"Joe Q. \"Public\" via ownCloud" <noreply@example.com>`,
+			want1:  `"Joe Q. \"Public\" via OpenCloud" <noreply@example.com>`,
 			want2:  `"Joe Q. \"Public\" via" <noreply@example.com>`,
 		},
 	}

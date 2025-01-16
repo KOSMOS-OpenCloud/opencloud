@@ -37,14 +37,14 @@ var _ = Describe("Notifications", func() {
 			Id: &user.UserId{
 				OpaqueId: "sharer",
 			},
-			Mail:        "sharer@owncloud.com",
+			Mail:        "sharer@opencloud.eu",
 			DisplayName: "Dr. S. Harer",
 		}
 		sharee = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharee",
 			},
-			Mail:        "sharee@owncloud.com",
+			Mail:        "sharee@opencloud.eu",
 			DisplayName: "Eric Expireling",
 		}
 		resourceid = &provider.ResourceId{
@@ -118,8 +118,8 @@ Click here to view it: files/shares/with-me
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			done:           make(chan struct{}),
@@ -143,8 +143,8 @@ Even though this share has been revoked you still might have access through othe
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			done:           make(chan struct{}),
@@ -168,8 +168,8 @@ Click here to view it: f/spaceid
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			done:           make(chan struct{}),
@@ -195,8 +195,8 @@ Click here to check it: f/spaceid
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			done:           make(chan struct{}),
@@ -219,8 +219,8 @@ Even though this membership has expired you still might have access through othe
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			done:           make(chan struct{}),
@@ -245,14 +245,14 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 			Id: &user.UserId{
 				OpaqueId: "sharer",
 			},
-			Mail:        "sharer@owncloud.com",
+			Mail:        "sharer@opencloud.eu",
 			DisplayName: "Dr. O'reilly",
 		}
 		sharee = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharee",
 			},
-			Mail:        "sharee@owncloud.com",
+			Mail:        "sharee@opencloud.eu",
 			DisplayName: "<script>alert('Eric Expireling');</script>",
 		}
 		resourceid = &provider.ResourceId{
@@ -331,8 +331,8 @@ Click here to view it: files/shares/with-me
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedHTMLBody: `<!DOCTYPE html>
 <html>
@@ -361,8 +361,8 @@ https://owncloud.com
                             <br>
                             <br>
                             --- <br>
-                            ownCloud - Store. Share. Work.<br>
-                            <a href="https://owncloud.com">https://owncloud.com</a>
+                            OpenCloud - a safe home for all your data<br>
+                            <a href="https://opencloud.eu">https://opencloud.eu</a>
                         </footer>
                     </td>
                 </tr>
@@ -399,8 +399,8 @@ Click here to view it: f/spaceid
 
 
 ---
-ownCloud - Store. Share. Work.
-https://owncloud.com
+OpenCloud - a safe home for all your data
+https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
 			expectedHTMLBody: `<!DOCTYPE html>
@@ -430,8 +430,8 @@ https://owncloud.com
                             <br>
                             <br>
                             --- <br>
-                            ownCloud - Store. Share. Work.<br>
-                            <a href="https://owncloud.com">https://owncloud.com</a>
+                            OpenCloud - a safe home for all your data<br>
+                            <a href="https://opencloud.eu">https://opencloud.eu</a>
                         </footer>
                     </td>
                 </tr>

@@ -18,7 +18,7 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	WebUIURL string `yaml:"ocis_url" env:"OC_URL;NOTIFICATIONS_WEB_UI_URL" desc:"The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails" introductionVersion:"pre5.0"`
+	WebUIURL string `yaml:"opencloud_url" env:"OC_URL;NOTIFICATIONS_WEB_UI_URL" desc:"The public facing URL of the OpenCloud Web UI, used e.g. when sending notification eMails" introductionVersion:"pre5.0"`
 
 	Notifications  Notifications        `yaml:"notifications"`
 	GRPCClientTLS  shared.GRPCClientTLS `yaml:"grpc_client_tls"`
@@ -44,7 +44,7 @@ type Notifications struct {
 type SMTP struct {
 	Host           string `yaml:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST" desc:"SMTP host to connect to." introductionVersion:"pre5.0"`
 	Port           int    `yaml:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT" desc:"Port of the SMTP host to connect to." introductionVersion:"pre5.0"`
-	Sender         string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER" desc:"Sender address of emails that will be sent (e.g. 'ownCloud <noreply@example.com>'." introductionVersion:"pre5.0"`
+	Sender         string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER" desc:"Sender address of emails that will be sent (e.g. 'OpenCloud <noreply@example.com>'." introductionVersion:"pre5.0"`
 	Username       string `yaml:"smtp_username" env:"NOTIFICATIONS_SMTP_USERNAME" desc:"Username for the SMTP host to connect to." introductionVersion:"pre5.0"`
 	Password       string `yaml:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD" desc:"Password for the SMTP host to connect to." introductionVersion:"pre5.0"`
 	Insecure       bool   `yaml:"insecure" env:"NOTIFICATIONS_SMTP_INSECURE" desc:"Allow insecure connections to the SMTP server." introductionVersion:"pre5.0"`

@@ -22,7 +22,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
-	"go-micro.dev/v4/client"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
@@ -33,6 +32,7 @@ import (
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0/mocks"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
+	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0/mocks"
 	"github.com/opencloud-eu/opencloud/services/userlog/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/userlog/pkg/service"
 )
@@ -51,7 +51,7 @@ var _ = Describe("UserlogService", func() {
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 
 		ehc mocks.EventHistoryService
-		vc  settingssvc.MockValueService
+		vc  settingsmocks.ValueService
 	)
 
 	BeforeEach(func() {
@@ -78,24 +78,22 @@ var _ = Describe("UserlogService", func() {
 		}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
-		vc.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return &settingssvc.GetValueResponse{
-				Value: &settingsmsg.ValueWithIdentifier{
-					Value: &settingsmsg.Value{
-						Value: &settingsmsg.Value_CollectionValue{
-							CollectionValue: &settingsmsg.CollectionValue{
-								Values: []*settingsmsg.CollectionOption{
-									{
-										Key:    "in-app",
-										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
-									},
+		vc.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(&settingssvc.GetValueResponse{
+			Value: &settingsmsg.ValueWithIdentifier{
+				Value: &settingsmsg.Value{
+					Value: &settingsmsg.Value_CollectionValue{
+						CollectionValue: &settingsmsg.CollectionValue{
+							Values: []*settingsmsg.CollectionOption{
+								{
+									Key:    "in-app",
+									Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
 								},
 							},
 						},
 					},
 				},
-			}, nil
-		}
+			},
+		}, nil)
 
 		ul, err = service.NewUserlogService(
 			service.Config(cfg),

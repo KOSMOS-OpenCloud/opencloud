@@ -2,97 +2,177 @@ package service
 
 import (
 	"context"
-	"testing"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
+	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0/mocks"
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"go-micro.dev/v4/client"
+	"github.com/stretchr/testify/mock"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-var testLogger = log.NewLogger()
+var _ = Describe("NotificationFilter", func() {
+	var (
+		testLogger = log.NewLogger()
+		vs         *settingsmocks.ValueService
+		ulf        userlogFilter
+	)
 
-func TestUserlogFilter_execute(t *testing.T) {
-	type args struct {
-		ctx       context.Context
-		event     events.Event
-		executant *user.UserId
-		users     []string
-	}
-	tests := []struct {
-		name string
-		vc   settings.ValueService
-		args args
-		want []string
-	}{
-		{"executant", settings.MockValueService{}, args{executant: &user.UserId{OpaqueId: "executant"}, users: []string{"foo", "executant"}}, []string{"foo"}},
-		{"no connection to ValueService", settings.MockValueService{
-			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
-				return nil, errors.New("no connection to ValueService")
-			},
-		}, args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string(nil)},
-		{"no setting in ValueService response", settings.MockValueService{
-			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
-				return &settings.GetValueResponse{}, nil
-			},
-		}, args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string(nil)},
-		{"ValueService nil response", settings.MockValueService{
-			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
-				return nil, nil
-			},
-		}, args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string(nil)},
-		{"event that cannot be disabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.BytesReceived{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"ShareCreated enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"ShareRemoved enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.ShareRemoved{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"ShareExpired enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.ShareExpired{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"SpaceShared enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceShared{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"SpaceUnshared enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceUnshared{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"SpaceMembershipExpired enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceMembershipExpired{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"SpaceDisabled enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDisabled{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"SpaceDeleted enabled", setupMockValueService(true), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDeleted{}}, ctx: context.TODO()}, []string{"foo"}},
-		{"ShareCreated disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareCreated{}}, ctx: context.TODO()}, []string(nil)},
-		{"ShareRemoved disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareRemoved{}}, ctx: context.TODO()}, []string(nil)},
-		{"ShareExpired disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.ShareExpired{}}, ctx: context.TODO()}, []string(nil)},
-		{"SpaceShared disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceShared{}}, ctx: context.TODO()}, []string(nil)},
-		{"SpaceUnshared disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceUnshared{}}, ctx: context.TODO()}, []string(nil)},
-		{"SpaceMembershipExpired disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceMembershipExpired{}}, ctx: context.TODO()}, []string(nil)},
-		{"SpaceDisabled disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDisabled{}}, ctx: context.TODO()}, []string(nil)},
-		{"SpaceDeleted disabled", setupMockValueService(false), args{users: []string{"foo"}, event: events.Event{Event: events.SpaceDeleted{}}, ctx: context.TODO()}, []string(nil)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ulf := userlogFilter{
-				log:         testLogger,
-				valueClient: tt.vc,
-			}
-			assert.Equal(t, tt.want, ulf.execute(tt.args.ctx, tt.args.event, tt.args.executant, tt.args.users))
-		})
-	}
-}
+	BeforeEach(func() {
+		vs = &settingsmocks.ValueService{}
+		ulf = userlogFilter{
+			log:         testLogger,
+			valueClient: vs,
+		}
+	})
 
-func setupMockValueService(inApp bool) settings.ValueService {
-	return settings.MockValueService{
-		GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
-			return &settings.GetValueResponse{
-				Value: &settingsmsg.ValueWithIdentifier{
-					Value: &settingsmsg.Value{
-						Value: &settingsmsg.Value_CollectionValue{
-							CollectionValue: &settingsmsg.CollectionValue{
-								Values: []*settingsmsg.CollectionOption{
-									{
-										Key:    "in-app",
-										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: inApp},
-									},
+	setupMockValueService := func(inApp bool) *settingsmocks.ValueService {
+		vs := settingsmocks.ValueService{}
+		vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(&settings.GetValueResponse{
+			Value: &settingsmsg.ValueWithIdentifier{
+				Value: &settingsmsg.Value{
+					Value: &settingsmsg.Value_CollectionValue{
+						CollectionValue: &settingsmsg.CollectionValue{
+							Values: []*settingsmsg.CollectionOption{
+								{
+									Key:    "in-app",
+									Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: inApp},
 								},
 							},
 						},
 					},
 				},
-			}, nil
-		},
+			},
+		}, nil)
+		return &vs
 	}
-}
+
+	Describe("execute", func() {
+		It("handles executants", func() {
+			vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(nil, nil)
+
+			Expect(ulf.execute(context.TODO(), events.Event{}, &user.UserId{OpaqueId: "executant"}, []string{"foo"})).To(ConsistOf("foo"))
+		})
+		It("handles connection errors", func() {
+			vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(nil, errors.New("no connection to ValueService"))
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareCreated{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+		It("handles no setting", func() {
+			vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(&settings.GetValueResponse{}, nil)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareCreated{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+		It("handles nil response", func() {
+			vs.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything).Return(nil, nil)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareCreated{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+		It("handles events that can not be disabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.BytesReceived{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles ShareCreated events", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareCreated{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles ShareRemoved events", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareRemoved{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles ShareExpired events", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareExpired{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles SpaceShared enabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceShared{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles SpaceUnshared enabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceUnshared{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles SpaceMembershipExpired enabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceMembershipExpired{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles SpaceDisabled enabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceDisabled{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles SpaceDeleted enabled", func() {
+			ulf.valueClient = setupMockValueService(true)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceDeleted{}}, nil, []string{"foo"})).To(ConsistOf("foo"))
+		})
+
+		It("handles ShareCreated disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareCreated{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles ShareRemoved disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareRemoved{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles ShareExpired disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.ShareExpired{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles SpaceShared disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceShared{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles SpaceUnshared disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceUnshared{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles SpaceMembershipExpired disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceMembershipExpired{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles SpaceDisabled disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceDisabled{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+
+		It("handles SpaceDeleted disabled", func() {
+			ulf.valueClient = setupMockValueService(false)
+
+			Expect(ulf.execute(context.TODO(), events.Event{Event: events.SpaceDeleted{}}, nil, []string{"foo"})).To(BeEmpty())
+		})
+	})
+})

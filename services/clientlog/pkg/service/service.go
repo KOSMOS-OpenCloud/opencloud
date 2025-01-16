@@ -58,7 +58,7 @@ func NewClientlogService(opts ...Option) (*ClientlogService, error) {
 		gatewaySelector:  o.GatewaySelector,
 		registeredEvents: make(map[string]events.Unmarshaller),
 		tp:               o.TraceProvider,
-		tracer:           o.TraceProvider.Tracer("github.com/owncloud/ocis/services/clientlog/pkg/service"),
+		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/clientlog/pkg/service"),
 		publisher:        o.Stream,
 		ch:               ch,
 	}

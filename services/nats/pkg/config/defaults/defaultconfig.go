@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		Nats: config.Nats{
 			Host:      "127.0.0.1",
 			Port:      9233,
-			ClusterID: "ocis-cluster",
+			ClusterID: "opencloud-cluster",
 			StoreDir:  filepath.Join(defaults.BaseDataPath(), "nats"),
 			TLSCert:   filepath.Join(defaults.BaseDataPath(), "nats/tls.crt"),
 			TLSKey:    filepath.Join(defaults.BaseDataPath(), "nats/tls.key"),

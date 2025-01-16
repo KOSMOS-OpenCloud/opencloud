@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		},
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",
-			Cluster:   "ocis-cluster",
+			Cluster:   "opencloud-cluster",
 			EnableTLS: false,
 		},
 		Engine: config.Engine{

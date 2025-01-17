@@ -21,6 +21,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -30,7 +31,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 const (

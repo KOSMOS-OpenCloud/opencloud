@@ -19,7 +19,7 @@ import (
 
 var (
 	// Name is the default name for the settings store
-	Name                   = "ocis-settings"
+	Name                   = "opencloud-settings"
 	managerName            = "metadata"
 	settingsSpaceID        = "f1bdd61a-da7c-49fc-8203-0558109d1b4f" // uuid.Must(uuid.NewV4()).String()
 	rootFolderLocation     = "settings"

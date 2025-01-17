@@ -33,7 +33,7 @@ var (
 			Type:        settingsmsg.Bundle_TYPE_ROLE,
 			DisplayName: "test role - reads | update",
 			Name:        "TEST_ROLE",
-			Extension:   "ocis-settings",
+			Extension:   "opencloud-settings",
 			Resource: &settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_BUNDLE,
 			},
@@ -69,7 +69,7 @@ var (
 			Type:        settingsmsg.Bundle_TYPE_ROLE,
 			DisplayName: "another",
 			Name:        "ANOTHER_TEST_ROLE",
-			Extension:   "ocis-settings",
+			Extension:   "opencloud-settings",
 			Resource: &settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_BUNDLE,
 			},

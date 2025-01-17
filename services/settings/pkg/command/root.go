@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-settings command.
+// Execute is the entry point for the opencloud-settings command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "settings",
-		Usage:    "Provide settings and permissions for oCIS",
+		Usage:    "Provide settings and permissions for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

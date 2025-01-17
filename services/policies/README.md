@@ -136,16 +136,16 @@ Note that additional steps can be configured and their position in the list defi
 
 ## Rego Key Match
 
-To identify available keys for OPA, you need to look at [engine.go](https://github.com/owncloud/ocis/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/owncloud/ocis/blob/master/protogen/gen/opencloud/services/policies/v0/policies.swagger.json) file. Note that which keys are available depends on from which module it is used.
+To identify available keys for OPA, you need to look at [engine.go](https://github.com/opencloud-eu/opencloud/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/opencloud/blob/blob/master/protogen/gen/opencloud/services/policies/v0/policies.swagger.json) file. Note that which keys are available depends on from which module it is used.
 
 ## Extend Mimetype File Extension Mapping
 
-In the extended set of the rego query language, it is possible to get a list of associated file extensions based on a mimetype, for example `ocis.mimetype.extensions("application/pdf")`.
+In the extended set of the rego query language, it is possible to get a list of associated file extensions based on a mimetype, for example `opencloud.mimetype.extensions("application/pdf")`.
 
-The list of mappings is restricted by default and is provided by the host system ocis is installed on.
+The list of mappings is restricted by default and is provided by the host system OpenCloud is installed on.
 
-In order to extend this list, ocis must be provided with the path to a custom `mime.types` file that maps mimetypes to extensions.
-The location for the file must be accessible by all instances of the policy service. As a rule of thumb, use the directory where the ocis configuration files are stored.
+In order to extend this list, OpenCloud must be provided with the path to a custom `mime.types` file that maps mimetypes to extensions.
+The location for the file must be accessible by all instances of the policy service. As a rule of thumb, use the directory where the OpenCloud configuration files are stored.
 Note that existing mappings from the host are extended by the definitions from the mime types file, but not replaced.
 
 The path to that file can be provided via a yaml configuration or an environment variable. Note to replace the `OC_CONFIG_DIR` string by an existing path.
@@ -164,4 +164,4 @@ A good example of how such a file should be formatted can be found in the [Apach
 
 ## Example Policies
 
-The policies service contains a set of preconfigured example policies. See the [deployment examples](https://github.com/owncloud/ocis/tree/master/deployments/examples) directory for details. The contained policies disallow Infinite Scale to create certain file types, both via the proxy middleware and the events service via postprocessing.
+The policies service contains a set of preconfigured example policies. See the [deployment examples](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples) directory for details. The contained policies disallow OpenCloud to create certain file types, both via the proxy middleware and the events service via postprocessing.

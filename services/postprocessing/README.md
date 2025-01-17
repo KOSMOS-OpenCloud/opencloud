@@ -4,7 +4,7 @@ The `postprocessing` service handles the coordination of asynchronous postproces
 
 ## General Prerequisites
 
-To use the postprocessing service, an event system needs to be configured for all services. By default, `ocis` ships with a preconfigured `nats` service.
+To use the postprocessing service, an event system needs to be configured for all services. By default, `OpenCloud` ships with a preconfigured `nats` service.
 
 ## Postprocessing Functionality
 
@@ -49,7 +49,7 @@ To enable virus scanning as a postprocessing step after uploading a file, the en
 
 ### Delay
 
-Though this is for development purposes only and NOT RECOMMENDED on production systems, setting the environment variable `POSTPROCESSING_DELAY` to a duration not equal to zero will add a delay step with the configured amount of time. ocis will continue postprocessing the file after the configured delay. Use the environment variable `POSTPROCESSING_STEPS` and the keyword `delay` if you have multiple postprocessing steps and want to define their order. If `POSTPROCESSING_DELAY` is set but the keyword `delay` is not contained in `POSTPROCESSING_STEPS`, it will be processed as last postprocessing step without being listed there. In this case, a log entry will be written on service startup to notify the admin about that situation. That log entry can be avoided by adding the keyword `delay` to `POSTPROCESSING_STEPS`.
+Though this is for development purposes only and NOT RECOMMENDED on production systems, setting the environment variable `POSTPROCESSING_DELAY` to a duration not equal to zero will add a delay step with the configured amount of time. OpenCloud will continue postprocessing the file after the configured delay. Use the environment variable `POSTPROCESSING_STEPS` and the keyword `delay` if you have multiple postprocessing steps and want to define their order. If `POSTPROCESSING_DELAY` is set but the keyword `delay` is not contained in `POSTPROCESSING_STEPS`, it will be processed as last postprocessing step without being listed there. In this case, a log entry will be written on service startup to notify the admin about that situation. That log entry can be avoided by adding the keyword `delay` to `POSTPROCESSING_STEPS`.
 
 ### Custom Postprocessing Steps
 By using the envvar `POSTPROCESSING_STEPS`, custom postprocessing steps can be added. Any word can be used as step name but be careful not to conflict with exising keywords like `virusscan` and `delay`. In addition, if a keyword is misspelled or the corresponding service does either not exist or does not follow the necessary event communication, the postprocessing service will wait forever getting the required response to proceed and does not continue any other processing.
@@ -93,13 +93,13 @@ Depending if you want to restart/resume all or defined failed uploads, different
     Note that there never can be a clear identification of a failed upload session due to various reasons causing them. You need to apply more critera like free space on disk, a failed service like antivirus etc. to declare an upload as failed.
 
     ```bash
-    ocis storage-users uploads sessions
+    opencloud storage-users uploads sessions
     ```
 
 -   **All failed uploads**\
     If you want to restart/resume all failed uploads, just rerun the command with the relevant flag. Note that this is the preferred command to handle failed processing steps:
     ```bash
-    ocis storage-users uploads sessions --resume
+    opencloud storage-users uploads sessions --resume
     ```
 
 -   **Particular failed uploads**\
@@ -108,14 +108,14 @@ Depending if you want to restart/resume all or defined failed uploads, different
     - **Defined by ID**\
       If you want to resume only a specific upload, use the postprocessing resume command with the ID selected:
       ```bash
-      ocis postprocessing resume -u <uploadID>
+      opencloud postprocessing resume -u <uploadID>
       ```
 
     - **Defined by step**\
       Alternatively, instead of restarting one specific upload, a system admin can also resume all uploads that are currently in a specific step.\
       Examples:\
       ```bash
-      ocis postprocessing resume                # Resumes all uploads where postprocessing is finished, but upload is not finished
-      ocis postprocessing resume -s "finished"  # Equivalent to the above
-      ocis postprocessing resume -s "virusscan" # Resume all uploads currently in virusscan step
+      opencloud postprocessing resume                # Resumes all uploads where postprocessing is finished, but upload is not finished
+      opencloud postprocessing resume -s "finished"  # Equivalent to the above
+      opencloud postprocessing resume -s "virusscan" # Resume all uploads currently in virusscan step
       ```

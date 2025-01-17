@@ -1,5 +1,5 @@
 {
-  "name": "owncloud/ocis",
+  "name": "opencloud-eu/opencloud",
   "config" : {
     "platform": {
       "php": "8.2"

@@ -6,7 +6,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/storage-system/pkg/config"
 )
 
-// StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// StorageSystemFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 	localEndpoint := pkgconfig.LocalEndpoint(cfg.GRPC.Protocol, cfg.GRPC.Addr)
 

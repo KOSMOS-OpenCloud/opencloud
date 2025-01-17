@@ -26,7 +26,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "web",
-		Usage:    "Serve ownCloud Web for oCIS",
+		Usage:    "Serve Web for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

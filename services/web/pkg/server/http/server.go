@@ -75,13 +75,14 @@ func Server(opts ...Option) (http.Service, error) {
 		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.ThemesPath),
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/themes"),
 	)
-	// oCis is Apache licensed, and the ownCloud branding is AGPLv3.
-	// we are not allowed to have the ownCloud branding as part of the oCIS repository,
+	// OpenCloud is Apache licensed, and the ownCloud branding is AGPLv3.
+	// we are not allowed to have the ownCloud branding as part of the OpenCloud repository,
 	// as workaround we layer the embedded core fs on top of the theme fs to provide the ownCloud branding.
 	// each asset that is part of the embedded core fs (coreFS secondary fs)
 	// is downloaded at build time from the ownCloud web repository,
 	// web is licensed under AGPLv3 too, and is allowed to contain the ownCloud branding.
 	// themeFS = themeFS.Primary (rw) < themeFS.Secondary (ro) < coreFS.Secondary (ro)
+	// FIXME can we get rid of this layering or do we need it for the fonts?
 	themeFS = fsx.NewFallbackFS(
 		themeFS,
 		fsx.NewBasePathFs(coreFS.Secondary(), "themes"),

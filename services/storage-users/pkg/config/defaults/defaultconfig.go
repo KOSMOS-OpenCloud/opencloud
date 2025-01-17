@@ -151,7 +151,7 @@ func DefaultConfig() *config.Config {
 		},
 		Events: config.Events{
 			Addr:      "127.0.0.1:9233",
-			ClusterID: "ocis-cluster",
+			ClusterID: "opencloud-cluster",
 			EnableTLS: false,
 		},
 		FilemetadataCache: config.FilemetadataCache{

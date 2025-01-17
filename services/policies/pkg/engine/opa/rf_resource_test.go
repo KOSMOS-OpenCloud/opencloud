@@ -13,8 +13,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine/opa"
 )
 
-var _ = Describe("opa ocis resource functions", func() {
-	Describe("ocis.resource.download", func() {
+var _ = Describe("opa opencloud resource functions", func() {
+	Describe("opencloud.resource.download", func() {
 		It("downloads reva resources", func() {
 			ts := []byte("Lorem Ipsum is simply dummy text of the printing and typesetting")
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ var _ = Describe("opa ocis resource functions", func() {
 			}))
 			defer srv.Close()
 
-			r := rego.New(rego.Query(`ocis.resource.download("`+srv.URL+`")`), opa.RFResourceDownload)
+			r := rego.New(rego.Query(`opencloud.resource.download("`+srv.URL+`")`), opa.RFResourceDownload)
 			rs, err := r.Eval(context.Background())
 			Expect(err).ToNot(HaveOccurred())
 

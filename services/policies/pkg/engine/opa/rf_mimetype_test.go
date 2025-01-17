@@ -12,22 +12,22 @@ import (
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/engine/opa"
 )
 
-var _ = Describe("opa ocis mimetype functions", func() {
-	Describe("ocis.mimetype.detect", func() {
+var _ = Describe("opa opencloud mimetype functions", func() {
+	Describe("opencloud.mimetype.detect", func() {
 		It("detects the mimetype", func() {
-			r := rego.New(rego.Query(`ocis.mimetype.detect("")`), opa.RFMimetypeDetect)
+			r := rego.New(rego.Query(`opencloud.mimetype.detect("")`), opa.RFMimetypeDetect)
 			rs, err := r.Eval(context.Background())
 			Expect(err).ToNot(HaveOccurred())
 			Expect(rs[0].Expressions[0].String()).To(Equal("text/plain"))
 		})
 	})
-	Describe("ocis.mimetype.extensions", func() {
+	Describe("opencloud.mimetype.extensions", func() {
 		DescribeTable("resolves extensions by mimetype",
 			func(mimetype string, expectations []string, f io.Reader) {
 				rfMimetypeExtensions, err := opa.RFMimetypeExtensions(f)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := rego.New(rego.Query(`ocis.mimetype.extensions("`+mimetype+`")`), rfMimetypeExtensions)
+				r := rego.New(rego.Query(`opencloud.mimetype.extensions("`+mimetype+`")`), rfMimetypeExtensions)
 				rs, err := r.Eval(context.Background())
 				Expect(err).ToNot(HaveOccurred())
 
@@ -48,10 +48,10 @@ var _ = Describe("opa ocis mimetype functions", func() {
 				}
 			},
 			Entry("With default mimetype", "application/pdf", []string{".pdf"}, nil),
-			Entry("With unknown mimetype", "ocis/with.custom.mt", []string{}, nil),
-			Entry("With custom mimetype", "ocis/with.custom.mt", []string{".with.custom.mt"}, strings.NewReader("ocis/with.custom.mt    with.custom.mt")),
-			Entry("With multiple custom mimetypes", "ocis/with.multiple.custom.mt", []string{".with.multiple.custom.1.mt", ".with.multiple.custom.2.mt"}, strings.NewReader("ocis/with.multiple.custom.mt                                with.multiple.custom.1.mt with.multiple.custom.2.mt")),
-			Entry("With custom ignored mimetype", "ocis/with.multiple.custom.ignored.mt", []string{}, strings.NewReader("#ocis/with.multiple.custom.ignored.mt with.multiple.custom.ignored.mt")),
+			Entry("With unknown mimetype", "opencloud/with.custom.mt", []string{}, nil),
+			Entry("With custom mimetype", "opencloud/with.custom.mt", []string{".with.custom.mt"}, strings.NewReader("opencloud/with.custom.mt    with.custom.mt")),
+			Entry("With multiple custom mimetypes", "opencloud/with.multiple.custom.mt", []string{".with.multiple.custom.1.mt", ".with.multiple.custom.2.mt"}, strings.NewReader("opencloud/with.multiple.custom.mt                                with.multiple.custom.1.mt with.multiple.custom.2.mt")),
+			Entry("With custom ignored mimetype", "opencloud/with.multiple.custom.ignored.mt", []string{}, strings.NewReader("#opencloud/with.multiple.custom.ignored.mt with.multiple.custom.ignored.mt")),
 		)
 	})
 })

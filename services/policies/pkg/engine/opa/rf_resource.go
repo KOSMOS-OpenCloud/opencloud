@@ -11,13 +11,13 @@ import (
 	"github.com/open-policy-agent/opa/types"
 )
 
-// RFResourceDownload extends the rego dictionary with the possibility to download oCis resources.
+// RFResourceDownload extends the rego dictionary with the possibility to download opencloud resources.
 //
-// Rego: `ocis.resource.download("ocis/path/0034892347349827")`
+// Rego: `opencloud.resource.download("opencloud/path/0034892347349827")`
 // Result: bytes
 var RFResourceDownload = rego.Function1(
 	&rego.Function{
-		Name:             "ocis.resource.download",
+		Name:             "opencloud.resource.download",
 		Decl:             types.NewFunction(types.Args(types.S), types.A),
 		Memoize:          true,
 		Nondeterministic: true,

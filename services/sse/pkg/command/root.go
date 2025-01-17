@@ -22,7 +22,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "sse",
-		Usage:    "Serve ownCloud sse for oCIS",
+		Usage:    "Serve sse for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

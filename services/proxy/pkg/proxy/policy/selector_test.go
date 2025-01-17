@@ -80,9 +80,9 @@ func TestClaimsSelector(t *testing.T) {
 	var tests = []testCase{
 		{"unauthenticated", context.Background(), nil, "unauthenticated"},
 		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), nil, "default"},
-		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
+		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "opencloud.routing.policy-value"}), nil, "opencloud.routing.policy-value"},
 		{"cookie-only", context.Background(), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "cookie"},
-		{"claim-can-override-cookie", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "ocis.routing.policy-value"},
+		{"claim-can-override-cookie", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "opencloud.routing.policy-value"}), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "opencloud.routing.policy-value"},
 	}
 	for _, tc := range tests {
 		r := httptest.NewRequest("GET", "https://example.com", nil)
@@ -118,7 +118,7 @@ func TestRegexSelector(t *testing.T) {
 	var tests = []testCase{
 		{"unauthenticated", context.Background(), nil, "unauthenticated"},
 		{"default", revactx.ContextSetUser(context.Background(), &userv1beta1.User{}), nil, "default"},
-		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), nil, "opencloud"},
+		{"mail-opencloud", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), nil, "opencloud"},
 		{"mail-oc10", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), nil, "oc10"},
 		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), nil, "opencloud"},
 		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), nil, "opencloud"},

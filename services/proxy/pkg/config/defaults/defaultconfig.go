@@ -64,10 +64,10 @@ func DefaultConfig() *config.Config {
 			OIDCRoleMapper: config.OIDCRoleMapper{
 				RoleClaim: "roles",
 				RolesMap: []config.RoleMapping{
-					{RoleName: "admin", ClaimValue: "ocisAdmin"},
-					{RoleName: "spaceadmin", ClaimValue: "ocisSpaceAdmin"},
-					{RoleName: "user", ClaimValue: "ocisUser"},
-					{RoleName: "user-light", ClaimValue: "ocisGuest"},
+					{RoleName: "admin", ClaimValue: "opencloudAdmin"},
+					{RoleName: "spaceadmin", ClaimValue: "opencloudSpaceAdmin"},
+					{RoleName: "user", ClaimValue: "opencloudUser"},
+					{RoleName: "user-light", ClaimValue: "opencloudGuest"},
 				},
 			},
 		},
@@ -107,7 +107,7 @@ func DefaultConfig() *config.Config {
 func DefaultPolicies() []config.Policy {
 	return []config.Policy{
 		{
-			Name: "ocis",
+			Name: "opencloud",
 			Routes: []config.Route{
 				{
 					Endpoint:    "/",
@@ -159,7 +159,7 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Type:     config.RegexRoute,
-					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
+					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in opencloud-ocs
 					Service:  "eu.opencloud.web.ocs",
 				},
 				{
@@ -330,7 +330,7 @@ func Sanitize(cfg *config.Config) {
 	if cfg.PolicySelector == nil {
 		cfg.PolicySelector = &config.PolicySelector{
 			Static: &config.StaticSelectorConf{
-				Policy: "ocis",
+				Policy: "opencloud",
 			},
 		}
 	}

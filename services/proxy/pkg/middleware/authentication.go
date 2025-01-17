@@ -19,7 +19,7 @@ var (
 	SupportedAuthStrategies []string
 
 	// ProxyWwwAuthenticate is a list of endpoints that do not rely on reva underlying authentication, such as ocs.
-	// services that fallback to reva authentication are declared in the "frontend" command on oCIS. It is a list of
+	// services that fallback to reva authentication are declared in the "frontend" command on OpenCloud. It is a list of
 	// regexp.Regexp which are safe to use concurrently.
 	ProxyWwwAuthenticate = []regexp.Regexp{*regexp.MustCompile("/ocs/v[12].php/cloud/")}
 

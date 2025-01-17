@@ -1,6 +1,6 @@
 # Proxy
 
-The proxy service is an API-Gateway for the ownCloud Infinite Scale microservices. Every HTTP request goes through this service. Authentication, logging and other preprocessing of requests also happens here. Mechanisms like request rate limiting or intrusion prevention are **not** included in the proxy service and must be setup in front like with an external reverse proxy.
+The proxy service is an API-Gateway for the OpenCloud microservices. Every HTTP request goes through this service. Authentication, logging and other preprocessing of requests also happens here. Mechanisms like request rate limiting or intrusion prevention are **not** included in the proxy service and must be setup in front like with an external reverse proxy.
 
 The proxy service is the only service communicating to the outside and needs therefore usual protections against DDOS, Slow Loris or other attack vectors. All other services are not exposed to the outside, but also need protective measures when it comes to distributed setups like when using container orchestration over various physical servers.
 
@@ -15,7 +15,7 @@ The following request authentication schemes are implemented:
 
 ## Configuring Routes
 
-The proxy handles routing to all endpoints that ocis offers. The currently availabe default routes can be found [in the code](https://github.com/opencloud-eu/opencloud/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own ocis extensions.
+The proxy handles routing to all endpoints that OpenCloud offers. The currently availabe default routes can be found [in the code](https://github.com/opencloud-eu/opencloud/blob/master/services/proxy/pkg/config/defaults/defaultconfig.go). Changing or adding routes can be necessary when writing own OpenCloud extensions.
 
 Due to the complexity when defining routes, these can only be defined in the yaml file but not via environment variables.
 
@@ -23,7 +23,7 @@ For _overwriting_ default routes, use the following yaml example:
 
 ```yaml
 policies:
-  - name: ocis
+  - name: opencloud
     routes:
       - endpoint: /
         service: eu.opencloud.web.web
@@ -35,7 +35,7 @@ For adding _additional_ routes to the default routes use:
 
 ```yaml
 additional_policies:
-  - name: ocis
+  - name: opencloud
     routes:
       - endpoint: /custom/endpoint
         service: eu.opencloud.custom.custom
@@ -59,7 +59,7 @@ users upon their first login.
 
 A number of prerequisites must be met for automatic user provisioning to work:
 
-* ownCloud Infinite Scale must be configured to use an external OpenID Connect IDP
+* OpenCloud must be configured to use an external OpenID Connect IDP
 * The `graph` service must be configured to allow updating users and groups
   (`GRAPH_LDAP_SERVER_WRITE_ENABLED`).
 * One of the claim values returned by the IDP as part of the userinfo response
@@ -79,14 +79,14 @@ be set for the proxy service:
 Set to `true` to enable automatic user provisioning.
 * `PROXY_AUTOPROVISION_CLAIM_USERNAME`\
 The name of an OIDC claim whose value should be used as the username for the
-autoprovsioned user in ownCloud Infinite Scale. Defaults to `preferred_username`.
+autoprovsioned user in OpenCloud. Defaults to `preferred_username`.
 Can also be set to e.g. `sub` to guarantee a unique and stable username.
 * `PROXY_AUTOPROVISION_CLAIM_EMAIL`\
 The name of an OIDC claim whose value should be used for the `mail` attribute
-of the autoprovisioned user in ownCloud Infinite Scale. Defaults to `email`.
+of the autoprovisioned user in OpenCloud. Defaults to `email`.
 * `PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME`\
 The name of an OIDC claim whose value should be used for the `displayname`
-attribute of the autoprovisioned user in ownCloud Infinite Scale. Defaults to `name`.
+attribute of the autoprovisioned user in OpenCloud. Defaults to `name`.
 * `PROXY_AUTOPROVISION_CLAIM_GROUPS`\
 The name of an OIDC claim whose value should be used to maintain a user's group
 membership. The claim value should contain a list of group names the user should
@@ -96,13 +96,13 @@ When resolving and authenticated OIDC user, the value of this claims is used to
 lookup the user in the users service. For auto provisioning setups this usually is the
 same claims as set via `PROXY_AUTOPROVISION_CLAIM_USERNAME`.
 * `PROXY_USER_CS3_CLAIM`\
-This is the name of the user attribute in ocis that is used to lookup the user by the
+This is the name of the user attribute in OpenCloud that is used to lookup the user by the
 value of the `PROXY_USER_OIDC_CLAIM`. For auto provisioning setups this usually
 needs to be set to `username`.
 
 ### How it Works
 
-When a user logs into ownCloud Infinite Scale for the first time, the proxy
+When a user logs into OpenCloud for the first time, the proxy
 checks if that user already exists. This is done by querying the `users` service for users,
 where the attribute set in `PROXY_USER_CS3_CLAIM` matches the value of the OIDC
 claim configured in `PROXY_USER_OIDC_CLAIM`.
@@ -186,7 +186,7 @@ in Infinite Scale via a `yaml` configuration. See the following `proxy.yaml` sni
 role_assignment:
     driver: oidc
     oidc_role_mapper:
-        role_claim: ocisRoles
+        role_claim: opencloudRoles
         role_mapping:
             - role_name: admin
               claim_value: myAdminRole
@@ -198,17 +198,17 @@ role_assignment:
               claim_value: myGuestRole
 ```
 
-This would assign the role `admin` to users with the value `myAdminRole` in the claim `ocisRoles`.
-The role `user` to users with the values `myUserRole` in the claims `ocisRoles` and so on.
+This would assign the role `admin` to users with the value `myAdminRole` in the claim `opencloudRoles`.
+The role `user` to users with the values `myUserRole` in the claims `opencloudRoles` and so on.
 
-Claim values that are not mapped to a specific ownCloud Infinite Scale role will be ignored.
+Claim values that are not mapped to a specific OpenCloud role will be ignored.
 
-Note: An ownCloud Infinite Scale user can only have a single role assigned. If the configured
+Note: An OpenCloud user can only have a single role assigned. If the configured
 `role_mapping` and a user's claim values result in multiple possible roles for a user, the order in
 which the role mappings are defined in the configuration is important. The first role in the
 `role_mappings` where the `claim_value` matches a value from the user's roles claim will be assigned
-to the user. So if e.g. a user's `ocisRoles` claim has the values `myUserRole` and
-`mySpaceAdminRole` that user will get the ocis role `spaceadmin` assigned (because `spaceadmin`
+to the user. So if e.g. a user's `opencloudRoles` claim has the values `myUserRole` and
+`mySpaceAdminRole` that user will get the OpenCloud role `spaceadmin` assigned (because `spaceadmin`
 appears before `user` in the above sample configuration).
 
 If a user's claim values don't match any of the configured role mappings an error will be logged and
@@ -218,13 +218,13 @@ The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The
 
 ```yaml
 - role_name: admin
-  claim_value: ocisAdmin
+  claim_value: opencloudAdmin
 - role_name: spaceadmin
-  claim_value: ocisSpaceAdmin
+  claim_value: opencloudSpaceAdmin
 - role_name: user
-  claim_value: ocisUser
+  claim_value: opencloudUser
 - role_name: guest
-  claim_value: ocisGuest
+  claim_value: opencloudcloudGuest
 ```
 
 ## Recommendations for Production Deployments
@@ -237,7 +237,7 @@ For Infinite Scale, external resources like an IDP (e.g. Keycloak) or when using
 
 To create a Content Security Policy (CSP), you need to create a yaml file containing the CSP definitions. To activate the settings, reference the file as value in the `PROXY_CSP_CONFIG_FILE_LOCATION` environment variable. For each change, a restart of the Infinite Scale deployment or the proxy service is required.
 
-A working example for a CSP can be found in a sub path of the `config` directory of the [ocis_full](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full/config) deployment example.
+A working example for a CSP can be found in a sub path of the `config` directory of the [opencloud_full](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples/opencloud_full/config) deployment example.
 
 See the [Content Security Policy (CSP) Quick Reference Guide](https://content-security-policy.com) for a description of directives.
 
@@ -266,7 +266,7 @@ Store specific notes:
 To authenticate presigned URLs the proxy service needs to read signing keys from a store that is populated by the ocs service. Possible stores are:
   -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `ocisstoreservice`:  Stores data in the legacy ocis store service. Requires setting `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `eu.opencloud.api.store`.
+  -   `opencloudstoreservice`:  Stores data in the legacy OpenCloud store service. Requires setting `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to `eu.opencloud.api.store`.
 
 The `memory` store cannot be used as it does not share the memory from the ocs service signing key memory store, even in a single process.
 
@@ -276,45 +276,45 @@ Store specific notes:
   -   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OC_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
   -   When using `nats-js-kv` it is recommended to set `OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` to the same value as `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`. That way the ocs uses the same nats instance as the proxy service.
   -   When using the `nats-js-kv` store, it is possible to set `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE` to instruct nats to not persist signing key data on disc.
-  -   When using `ocisstoreservice` the `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` must be set to the service name `eu.opencloud.api.store`. It does not support TTL and stores the presigning keys indefinitely. Also, the store service needs to be started.
+  -   When using `opencloudstoreservice` the `PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` must be set to the service name `eu.opencloud.api.store`. It does not support TTL and stores the presigning keys indefinitely. Also, the store service needs to be started.
 
 
 ## Special Settings
 
-When using the ocis IDP service instead of an external IDP:
+When using the OpenCloud IDP service instead of an external IDP:
 
--   Use the environment variable `OC_URL` to define how ocis can be accessed, mandatory use `https` as protocol for the URL.
+-   Use the environment variable `OC_URL` to define how OpenCloud can be accessed, mandatory use `https` as protocol for the URL.
 -   If no reverse proxy is set up, the `PROXY_TLS` environment variable **must** be set to `true` because the embedded `libreConnect` shipped with the IDP service has a hard check if the connection is on TLS and uses the HTTPS protocol. If this mismatches, an error will be logged and no connection from the client can be established.
--   `PROXY_TLS` **can** be set to `false` if a reverse proxy is used and the https connection is terminated at the reverse proxy. When setting to `false`, the communication between the reverse proxy and ocis is not secured. If set to `true`, you must provide certificates.
+-   `PROXY_TLS` **can** be set to `false` if a reverse proxy is used and the https connection is terminated at the reverse proxy. When setting to `false`, the communication between the reverse proxy and OpenCloud is not secured. If set to `true`, you must provide certificates.
 
 ## Metrics
 
-The proxy service in ocis has the ability to expose metrics in the prometheus format. The metrics are exposed on the `/metrics` endpoint. There are two ways to run the ocis proxy service which has an impact on the number of metrics exposed.
+The proxy service in OpenCloud has the ability to expose metrics in the prometheus format. The metrics are exposed on the `/metrics` endpoint. There are two ways to run the OpenCloud proxy service which has an impact on the number of metrics exposed.
 
 ### 1) Single Process Mode
-In the single process mode, all ocis services are running inside a single process. This is the default mode when using the `ocis server` command to start the services. In this mode, the proxy service exposes metrics about the proxy service itself and about the ocis services it is proxying. This is due to the nature of the prometheus registry which is a singleton. The metrics exposed by the proxy service itself are prefixed with `ocis_proxy_` and the metrics exposed by other ocis services are prefixed with `ocis_<service-name>_`.
+In the single process mode, all OpenCloud services are running inside a single process. This is the default mode when using the `opencloud server` command to start the services. In this mode, the proxy service exposes metrics about the proxy service itself and about the OpenCloud services it is proxying. This is due to the nature of the prometheus registry which is a singleton. The metrics exposed by the proxy service itself are prefixed with `opencloud_proxy_` and the metrics exposed by other opencloud services are prefixed with `opencloud_<service-name>_`.
 
 ### 2) Standalone Mode
-In this mode, the proxy service only exposes its own metrics. The metrics of the other ocis services are exposed on their own metrics endpoints.
+In this mode, the proxy service only exposes its own metrics. The metrics of the other OpenCloud services are exposed on their own metrics endpoints.
 
 ### Available Metrics
 The following metrics are exposed by the proxy service:
 
 | Metric Name                      | Description                                                                                                                                                                                                                   | Labels                                |
 |----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
-| `ocis_proxy_requests_total`      | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests.                                                                                   | `method`: HTTP method of the request  |
-| `ocis_proxy_errors_total`        | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests which have failed. That counts all response codes >= 500                           | `method`: HTTP method of the request  |
-| `ocis_proxy_duration_seconds`    | [Histogram](https://prometheus.io/docs/tutorials/understanding_metric_types/#histogram) of the time (in seconds) each request took. A histogram metric uses buckets to count the number of events that fall into each bucket. | `method`: HTTP method of the request  |
-| `ocis_proxy_build_info{version}` | A metric with a constant `1` value labeled by version, exposing the version of the ocis proxy service.                                                                                                                        | `version`: Build version of the proxy |
+| `opencloud_proxy_requests_total`      | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests.                                                                                   | `method`: HTTP method of the request  |
+| `opencloud_proxy_errors_total`        | [Counter](https://prometheus.io/docs/tutorials/understanding_metric_types/#counter) metric which reports the total number of HTTP requests which have failed. That counts all response codes >= 500                           | `method`: HTTP method of the request  |
+| `opencloud_proxy_duration_seconds`    | [Histogram](https://prometheus.io/docs/tutorials/understanding_metric_types/#histogram) of the time (in seconds) each request took. A histogram metric uses buckets to count the number of events that fall into each bucket. | `method`: HTTP method of the request  |
+| `opencloud_proxy_build_info{version}` | A metric with a constant `1` value labeled by version, exposing the version of the OpenCloud proxy service.                                                                                                                        | `version`: Build version of the proxy |
 
 ### Prometheus Configuration
-The following is an example prometheus configuration for the single process mode. It assumes that the proxy debug address is configured to bind on all interfaces `PROXY_DEBUG_ADDR=0.0.0.0:9205` and that the proxy is available via the `ocis` service name (typically in docker-compose). The prometheus service detects the `/metrics` endpoint automatically and scrapes it every 15 seconds.
+The following is an example prometheus configuration for the single process mode. It assumes that the proxy debug address is configured to bind on all interfaces `PROXY_DEBUG_ADDR=0.0.0.0:9205` and that the proxy is available via the `opencloud` service name (typically in docker-compose). The prometheus service detects the `/metrics` endpoint automatically and scrapes it every 15 seconds.
 
 ```yaml
 global:
   scrape_interval: 15s
 scrape_configs:
-  - job_name: ocis_proxy
+  - job_name: opencloud_proxy
     static_configs:
-    - targets: ["ocis:9205"]
+    - targets: ["opencloud:9205"]
 ```

@@ -21,7 +21,7 @@ var (
 )
 
 const (
-	SelectorCookieName = "owncloud-selector"
+	SelectorCookieName = "opencloud-selector"
 )
 
 // Selector is a function which selects a proxy-policy based on the request.
@@ -107,7 +107,7 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 	}
 }
 
-// NewClaimsSelector selects the policy based on the "ocis.routing.policy" claim
+// NewClaimsSelector selects the policy based on the "opencloud.routing.policy" claim
 // The policy for corner cases is configurable:
 //
 //	"policy_selector": {

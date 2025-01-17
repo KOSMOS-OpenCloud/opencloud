@@ -56,7 +56,7 @@ func WithRolesClaim(claim string) Option {
 	}
 }
 
-// WithRoleMapping configures the map of ocis role names to claims values
+// WithRoleMapping configures the map of OpenCloud role names to claims values
 func WithRoleMapping(roleMap []config.RoleMapping) Option {
 	return func(o *Options) {
 		o.roleMapping = roleMap

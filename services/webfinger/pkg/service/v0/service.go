@@ -15,7 +15,7 @@ type Service interface {
 	//
 	//	GET /.well-known/webfinger?
 	//	     resource=acct%3Acarol%40example.com&
-	//	     rel=http%3A%2F%2Fwebfinger.owncloud%rel%2Fserver-instance
+	//	     rel=http%3A%2F%2Fwebfinger.opencloud%rel%2Fserver-instance
 	//	     HTTP/1.1
 	//	Host: example.com
 	//
@@ -30,14 +30,14 @@ type Service interface {
 	//	  "links" :
 	//	  [
 	//	    {
-	//	      "rel" : "http://webfinger.owncloud/rel/server-instance",
+	//	      "rel" : "http://webfinger.opencloud/rel/server-instance",
 	//	      "href" : "https://instance.example.com",
 	//	      "titles": {
 	//	        "en": "Readable Instance Name"
 	//	      }
 	//	    },
 	//	    {
-	//	      "rel" : "http://webfinger.owncloud/rel/server-instance",
+	//	      "rel" : "http://webfinger.opencloud/rel/server-instance",
 	//	      "href" : "https://otherinstance.example.com",
 	//	      "titles": {
 	//	        "en": "Other Readable Instance Name"

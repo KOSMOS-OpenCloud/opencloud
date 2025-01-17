@@ -130,9 +130,9 @@ func getRelationProviders(cfg *config.Config) (map[string]service.RelationProvid
 		switch relationURI {
 		case relations.OpenIDConnectRel:
 			rels[relationURI] = relations.OpenIDDiscovery(cfg.IDP)
-		case relations.OwnCloudInstanceRel:
+		case relations.OpenCloudInstanceRel:
 			var err error
-			rels[relationURI], err = relations.OwnCloudInstance(cfg.Instances, cfg.OpenCloudURL)
+			rels[relationURI], err = relations.OpenCloudInstance(cfg.Instances, cfg.OpenCloudURL)
 			if err != nil {
 				return nil, err
 			}

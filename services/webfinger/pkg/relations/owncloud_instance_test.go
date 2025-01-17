@@ -9,23 +9,23 @@ import (
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/webfinger"
 )
 
-func TestOwnCloudInstanceErr(t *testing.T) {
-	_, err := OwnCloudInstance([]config.Instance{}, "http://\n\rinvalid")
+func TestOpenCloudInstanceErr(t *testing.T) {
+	_, err := OpenCloudInstance([]config.Instance{}, "http://\n\rinvalid")
 	if err == nil {
 		t.Errorf("provider did not err on invalid url: %v", err)
 	}
-	_, err = OwnCloudInstance([]config.Instance{{Regex: "("}}, "http://docis.tld")
+	_, err = OpenCloudInstance([]config.Instance{{Regex: "("}}, "http://opencloud.tld")
 	if err == nil {
 		t.Errorf("provider did not err on invalid regex: %v", err)
 	}
-	_, err = OwnCloudInstance([]config.Instance{{Href: "{{invalid}}ee"}}, "http://docis.tld")
+	_, err = OpenCloudInstance([]config.Instance{{Href: "{{invalid}}ee"}}, "http://opencloud.tld")
 	if err == nil {
 		t.Errorf("provider did not err on invalid href template: %v", err)
 	}
 }
 
-func TestOwnCloudInstanceAddLink(t *testing.T) {
-	provider, err := OwnCloudInstance([]config.Instance{{
+func TestOpenCloudInstanceAddLink(t *testing.T) {
+	provider, err := OpenCloudInstance([]config.Instance{{
 		Claim: "customclaim",
 		Regex: ".+@.+\\..+",
 		Href:  "https://{{.otherclaim}}.domain.tld",
@@ -33,7 +33,7 @@ func TestOwnCloudInstanceAddLink(t *testing.T) {
 			"foo": "bar",
 		},
 		Break: true,
-	}}, "http://docis.tld")
+	}}, "http://opencloud.tld")
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,8 +52,8 @@ func TestOwnCloudInstanceAddLink(t *testing.T) {
 	if jrd.Links[0].Href != "https://someone.domain.tld" {
 		t.Errorf("provider returned wrong issuer link href: %v, expected %v", jrd.Links[0].Href, "https://someone.domain.tld")
 	}
-	if jrd.Links[0].Rel != OwnCloudInstanceRel {
-		t.Errorf("provider returned owncloud server instance rel: %v, expected %v", jrd.Links[0].Rel, OwnCloudInstanceRel)
+	if jrd.Links[0].Rel != OpenCloudInstanceRel {
+		t.Errorf("provider returned opencloud server instance rel: %v, expected %v", jrd.Links[0].Rel, OpenCloudInstanceRel)
 	}
 	if len(jrd.Links[0].Titles) != 1 {
 		t.Errorf("provider returned wrong number of titles: %v, expected 1", len(jrd.Links[0].Titles))

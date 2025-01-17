@@ -1,16 +1,14 @@
 # Webfinger
 
-The webfinger service provides an RFC7033 WebFinger lookup of ownCloud instances relevant for a given user account via endpoints a the /.well-known/webfinger implementation.
-
-It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also returns localized `titles` in addition to the `href` property.
+The webfinger service provides an RFC7033 WebFinger lookup of OpenCloud instances relevant for a given user account via endpoints a the /.well-known/webfinger implementation.
 
 ## OpenID Connect Discovery
 
-Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fdrive.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
+Clients can make an unauthenticated `GET https://drive.opencloud.test/.well-known/webfinger?resource=https%3A%2F%2Fdrive.opencloud.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
 
 ```json
 {
-    "subject": "https://drive.ocis.test",
+    "subject": "https://drive.opencloud.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
@@ -24,7 +22,7 @@ Here, the `resource` takes the instance domain URI, but an `acct:` URI works as 
 
 ## Authenticated Instance Discovery
 
-When using OpenID connect to authenticate requests, clients can look up the owncloud instances a user has access to.
+When using OpenID connect to authenticate requests, clients can look up the opencloud instances a user has access to.
 
 *   Authentication is necessary to prevent leaking information about existing users.
 *   Basic auth is not supported.
@@ -33,17 +31,17 @@ The default configuration will simply return the `OC_URL` and direct clients to 
 
 ```json
 {
-    "subject": "acct:einstein@drive.ocis.test",
+    "subject": "acct:einstein@drive.opencloud.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
             "href": "https://sso.example.org/cas/oidc/"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
             "href": "https://abc.drive.example.org",
             "titles": {
-                "en": "oCIS Instance"
+                "en": "OpenCloud Instance"
             }
         }
     ]
@@ -59,38 +57,38 @@ webfinger:
   instances:
   -  claim: email
      regex: einstein@example\.org
-     href: "https://{{.preferred_username}}.cloud.ocis.test"
+     href: "https://{{.preferred_username}}.cloud.opencloud.test"
      title: 
-       "en": "oCIS Instance for Einstein"
-       "de": "oCIS Instanz für Einstein"
+       "en": "OpenCloud Instance for Einstein"
+       "de": "OpenCloud Instanz für Einstein"
      break: true
   -  claim: "email"
      regex: marie@example\.org
-     href: "https://{{.preferred_username}}.cloud.ocis.test"
+     href: "https://{{.preferred_username}}.cloud.opencloud.test"
      title: 
-       "en": "oCIS Instance for Marie"
-       "de": "oCIS Instanz für Marie"
+       "en": "OpenCloud Instance for Marie"
+       "de": "OpenCloud Instanz für Marie"
      break: false
   -  claim: "email"
      regex: .+@example\.org
-     href: "https://example-org.cloud.ocis.test"
+     href: "https://example-org.cloud.opencloud.test"
      title:
-       "en": "oCIS Instance for example.org"
-       "de": "oCIS Instanz für example.org"
+       "en": "OpenCloud Instance for example.org"
+       "de": "OpenCloud Instanz für example.org"
      break: true
   -  claim: "email"
      regex: .+@example\.com
-     href: "https://example-com.cloud.ocis.test"
+     href: "https://example-com.cloud.opencloud.test"
      title:
-       "en": "oCIS Instance for example.com"
-       "de": "oCIS Instanz für example.com"
+       "en": "OpenCloud Instance for example.com"
+       "de": "OpenCloud Instanz für example.com"
      break: true
   -  claim: "email"
      regex: .+@.+\..+
-     href: "https://cloud.ocis.test"
+     href: "https://cloud.opencloud.test"
      title:
-       "en": "oCIS Instance"
-       "de": "oCIS Instanz"
+       "en": "OpenCloud Instance"
+       "de": "OpenCloud Instanz"
      break: true
 ```
 
@@ -105,19 +103,19 @@ Now, an authenticated webfinger request for `acct:me@example.org` (when logged i
             "href": "https://sso.example.org/cas/oidc/"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://marie.cloud.ocis.test",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
+            "href": "https://marie.cloud.opencloud.test",
             "titles": {
-                "en": "oCIS Instance for Marie",
-                "de": "oCIS Instanz für Marie"
+                "en": "OpenCloud Instance for Marie",
+                "de": "OpenCloud Instanz für Marie"
             }
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
             "href": "https://xyz.drive.example.org",
             "titles": {
-                "en": "oCIS Instance for example.org",
-                "de": "oCIS Instanz für example.org"
+                "en": "OpenCloud Instance for example.org",
+                "de": "OpenCloud Instanz für example.org"
             }
         }
     ]

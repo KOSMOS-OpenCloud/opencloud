@@ -4,7 +4,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/storage-publiclink/pkg/config"
 )
 
-// StoragePublicLinkConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// StoragePublicLinkConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func StoragePublicLinkConfigFromStruct(cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"shared": map[string]interface{}{

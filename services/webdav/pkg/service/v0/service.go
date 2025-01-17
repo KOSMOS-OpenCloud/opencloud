@@ -392,7 +392,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		Processor:     tr.Processor,
 		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
 			WebdavSource: &thumbnailsmsg.WebdavSource{
-				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
+				Url:             g.config.OpenCloudPublicURL + r.URL.RequestURI(),
 				IsPublicLink:    true,
 				PublicLinkToken: tr.PublicLinkToken,
 			},
@@ -437,7 +437,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		Processor:     tr.Processor,
 		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
 			WebdavSource: &thumbnailsmsg.WebdavSource{
-				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
+				Url:             g.config.OpenCloudPublicURL + r.URL.RequestURI(),
 				IsPublicLink:    true,
 				PublicLinkToken: tr.PublicLinkToken,
 			},

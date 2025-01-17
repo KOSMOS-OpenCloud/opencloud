@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis invitations command.
+// Execute is the entry point for the opencloud invitations command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "invitations",
-		Usage:    "Serve invitations API for oCIS",
+		Usage:    "Serve invitations API for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

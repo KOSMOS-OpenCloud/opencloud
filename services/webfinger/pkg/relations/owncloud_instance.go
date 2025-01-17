@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	OwnCloudInstanceRel = "http://webfinger.owncloud/rel/server-instance"
+	OpenCloudInstanceRel = "http://webfinger.opencloud/rel/server-instance"
 )
 
 type compiledInstance struct {
@@ -23,14 +23,14 @@ type compiledInstance struct {
 	hrefTemplate  *template.Template
 }
 
-type ownCloudInstance struct {
+type openCloudInstance struct {
 	instances    []compiledInstance
 	openCloudURL string
 	instanceHost string
 }
 
-// OwnCloudInstance adds one or more ownCloud instance relations
-func OwnCloudInstance(instances []config.Instance, openCloudURL string) (service.RelationProvider, error) {
+// OpenCloudInstance adds one or more OpenCloud instance relations
+func OpenCloudInstance(instances []config.Instance, openCloudURL string) (service.RelationProvider, error) {
 	compiledInstances := make([]compiledInstance, 0, len(instances))
 	var err error
 	for _, instance := range instances {
@@ -50,14 +50,14 @@ func OwnCloudInstance(instances []config.Instance, openCloudURL string) (service
 	if err != nil {
 		return nil, err
 	}
-	return &ownCloudInstance{
+	return &openCloudInstance{
 		instances:    compiledInstances,
 		openCloudURL: openCloudURL,
 		instanceHost: u.Host + u.Path,
 	}, nil
 }
 
-func (l *ownCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceDescriptor) {
+func (l *openCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceDescriptor) {
 	if jrd == nil {
 		jrd = &webfinger.JSONResourceDescriptor{}
 	}
@@ -74,7 +74,7 @@ func (l *ownCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceD
 				var tmplWriter strings.Builder
 				instance.hrefTemplate.Execute(&tmplWriter, claims)
 				jrd.Links = append(jrd.Links, webfinger.Link{
-					Rel:    OwnCloudInstanceRel,
+					Rel:    OpenCloudInstanceRel,
 					Href:   tmplWriter.String(),
 					Titles: instance.Titles,
 				})

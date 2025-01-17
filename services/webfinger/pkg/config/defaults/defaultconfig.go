@@ -38,14 +38,14 @@ func DefaultConfig() *config.Config {
 		},
 
 		OpenCloudURL: "https://localhost:9200",
-		Relations:    []string{relations.OpenIDConnectRel, relations.OwnCloudInstanceRel},
+		Relations:    []string{relations.OpenIDConnectRel, relations.OpenCloudInstanceRel},
 		Instances: []config.Instance{
 			{
 				Claim: "sub",
 				Regex: ".+",
 				Href:  "{{.OC_URL}}",
 				Titles: map[string]string{
-					"en": "oCIS Instance",
+					"en": "OpenCloud Instance",
 				},
 			},
 		},

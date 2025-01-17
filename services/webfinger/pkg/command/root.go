@@ -22,11 +22,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis webfinger command.
+// Execute is the entry point for the opencloud webfinger command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "webfinger",
-		Usage:    "Serve webfinger API for oCIS",
+		Usage:    "Serve webfinger API for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

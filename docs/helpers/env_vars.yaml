@@ -16566,7 +16566,7 @@ WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL:
   deprecationInfo: ""
 WEBFINGER_RELATIONS:
   name: WEBFINGER_RELATIONS
-  defaultValue: '[http://openid.net/specs/connect/1.0/issuer http://webfinger.owncloud/rel/server-instance]'
+  defaultValue: '[http://openid.net/specs/connect/1.0/issuer http://webfinger.opencloud/rel/server-instance]'
   type: '[]string'
   description: A list of relation URIs or registered relation types to add to webfinger
     responses. See the Environment Variable Types description for more details.

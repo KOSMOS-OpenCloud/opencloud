@@ -1,8 +1,8 @@
 # TODO
 Currently, clients need to make subsequent calls to:
 *   /status.php to check if the instance is in maintenance mode or if the version is supported
-*   /config.json to get the available apps for ocis web to determine which routes require authentication
-*   /themes/owncloud/theme.json for theming info
+*   /config.json to get the available apps for OpenCloud web to determine which routes require authentication
+*   /themes/opencloud/theme.json for theming info
 *   /.well-known/openid-configuration, auth2 token and oidc userinfo endpoints to authenticate the user
 *   /ocs/v1.php/cloud/user to get the username, eg. einstein ... again? it contains the oc10 user id (marie, not the uuid)
 *   /ocs/v1.php/cloud/capabilities to fetch instance capabilites
@@ -26,45 +26,45 @@ The /.well-known/webfinger enpdoint allows us to not only get rid of some of the
 
 ```json
 {
-    "subject": "https://drive.ocis.test",
+    "subject": "https://drive.opencloud.test",
     "properties": {
-        "http://webfinger.owncloud/prop/maintenance": "false",
-        "http://webfinger.owncloud/prop/version": "10.11.0.6"
+        "http://webfinger.opencloud/prop/maintenance": "false",
+        "http://webfinger.opencloud/prop/version": "10.11.0.6"
     },
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
-            "href": "https://idp.ocis.test"
+            "href": "https://idp.opencloud.test"
         }
     ]
 }
 ```
 
-## Introduce Dedicated ocis web Endpoint
+## Introduce Dedicated OpenCloud web Endpoint
 
-It also allows us to move some services out of a sharded deployment. We could e.g. introduce a relation for a common ocis web endpoint to not exponse the different instances in the browser bar:
+It also allows us to move some services out of a sharded deployment. We could e.g. introduce a relation for a common OpenCloud web endpoint to not exponse the different instances in the browser bar:
 ```json
 {
-    "subject": "acct:einstein@drive.ocis.test",
+    "subject": "acct:einstein@drive.opencloud.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
-            "href": "https://idp.ocis.test"
+            "href": "https://idp.opencloud.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/web",
-            "href": "https://drive.ocis.test"
+            "rel": "http://webfinger.opencloud/rel/web",
+            "href": "https://drive.opencloud.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://abc.drive.ocis.test",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
+            "href": "https://abc.drive.opencloud.test",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://xyz.drive.ocis.test",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
+            "href": "https://xyz.drive.opencloud.test",
     	    "titles": {
     	      "en": "Readable Other Instance Name"
     	    }
@@ -73,24 +73,24 @@ It also allows us to move some services out of a sharded deployment. We could e.
 }
 ```
 
-## Dedicated ocis web Endpoint
+## Dedicated OpenCloud web Endpoint
 
-We could also omit the `http://webfinger.owncloud/rel/server-instance` relation and go straight for a graph service with e.g. `rel=http://libregraph.org/rel/graph`:
+We could also omit the `http://webfinger.opencloud/rel/server-instance` relation and go straight for a graph service with e.g. `rel=http://libregraph.org/rel/graph`:
 ```json
 {
-    "subject": "acct:einstein@drive.ocis.test",
+    "subject": "acct:einstein@drive.opencloud.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
-            "href": "https://idp.ocis.test"
+            "href": "https://idp.opencloud.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/web",
-            "href": "https://drive.ocis.test"
+            "rel": "http://webfinger.opencloud/rel/web",
+            "href": "https://drive.opencloud.test"
         },
         {
             "rel": "http://libregraph.org/rel/graph",
-            "href": "https://abc.drive.ocis.test/graph/v1.0",
+            "href": "https://abc.drive.opencloud.test/graph/v1.0",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
@@ -103,10 +103,10 @@ In theory the graph endpoint would allow discovering drives on any domain. But t
 
 ## Subject Properties
 
-We could also embed subject metadata, however since apps like ocis web also need the groups a user is member of a dedicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
+We could also embed subject metadata, however since apps like OpenCloud web also need the groups a user is member of a dedicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
 ```json
 {
-    "subject": "acct:einstein@drive.ocis.test",
+    "subject": "acct:einstein@drive.opencloud.test",
     "properties": {
         "http://libregraph.org/prop/user/id": "4c510ada-c86b-4815-8820-42cdf82c3d51",
         "http://libregraph.org/prop/user/onPremisesSamAccountName": "einstein",
@@ -116,18 +116,18 @@ We could also embed subject metadata, however since apps like ocis web also need
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
-            "href": "https://idp.ocis.test"
+            "href": "https://idp.opencloud.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://abc.drive.ocis.test",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
+            "href": "https://abc.drive.opencloud.test",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
         },
         {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://xyz.drive.ocis.test",
+            "rel": "http://webfinger.opencloud/rel/server-instance",
+            "href": "https://xyz.drive.opencloud.test",
     	    "titles": {
     	      "en": "Readable Other Instance Name"
     	    }

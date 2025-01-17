@@ -12,12 +12,12 @@ import "google/protobuf/field_mask.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "ownCloud Infinite Scale search";
+    title: "OpenCloud search";
     version: "1.0.0";
     contact: {
-      name: "ownCloud GmbH";
+      name: "OpenCloud GmbH";
       url: "https://github.com/opencloud-eu/opencloud";
-      email: "support@owncloud.com";
+      email: "support@opencloud.eu";
     };
     license: {
       name: "Apache-2.0";
@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/json";
   external_docs: {
     description: "Developer Manual";
-    url: "https://owncloud.dev/services/search/";
+    url: "https://docs.opencloud.eu/services/search/";
   };
 };
 

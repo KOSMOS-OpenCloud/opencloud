@@ -124,14 +124,14 @@ Feature: State of the quota
       | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200             | 91.17          |
 
   @env-config
-  Scenario: upload a file by setting OCIS spaces max quota
+  Scenario: upload a file by setting OpenCloud spaces max quota
     Given the config "OC_SPACES_MAX_QUOTA" has been set to "10"
     And user "Brian" has been created with default attributes
     When user "Brian" uploads file with content "more than 10 bytes content" to "lorem.txt" using the WebDAV API
     Then the HTTP status code should be "507"
 
   @env-config
-  Scenario: try to create a space with quota greater than OCIS spaces max quota
+  Scenario: try to create a space with quota greater than OpenCloud spaces max quota
     Given the config "OC_SPACES_MAX_QUOTA" has been set to "50"
     And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API

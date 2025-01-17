@@ -43,7 +43,7 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - GraphContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - WebDavLockingContext:
         - SharingNgContext:
 
@@ -67,7 +67,7 @@ default:
         - SpacesTUSContext:
         - ArchiverContext:
         - GraphContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
 
     apiContract:
@@ -87,7 +87,7 @@ default:
         - SpacesTUSContext:
         - GraphContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiArchiver:
       paths:
@@ -120,7 +120,7 @@ default:
         - PublicWebDavContext:
         - TUSContext:
         - SpacesTUSContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - TrashbinContext:
         - SharingNgContext:
 
@@ -139,7 +139,7 @@ default:
         - PublicWebDavContext:
         - TUSContext:
         - SpacesTUSContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - TrashbinContext:
         - SharingNgContext:
 
@@ -153,7 +153,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - GraphContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SettingsContext:
         - TUSContext:
         - SpacesTUSContext:
@@ -169,7 +169,7 @@ default:
         - GraphContext:
         - PublicWebDavContext:
         - TrashbinContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
 
     apiAsyncUpload:
@@ -183,7 +183,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - GraphContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiNotification:
       paths:
@@ -197,7 +197,7 @@ default:
         - GraphContext:
         - FilesVersionsContext:
         - SettingsContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
         - OcmContext:
 
@@ -213,7 +213,7 @@ default:
         - GraphContext:
         - FilesVersionsContext:
         - SettingsContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - PublicWebDavContext:
         - SharingNgContext:
 
@@ -233,7 +233,7 @@ default:
         - ChecksumContext:
         - FilesVersionsContext:
         - SettingsContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - PublicWebDavContext:
         - ArchiverContext:
         - SharingNgContext:
@@ -292,7 +292,7 @@ default:
         - TagContext:
         - SpacesTUSContext:
         - TUSContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
         - WebDavPropertiesContext:
 
@@ -302,7 +302,7 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
 
     apiSpacesDavOperation:
@@ -315,7 +315,7 @@ default:
         - FilesVersionsContext:
         - SharingNgContext:
         - SettingsContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiLocks:
       paths:
@@ -327,7 +327,7 @@ default:
         - WebDavLockingContext:
         - PublicWebDavContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiSharingNg1:
       paths:
@@ -337,7 +337,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SettingsContext:
 
     apiSharingNg2:
@@ -348,7 +348,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SettingsContext:
 
     apiSettings:
@@ -378,7 +378,7 @@ default:
         - SpacesContext:
         - SharingNgContext:
         - PublicWebDavContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiSharingNgLinkShareRoot:
       paths:
@@ -389,7 +389,7 @@ default:
         - SpacesContext:
         - SharingNgContext:
         - PublicWebDavContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiOcm:
       paths:
@@ -400,7 +400,7 @@ default:
         - OcmContext:
         - SharingNgContext:
         - SpacesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - NotificationContext:
         - SettingsContext:
         - SpacesTUSContext:
@@ -431,7 +431,7 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - OcisConfigContext:
+        - OcConfigContext:
 
     apiAuthApp:
       paths:
@@ -441,7 +441,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - AuthAppContext:
         - CliContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     cliCommands:
       paths:
@@ -450,7 +450,7 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - CliContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - FilesVersionsContext:
         - SharingNgContext:
         - SearchContext:
@@ -528,7 +528,7 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - ShareesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiShareManagementToShares:
       paths:
@@ -543,7 +543,7 @@ default:
         - FilesVersionsContext:
         - SettingsContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiShareManagementBasicToShares:
       paths:
@@ -590,7 +590,7 @@ default:
         - TrashbinContext:
         - SharingNgContext:
         - WebDavPropertiesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiSharePublicLink2:
       paths:
@@ -601,7 +601,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
         - SharingNgContext:
 
     coreApiShareUpdateToShares:
@@ -645,7 +645,7 @@ default:
         - WebDavPropertiesContext:
         - TrashbinContext:
         - SharingNgContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiWebdavDelete:
       paths:
@@ -709,7 +709,7 @@ default:
         - SharingNgContext:
         - WebDavPropertiesContext:
         - TrashbinContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiWebdavPreviews:
       paths:
@@ -719,7 +719,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SharingNgContext:
         - WebDavPropertiesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiWebdavProperties:
       paths:
@@ -729,7 +729,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SharingNgContext:
         - WebDavPropertiesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
     coreApiWebdavUpload:
       paths:
@@ -776,7 +776,7 @@ default:
         - FilesVersionsContext:
         - SharingNgContext:
         - WebDavPropertiesContext:
-        - OcisConfigContext:
+        - OcConfigContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

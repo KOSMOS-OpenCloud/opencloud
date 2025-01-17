@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"ociswrapper/common"
-	"ociswrapper/ocis"
+	"ocwrapper/common"
+	"ocwrapper/opencloud"
 	"os"
 )
 
@@ -90,18 +90,18 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	for key, value := range envBody {
 		envMap = append(envMap, fmt.Sprintf("%s=%v", key, value))
 	}
-	ocis.EnvConfigs = append(ocis.EnvConfigs, envMap...)
+	opencloud.EnvConfigs = append(opencloud.EnvConfigs, envMap...)
 
 	var message string
 
-	success, _ := ocis.Restart(ocis.EnvConfigs)
+	success, _ := opencloud.Restart(opencloud.EnvConfigs)
 	if success {
-		message = "oCIS configured successfully"
+		message = "opencloud configured successfully"
 		sendResponse(res, http.StatusOK, message)
 		return
 	}
 
-	message = "Failed to restart oCIS with new configuration"
+	message = "Failed to restart opencloud with new configuration"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 
@@ -112,25 +112,25 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var message string
-	ocis.EnvConfigs = []string{}
-	success, _ := ocis.Restart(os.Environ())
+	opencloud.EnvConfigs = []string{}
+	success, _ := opencloud.Restart(os.Environ())
 	if success {
-		message = "oCIS configuration rolled back successfully"
+		message = "opencloud configuration rolled back successfully"
 		sendResponse(res, http.StatusOK, message)
 		return
 	}
 
-	message = "Failed to restart oCIS with initial configuration"
+	message = "Failed to restart opencloud with initial configuration"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 
-func StopOcisHandler(res http.ResponseWriter, req *http.Request) {
+func StopOpencloudHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
-	success, message := ocis.Stop()
+	success, message := opencloud.Stop()
 	if success {
 		sendResponse(res, http.StatusOK, message)
 		return
@@ -139,21 +139,21 @@ func StopOcisHandler(res http.ResponseWriter, req *http.Request) {
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 
-func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
+func StartOpencloudHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		sendResponse(res, http.StatusMethodNotAllowed, "")
 		return
 	}
 
-	if ocis.IsOcisRunning() {
-		sendResponse(res, http.StatusConflict, "oCIS server is already running")
+	if opencloud.IsOpencloudRunning() {
+		sendResponse(res, http.StatusConflict, "opencloud server is already running")
 		return
 	}
 
 	common.Wg.Add(1)
-	go ocis.Start(nil)
+	go opencloud.Start(nil)
 
-	success, message := ocis.WaitForConnection()
+	success, message := opencloud.WaitForConnection()
 	if success {
 		sendResponse(res, http.StatusOK, message)
 		return
@@ -199,6 +199,6 @@ func CommandHandler(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	exitCode, output := ocis.RunCommand(command, stdIn)
+	exitCode, output := opencloud.RunCommand(command, stdIn)
 	sendCmdResponse(res, exitCode, output)
 }

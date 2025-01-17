@@ -25,7 +25,7 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
-use TestHelpers\OcisConfigHelper;
+use TestHelpers\OcConfigHelper;
 use TestHelpers\BehatHelper;
 use Psr\Http\Message\ResponseInterface;
 
@@ -57,7 +57,7 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorHasStoppedTheServer(): void {
-		$response = OcisConfigHelper::stopOcis();
+		$response = OcConfigHelper::stopOpencloud();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
@@ -67,7 +67,7 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorHasStartedTheServer(): void {
-		$response = OcisConfigHelper::startOcis();
+		$response = OcConfigHelper::startOpencloud();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 

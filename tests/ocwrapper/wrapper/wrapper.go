@@ -3,10 +3,10 @@ package wrapper
 import (
 	"fmt"
 	"net/http"
-	"ociswrapper/common"
-	"ociswrapper/log"
-	"ociswrapper/ocis/config"
-	"ociswrapper/wrapper/handlers"
+	"ocwrapper/common"
+	"ocwrapper/log"
+	"ocwrapper/opencloud/config"
+	"ocwrapper/wrapper/handlers"
 )
 
 func Start(port string) {
@@ -25,12 +25,12 @@ func Start(port string) {
 	mux.HandleFunc("/config", handlers.SetEnvHandler)
 	mux.HandleFunc("/rollback", handlers.RollbackHandler)
 	mux.HandleFunc("/command", handlers.CommandHandler)
-	mux.HandleFunc("/stop", handlers.StopOcisHandler)
-	mux.HandleFunc("/start", handlers.StartOcisHandler)
+	mux.HandleFunc("/stop", handlers.StopOpencloudHandler)
+	mux.HandleFunc("/start", handlers.StartOpencloudHandler)
 
 	httpServer.Handler = mux
 
-	log.Println(fmt.Sprintf("Starting ociswrapper on port %s...", port))
+	log.Println(fmt.Sprintf("Starting ocwrapper on port %s...", port))
 
 	err := httpServer.ListenAndServe()
 	if err != nil {

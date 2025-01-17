@@ -38,11 +38,11 @@ use Laminas\Ldap\Ldap;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\HttpLogger;
-use TestHelpers\OcisHelper;
+use TestHelpers\OcHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SettingsHelper;
-use TestHelpers\OcisConfigHelper;
+use TestHelpers\OcConfigHelper;
 use TestHelpers\BehatHelper;
 use Swaggest\JsonSchema\InvalidValue as JsonSchemaException;
 use Swaggest\JsonSchema\Exception\ArrayException;
@@ -478,10 +478,10 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
 		$this->publicLinkSharePassword = "publicPwd:1";
 
-		$this->baseUrl = OcisHelper::getServerUrl();
+		$this->baseUrl = OcHelper::getServerUrl();
 		$this->localBaseUrl = $this->baseUrl;
 		// federated server url from the environment
-		$this->remoteBaseUrl = OcisHelper::getFederatedServerUrl();
+		$this->remoteBaseUrl = OcHelper::getFederatedServerUrl();
 
 		// get the admin username from the environment (if defined)
 		$adminUsernameFromEnvironment = $this->getAdminUsernameFromEnvironment();
@@ -617,10 +617,10 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return void
 	 */
-	public function startOcisServer(): void {
-		$response = OcisConfigHelper::startOcis();
+	public function startOpencloudServer(): void {
+		$response = OcConfigHelper::startOpencloud();
 		// 409 is returned if the server is already running
-		$this->theHTTPStatusCodeShouldBe([200, 409], 'Starting oCIS server', $response);
+		$this->theHTTPStatusCodeShouldBe([200, 409], 'Starting OpenCloud server', $response);
 	}
 
 	/**
@@ -727,7 +727,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * removes the port from the ocis URL
+	 * removes the port from the OpenCloud URL
 	 *
 	 * @param string $url
 	 *
@@ -751,13 +751,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function getStorageUsersRoot(): string {
-		$ocisDataPath = getenv("OC_BASE_DATA_PATH") ? getenv("OC_BASE_DATA_PATH") : getenv("HOME") . '/.ocis';
-		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocisDataPath . "/storage/users";
+		$ocDataPath = getenv("OC_BASE_DATA_PATH") ? getenv("OC_BASE_DATA_PATH") : getenv("HOME") . '/.opencloud';
+		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocDataPath . "/storage/users";
 	}
 
 	/**
 	 * returns the path of the base URL
-	 * e.g. owncloud-core/10 if the baseUrl is http://localhost/owncloud-core/10
 	 * the path is without a slash at the end and without a slash at the beginning
 	 *
 	 * @return string
@@ -808,7 +807,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function getCollaborationHostName(): string {
-		return $this->removeSchemeAndPortFromUrl(OcisHelper::getCollaborationServiceUrl());
+		return $this->removeSchemeAndPortFromUrl(OcHelper::getCollaborationServiceUrl());
 	}
 
 	/**
@@ -868,7 +867,6 @@ class FeatureContext extends BehatVariablesContext {
 
 	/**
 	 * returns the base URL without any sub-path e.g. http://localhost:8080
-	 * of the base URL http://localhost:8080/owncloud
 	 *
 	 * @return string
 	 */
@@ -1516,7 +1514,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return bool
 	 */
 	public function isAPublicLinkUrl(string $url): bool {
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$urlEnding = \ltrim($url, '/');
 		} else {
 			if (\substr($url, 0, 4) !== "http") {
@@ -1743,7 +1741,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Make a directory under the server root on the ownCloud server
+	 * Make a directory under the server root on the OpenCloud server
 	 *
 	 * @param string $dirPathFromServerRoot e.g. 'apps2/myapp/appinfo'
 	 *
@@ -2559,7 +2557,7 @@ class FeatureContext extends BehatVariablesContext {
 				]
 			);
 
-			if (!OcisHelper::isTestingOnReva()) {
+			if (!OcHelper::isTestingOnReva()) {
 				array_push(
 					$substitutions,
 					[

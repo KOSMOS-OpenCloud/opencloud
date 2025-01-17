@@ -261,7 +261,7 @@ class TUSContext implements Context {
 		string  $destination,
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
-		int     $bytes = null,
+		?int     $bytes = null,
 		string  $checksum = ''
 	): void {
 		$this->uploadFileUsingTus($user, $source, $destination, null, $uploadMetadata, $noOfChunks, $bytes, $checksum);
@@ -287,7 +287,7 @@ class TUSContext implements Context {
 		?string  $spaceId = null,
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
-		int     $bytes = null,
+		?int     $bytes = null,
 		string  $checksum = ''
 	) {
 		$user = $this->featureContext->getActualUsername($user);

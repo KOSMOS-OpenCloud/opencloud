@@ -33,13 +33,13 @@ use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\GraphHelper;
-use TestHelpers\OcisHelper;
+use TestHelpers\OcHelper;
 use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';
 
 /**
- * Context for ocis spaces specific steps
+ * Context for OpenCloud spaces specific steps
  */
 class SpacesContext implements Context {
 	private FeatureContext $featureContext;
@@ -453,7 +453,7 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function cleanDataAfterTests(): void {
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			return;
 		}
 		$this->deleteAllProjectSpaces();
@@ -1978,7 +1978,7 @@ class SpacesContext implements Context {
 		string $fromSpaceName,
 		string $fileDestination,
 		string $toSpaceName,
-		TableNode $table = null
+		?TableNode $table = null
 	): void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
@@ -2146,7 +2146,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileDestination,
 		string $spaceName,
-		string $endPath = null
+		?string $endPath = null
 	): string {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
@@ -3229,8 +3229,7 @@ class SpacesContext implements Context {
 	/**
 	 * User gets all objects in the trash of project space
 	 *
-	 * Method "getTrashbinContentFromResponseXml" borrowed from core repository
-	 * and return array like:
+	 * Method "getTrashbinContentFromResponseXml" returns array like:
 	 * 	[1] => Array
 	 *       (
 	 *             [href] => /dav/spaces/trash-bin/spaceId/objectId/
@@ -4070,7 +4069,6 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function searchResultShouldContainSpace(string $user, string $spaceName): void {
-		// get a response after a Report request (called in the core)
 		$responseArray = json_decode(
 			json_encode(
 				HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath("//d:response/d:href")
@@ -4621,7 +4619,7 @@ class SpacesContext implements Context {
 		string $recipientType,
 		string $recipient,
 		string $role,
-		string $expirationDate = null
+		?string $expirationDate = null
 	): void {
 		$response = $this->listAllAvailableSpacesOfUser($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(

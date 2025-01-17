@@ -8,7 +8,7 @@ Feature: check activities
 
   @issue-9712
   Scenario: check activities after uploading a file and a folder
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
@@ -185,8 +185,8 @@ Feature: check activities
 
   @issue-10001
   Scenario: check edit activity of a file
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "/textfile.txt"
-    And user "Alice" has uploaded file with content "edited ownCloud test text file" to "/textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "/textfile.txt"
+    And user "Alice" has uploaded file with content "edited OpenCloud test text file" to "/textfile.txt"
     When user "Alice" lists the activities of file "/textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -290,7 +290,7 @@ Feature: check activities
 
   @issue-9712
   Scenario: check activities after deleting a file and a folder
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has deleted file "textfile.txt"
     And user "Alice" has deleted folder "FOLDER"
@@ -667,7 +667,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination file and folder after moving a file into it
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has moved file "textfile.txt" to "FOLDER/textfile.txt"
     When user "Alice" lists the activities of file "FOLDER/textfile.txt" from space "Personal" using the Graph API
@@ -1140,7 +1140,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination file and folder after moving a file by renaming destination file
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has moved file "textfile.txt" to "FOLDER/renamed.txt"
     When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API
@@ -1612,7 +1612,7 @@ Feature: check activities
 
   @issue-9712
   Scenario: check rename activity for a file and a folder
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has moved file "textfile.txt" to "renamed.txt"
     And user "Alice" has moved folder "/FOLDER" to "RENAMED FOLDER"
@@ -1840,7 +1840,7 @@ Feature: check activities
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/textfile.txt"
     And user "Alice" has moved file "/New Folder/textfile.txt" to "/New Folder/Sub Folder/textfile.txt"
     And user "Alice" has moved folder "/New Folder/Folder" to "/New Folder/Sub Folder/Folder"
     And user "Alice" has moved file "/New Folder/Sub Folder/textfile.txt" to "/New Folder/Sub Folder/renamed.txt"
@@ -2369,9 +2369,9 @@ Feature: check activities
   @issue-10210
   Scenario: check activities of a folder after renaming
     Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "FOLDER/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "FOLDER/textfile.txt"
     And user "Alice" has moved folder "FOLDER" to "RENAMED FOLDER"
-    And user "Alice" has uploaded file with content "updated ownCloud test text file" to "RENAMED FOLDER/textfile.txt"
+    And user "Alice" has uploaded file with content "updated OpenCloud test text file" to "RENAMED FOLDER/textfile.txt"
     When user "Alice" lists the activities of file "RENAMED FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2596,7 +2596,7 @@ Feature: check activities
 
   @issue-9856 @issue-10127
   Scenario: check activity message with different language
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And user "Alice" has switched the system language to "de" using the Graph API
     When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
@@ -2693,7 +2693,7 @@ Feature: check activities
   Scenario: check activity with -1 depth filter
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with depth "-1" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2888,7 +2888,7 @@ Feature: check activities
   Scenario: check activity with depth filter
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with depth "1" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -3027,7 +3027,7 @@ Feature: check activities
   Scenario: check activity with limit filter
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -3165,8 +3165,8 @@ Feature: check activities
 
   Scenario: check activity with sort filter
     Given user "Alice" has created folder "/New Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/textfile.txt"
-    And user "Alice" has uploaded file with content "updated ownCloud test text file" to "/New Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "updated OpenCloud test text file" to "/New Folder/textfile.txt"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with sort "asc" using the Graph API
     Then the HTTP status code should be "200"
     And the activities should be in the following order:
@@ -3186,8 +3186,8 @@ Feature: check activities
   Scenario: check activities with limit and sort filters (asc/desc)
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
-    And user "Alice" has uploaded file with content "updated ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has uploaded file with content "updated OpenCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" and sort "asc" using the Graph API
     Then the HTTP status code should be "200"
     And the activities should be in the following order:
@@ -3204,14 +3204,14 @@ Feature: check activities
   @issue-9860
   Scenario: user tries to check activities of another user's file
     Given user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
-    And user "Alice" has uploaded file with content "updated ownCloud test text file" to "textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
+    And user "Alice" has uploaded file with content "updated OpenCloud test text file" to "textfile.txt"
     When user "Brian" tries to list the activities of file "textfile.txt" from space "Personal" owned by user "Alice" using the Graph API
     Then the HTTP status code should be "403"
 
 
   Scenario: check activities of destination resources after copying a file
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has copied file "textfile.txt" to "FOLDER/textfile.txt"
     When user "Alice" lists the activities of file "FOLDER/textfile.txt" from space "Personal" using the Graph API
@@ -3433,7 +3433,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination resources after copying a file by renaming the destination file
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has copied file "textfile.txt" to "FOLDER/renamed.txt"
     When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API
@@ -3656,7 +3656,7 @@ Feature: check activities
 
   Scenario: check activities of destination resources after copying a file into same folder by renaming the destination file
     Given user "Alice" has created folder "/FOLDER"
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "FOLDER/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "FOLDER/textfile.txt"
     And user "Alice" has copied file "FOLDER/textfile.txt" to "FOLDER/renamed.txt"
     When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"

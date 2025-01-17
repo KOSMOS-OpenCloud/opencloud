@@ -11,12 +11,12 @@ Feature: move (rename) file
   Scenario Outline: moving a file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     When user "Alice" moves file "/textfile0.txt" to "/FOLDER/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/FOLDER/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/FOLDER/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -26,15 +26,15 @@ Feature: move (rename) file
   @smokeTest
   Scenario Outline: moving and overwriting a file
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0 v1" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0 v2" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0 v1" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0 v2" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "textfile1.txt"
     When user "Alice" moves file "/textfile0.txt" to "/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0 v2"
-    And the content of version index "1" of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0 v1"
+    And the content of file "/textfile1.txt" for user "Alice" should be "OpenCloud test text file 0 v2"
+    And the content of version index "1" of file "/textfile1.txt" for user "Alice" should be "OpenCloud test text file 0 v1"
     And as "Alice" file "/textfile0.txt" should not exist
     Examples:
       | dav-path-version |
@@ -45,11 +45,11 @@ Feature: move (rename) file
 
   Scenario Outline: moving (renaming) a file to be only different case
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     When user "Alice" moves file "/textfile0.txt" to "/TextFile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/textfile0.txt" should not exist
-    And the content of file "/TextFile0.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/TextFile0.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -59,12 +59,12 @@ Feature: move (rename) file
   @smokeTest
   Scenario Outline: moving (renaming) a file to a file with only different case to an existing file
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "textfile1.txt"
     When user "Alice" moves file "/textfile1.txt" to "/TextFile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
-    And the content of file "/TextFile0.txt" for user "Alice" should be "ownCloud test text file 1"
+    And the content of file "/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
+    And the content of file "/TextFile0.txt" for user "Alice" should be "OpenCloud test text file 1"
     Examples:
       | dav-path-version |
       | old              |
@@ -75,12 +75,12 @@ Feature: move (rename) file
   Scenario Outline: moving (renaming) a file to a file in a folder with only different case to an existing file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
-    And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file parent" to "PARENT/parent.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "textfile1.txt"
     When user "Alice" moves file "/textfile1.txt" to "/PARENT/Parent.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/PARENT/parent.txt" for user "Alice" should be "ownCloud test text file parent"
-    And the content of file "/PARENT/Parent.txt" for user "Alice" should be "ownCloud test text file 1"
+    And the content of file "/PARENT/parent.txt" for user "Alice" should be "OpenCloud test text file parent"
+    And the content of file "/PARENT/Parent.txt" for user "Alice" should be "OpenCloud test text file 1"
     Examples:
       | dav-path-version |
       | old              |
@@ -90,11 +90,11 @@ Feature: move (rename) file
   @issue-1976
   Scenario Outline: try to move a file into same folder with same name
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "testfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "testfile.txt"
     When user "Alice" moves file "testfile.txt" to "testfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" the file with original path "testfile.txt" should not exist in the trashbin
-    And the content of file "testfile.txt" for user "Alice" should be "ownCloud test text file"
+    And the content of file "testfile.txt" for user "Alice" should be "OpenCloud test text file"
     Examples:
       | dav-path-version |
       | old              |
@@ -178,10 +178,10 @@ Feature: move (rename) file
   @sqliteDB
   Scenario Outline: renaming to a file with special characters
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 2" to "textfile2.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 3" to "textfile3.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 2" to "textfile2.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 3" to "textfile3.txt"
     When user "Alice" moves the following file using the WebDAV API
       | source         | destination   |
       | /textfile0.txt | *a@b#c$e%f&g* |
@@ -189,10 +189,10 @@ Feature: move (rename) file
       | /textfile2.txt | file[2]       |
       | /textfile3.txt | file [ 3 ]    |
     Then the HTTP status code of responses on all endpoints should be "201"
-    And the content of file "*a@b#c$e%f&g*" for user "Alice" should be "ownCloud test text file 0"
-    And the content of file "1 2 3##.##" for user "Alice" should be "ownCloud test text file 1"
-    And the content of file "file[2]" for user "Alice" should be "ownCloud test text file 2"
-    And the content of file "file [ 3 ]" for user "Alice" should be "ownCloud test text file 3"
+    And the content of file "*a@b#c$e%f&g*" for user "Alice" should be "OpenCloud test text file 0"
+    And the content of file "1 2 3##.##" for user "Alice" should be "OpenCloud test text file 1"
+    And the content of file "file[2]" for user "Alice" should be "OpenCloud test text file 2"
+    And the content of file "file [ 3 ]" for user "Alice" should be "OpenCloud test text file 3"
     Examples:
       | dav-path-version |
       | old              |
@@ -203,10 +203,10 @@ Feature: move (rename) file
   #after fixing the issues merge this Scenario into the one above
   Scenario Outline: renaming to a file with question mark in its name
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     When user "Alice" moves file "/textfile0.txt" to "/#oc ab?cd=ef#" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/#oc ab?cd=ef#" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/#oc ab?cd=ef#" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -325,12 +325,12 @@ Feature: move (rename) file
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "<source-folder>"
     And user "Alice" has created folder "<destination-folder>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source-folder>/<source-file>"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/<source-folder>/<source-file>"
     When user "Alice" moves file "/<source-folder>/<source-file>" to "/<destination-folder>/<destination-file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/<destination-folder>/<destination-file>" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/<destination-folder>/<destination-file>" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version | source-folder | source-file | destination-folder | destination-file |
       | old              | text          | file.txt    | 0                  | file.txt         |
@@ -362,12 +362,12 @@ Feature: move (rename) file
   Scenario Outline: moving a file from a folder to the root
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "<source-folder>"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/<source-folder>/<source-file>"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/<source-folder>/<source-file>"
     When user "Alice" moves file "/<source-folder>/<source-file>" to "/<destination-file>" using the WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions for user "Alice"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/<destination-file>" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/<destination-file>" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version | source-folder | source-file | destination-file |
       | old              | 0             | file.txt    | file.txt         |
@@ -492,7 +492,7 @@ Feature: move (rename) file
 
   Scenario Outline: rename a file to .htaccess
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "textfile0.txt"
     When user "Alice" moves file "/textfile0.txt" to "/.htaccess" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should see the following elements

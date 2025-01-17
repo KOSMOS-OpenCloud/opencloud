@@ -26,10 +26,10 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\OcisConfigHelper;
+use TestHelpers\OcConfigHelper;
 
 /**
- * A helper class for running oCIS CLI commands
+ * A helper class for running OpenCloud CLI commands
  */
 class CliHelper {
 	/**
@@ -39,7 +39,7 @@ class CliHelper {
 	 * @throws GuzzleException
 	 */
 	public static function runCommand(array $body): ResponseInterface {
-		$url = OcisConfigHelper::getWrapperUrl() . "/command";
-		return OcisConfigHelper::sendRequest($url, "POST", \json_encode($body));
+		$url = OcConfigHelper::getWrapperUrl() . "/command";
+		return OcConfigHelper::sendRequest($url, "POST", \json_encode($body));
 	}
 }

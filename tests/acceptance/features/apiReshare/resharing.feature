@@ -1,7 +1,7 @@
 Feature: re-share resources
   As a user
   I cannot to re-share resources
-  This feature has been removed from ocis
+  This feature has been removed from OpenCloud
 
   Background:
     Given these users have been created with default attributes:

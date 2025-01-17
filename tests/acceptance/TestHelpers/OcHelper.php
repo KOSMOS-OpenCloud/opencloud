@@ -39,13 +39,13 @@ abstract class StorageDriver {
 }
 
 /**
- * Class OcisHelper
+ * Class OcHelper
  *
- * Helper functions that are needed to run tests on OCIS
+ * Helper functions that are needed to run tests on OpenCloud server
  *
  * @package TestHelpers
  */
-class OcisHelper {
+class OcHelper {
 	public const STORAGE_DRIVERS = [
 		StorageDriver::OCIS,
 		StorageDriver::EOS,
@@ -109,7 +109,7 @@ class OcisHelper {
 	public static function getStorageDriver(): string {
 		$storageDriver = (\getenv("STORAGE_DRIVER"));
 		if ($storageDriver === false) {
-			return StorageDriver::OWNCLOUD;
+			return StorageDriver::OCIS;
 		}
 		$storageDriver = \strtoupper($storageDriver);
 		if (!\in_array($storageDriver, self::STORAGE_DRIVERS)) {
@@ -141,7 +141,7 @@ class OcisHelper {
 			}
 			if ($deleteCmd === false) {
 				if (self::getStorageDriver() === StorageDriver::OWNCLOUD) {
-					self::recurseRmdir(self::getOcisRevaDataRoot() . $user);
+					self::recurseRmdir(self::getOcRevaDataRoot() . $user);
 				}
 				continue;
 			} elseif (self::getStorageDriver() === StorageDriver::EOS) {
@@ -259,10 +259,10 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	private static function getOcisRevaDataRoot(): string {
+	private static function getOcRevaDataRoot(): string {
 		$root = \getenv("OC_REVA_DATA_ROOT");
 		if ($root === false || $root === "") {
-			$root = "/var/tmp/ocis/owncloud/";
+			$root = "/var/tmp/opencloud/opencloud/";
 		}
 		if (!\file_exists($root)) {
 			echo "WARNING: reva data root folder ($root) does not exist\n";

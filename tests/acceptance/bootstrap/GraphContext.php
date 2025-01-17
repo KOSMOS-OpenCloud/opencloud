@@ -200,10 +200,10 @@ class GraphContext implements Context {
 	public function editUserUsingTheGraphApi(
 		string $byUser,
 		string $user,
-		string $userName = null,
-		string $password = null,
-		string $email = null,
-		string $displayName = null,
+		?string $userName = null,
+		?string $password = null,
+		?string $email = null,
+		?string $displayName = null,
 		bool $accountEnabled = true,
 		string $method="PATCH"
 	): ResponseInterface {
@@ -2371,7 +2371,7 @@ class GraphContext implements Context {
 	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(
 		string $eventType,
 		?string $spaceType=null,
-		PyStringNode $schemaString=null
+		?PyStringNode $schemaString=null
 	): void {
 		$actualResponseToAssert = null;
 		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;

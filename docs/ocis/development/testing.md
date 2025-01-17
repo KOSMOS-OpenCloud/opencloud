@@ -2,8 +2,8 @@
 title: "Acceptance Testing"
 date: 2018-05-02T00:00:00+00:00
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis/development
+geekdocRepo: https://github.com/opencloud-eu/opencloud
+geekdocEditPath: edit/master/docs/opencloud/development
 geekdocFilePath: testing.md
 ---
 
@@ -15,7 +15,7 @@ Both ways to run tests with the test suites are described here.
 
 ## Running Test Suite in Docker
 
-Let's see what is available. Invoke the following command from within the root of the oCIS repository.
+Let's see what is available. Invoke the following command from within the root of the OpenCloud repository.
 
 ```bash
 make -C tests/acceptance/docker help
@@ -23,12 +23,12 @@ make -C tests/acceptance/docker help
 
 Basically we have two sources for feature tests and test suites:
 
-- [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [tests and test suites transferred from ownCloud core, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
+- [OpenCloud feature test and test suites](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features)
+- [tests and test suites transferred from core, they have prefix coreApi](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features)
 
-At the moment, both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
+At the moment, both can be applied to OpenCloud.
 
-As a storage backend, we offer oCIS native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `S3` storage driver.
+As a storage backend, we support the oCIS native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `s3ng` storage driver.
 
 You can invoke two types of test suite runs:
 
@@ -37,9 +37,9 @@ You can invoke two types of test suite runs:
 
 ### Run Full Test Suite
 
-#### Local oCIS Tests (prefix `api`)
+#### Local OpenCloud Tests (prefix `api`)
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local oCIS specific test suites [here](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features). They can be run with `ocis` storage and `S3` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features). They can be run with `ocis` storage and `s3ng` storage.
 
 For example, command:
 
@@ -47,7 +47,7 @@ For example, command:
 make -C tests/acceptance/docker localApiTests-apiGraph-ocis
 ```
 
-runs the same tests as the `localApiTests-apiGraph-ocis` CI pipeline, which runs the oCIS test suite "apiGraph" against the oCIS server with ocis storage.
+runs the same tests as the `localApiTests-apiGraph-ocis` CI pipeline, which runs the OpenCloud test suite "apiGraph" against the OpenCloud server with `ocis` storage.
 
 And command:
 
@@ -55,18 +55,18 @@ And command:
 make -C tests/acceptance/docker localApiTests-apiGraph-s3ng
 ```
 
-runs the oCIS test suite `apiGraph` against the oCIS server with s3 storage.
+runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `s3ng` storage.
 
 {{< hint info >}}
-While running the tests, oCIS server is started with [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ociswrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
+While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
 
 ```bash
 WITH_WRAPPER=false \
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
-But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
+But some test suites that are tagged with `@env-config` require the OpenCloud server to be run with ocwrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
 {{< /hint >}}
 
 {{< hint info >}}
@@ -75,7 +75,7 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 ```bash
 START_EMAIL=true \
 BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
 {{< /hint >}}
@@ -86,7 +86,7 @@ To run the tests that require tika service (tests tagged with `@tikaServiceNeede
 ```bash
 START_TIKA=true \
 BEHAT_FEATURE='tests/acceptance/features/apiSearchContent/contentSearch.feature' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
 {{< /hint >}}
@@ -100,16 +100,16 @@ OC_ASYNC_UPLOADS=true \
 OC_ADD_RUN_SERVICES=antivirus \
 POSTPROCESSING_STEPS=virusscan \
 BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
 {{< /hint >}}
 
-#### Tests Transferred From ownCloud Core (prefix `coreApi`)
+#### Tests Transferred From Core (prefix `coreApi`)
 
-Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with ocis storage.
+Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `ocis` storage.
 
-And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with s3 storage.
+And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `s3ng` storage.
 
 ### Run Single Feature Test
 
@@ -119,7 +119,7 @@ For example;
 
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
 {{< hint info >}}
@@ -134,22 +134,22 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
-Similarly, with S3 storage;
+Similarly, with `s3ng` storage;
 
 ```bash
 # run a whole feature
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
+make -C tests/acceptance/docker test-opencloud-feature-s3ng-storage
 
 # run a single scenario
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
+make -C tests/acceptance/docker test-opencloud-feature-s3ng-storage
 ```
 
-In the same way, tests transferred from ownCloud core can be run as:
+In the same way, tests transferred from core can be run as:
 
 ```bash
 # run a whole feature
@@ -162,16 +162,16 @@ make -C tests/acceptance/docker test-core-feature-ocis-storage
 ```
 
 {{< hint info >}}
-The test suites transferred from ownCloud core have `coreApi` prefixed
+The test suites transferred from core have `coreApi` prefixed
 {{< /hint >}}
 
-### oCIS Image to Be Tested (Skip Local Image Build)
+### OpenCloud Image to Be Tested (Skip Local Image Build)
 
-By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OC_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
+By default, the tests will be run against the docker image built from your current working state of the OpenCloud repository. For some purposes it might also be handy to use an OpenCloud image from Docker Hub. Therefore, you can provide the optional flag `OC_IMAGE_TAG=...` which must contain an available docker tag of the [opencloud-eu/opencloud registry on Docker Hub](https://hub.docker.com/r/opencloud-eu/opencloud) (e.g. 'latest').
 
 ```bash
 OC_IMAGE_TAG=latest \
-make -C tests/acceptance/docker localApiTests-apiGraph-ocis
+make -C tests/acceptance/docker localApiTests-apiGraph-opencloud
 ```
 
 ### Test Log Output
@@ -188,7 +188,7 @@ The log output is opened in `less`. You can navigate up and down with your curso
 
 ### Cleanup
 
-During testing we start a redis and oCIS docker container. These will not be stopped automatically. You can stop them with:
+During testing we start a redis and OpenCloud docker container. These will not be stopped automatically. You can stop them with:
 
 ```bash
 make -C tests/acceptance/docker clean
@@ -196,23 +196,23 @@ make -C tests/acceptance/docker clean
 
 ## Running Test Suite in Local Environment
 
-### Run oCIS
+### Run OpenCloud
 
-Create an up-to-date oCIS binary by [building oCIS]({{< ref "build" >}})
+Create an up-to-date OpenCloud binary by [building OpenCloud]({{< ref "build" >}})
 
-To start oCIS:
+To start OpenCloud:
 
 ```bash
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
 OC_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true \
-ocis/bin/ocis server
+opencloud/bin/opencloud server
 ```
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-#### Run Local oCIS Tests (prefix `api`) and Tests Transferred From ownCloud Core (prefix `coreApi`)
+#### Run Local OpenCloud Tests (prefix `api`) and Tests Transferred From Core (prefix `coreApi`)
 
 ```bash
 make test-acceptance-api \
@@ -221,7 +221,7 @@ TEST_SERVER_URL=https://localhost:9200 \
 
 Useful environment variables:
 
-`TEST_SERVER_URL`: oCIS server url. Please, adjust the server url according to your setup.
+`TEST_SERVER_URL`: OpenCloud server url. Please, adjust the server url according to your setup.
 
 `BEHAT_FEATURE`: to run a single feature
 
@@ -257,13 +257,11 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 
 ### Use Existing Tests for BDD
 
-As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in oCIS.
-Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
+As a lot of scenarios are written for core, we can use those tests for Behaviour driven development in OpenCloud.
+Every scenario that does not work in OpenCloud with `ocis` storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
-
-The tests are not currently run in CI with the OWNCLOUD or EOS storage drivers, so there are no expected-failures files for those.
 
 If you want to work on a specific issue
 
@@ -296,24 +294,24 @@ make test-acceptance-api
 
 ## Running ENV Config Tests (@env-Config)
 
-Test suites tagged with `@env-config` are used to test the environment variables that are used to configure oCIS. These tests are special tests that require the oCIS server to be run using [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md).
+Test suites tagged with `@env-config` are used to test the environment variables that are used to configure OpenCloud. These tests are special tests that require the OpenCloud server to be run using [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md).
 
-### Run oCIS With ociswrapper
+### Run OpenCloud With ocwrapper
 
 ```bash
-# working dir: ocis repo root dir
+# working dir: OpenCloud repo root dir
 
-# init oCIS
+# init OpenCloud
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
 # build the wrapper
-cd tests/ociswrapper
+cd tests/ocwrapper
 make build
 
-# run oCIS
+# run OpenCloud
 PROXY_ENABLE_BASIC_AUTH=true \
-./bin/ociswrapper serve --bin=../../ocis/bin/ocis
+./bin/ocwrapper serve --bin=../../opencloud/bin/opencloud
 ```
 
 ### Run the Tests
@@ -327,11 +325,11 @@ make test-acceptance-api
 
 ### Writing New ENV Config Tests
 
-While writing tests for a new oCIS ENV configuration, please make sure to follow these guidelines:
+While writing tests for a new OpenCloud ENV configuration, please make sure to follow these guidelines:
 
 1. Tag the test suite (or test scenarios) with `@env-config`
-2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
-3. Recommended: add the new step implementations in `OcisConfigContext.php`
+2. Use `OcConfigHelper.php` for helper functions - provides functions to reconfigure the running OpenCloud instance.
+3. Recommended: add the new step implementations in `OcConfigContext.php`
 
 ## Running Test Suite With Email Service (@email)
 
@@ -345,23 +343,23 @@ Run the following command to setup inbucket
 docker run -d -p9000:9000 -p2500:2500 --name inbucket inbucket/inbucket
 ```
 
-### Run oCIS
+### Run OpenCloud
 
-Documentation for environment variables is available [here](https://owncloud.dev/services/notifications/#environment-variables)
+Documentation for environment variables is available [here](https://docs.opencloud.eu/services/notifications/#environment-variables)
 
 ```bash
-# init oCIS
+# init OpenCloud
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
-# run oCIS
+# run OpenCloud
 PROXY_ENABLE_BASIC_AUTH=true \
 OC_ADD_RUN_SERVICES=notifications \
 NOTIFICATIONS_SMTP_HOST=localhost \
 NOTIFICATIONS_SMTP_PORT=2500 \
 NOTIFICATIONS_SMTP_INSECURE=true \
-NOTIFICATIONS_SMTP_SENDER="owncloud <noreply@example.com>" \
-ocis/bin/ocis server
+NOTIFICATIONS_SMTP_SENDER="OpenCloud <noreply@example.com>" \
+opencloud/bin/opencloud server
 ```
 
 ### Run the Acceptance Test
@@ -388,22 +386,23 @@ Run the following docker command to setup tika service
 docker run -d -p 127.0.0.1:9998:9998 apache/tika
 ```
 
-### Run oCIS
+### Run OpenCloud
 
+TODO: change for valid link
 Documentation related to the content based search and tika extractor can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/search.html#content-extraction)
 
 ```bash
-# init oCIS
+# init OpenCloud
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
-# run oCIS
+# run OpenCloud
 PROXY_ENABLE_BASIC_AUTH=true \
 OC_INSECURE=true \
 SEARCH_EXTRACTOR_TYPE=tika \
 SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://localhost:9998 \
 SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true \
-ocis/bin/ocis server
+opencloud/bin/opencloud server
 ```
 
 ### Run the Acceptance Test
@@ -418,6 +417,7 @@ make test-acceptance-api
 
 ## Running Test Suite With Antivirus Service (@antivirus)
 
+TODO: change for valid link
 Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
 
 ### Setup clamAV
@@ -467,23 +467,23 @@ docker run -d -p 3310:3310 owncloudci/clamavd
 docker run -d -p 3310:3310 -v /your/local/filesystem/path/to/clamav/:/var/lib/clamav mkodockx/docker-clamav:alpine
 ```
 
-### Run oCIS
+### Run OpenCloud
 
-As `antivirus` service is not enabled by default we need to enable the service while running oCIS server. We also need to enable `async upload` and as virus scan is performed in post-processing step, we need to set it as well. Documentation for environment variables related to antivirus is available [here](https://owncloud.dev/services/antivirus/#environment-variables)
+As `antivirus` service is not enabled by default we need to enable the service while running OpenCloud server. We also need to enable `async upload` and as virus scan is performed in post-processing step, we need to set it as well. Documentation for environment variables related to antivirus is available [here](https://docs.opencloud.eu/services/antivirus/#environment-variables)
 
 ```bash
-# init oCIS
+# init OpenCloud
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
-# run oCIS
+# run OpenCloud
 PROXY_ENABLE_BASIC_AUTH=true \
 ANTIVIRUS_SCANNER_TYPE="clamav" \
 ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
 POSTPROCESSING_STEPS="virusscan" \
 OC_ASYNC_UPLOADS=true \
 OC_ADD_RUN_SERVICES="antivirus"
-ocis/bin/ocis server
+opencloud/bin/opencloud server
 ```
 
 {{< hint info >}}
@@ -506,16 +506,17 @@ make test-acceptance-api
 
 ## Running Test Suite With Federated Sharing (@ocm)
 
-Test suites that are tagged with `@ocm` require running two different ocis instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
+TODO: change for valid link
+Test suites that are tagged with `@ocm` require running two different OpenCloud instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
 
-### Setup First oCIS Instance
+### Setup First OpenCloud Instance
 
 ```bash
-# init oCIS
+# init OpenCloud
 IDM_ADMIN_PASSWORD=admin \
-ocis/bin/ocis init --insecure true
+opencloud/bin/opencloud init --insecure true
 
-# run oCIS
+# run OpenCloud
 OC_URL="https://localhost:9200" \
 PROXY_ENABLE_BASIC_AUTH=true \
 OC_ENABLE_OCM=true \
@@ -524,31 +525,31 @@ OC_ADD_RUN_SERVICES="ocm" \
 OCM_OCM_INVITE_MANAGER_INSECURE=true \
 OCM_OCM_SHARE_PROVIDER_INSECURE=true \
 OCM_OCM_STORAGE_PROVIDER_INSECURE=true \
-WEB_UI_CONFIG_FILE="tests/config/local/ocis-web.json" \
-ocis/bin/ocis server
+WEB_UI_CONFIG_FILE="tests/config/local/opencloud-web.json" \
+opencloud/bin/opencloud server
 ```
 
-The first oCIS instance should be available at: https://localhost:9200/
+The first OpenCloud instance should be available at: https://localhost:9200/
 
-### Setup Second oCIS Instance
+### Setup Second OpenCloud Instance
 
-You can run the second oCIS instance in two ways:
+You can run the second OpenCloud instance in two ways:
 
 #### Using `.vscode/launch.json`
 
-From the `Run and Debug` panel of VSCode, select `Fed oCIS Server` and start the debugger.
+From the `Run and Debug` panel of VSCode, select `Fed OpenCloud Server` and start the debugger.
 
 #### Using env file
 
 ```bash
-# init oCIS
-source tests/config/local/.env-federation && ocis/bin/ocis init
+# init OpenCloud
+source tests/config/local/.env-federation && opencloud/bin/opencloud init
 
-# run oCIS
-ocis/bin/ocis server
+# run OpenCloud
+opencloud/bin/opencloud server
 ```
 
-The second oCIS instance should be available at: https://localhost:10200/
+The second OpenCloud instance should be available at: https://localhost:10200/
 
 {{< hint info >}}
 To enable ocm in the web interface, you need to set the following envs:
@@ -569,18 +570,18 @@ make test-acceptance-api
 
 ## Running Text Preview Tests Containing Unicode Characters
 
-There are some tests that check the text preview of files containing Unicode characters. The oCIS server by default cannot generate the thumbnail of such files correctly but it provides an environment variable to allow the use of custom fonts that support Unicode characters. So to run such tests successfully, we have to run the oCIS server with this environment variable.
+There are some tests that check the text preview of files containing Unicode characters. The OpenCloud server by default cannot generate the thumbnail of such files correctly but it provides an environment variable to allow the use of custom fonts that support Unicode characters. So to run such tests successfully, we have to run the OpenCloud server with this environment variable.
 
 ```bash
 ...
 THUMBNAILS_TXT_FONTMAP_FILE="/path/to/fontsMap.json"
-ocis/bin/ocis server
+opencloud/bin/opencloud server
 ```
 
 The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
 
 ```json
 {
-  "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
+  "defaultFont": "/path/to/opencloud/tests/config/drone/NotoSans.ttf"
 }
 ```

@@ -11,7 +11,7 @@ Feature: sharing
   Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -28,7 +28,7 @@ Feature: sharing
       | mimetype               | text/plain            |
       | storage_id             | ANY_VALUE             |
       | share_type             | user                  |
-    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -64,7 +64,7 @@ Feature: sharing
   Scenario Outline: creating a share of a file with a user and asking for various permission combinations
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" with permissions <requested-permissions> using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -156,7 +156,7 @@ Feature: sharing
   Scenario Outline: creating a share of a file with a group, the default permissions are read(1)+update(2)
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "/textfile0.txt" with group "grp1" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
@@ -255,7 +255,7 @@ Feature: sharing
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
-    And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/randomfile.txt"
+    And user "Brian" has uploaded file with content "OpenCloud test text file 0" to "/randomfile.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | randomfile.txt |
       | space           | Personal       |
@@ -322,7 +322,7 @@ Feature: sharing
   Scenario Outline: user shares a file with file name longer than 64 chars to another user
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
     When user "Alice" shares file "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt" with user "Brian" using the sharing API
     Then as "Brian" file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt" should exist
@@ -337,7 +337,7 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been created with default attributes
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
     When user "Alice" shares file "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt" with group "grp1" using the sharing API
     Then as "Brian" file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt" should exist
@@ -350,11 +350,11 @@ Feature: sharing
   Scenario Outline: user shares a folder with folder name longer than 64 chars to another user
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test" to "/textfile0.txt"
     And user "Alice" has created folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt"
     When user "Alice" shares folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog" with user "Brian" using the sharing API
-    Then the content of file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt" for user "Brian" should be "ownCloud test"
+    Then the content of file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt" for user "Brian" should be "OpenCloud test"
     Examples:
       | ocs-api-version |
       | 1               |
@@ -366,11 +366,11 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been created with default attributes
     And user "Brian" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "ownCloud test" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test" to "/textfile0.txt"
     And user "Alice" has created folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt"
     When user "Alice" shares folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog" with group "grp1" using the sharing API
-    Then the content of file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt" for user "Brian" should be "ownCloud test"
+    Then the content of file "/Shares/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt" for user "Brian" should be "OpenCloud test"
     Examples:
       | ocs-api-version |
       | 1               |
@@ -474,7 +474,7 @@ Feature: sharing
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
@@ -516,7 +516,7 @@ Feature: sharing
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
-    And user "Alice" has uploaded file with content "ownCloud" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | common   |
       | space           | Personal |
@@ -552,7 +552,7 @@ Feature: sharing
   Scenario Outline: creating a share of a renamed file
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "/textfile0.txt" to "/renamed.txt"
     When user "Alice" shares file "renamed.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -569,7 +569,7 @@ Feature: sharing
       | mimetype               | text/plain          |
       | storage_id             | ANY_VALUE           |
       | share_type             | user                |
-    And the content of file "/Shares/renamed.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/renamed.txt" for user "Brian" should be "OpenCloud test text file 0"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -582,7 +582,7 @@ Feature: sharing
       | username |
       | Brian    |
       | Carol    |
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |
@@ -644,7 +644,7 @@ Feature: sharing
   Scenario Outline: sharing a same file twice to the same group is not possible
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
       | space           | Personal      |

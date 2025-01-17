@@ -92,7 +92,7 @@ Feature: create user
     And user "Brian" should exist
 
   @env-config
-  Scenario Outline: create user with setting OCIS no restriction on the user name
+  Scenario Outline: create user with setting OpenCloud no restriction on the user name
     Given the config "GRAPH_USERNAME_MATCH" has been set to "none"
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user with the following attributes using the Graph API:
@@ -109,7 +109,7 @@ Feature: create user
       | (*:!;+-&$%)_alice | user names starts with the ASCII characters |
 
   @env-config
-  Scenario: create user with setting OCIS not to assign the default user role
+  Scenario: create user with setting OpenCloud not to assign the default user role
     Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "false"
     When the user "admin" creates a new user with the following attributes using the Graph API:
       | userName       | sam             |
@@ -124,7 +124,7 @@ Feature: create user
     And the Graph API response should have no role
 
   @env-config
-  Scenario: create user with setting OCIS assign the default user role
+  Scenario: create user with setting OpenCloud assign the default user role
     Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "true"
     When the user "admin" creates a new user with the following attributes using the Graph API:
       | userName       | sam             |

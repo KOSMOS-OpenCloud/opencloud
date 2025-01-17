@@ -28,7 +28,7 @@ Feature: settings api
                 "type": "object",
                 "required": [ "extension", "bundle", "setting"],
                 "properties": {
-                  "extension": { "const": "ocis-accounts" },
+                  "extension": { "const": "opencloud-accounts" },
                   "bundle": { "const": "profile" },
                   "setting": { "const": "auto-accept-shares" }
                 }
@@ -128,7 +128,7 @@ Feature: settings api
                 "type": "object",
                 "required": [ "extension", "bundle", "setting"],
                 "properties": {
-                  "extension": { "const": "ocis-accounts" },
+                  "extension": { "const": "opencloud-accounts" },
                   "bundle": { "const": "profile" },
                   "setting": { "const": "language" }
                 }
@@ -199,7 +199,7 @@ Feature: settings api
                     "id": { "pattern": "^%user_id_pattern%$" },
                     "name": { "const": "spaceadmin" },
                     "type": { "const": "TYPE_ROLE" },
-                    "extension": { "const": "ocis-roles" },
+                    "extension": { "const": "opencloud-roles" },
                     "displayName": { "const": "Space Admin" },
                     "resource": {
                       "type": "object",
@@ -217,7 +217,7 @@ Feature: settings api
                     "id": { "pattern": "^%user_id_pattern%$" },
                     "name": { "const": "admin"},
                     "type": { "const": "TYPE_ROLE" },
-                    "extension": { "const": "ocis-roles" },
+                    "extension": { "const": "opencloud-roles" },
                     "displayName": { "const": "Admin" },
                     "resource": {
                       "type": "object",
@@ -235,7 +235,7 @@ Feature: settings api
                     "id": { "pattern": "^%user_id_pattern%$" },
                     "name": { "const": "user-light" },
                     "type": { "const": "TYPE_ROLE" },
-                    "extension": { "const": "ocis-roles" },
+                    "extension": { "const": "opencloud-roles" },
                     "displayName": { "const": "User Light" },
                     "resource": {
                       "type": "object",
@@ -253,7 +253,7 @@ Feature: settings api
                     "id": { "pattern": "^%user_id_pattern%$" },
                     "name": { "const": "user" },
                     "type": { "const": "TYPE_ROLE" },
-                    "extension": { "const": "ocis-roles" },
+                    "extension": { "const": "opencloud-roles" },
                     "displayName": { "const": "User" },
                     "resource": {
                       "type": "object",

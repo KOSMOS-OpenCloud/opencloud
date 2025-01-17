@@ -9,7 +9,7 @@ Feature: check activities
 
 
   Scenario: check copy activity of destination resources
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has created folder "newFolder"
     And user "Alice" has copied file with id "<<FILEID>>" as "textfile.txt" into folder "newFolder" inside space "Personal"
@@ -232,7 +232,7 @@ Feature: check activities
 
 
   Scenario: check edit activity
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has updated a file with content "updated content" using file-id "<<FILEID>>"
     When user "Alice" lists the activities of file "textfile.txt" from space "Personal" using the Graph API
@@ -338,7 +338,7 @@ Feature: check activities
 
   @issue-9744
   Scenario: check rename activity
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has renamed file with id "<<FILEID>>" to "renamed.txt" inside space "Personal"
     When user "Alice" lists the activities of file "renamed.txt" from space "Personal" using the Graph API
@@ -453,7 +453,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination file and folder after moving a file using file-id
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has created folder "New Folder"
     And user "Alice" has moved file with id "<<FILEID>>" as "textfile.txt" into folder "New Folder" inside space "Personal"
@@ -906,7 +906,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination file and folder after moving a file by renaming destination file using file-id
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has moved file with id "<<FILEID>>" as "renamed.txt" into folder "FOLDER" inside space "Personal"
@@ -1380,7 +1380,7 @@ Feature: check activities
 
 
   Scenario: check activities of destination resources after copying a file by renaming the destination file
-    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has created folder "newFolder"
     And user "Alice" has copied file with id "<<FILEID>>" as "renamed.txt" into folder "newFolder" inside space "Personal"
@@ -1604,7 +1604,7 @@ Feature: check activities
 
   Scenario: check activities of destination resources after copying file into same folder by renaming the destination file
     Given user "Alice" has created folder "/FOLDER"
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "FOLDER/textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "FOLDER/textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has copied file with id "<<FILEID>>" as "renamed.txt" into folder "FOLDER" inside space "Personal"
     When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API

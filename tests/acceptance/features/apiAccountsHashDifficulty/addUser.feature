@@ -2,7 +2,7 @@
 Feature: add user
   As an admin
   I want to be able to add users and store their password with the full hash difficulty
-  So that I can give people controlled individual access to resources on the ownCloud server
+  So that I can give people controlled individual access to resources on the OpenCloud server
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

@@ -252,7 +252,7 @@ class WebDavHelper {
 			if ($folderDepth !== '') {
 				throw new InvalidArgumentException('Invalid depth value ' . $folderDepth);
 			}
-			$folderDepth = '1'; // oCIS server's default value
+			$folderDepth = '1'; // OpenCloud server's default value
 		}
 		$headers['Depth'] = $folderDepth;
 		return self::makeDavRequest(
@@ -527,7 +527,7 @@ class WebDavHelper {
 		}
 
 		$personalSpaceId = '';
-		if (!OcisHelper::isTestingOnReva()) {
+		if (!OcHelper::isTestingOnReva()) {
 			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
 			Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
 
@@ -610,10 +610,7 @@ class WebDavHelper {
 	/**
 	 * sends a DAV request
 	 *
-	 * @param string|null $baseUrl
-	 * URL of owncloud e.g. http://localhost:8080
-	 * should include the subfolder if owncloud runs in a subfolder
-	 * e.g. http://localhost:8080/owncloud-core
+	 * @param string|null $baseUrl URL of OpenCloud e.g. http://localhost:8080
 	 * @param string|null $user
 	 * @param string|null $password or token when bearer auth is used
 	 * @param string|null $method PUT, GET, DELETE, etc.

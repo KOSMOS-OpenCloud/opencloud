@@ -7,14 +7,14 @@ git config --global advice.detachedHead false
 
 ## CONFIGURE TEST
 
-if [ "$TEST_SOURCE" = "oc10" ]; then
+if [ "$TEST_SOURCE" = "core" ]; then
     export ACCEPTANCE_TEST_TYPE='core-api'
     if [ "$STORAGE_DRIVER" = "ocis" ]; then
         export OC_REVA_DATA_ROOT=''
-        export BEHAT_FILTER_TAGS='~@skipOnOcis-OCIS-Storage'
+        export BEHAT_FILTER_TAGS='~@skipOnOpencloud-OCIS-Storage'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
     elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-S3NG-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing STORAGE selected"
@@ -23,12 +23,12 @@ if [ "$TEST_SOURCE" = "oc10" ]; then
 
     unset BEHAT_SUITE
 
-elif [ "$TEST_SOURCE" = "ocis" ]; then
+elif [ "$TEST_SOURCE" = "opencloud" ]; then
     if [ "$STORAGE_DRIVER" = "ocis" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OCIS-Storage'
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-OCIS-Storage'
         export OC_REVA_DATA_ROOT=''
     elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-S3NG-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing storage selected"

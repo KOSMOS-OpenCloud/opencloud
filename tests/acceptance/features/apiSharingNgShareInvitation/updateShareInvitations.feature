@@ -2,7 +2,7 @@ Feature: Update permission of a share
   As a user
   I want to update resources shared with me
   So that I can have more control over my shares and manage it
-  https://owncloud.dev/libre-graph-api/#/drives.permissions/UpdatePermission
+  https://docs.opencloud.eu/libre-graph-api/#/drives.permissions/UpdatePermission
 
   Background:
     Given these users have been created with default attributes:

@@ -26,7 +26,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
-use TestHelpers\OcisHelper;
+use TestHelpers\OcHelper;
 use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
@@ -203,8 +203,8 @@ trait WebDav {
 
 	/**
 	 * gives the DAV path of a file including the subfolder of the webserver
-	 * e.g. when the server runs in `http://localhost/owncloud/`
-	 * this function will return `owncloud/webdav/prueba.txt`
+	 * e.g. when the server runs in `http://localhost/opencloud/`
+	 * this function will return `opencloud/webdav/prueba.txt`
 	 *
 	 * @param string $user
 	 * @param string $spaceId
@@ -1809,22 +1809,22 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then the HTTP status code of responses on each endpoint should be :ocisStatusCodes on oCIS or :revaStatusCodes on reva
+	 * @Then the HTTP status code of responses on each endpoint should be :ocStatusCodes on OpenCloud or :revaStatusCodes on reva
 	 *
-	 * @param string $ocisStatusCodes a comma-separated string of expected HTTP status codes when running on oCIS
+	 * @param string $ocStatusCodes a comma-separated string of expected HTTP status codes when running on OpenCloud
 	 * @param string $revaStatusCodes a comma-separated string of expected HTTP status codes when running on reva
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBeOcisReva(
-		string $ocisStatusCodes,
+	public function theHTTPStatusCodeOfResponsesOnEachEndpointShouldBeOcReva(
+		string $ocStatusCodes,
 		string $revaStatusCodes
 	): void {
-		if (OcisHelper::isTestingOnReva()) {
+		if (OcHelper::isTestingOnReva()) {
 			$expectedStatusCodes = $revaStatusCodes;
 		} else {
-			$expectedStatusCodes = $ocisStatusCodes;
+			$expectedStatusCodes = $ocStatusCodes;
 		}
 		$this->checkTheHTTPStatusCodeOfResponsesOnEachEndpoint($expectedStatusCodes);
 	}
@@ -3300,7 +3300,7 @@ trait WebDav {
 	 */
 	public function encodePath(string $path): string {
 		// slashes need to stay
-		// in ocis even brackets are encoded
+		// in OpenCloud even brackets are encoded
 		return \str_replace('%2F', '/', \rawurlencode($path));
 	}
 

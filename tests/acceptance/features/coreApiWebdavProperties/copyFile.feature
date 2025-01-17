@@ -6,8 +6,8 @@ Feature: copy file
   Background:
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file 1" to "/textfile1.txt"
     And user "Alice" has created folder "/FOLDER"
 
   @smokeTest
@@ -15,7 +15,7 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     When user "Alice" copies file "/textfile0.txt" to "/FOLDER/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/FOLDER/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/FOLDER/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -27,7 +27,7 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     When user "Alice" copies file "/textfile0.txt" to "/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And the content of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/textfile1.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -40,8 +40,8 @@ Feature: copy file
     # "/textfile1.txt" already exists in the skeleton, make another with only case differences in the file name
     When user "Alice" copies file "/textfile0.txt" to "/TextFile1.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/textfile1.txt" for user "Alice" should be "ownCloud test text file 1"
-    And the content of file "/TextFile1.txt" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/textfile1.txt" for user "Alice" should be "OpenCloud test text file 1"
+    And the content of file "/TextFile1.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -78,7 +78,7 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Brian" has uploaded file with content "OpenCloud test text file 1" to "textfile1.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
@@ -89,7 +89,7 @@ Feature: copy file
     And user "Brian" has copied file "textfile1.txt" to "/testshare/overwritethis.txt"
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/overwritethis.txt" using the WebDAV API
     Then the HTTP status code should be "403"
-    And the content of file "/Shares/testshare/overwritethis.txt" for user "Alice" should be "ownCloud test text file 1"
+    And the content of file "/Shares/testshare/overwritethis.txt" for user "Alice" should be "OpenCloud test text file 1"
     Examples:
       | dav-path-version |
       | old              |
@@ -116,7 +116,7 @@ Feature: copy file
     And user "Alice" has created folder "FOLDER/sample-folder"
     When user "Alice" copies file "/textfile1.txt" to "/FOLDER" using the WebDAV API
     Then the HTTP status code should be "204"
-    And the content of file "/FOLDER" for user "Alice" should be "ownCloud test text file 1"
+    And the content of file "/FOLDER" for user "Alice" should be "OpenCloud test text file 1"
     And as "Alice" folder "/FOLDER/sample-folder" should not exist
     And as "Alice" file "/textfile1.txt" should exist
     Examples:
@@ -700,8 +700,8 @@ Feature: copy file
     And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/textfile0.txt" to "/Shares/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
-    And the content of file "/testshare/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
+    And the content of file "/testshare/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -720,11 +720,11 @@ Feature: copy file
       | shareType       | user      |
       | permissionsRole | Editor    |
     And user "Alice" has a share "testshare" synced
-    And user "Brian" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Brian" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Brian" copies file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "ownCloud test text file 0"
-    And the content of file "/testshare/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
+    And the content of file "/Shares/testshare/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
+    And the content of file "/testshare/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |
@@ -743,12 +743,12 @@ Feature: copy file
       | shareType       | user      |
       | permissionsRole | Editor    |
     And user "Alice" has a share "testshare" synced
-    And user "Alice" has uploaded file with content "ownCloud test text file inside share" to "/Shares/testshare/fileInsideShare.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file inside share" to "/Shares/testshare/fileInsideShare.txt"
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/fileInsideShare.txt" should exist
-    And the content of file "/fileInsideShare.txt" for user "Alice" should be "ownCloud test text file inside share"
-    And the content of file "/testshare/fileInsideShare.txt" for user "Brian" should be "ownCloud test text file inside share"
+    And the content of file "/fileInsideShare.txt" for user "Alice" should be "OpenCloud test text file inside share"
+    And the content of file "/testshare/fileInsideShare.txt" for user "Brian" should be "OpenCloud test text file inside share"
     Examples:
       | dav-path-version |
       | old              |
@@ -805,7 +805,7 @@ Feature: copy file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "ownCloud test text file inside share" to "/testshare/fileInsideShare.txt"
+    And user "Brian" has uploaded file with content "OpenCloud test text file inside share" to "/testshare/fileInsideShare.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
       | space           | Personal  |
@@ -816,8 +816,8 @@ Feature: copy file
     When user "Brian" copies file "testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Brian" file "/fileInsideShare.txt" should exist
-    And the content of file "/Shares/testshare/fileInsideShare.txt" for user "Alice" should be "ownCloud test text file inside share"
-    And the content of file "/fileInsideShare.txt" for user "Brian" should be "ownCloud test text file inside share"
+    And the content of file "/Shares/testshare/fileInsideShare.txt" for user "Alice" should be "OpenCloud test text file inside share"
+    And the content of file "/fileInsideShare.txt" for user "Brian" should be "OpenCloud test text file inside share"
     Examples:
       | dav-path-version |
       | old              |
@@ -986,8 +986,8 @@ Feature: copy file
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/testshare/textfile0.txt" should exist
     And as "Carol" file "/Shares/testshare/textfile0.txt" should exist
-    And the content of file "/Shares/testshare/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
-    And the content of file "/Shares/testshare/textfile0.txt" for user "Carol" should be "ownCloud test text file 0"
+    And the content of file "/Shares/testshare/textfile0.txt" for user "Brian" should be "OpenCloud test text file 0"
+    And the content of file "/Shares/testshare/textfile0.txt" for user "Carol" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |
       | old              |

@@ -23,7 +23,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\OcisHelper;
+use TestHelpers\OcHelper;
 use TestHelpers\OcmHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
@@ -125,7 +125,7 @@ class OcmContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function acceptInvitation(string $user, string $token = null): ResponseInterface {
+	public function acceptInvitation(string $user, ?string $token = null): ResponseInterface {
 		$providerDomain = $this->featureContext->getLocalBaseUrlWithoutScheme();
 		if ($this->featureContext->getCurrentServer() === "LOCAL") {
 			$providerDomain = $this->featureContext->getRemoteBaseUrlWithoutScheme();

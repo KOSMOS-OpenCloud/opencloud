@@ -1,4 +1,4 @@
-module ociswrapper
+module ocwrapper
 
 go 1.20
 

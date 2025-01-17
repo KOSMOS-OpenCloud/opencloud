@@ -3,7 +3,7 @@
 Feature: create a public link share
   As a user
   I want to create public links
-  So that I can share resources to people who aren't owncloud users
+  So that I can share resources to people who aren't OpenCloud users
 
   Background:
     Given user "Alice" has been created with default attributes
@@ -230,7 +230,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Do not allow public sharing of the root on OCIS when the default permission is read and access using the public WebDAV API
+  Scenario Outline: Do not allow public sharing of the root on OpenCloud when the default permission is read and access using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
       | path     | /        |

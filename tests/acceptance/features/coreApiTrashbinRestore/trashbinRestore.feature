@@ -2,7 +2,7 @@
 Feature: restore deleted files/folders
   As a user
   I would like to restore files/folders
-  So that I can recover accidentally deleted files/folders in ownCloud
+  So that I can recover accidentally deleted files/folders in OpenCloud
 
   Background:
     Given user "Alice" has been created with default attributes

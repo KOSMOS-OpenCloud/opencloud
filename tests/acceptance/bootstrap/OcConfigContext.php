@@ -23,14 +23,14 @@
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
-use TestHelpers\OcisConfigHelper;
+use TestHelpers\OcConfigHelper;
 use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
 
 /**
- * steps needed to re-configure oCIS server
+ * steps needed to re-configure OpenCloud server
  */
-class OcisConfigContext implements Context {
+class OcConfigContext implements Context {
 	private array $enabledPermissionsRoles = [];
 
 	/**
@@ -64,7 +64,7 @@ class OcisConfigContext implements Context {
 			"POSTPROCESSING_DELAY" => $delayTime . "s",
 		];
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response =  OcConfigHelper::reConfigureOc($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -86,7 +86,7 @@ class OcisConfigContext implements Context {
 			$configVariable => $configValue,
 		];
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response =  OcConfigHelper::reConfigureOc($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -111,7 +111,7 @@ class OcisConfigContext implements Context {
 		$envs = [
 			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
 		];
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response =  OcConfigHelper::reConfigureOc($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -137,7 +137,7 @@ class OcisConfigContext implements Context {
 		$envs = [
 			"GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles),
 		];
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response =  OcConfigHelper::reConfigureOc($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -157,7 +157,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
 		$path = \dirname(__FILE__) . "/../../" . $path;
-		$response =  OcisConfigHelper::reConfigureOcis(
+		$response =  OcConfigHelper::reConfigureOc(
 			[
 				$configVariable => $path
 			]
@@ -183,7 +183,7 @@ class OcisConfigContext implements Context {
 			$envs[$row['config']] = $row['value'];
 		}
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response =  OcConfigHelper::reConfigureOc($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -196,12 +196,12 @@ class OcisConfigContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function rollbackOcis(): void {
-		$response = OcisConfigHelper::rollbackOcis();
+	public function rollbackOc(): void {
+		$response = OcConfigHelper::rollbackOc();
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper."
+			"Failed to rollback OpenCloud server. Check if OpenCloud is started with ocwrapper."
 		);
 	}
 }

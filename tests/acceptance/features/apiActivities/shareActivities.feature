@@ -8,7 +8,7 @@ Feature: check share activity
       | username |
       | Alice    |
       | Brian    |
-    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Alice" has uploaded file with content "OpenCloud test text file" to "textfile.txt"
 
 
   Scenario: check activities after adding share to a file
@@ -1942,7 +1942,7 @@ Feature: check share activity
 
   @issue-9860
   Scenario: sharee tries to check the activities of unshared file
-    Given user "Alice" has uploaded file with content "another ownCloud test text file" to "anotherTextfile.txt"
+    Given user "Alice" has uploaded file with content "another OpenCloud test text file" to "anotherTextfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
       | space           | Personal     |

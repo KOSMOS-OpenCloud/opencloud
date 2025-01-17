@@ -1,7 +1,7 @@
 package config
 
 var config = map[string]string{
-	"bin":           "/usr/bin/ocis",
+	"bin":           "/usr/bin/opencloud",
 	"url":           "https://localhost:9200",
 	"retry":         "5",
 	"adminUsername": "",

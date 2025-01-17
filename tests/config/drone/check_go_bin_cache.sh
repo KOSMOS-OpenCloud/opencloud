@@ -14,7 +14,7 @@ BINGO_DIR="$ROOT_PATH/.bingo"
 # generate hash of a .bingo folder
 BINGO_HASH=$(cat "$BINGO_DIR"/* | sha256sum | cut -d ' ' -f 1)
 
-URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/$2"
+URL="$CACHE_ENDPOINT/$CACHE_BUCKET/opencloud/go-bin/$BINGO_HASH/$2"
 if curl --output /dev/null --silent --head --fail "$URL"; then
     echo "[INFO] Go bin cache with has '$BINGO_HASH' exists."
     # https://discourse.drone.io/t/how-to-exit-a-pipeline-early-without-failing/3951

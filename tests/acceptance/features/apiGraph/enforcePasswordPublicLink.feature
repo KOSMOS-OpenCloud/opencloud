@@ -275,7 +275,7 @@ Feature: enforce password on public link
       | password | http-status-code | ocs-status-code | message                                                                                               |
       | 123      | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | password | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
-      | ownCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | OpenCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
 
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
@@ -294,4 +294,4 @@ Feature: enforce password on public link
       | password | http-status-code | ocs-status-code | message                                                                                               |
       | 123      | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | password | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
-      | ownCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | OpenCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |

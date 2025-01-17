@@ -1,5 +1,5 @@
 Feature: Update a link share for a resource
-  https://owncloud.dev/libre-graph-api/#/drives.permissions/CreateLink
+  https://docs.opencloud.eu/libre-graph-api/#/drives.permissions/CreateLink
 
   Background:
     Given these users have been created with default attributes:
@@ -281,7 +281,7 @@ Feature: Update a link share for a resource
       | banned-password |
       | 123             |
       | password        |
-      | ownCloud        |
+      | OpenCloud        |
 
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a folder inside project-space using permissions endpoint

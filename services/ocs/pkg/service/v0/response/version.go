@@ -42,7 +42,7 @@ func OcsV1StatusCodes(meta data.Meta) int {
 // see https://github.com/owncloud/core/blob/c08baf580927ecb8ec179028dda255fdd85b4568/lib/private/legacy/api.php#L528
 // also HTTP status codes for apps are the same as OCS codes
 // see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
-// I think this is a bug in the ocs v2 api, but since we are going to mimic bugs in ocis ... here goes
+// I think this is a bug in the ocs v2 api, but since we are going to mimic bugs in OpenCloud ... here goes
 func OcsV2StatusCodes(meta data.Meta) int {
 	sc := meta.StatusCode
 	switch sc {

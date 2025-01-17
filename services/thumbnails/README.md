@@ -109,7 +109,7 @@ export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 Then you just need to set the `ENABLE_VIPS` variable on the `make` command:
 
 ```shell
-make -C OpenCloud build ENABLE_VIPS=1
+make -C opencloud build ENABLE_VIPS=1
 ```
 
 Or include the `enable_vips` build tag in the `go build` command:

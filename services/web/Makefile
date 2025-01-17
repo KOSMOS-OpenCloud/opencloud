@@ -33,7 +33,7 @@ ci-node-generate: pull-assets
 .PHONY: pull-assets
 pull-assets:
 	git clean -xfd assets
-	rm -rf _web && git clone -b main --single-branch git@github.com:opencloud-eu/web.git _web
+	rm -rf _web && git clone -b main --depth 1 git@github.com:opencloud-eu/web.git _web
 	make -C _web release
 	tar xfv _web/release/web.tar.gz -C assets/core/
 	cp -r _web/dev/docker/ocis-themes/opencloud assets/core/themes/ && rm -rf assets/core/themes/owncloud

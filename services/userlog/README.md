@@ -38,7 +38,7 @@ For the time being, the configuration which user related events are of interest 
 
 ## Retrieving
 
-The `userlog` service provides an API to retrieve configured events. For now, this API is mostly following the [oc10 notification GET API](https://doc.owncloud.com/server/next/developer_manual/core/apis/ocs-notification-endpoint-v1.html#get-user-notifications).
+The `userlog` service provides an API to retrieve configured events. For now, this API is mostly following the [oc10 notification GET API](https://docs.opencloud.eu/server/next/developer_manual/core/apis/ocs-notification-endpoint-v1.html#get-user-notifications).
 
 ## Posting
 
@@ -72,7 +72,7 @@ For example, for the language `de`, one needs to place the corresponding transla
 
 <!-- also see the notifications readme -->
 
-Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
+Important: For the time being, the embedded OpenCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 

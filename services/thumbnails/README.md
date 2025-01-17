@@ -10,11 +10,11 @@ The relevant environment variables defining file locations are:
 -   (2) `STORAGE_USERS_OCIS_ROOT`
 -   (3) `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 
-(1) ... Having a default set by the Infinite Scale code, but if defined, used as base path for other services.
+(1) ... Having a default set by the OpenCloud code, but if defined, used as base path for other services.
 (2) ... Source files, defaults to (1) plus path component, but can be freely defined if required.
 (3) ... Target files, defaults to (1) plus path component, but can be freely defined if required.
 
-For details and defaults for these environment variables see the ocis admin documentation.
+For details and defaults for these environment variables see the OpenCloud admin documentation.
 
 ## Thumbnail Location
 
@@ -95,9 +95,9 @@ If a resource is shared using SecureView, the share reciever will get a 403 (for
 To improve performance and to support a wider range of images formats, the thumbnails service is able to utilize the [libvips library](https://www.libvips.org/) for thumbnail generation. Support for libvips needs to be
 enabled at buildtime and has a couple of implications:
 
-*  With libvips support enabled, it is not possible to create a statically linked ocis binary.
-*  Therefore, the libvips shared libraries need to be available at runtime in the same release that was used to build the ocis binary.
-*  When using the ocis docker images, the libvips shared libraries are included in the image and are correctly embedded.
+*  With libvips support enabled, it is not possible to create a statically linked OpenCloud binary.
+*  Therefore, the libvips shared libraries need to be available at runtime in the same release that was used to build the OpenCloud binary.
+*  When using the OpenCloud docker images, the libvips shared libraries are included in the image and are correctly embedded.
 
 Support of libvips is disabled by default. To enable it, make sure libvips and its buildtime dependencies are installed in your build environment. For macOS users, add the build time dependencies via:
 
@@ -109,15 +109,15 @@ export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 Then you just need to set the `ENABLE_VIPS` variable on the `make` command:
 
 ```shell
-make -C ocis build ENABLE_VIPS=1
+make -C OpenCloud build ENABLE_VIPS=1
 ```
 
 Or include the `enable_vips` build tag in the `go build` command:
 
 ```shell
-go build -tags enable_vips -o ocis -o bin/ocis ./cmd/ocis
+go build -tags enable_vips -o opencloud -o bin/opencloud ./cmd/opencloud
 ```
 
-When building a docker image using the Dockerfile in the top-level directory of ocis, libvips support is enabled and the libvips shared libraries are included
+When building a docker image using the Dockerfile in the top-level directory of OpenCloud, libvips support is enabled and the libvips shared libraries are included
 in the resulting docker image.
 

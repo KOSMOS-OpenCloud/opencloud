@@ -43,7 +43,7 @@ type Service struct {
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config, logger log.Logger) settings.ServiceHandler {
 	service := Service{
-		id:     "ocis-settings",
+		id:     "opencloud-settings",
 		config: cfg,
 		logger: logger,
 	}

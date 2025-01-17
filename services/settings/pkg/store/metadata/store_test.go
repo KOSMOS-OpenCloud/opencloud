@@ -39,7 +39,7 @@ const (
 	value3 = "b42702d2-5e4d-4d73-b133-e1f9e285355e"
 )
 
-// use "unit" or "integration" do define test type. You need a running ocis instance for integration tests
+// use "unit" or "integration" do define test type. You need a running OpenCloud instance for integration tests
 var testtype = "unit"
 
 // MockedMetadataClient mocks the metadataservice inmemory

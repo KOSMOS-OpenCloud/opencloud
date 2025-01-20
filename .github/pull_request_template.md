@@ -48,8 +48,7 @@ Please set the following labels:
 
 ## Checklist:
 <!-- Tick the checkboxes when done. -->
-<!-- Raise documentation ticket in opencloud.github.io/ -->
 - [ ] Code changes
 - [ ] Unit tests added
 - [ ] Acceptance tests added
-- [ ] Documentation ticket raised: <link> 
+- [ ] Documentation added

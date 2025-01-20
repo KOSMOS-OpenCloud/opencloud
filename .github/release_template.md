@@ -1,5 +1,5 @@
 ### Template
-[Release Template](https://github.com/opencloud-eu/opencloud/blob/master/.github/release_template.md)
+[Release Template](https://github.com/opencloud-eu/opencloud/blob/main/.github/release_template.md)
 
 ### Prerequisites
 

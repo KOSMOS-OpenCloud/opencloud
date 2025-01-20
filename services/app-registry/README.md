@@ -12,7 +12,7 @@ Administrators can set default applications for each MIME type and also allow th
 
 ### MIME Type Configuration
 
-Modifing the MIME type config can only be achieved via a yaml configuration. Using environment variables is not possible. For an example, see the `ocis_full/config/ocis/app-registry.yaml` at [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples). The following is a brief structure and a field description:
+Modifing the MIME type config can only be achieved via a yaml configuration. Using environment variables is not possible. For an example, see the `opencloud_full/config/opencloud/app-registry.yaml` at [docker-compose example](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples). The following is a brief structure and a field description:
 
 **Structure**
 
@@ -46,23 +46,11 @@ The name of the default app which opens this MIME type if the user doesn’t spe
 * `allow_creation`\
 Whether a user should be able to create new files of that MIME type (true or false).
 
-## App Drivers
-
-App drivers represent apps if the app is not able to register itself. Currently there is only the CS3org WOPI server app driver.
-
-### CS3org WOPI Server App Driver
-
-The CS3org WOPI server app driver is included in Infinite Scale by default. It needs at least one WOPI-compliant app like Collabora, OnlyOffice or the Microsoft Online Server or a CS3org WOPI bridge supported app like CodiMD or Etherpad and the [CS3org WOPI server](https://github.com/cs3org/wopiserver).
-
-### App Provider Configuration
-
-The configuration of the actual app provider in a [docker-compose example](https://github.com/owncloud/ocis/tree/master/deployments/examples) can be found in the full `ocis-wopi` example directory especially in the config sections `ocis-appprovider-collabora` and `ocis-appprovider-onlyoffice`.
-
 ## Endpoint Access
 
 ### Listing available apps and mime types
 
-Clients, for example ownCloud Web, need to offer users the available apps to open files and mime types for new file creation. This information can be obtained from this endpoint.
+Clients, for example OpenCloud Web, need to offer users the available apps to open files and mime types for new file creation. This information can be obtained from this endpoint.
 
 **Endpoint**: specified in the capabilities in `apps_url`, currently `/app/list`
 

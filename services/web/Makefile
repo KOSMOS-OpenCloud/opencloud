@@ -46,4 +46,4 @@ ci-node-check-licenses: # OpenCloud Web does the check on it's own
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
 	@mkdir -p ../../third-party-licenses/node/web
-	@curl --fail -slL -o- https://github.com/opencloud/web/releases/download/$(WEB_ASSETS_VERSION)/third-party-licenses.tar.gz | tar xzf - -C ../../third-party-licenses/node/web
+	@curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/third-party-licenses.tar.gz | tar xzf - -C ../../third-party-licenses/node/web

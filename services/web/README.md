@@ -1,6 +1,6 @@
 # Web
 
-The web service embeds and serves the static files for the [Infinite Scale Web Client](https://github.com/owncloud/web).
+The web service embeds and serves the static files for the [OpenCloud Web Client](https://github.com/opencloud-eu/web).
 Note that clients will respond with a connection error if the web service is not available.
 
 The web service also provides a minimal API for branding functionality like changing the logo shown.
@@ -9,7 +9,7 @@ The web service also provides a minimal API for branding functionality like chan
 
 If you want to use your custom compiled web client assets instead of the embedded ones,
 then you can do that by setting the `WEB_ASSET_PATH` variable to point to your compiled files.
-See [ownCloud Web / Getting Started](https://owncloud.dev/clients/web/getting-started/) and [ownCloud Web / Setup with oCIS](https://owncloud.dev/clients/web/backend-ocis/) for more details.
+See [OpenCloud Web / Getting Started](https://docs.opencloud.eu/clients/web/getting-started/) and [OpenCloud Web / Setup with OpenCloud](https://docs.opencloud.eu/clients/web/backend-opencloud/) for more details.
 
 ## Web UI Configuration
 
@@ -25,14 +25,14 @@ for more details.
 ### Web UI Config File
 
 When defined via the `WEB_UI_CONFIG_FILE` environment variable, the configuration of the web UI can be made
-with a [json based](https://github.com/owncloud/web/tree/master/config) file.
+with a [json based](https://github.com/opencloud-eu/web/tree/master/config) file.
 
 ### Embedding Web
 
 Web can be consumed by another application in a stripped down version called “Embed mode”.
 This mode is supposed to be used in the context of selecting or sharing resources.
 
-For more details see the developer documentation [ownCloud Web / Embed Mode](https://owncloud.dev/clients/web/embed-mode/).
+For more details see the developer documentation [OpenCloud Web / Embed Mode](https://docs.opencloud.eu/clients/web/embed-mode/).
 See the environment variables: `WEB_OPTION_MODE` and `WEB_OPTION_EMBED_TARGET` to configure the embedded mode.
 
 ## Web Apps
@@ -46,7 +46,7 @@ and does not support injection of dynamic web applications (custom dynamic backe
 ### Loading Themes
 
 Web themes are loaded, if added in the Infinite Scale source code, at build-time from
-`<ocis_repo>/services/web/assets/themes`.
+`<opencloud_repo>/services/web/assets/themes`.
 This cannot be manipulated at runtime.
 
 Additionally, the administrator can provide custom themes by storing it in the path defined by the environment
@@ -58,9 +58,9 @@ This can be done by setting the `WEB_UI_THEME_PATH` environment variable.
 The final theme is composed of the built-in and the custom theme provided by the
 administrator via `WEB_ASSET_THEMES_PATH` and `WEB_UI_THEME_PATH`.
 
-For example, Infinite Scale by default contains a built-in ownCloud theme.
+For example, OpenCloud by default contains a built-in OpenCloud theme.
 If the administrator provides a custom theme via the `WEB_ASSET_THEMES_PATH` directory like,
-`WEB_ASSET_THEMES_PATH/owncloud/themes.json`, this one will be used instead of the built-in one.
+`WEB_ASSET_THEMES_PATH/opencloud/themes.json`, this one will be used instead of the built-in one.
 
 Some theme keys are mandatory, like the `common.shareRoles` settings.
 Such mandatory keys are injected automatically at runtime if not provided.
@@ -68,7 +68,7 @@ Such mandatory keys are injected automatically at runtime if not provided.
 ### Loading Applications
 
 Web applications are loaded, if added in the Infinite Scale source code, at build-time from
-`<ocis_repo>/services/web/assets/apps`. This cannot be manipulated at runtime.
+`<opencloud_repo>/services/web/assets/apps`. This cannot be manipulated at runtime.
 
 Additionally, the administrator can provide custom applications by storing them in the path defined by the environment
 variable `WEB_ASSET_APPS_PATH`.

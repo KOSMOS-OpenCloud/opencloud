@@ -8,7 +8,7 @@ type HTTP struct {
 	TLS       shared.HTTPServiceTLS `yaml:"tls"`
 	Namespace string                `yaml:"-"`
 	Root      string                `yaml:"root" env:"WEB_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service." introductionVersion:"pre5.0"`
-	CacheTTL  int                   `yaml:"cache_ttl" env:"WEB_CACHE_TTL" desc:"Cache policy in seconds for ownCloud Web assets." introductionVersion:"pre5.0"`
+	CacheTTL  int                   `yaml:"cache_ttl" env:"WEB_CACHE_TTL" desc:"Cache policy in seconds for OpenCloud Web assets." introductionVersion:"pre5.0"`
 	CORS      CORS                  `yaml:"cors"`
 }
 

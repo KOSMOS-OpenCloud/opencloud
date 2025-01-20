@@ -95,7 +95,7 @@ func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// LogoUpload implements the endpoint to upload a custom logo for the oCIS instance.
+// LogoUpload implements the endpoint to upload a custom logo for the OpenCloud instance.
 func (s Service) LogoUpload(w http.ResponseWriter, r *http.Request) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {

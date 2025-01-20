@@ -41,7 +41,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 	}
 	targetBackupConfig := ""
 	if err != nil {
-		targetBackupConfig, err = backupOcisConfigFile(configPath)
+		targetBackupConfig, err = backupOpenCloudConfigFile(configPath)
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 	}
 
 	// Load old config
-	var oldCfg OcisConfig
+	var oldCfg OpenCloudConfig
 	if diff {
 		fp, err := os.ReadFile(path.Join(configPath, configFilename))
 		if err != nil {
@@ -65,10 +65,10 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 	}
 
 	var (
-		systemUserID, adminUserID, graphApplicationID, storageUsersMountID, serviceAccountID  string
-		idmServicePassword, idpServicePassword, ocisAdminServicePassword, revaServicePassword string
-		tokenManagerJwtSecret, collaborationWOPISecret, machineAuthAPIKey, systemUserAPIKey   string
-		revaTransferSecret, thumbnailsTransferSecret, serviceAccountSecret                    string
+		systemUserID, adminUserID, graphApplicationID, storageUsersMountID, serviceAccountID string
+		idmServicePassword, idpServicePassword, ocAdminServicePassword, revaServicePassword  string
+		tokenManagerJwtSecret, collaborationWOPISecret, machineAuthAPIKey, systemUserAPIKey  string
+		revaTransferSecret, thumbnailsTransferSecret, serviceAccountSecret                   string
 	)
 
 	if diff {
@@ -80,7 +80,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 
 		idmServicePassword = oldCfg.Idm.ServiceUserPasswords.IdmPassword
 		idpServicePassword = oldCfg.Idm.ServiceUserPasswords.IdpPassword
-		ocisAdminServicePassword = oldCfg.Idm.ServiceUserPasswords.AdminPassword
+		ocAdminServicePassword = oldCfg.Idm.ServiceUserPasswords.AdminPassword
 		revaServicePassword = oldCfg.Idm.ServiceUserPasswords.RevaPassword
 		tokenManagerJwtSecret = oldCfg.TokenManager.JWTSecret
 		collaborationWOPISecret = oldCfg.Collaboration.WopiApp.Secret
@@ -110,11 +110,11 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		if err != nil {
 			return fmt.Errorf("could not generate random password for idp: %s", err)
 		}
-		ocisAdminServicePassword = adminPassword
-		if ocisAdminServicePassword == "" {
-			ocisAdminServicePassword, err = generators.GenerateRandomPassword(passwordLength)
+		ocAdminServicePassword = adminPassword
+		if ocAdminServicePassword == "" {
+			ocAdminServicePassword, err = generators.GenerateRandomPassword(passwordLength)
 			if err != nil {
-				return fmt.Errorf("could not generate random password for ocis admin: %s", err)
+				return fmt.Errorf("could not generate random password for opencloud admin: %s", err)
 			}
 		}
 
@@ -157,7 +157,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		ServiceAccountSecret: serviceAccountSecret,
 	}
 
-	cfg := OcisConfig{
+	cfg := OpenCloudConfig{
 		TokenManager: TokenManager{
 			JWTSecret: tokenManagerJwtSecret,
 		},
@@ -168,7 +168,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		AdminUserID:       adminUserID,
 		Idm: IdmService{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
-				AdminPassword: ocisAdminServicePassword,
+				AdminPassword: ocAdminServicePassword,
 				IdpPassword:   idpServicePassword,
 				RevaPassword:  revaServicePassword,
 				IdmPassword:   idmServicePassword,
@@ -296,5 +296,5 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 	if diff {
 		return writePatch(configPath, yamlOutput)
 	}
-	return writeConfig(configPath, ocisAdminServicePassword, targetBackupConfig, yamlOutput)
+	return writeConfig(configPath, ocAdminServicePassword, targetBackupConfig, yamlOutput)
 }

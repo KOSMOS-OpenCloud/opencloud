@@ -26,7 +26,7 @@ func configExists(configPath string) bool {
 	return false
 }
 
-func backupOcisConfigFile(configPath string) (string, error) {
+func backupOpenCloudConfigFile(configPath string) (string, error) {
 	sourceConfig := path.Join(configPath, configFilename)
 	targetBackupConfig := path.Join(configPath, configFilename+"."+time.Now().Format("2006-01-02-15-04-05")+".backup")
 	source, err := os.Open(sourceConfig)
@@ -46,16 +46,16 @@ func backupOcisConfigFile(configPath string) (string, error) {
 	return targetBackupConfig, nil
 }
 
-// printBanner prints the generated OCIS config banner.
-func printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig string) {
+// printBanner prints the generated opencloud config banner.
+func printBanner(targetPath, ocAdminServicePassword, targetBackupConfig string) {
 	fmt.Printf(
 		"\n=========================================\n"+
-			" generated OCIS Config\n"+
+			" generated OpenCloud Config\n"+
 			"=========================================\n"+
 			" configpath : %s\n"+
 			" user       : admin\n"+
 			" password   : %s\n\n",
-		targetPath, ocisAdminServicePassword)
+		targetPath, ocAdminServicePassword)
 	if targetBackupConfig != "" {
 		fmt.Printf("\n=========================================\n"+
 			"An older config file has been backuped to\n %s\n\n",
@@ -64,13 +64,13 @@ func printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig string
 }
 
 // writeConfig writes the config to the target path and prints a banner
-func writeConfig(configPath, ocisAdminServicePassword, targetBackupConfig string, yamlOutput []byte) error {
+func writeConfig(configPath, ocAdminServicePassword, targetBackupConfig string, yamlOutput []byte) error {
 	targetPath := path.Join(configPath, configFilename)
 	err := os.WriteFile(targetPath, yamlOutput, 0600)
 	if err != nil {
 		return err
 	}
-	printBanner(targetPath, ocisAdminServicePassword, targetBackupConfig)
+	printBanner(targetPath, ocAdminServicePassword, targetBackupConfig)
 	return nil
 }
 
@@ -98,7 +98,7 @@ func writePatch(configPath string, yamlOutput []byte) error {
 	if err != nil {
 		return err
 	}
-	patchPath := path.Join(configPath, "ocis.config.patch")
+	patchPath := path.Join(configPath, "opencloud.config.patch")
 	err = os.WriteFile(patchPath, stdout, 0600)
 	if err != nil {
 		return err

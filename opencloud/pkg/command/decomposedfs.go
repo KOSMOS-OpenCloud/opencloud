@@ -64,7 +64,7 @@ func checkCmd(cfg *config.Config) *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  "repair",
-				Usage: "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while ownCloud Infinite Scale is not running.",
+				Usage: "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while OpenCloud is not running.",
 			},
 			&cli.BoolFlag{
 				Name:  "force",
@@ -80,7 +80,7 @@ func check(c *cli.Context) error {
 	repairFlag := c.Bool("repair")
 
 	if repairFlag && !c.Bool("force") {
-		answer := strings.ToLower(stringPrompt("IMPORTANT: Only use '--repair' when ownCloud Infinite Scale is not running. Do you want to continue? [yes | no = default]"))
+		answer := strings.ToLower(stringPrompt("IMPORTANT: Only use '--repair' when OpenCloud is not running. Do you want to continue? [yes | no = default]"))
 		if answer != "yes" && answer != "y" {
 			return nil
 		}

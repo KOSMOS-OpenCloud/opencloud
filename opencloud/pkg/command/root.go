@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Execute is the entry point for the ocis command.
+// Execute is the entry point for the opencloud command.
 func Execute() error {
 	cfg := config.DefaultConfig()
 

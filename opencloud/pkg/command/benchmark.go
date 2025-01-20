@@ -91,7 +91,7 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 			// other flags
 			&cli.StringFlag{
 				Name:  "bearer-token-command",
-				Usage: "Command to execute for a bearer token, e.g. 'oidc-token OCIS'. When set, disables basic auth.",
+				Usage: "Command to execute for a bearer token, e.g. 'oidc-token opencloud'. When set, disables basic auth.",
 			},
 			&cli.IntFlag{
 				Name:  "every",
@@ -299,7 +299,7 @@ func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
 
 			path := c.String("path")
 			if path == "" {
-				f, err := os.CreateTemp("", "ocis-bench-temp-")
+				f, err := os.CreateTemp("", "opencloud-bench-temp-")
 				if err != nil {
 					log.Fatal(err)
 				}

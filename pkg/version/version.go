@@ -23,10 +23,10 @@ var (
 	//Date = time.Now().Format("20060102")
 	Date = "dev"
 
-	// Legacy defines the old long 4 number ownCloud version needed for some clients
+	// Legacy defines the old long 4 number OpenCloud version needed for some clients
 	Legacy = "10.11.0.0"
 
-	// LegacyString defines the old ownCloud version needed for some clients
+	// LegacyString defines the old OpenCloud version needed for some clients
 	LegacyString = "10.11.0"
 )
 

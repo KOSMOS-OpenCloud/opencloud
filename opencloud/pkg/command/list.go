@@ -15,7 +15,7 @@ import (
 func ListCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "list",
-		Usage:    "list oCIS services running in the runtime (supervised mode)",
+		Usage:    "list OpenCloud services running in the runtime (supervised mode)",
 		Category: "runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{

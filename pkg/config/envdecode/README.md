@@ -10,7 +10,7 @@ nested structs, but it will not allocate new pointers to structs.
 ## API
 
 Full API docs are available on
-[godoc.org](https://godoc.org/github.com/owncloud/ocis/ocis-pkg/config/envdecode).
+[godoc.org](https://godoc.org/github.com/opencloud-eu/opencloud/pkg/config/envdecode).
 
 Define a struct with `env` struct tags:
 

@@ -7,12 +7,12 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/config"
 )
 
-// Runtime represents an oCIS runtime environment.
+// Runtime represents an OpenCloud runtime environment.
 type Runtime struct {
 	c *config.Config
 }
 
-// New creates a new oCIS + micro runtime
+// New creates a new OpenCloud + micro runtime
 func New(cfg *config.Config) Runtime {
 	return Runtime{
 		c: cfg,

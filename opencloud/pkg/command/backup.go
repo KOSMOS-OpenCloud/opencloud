@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	ocbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
 	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/backup"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
@@ -18,7 +18,7 @@ import (
 func BackupCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "backup",
-		Usage: "ocis backup functionality",
+		Usage: "OpenCloud backup functionality",
 		Subcommands: []*cli.Command{
 			ConsistencyCommand(cfg),
 		},
@@ -41,7 +41,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:     "basepath",
 				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/ocis/storage/users)",
+				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)",
 				Required: true,
 			},
 			&cli.StringFlag{
@@ -77,7 +77,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 					s3bs.Options{},
 				)
 			case "ocis":
-				bs, err = ocisbs.New(basePath)
+				bs, err = ocbs.New(basePath)
 			case "none":
 				bs = nil
 			default:

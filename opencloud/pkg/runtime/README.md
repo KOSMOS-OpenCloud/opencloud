@@ -1,6 +1,6 @@
-# ownCloud Infinite Scale: Runtime
+# OpenCloud: Runtime
 
-Pman is a slim utility library for supervising long-running processes. It can be [embedded](https://github.com/owncloud/OCIS/blob/ea2a2b328e7261ed72e65adf48359c0a44e14b40/OCIS/pkg/runtime/runtime.go#L84) or used as a cli command.
+Pman is a slim utility library for supervising long-running processes. It can be embedded or used as a cli command.
 
 When used as a CLI command it relays actions to a running runtime.
 
@@ -10,7 +10,7 @@ Start a runtime
 
 ```go
 package main
-import "github.com/owncloud/ocis/ocis/pkg/runtime/service"
+import "github.com/opencloude-eu/opencloud/opencloud/pkg/runtime/service"
 
 func main() {
     service.Start()
@@ -28,8 +28,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/runtime/process"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/runtime/service"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
@@ -65,4 +65,4 @@ func main() {
 }
 ```
 
-Run the example above with `RUNTIME_KEEP_ALIVE=true` and with no `RUNTIME_KEEP_ALIVE` set to see its behavior. It requires an [oCIS binary](https://github.com/owncloud/ocis/releases) present in your `$PATH` for it to work.
+Run the example above with `RUNTIME_KEEP_ALIVE=true` and with no `RUNTIME_KEEP_ALIVE` set to see its behavior. It requires an [OpenCloud binary](https://github.com/opencloud-eu/opencloud/releases) present in your `$PATH` for it to work.

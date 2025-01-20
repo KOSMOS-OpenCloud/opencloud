@@ -11,7 +11,7 @@ The search service is responsible for metadata and content extraction, stores th
 *   The search service consumes events and does not block other tasks.
 *   When looking for content extraction, [Apache Tika - a content analysis toolkit](https://tika.apache.org) can be used but needs to be installed separately.
 
-Extractions are stored as index via the search service. Consider that indexing requires adequate storage capacity - and the space requirement will grow. To avoid filling up the filesystem with the index and rendering Infinite Scale unusable, the index should reside on its own filesystem.
+Extractions are stored as index via the search service. Consider that indexing requires adequate storage capacity - and the space requirement will grow. To avoid filling up the filesystem with the index and rendering OpenCloud unusable, the index should reside on its own filesystem.
 
 You can change the path to where search maintains its data in case the filesystem gets close to full and you need to relocate the data. Stop the service, move the data, reconfigure the path in the environment variable and restart the service.
 
@@ -39,7 +39,7 @@ Not all parts are supported, the following list gives an overview of parts that 
 *   NEAR operator
 *   Date intervals
 
-In the following [ADR](https://github.com/owncloud/ocis/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why we chose KQL.
+In the following [ADR](https://github.com/opencloud-eu/opencloud/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why we chose KQL.
 
 ## Extraction Engines
 
@@ -54,7 +54,7 @@ The search service is able to manage and retrieve many types of information. For
 
 ### Basic Extractor
 
-This extractor is the most simple one and just uses the resource information provided by Infinite Scale. It does not do any further analysis. The following fields are included in the index: `Name`, `Size`, `MimeType`, `Tags`, `Mtime`.
+This extractor is the most simple one and just uses the resource information provided by OpenCloud. It does not do any further analysis. The following fields are included in the index: `Name`, `Size`, `MimeType`, `Tags`, `Mtime`.
 
 ### Tika Extractor
 
@@ -74,7 +74,7 @@ When extracting content, you can specify whether [stop words](https://en.wikiped
 
 When using the Tika container and docker-compose, consider the following:
 
-*   See the [ocis_full](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full) example.
+*   See the [opencloud_full](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples/opencloud_full) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
 
 If using the `tika` extractor, make sure to also set `FRONTEND_FULL_TEXT_SEARCH_ENABLED` in the frontend service to `true`. This will tell the webclient that full-text search has been enabled.
@@ -121,7 +121,7 @@ This case is similar to [Folder created](#folder-created) with the difference th
 
 #### File Version Restored
 
-Since Infinite Scale is capable of storing multiple versions of the same file, the search service also needs to take care of those versions. When a file version is restored, the service starts to extract all needed information, creates the index and makes the file discoverable.
+Since OpenCloud is capable of storing multiple versions of the same file, the search service also needs to take care of those versions. When a file version is restored, the service starts to extract all needed information, creates the index and makes the file discoverable.
 
 #### Resource Tag Added
 
@@ -144,13 +144,13 @@ This is exactly the same as [File uploaded - synchronous](#file-uploaded---synch
 The service includes a command-line interface to trigger re-indexing a space:
 
 ```shell
-ocis search index --space $SPACE_ID
+opencloud search index --space $SPACE_ID
 ```
 
 It can also be used to re-index all spaces:
 
 ```shell
-ocis search index --all-spaces
+opencloud search index --all-spaces
 ```
 
 Note that either `--space $SPACE_ID` or `--all-spaces` must be set.

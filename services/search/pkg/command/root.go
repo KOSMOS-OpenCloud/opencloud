@@ -24,11 +24,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-search command.
+// Execute is the entry point for the opencloud-search command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "search",
-		Usage:    "Serve search API for oCIS",
+		Usage:    "Serve search API for OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 	return app.RunContext(cfg.Context, os.Args)

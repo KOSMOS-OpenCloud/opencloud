@@ -9,13 +9,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/engine"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/query/bleve"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 var _ = Describe("Bleve", func() {

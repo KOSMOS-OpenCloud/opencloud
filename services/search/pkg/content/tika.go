@@ -12,10 +12,10 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/go-tika/tika"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 // Tika is used to extract content from a resource,

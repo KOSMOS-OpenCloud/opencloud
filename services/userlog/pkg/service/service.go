@@ -68,7 +68,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		valueClient:      o.ValueClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
 		tp:               o.TraceProvider,
-		tracer:           o.TraceProvider.Tracer("github.com/owncloud/ocis/services/userlog/pkg/service"),
+		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/userlog/pkg/service"),
 		publisher:        o.Stream,
 		filter:           newUserlogFilter(o.Logger, o.ValueClient),
 	}

@@ -33,8 +33,8 @@ ci-node-generate: assets
 assets: pnpm-build \
 		assets/identifier/static \
 		assets/identifier/static/favicon.ico \
-		assets/identifier/static/opentalk-500.woff2 \
-		assets/identifier/static/opentalk-750.woff2
+		assets/identifier/static/opencloud-500.woff2 \
+		assets/identifier/static/opencloud-750.woff2
 
 assets/identifier/static:
 	mkdir -p assets/identifier/static
@@ -48,13 +48,13 @@ FONT_VARIATION_750_URL = https://gitlab.opencode.de/opentalk/web-frontend/-/raw/
 assets/identifier/static/favicon.ico:
 	curl --fail -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
-.PHONY: assets/identifier/static/opentalk-500.woff2
-assets/identifier/static/opentalk-500.woff2:
-	curl --fail -o assets/identifier/static/opentalk-500.woff2 ${FONT_VARIATION_500_URL}
+.PHONY: assets/identifier/static/opencloud-500.woff2
+assets/identifier/static/opencloud-500.woff2:
+	curl --fail -o assets/identifier/static/opencloud-500.woff2 ${FONT_VARIATION_500_URL}
 
-.PHONY: assets/identifier/static/opentalk-750.woff2
-assets/identifier/static/opentalk-750.woff2:
-	curl --fail -o assets/identifier/static/opentalk-750.woff2 ${FONT_VARIATION_750_URL}
+.PHONY: assets/identifier/static/opencloud-750.woff2
+assets/identifier/static/opencloud-750.woff2:
+	curl --fail -o assets/identifier/static/opencloud-750.woff2 ${FONT_VARIATION_750_URL}
 
 .PHONY: pnpm-build
 pnpm-build: node_modules

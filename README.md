@@ -18,7 +18,7 @@ The OpenCloud backend authenticates users via [OpenID Connect](https://openid.ne
 
 ### Database
 
-The OpenCloud backend does not use a database. It stores all data in the filesystem. By default, the root directory of the backend is `$HOME/.ocis/`.
+The OpenCloud backend does not use a database. It stores all data in the filesystem. By default, the root directory of the backend is `$HOME/.opencloud/`.
 
 ## Getting Involved
 
@@ -36,7 +36,7 @@ That will produce the binary `bin/opencloud`.
 
 For more information consult the [Development Documentation](https://docs.opencloud.eu/opencloud/).
 
-Please always refer to our [Contribution Guidelines](https://github.com//opencloud-eu/opencloud/blob/master/CONTRIBUTING.md).
+Please always refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/master/CONTRIBUTING.md).
 
 ## Security
 

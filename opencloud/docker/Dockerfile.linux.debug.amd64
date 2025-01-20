@@ -7,10 +7,10 @@ RUN apk add --no-cache attr bash ca-certificates curl delve inotify-tools libc6-
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="OpenCloud GmbH <devops@opencloud.eu>" \
-  org.opencontainers.image.title="OpenCloud Pulse" \
+  org.opencontainers.image.title="OpenCloud" \
   org.opencontainers.image.vendor="OpenCloud GmbH" \
   org.opencontainers.image.authors="OpenCloud GmbH" \
-  org.opencontainers.image.description="OpenCloud - OpenCloud Pulse is a modern file-sync and share platform" \
+  org.opencontainers.image.description="OpenCloud is a modern file-sync and share platform" \
   org.opencontainers.image.licenses="Apache-2.0" \
   org.opencontainers.image.documentation="https://github.com/opencloud-eu/opencloud" \
   org.opencontainers.image.url="https://hub.docker.com/r/opencloud-eu/opencloud" \

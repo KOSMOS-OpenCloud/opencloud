@@ -10,7 +10,7 @@ import (
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
-	ociscrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
+	occrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
 )
@@ -42,7 +42,7 @@ func NewService(opts ...Option) (Service, error) {
 			// to connect with InsecureSkipVerify.
 			sopts.Logger.Warn().Str("address", sopts.Address).
 				Msg("No server certificate configured. Generating a temporary self-signed certificate")
-			cert, err = ociscrypto.GenTempCertForAddr(sopts.Address)
+			cert, err = occrypto.GenTempCertForAddr(sopts.Address)
 			if err != nil {
 				return Service{}, fmt.Errorf("error creating temporary self-signed certificate: %w", err)
 			}

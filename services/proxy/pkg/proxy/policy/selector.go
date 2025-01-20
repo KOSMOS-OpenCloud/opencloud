@@ -132,7 +132,7 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 
 		// first, try to route by selector
 		if claims := oidc.FromContext(r.Context()); claims != nil {
-			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
+			if p, ok := claims[oidc.OpenCloudRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
 			}

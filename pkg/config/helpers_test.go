@@ -19,7 +19,7 @@ a: "${FOO_VAR|no-foo}"
 b: "${BAR_VAR|no-bar}"
 c: "${CODE_VAR|code}"
 `
-	filePath := "etc/ocis/foo.yaml"
+	filePath := "etc/opencloud/foo.yaml"
 	fs := fstest.MapFS{
 		filePath: {Data: []byte(yaml)},
 	}
@@ -37,7 +37,7 @@ c: "${CODE_VAR|code}"
 
 func TestBindSourcesToStructs_UnknownFile(t *testing.T) {
 	// setup test env
-	filePath := "etc/ocis/foo.yaml"
+	filePath := "etc/opencloud/foo.yaml"
 	fs := fstest.MapFS{}
 	// perform test
 	c := TestConfig{}
@@ -173,7 +173,7 @@ clientlog:
     service_account_id: c05389b2-d94c-4d01-a9b5-a2f97952cc14
     service_account_secret: GW5.x1vDM&+NPRi++eV@.P7Tms4vj!=s
 `
-	filePath := "etc/ocis/foo.yaml"
+	filePath := "etc/opencloud/foo.yaml"
 	fs := fstest.MapFS{
 		filePath: {Data: []byte(yaml)},
 	}

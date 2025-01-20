@@ -18,7 +18,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
-	ociscrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
+	occrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 )
@@ -49,7 +49,7 @@ func NewServiceWithClient(client client.Client, opts ...Option) (Service, error)
 		} else {
 			// Generate a self-signed server certificate on the fly. This requires the clients
 			// to connect with InsecureSkipVerify.
-			cert, err = ociscrypto.GenTempCertForAddr(sopts.Address)
+			cert, err = occrypto.GenTempCertForAddr(sopts.Address)
 			if err != nil {
 				return Service{}, fmt.Errorf("grpc service error creating temporary self-signed certificate: %w", err)
 			}

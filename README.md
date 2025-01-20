@@ -6,7 +6,7 @@
 > [!TIP]
 > For general information about OpenCloud and how to install please visit [OpenCloud on Github](https://github.com/opencloud-eu/) and [OpenCloud GmbH](https://opencloud.eu).
 
-This is one of the main repositories of OpenCloud. It contains most of the code for the backend that is run on a server and is mostly written in golang.
+This the main repository of the OpenCloud server. It contains the golang codebase for the backend services.
 
 ## Technology
 

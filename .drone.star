@@ -766,7 +766,7 @@ def uploadScanResults(ctx):
                 "name": "clone",
                 "image": ALPINE_GIT,
                 "commands": [
-                                # Always use the owncloud/ocis repository as base to have an up to date default branch.
+                                # Always use the opencloud-eu/opencloud repository as base to have an up to date default branch.
                                 # This is needed for the skipIfUnchanged step, since it references a commit on master (which could be absent on a fork)
                                 "git clone https://github.com/%s.git ." % (ctx.repo.slug),
                             ] + fork_handling +
@@ -2957,7 +2957,7 @@ def setupForLitmus():
     }]
 
 def getDroneEnvAndCheckScript(ctx):
-    ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
+    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
     path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
     path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
     return {
@@ -3246,7 +3246,7 @@ def k6LoadTests(ctx):
     if "skip" in config["k6LoadTests"] and config["k6LoadTests"]["skip"]:
         return []
 
-    ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
+    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
     script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
 
     event_array = ["cron"]

@@ -315,7 +315,7 @@ class WebDavPropertiesContext implements Context {
 		string $propertyName,
 		string $path,
 		string $propertyValue,
-		string $namespace = null,
+		?string $namespace = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		return WebDavHelper::proppatch(
@@ -648,7 +648,7 @@ class WebDavPropertiesContext implements Context {
 	public function checkResponseContainsProperty(
 		ResponseInterface $response,
 		string $key,
-		string $namespaceString = null
+		?string $namespaceString = null
 	): SimpleXMLElement {
 		$xmlPart = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		;

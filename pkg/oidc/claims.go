@@ -6,16 +6,16 @@ import (
 )
 
 const (
-	Iss               = "iss"
-	Sub               = "sub"
-	Email             = "email"
-	Name              = "name"
-	PreferredUsername = "preferred_username"
-	UIDNumber         = "uidnumber"
-	GIDNumber         = "gidnumber"
-	Groups            = "groups"
-	OwncloudUUID      = "ownclouduuid"
-	OcisRoutingPolicy = "ocis.routing.policy"
+	Iss                    = "iss"
+	Sub                    = "sub"
+	Email                  = "email"
+	Name                   = "name"
+	PreferredUsername      = "preferred_username"
+	UIDNumber              = "uidnumber"
+	GIDNumber              = "gidnumber"
+	Groups                 = "groups"
+	OwncloudUUID           = "ownclouduuid"
+	OpenCloudRoutingPolicy = "opencloud.routing.policy"
 )
 
 // SplitWithEscaping splits s into segments using separator which can be escaped using the escape string

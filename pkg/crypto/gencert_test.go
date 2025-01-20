@@ -51,7 +51,7 @@ func TestPersistKey(t *testing.T) {
 	p256 := elliptic.P256()
 	var (
 		tmpDir     = t.TempDir()
-		keyPath    = filepath.Join(tmpDir, "ocis", "testKey")
+		keyPath    = filepath.Join(tmpDir, "opencloud", "testKey")
 		rsaPk, _   = rsa.GenerateKey(rand.Reader, 2048)
 		ecdsaPk, _ = ecdsa.GenerateKey(p256, rand.Reader)
 	)
@@ -97,7 +97,7 @@ func TestPersistCertificate(t *testing.T) {
 	p256 := elliptic.P256()
 	var (
 		tmpDir     = t.TempDir()
-		certPath   = filepath.Join(tmpDir, "ocis", "testCert")
+		certPath   = filepath.Join(tmpDir, "opencloud", "testCert")
 		rsaPk, _   = rsa.GenerateKey(rand.Reader, 2048)
 		ecdsaPk, _ = ecdsa.GenerateKey(p256, rand.Reader)
 	)

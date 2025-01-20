@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocis-pkg
+NAME := pkg
 
 include ../.make/recursion.mk
 

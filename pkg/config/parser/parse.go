@@ -38,7 +38,7 @@ func ParseConfig(cfg *config.Config, skipValidate bool) error {
 }
 
 // EnsureDefaults ensures that all pointers in the
-// oCIS config (not the services configs) are initialized
+// OpenCloud config (not the services configs) are initialized
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.Tracing == nil {
 		cfg.Tracing = &shared.Tracing{}
@@ -63,7 +63,7 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 }
 
-// EnsureCommons copies applicable parts of the oCIS config into the commons part
+// EnsureCommons copies applicable parts of the OpenCloud config into the commons part
 func EnsureCommons(cfg *config.Config) {
 	// ensure the commons part is initialized
 	if cfg.Commons == nil {

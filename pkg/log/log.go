@@ -24,7 +24,7 @@ func init() {
 	setMicroLogger()
 }
 
-// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// for logging reasons we don't want the same logging level on both OpenCloud and micro. As a framework builder we do not
 // want to expose to the end user the internal framework logs unless explicitly specified.
 func setMicroLogger() {
 	if os.Getenv("MICRO_LOG_LEVEL") == "" {

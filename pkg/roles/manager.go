@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	cacheDatabase  = "ocis-pkg"
+	cacheDatabase  = "opencloud-pkg"
 	cacheTableName = "roles"
 	cacheTTL       = time.Hour
 )

@@ -1,6 +1,6 @@
-# ocis
+# opencloud
 
-The ocis package contains the Infinite Scale runtime and the commands for the Infinite Scale CLI.
+The opencloud package contains the OpenCloud runtime and the commands for the OpenCloud CLI.
 
 ## Service Registry
 
@@ -15,26 +15,26 @@ To configure which registry to use, you have to set the environment variable `MI
 
 ## Memory limits
 
-oCIS will automatically set the go native `GOMEMLIMIT` to `0.9`. To disable the limit set `AUTOMEMEMLIMIT=off`. For more information take a look at the official [Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide).
+OpenCloud will automatically set the go native `GOMEMLIMIT` to `0.9`. To disable the limit set `AUTOMEMEMLIMIT=off`. For more information take a look at the official [Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide).
 
 ## CLI Commands
 
-The ocis package offers a variety of cli commands to monitor or repair ocis installations. All these commands have a common mandatory parameter: `--basePath` (or `-p`) which needs to point to a storage provider. Example paths are:
+The opencloud package offers a variety of cli commands to monitor or repair OpenCloud installations. All these commands have a common mandatory parameter: `--basePath` (or `-p`) which needs to point to a storage provider. Example paths are:
 
 ```bash
-.ocis/storage/users          # bare metal installation
-/var/tmp/ocis/storage/users  # docker installation
+.opencloud/storage/users          # bare metal installation
+/var/tmp/opencloud/storage/users  # docker installation
 ...
 ```
 
-These paths can vary depending on your ocis installation.
+These paths can vary depending on your OpenCloud installation.
 
 ### Backup CLI
 
-The backup command allows inspecting the consistency of an ocis storage:
+The backup command allows inspecting the consistency of an OpenCloud storage:
 
 ```bash
-ocis backup consistency -p /base/path/storage/users
+opencloud backup consistency -p /base/path/storage/users
 ```
 
 This will check the consistency of the storage and output a list of inconsistencies. Inconsistencies can be:
@@ -64,7 +64,7 @@ Exits with non-zero exit code if inconsistencies are found. Useful for automatio
 When a shared space or directory got deleted, use the `shares cleanup` command to remove those share orphans. This can't be done automatically at the moment.
 
 ```bash
-ocis shares cleanup
+opencloud shares cleanup
 ```
 
 ### Revisions CLI
@@ -72,7 +72,7 @@ ocis shares cleanup
 The revisions command allows removing the revisions of files in the storage.
 
 ```bash
-ocis revisions purge -p /base/path/storage/users
+opencloud revisions purge -p /base/path/storage/users
 ```
 
 It takes the `--resource-id` (or `--r`) parameter which specify the scope of the command:
@@ -97,7 +97,7 @@ Prints additional information about the revisions that are removed.
 The trash cli allows removing empty folders from the trashbin. This should be used to speed up trash bin operations.
 
 ```bash
-ocis trash purge-empty-dirs -p /base/path/storage/users
+opencloud trash purge-empty-dirs -p /base/path/storage/users
 ```
 
 This command provides additional options:
@@ -110,7 +110,7 @@ Do not remove any empty folders but print the empty folders that would be remove
 This command simplifies the process of finding out which UID belongs to which role. The command is:
 
 ```bash
-ocis graph list-unified-roles
+opencloud graph list-unified-roles
 ```
 
 The output of this command includes the following information for each role:

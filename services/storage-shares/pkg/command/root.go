@@ -26,7 +26,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "storage-shares",
-		Usage:    "Provide a virtual storage for shares in oCIS",
+		Usage:    "Provide a virtual storage for shares in OpenCloud",
 		Commands: GetCommands(cfg),
 	})
 

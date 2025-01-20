@@ -1,6 +1,6 @@
 # Storage-System
 
-The Infinite Scale Storage-System service persists and caches user related data that is defined via Infinite Scale. This can be among other data role assignments, user settings and users shares.
+The OpenCloud Storage-System service persists and caches user related data that is defined via OpenCloud. This can be among other data role assignments, user settings and users shares.
 
 ## Caching
 

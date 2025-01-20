@@ -4,15 +4,15 @@ Purpose and description to be added
 
 ## Graceful Shutdown
 
-Starting with Infinite Scale version 3.1, you can define a graceful shutdown period for the `storage-users` service.
+You can define a graceful shutdown period for the `storage-users` service.
 
 IMPORTANT: The graceful shutdown period is only applicable if the `storage-users` service runs as standalone service. It does not apply if the `storage-users` service runs as part of the single binary or as single Docker environment. To build an environment where the `storage-users` service runs as a standalone service, you must start two instances, one _without_ the `storage-users` service and one _only with_ the the `storage-users` service. Note that both instances must be able to communicate on the same network.
 
-When hard-stopping Infinite Scale, for example with the `kill <pid>` command (SIGKILL), it is possible and likely that not all data from the decomposedfs (metadata) has been written to the storage which may result in an inconsistent decomposedfs. When gracefully shutting down Infinite Scale, using a command like SIGTERM, the process will no longer accept any write requests from _other_ services and will try to write the internal open  requests which can take an undefined duration based on many factors. To mitigate that situation, the following things have been implemented:
+When hard-stopping OpenCloud, for example with the `kill <pid>` command (SIGKILL), it is possible and likely that not all data from the decomposedfs (metadata) has been written to the storage which may result in an inconsistent decomposedfs. When gracefully shutting down OpenCloud, using a command like SIGTERM, the process will no longer accept any write requests from _other_ services and will try to write the internal open  requests which can take an undefined duration based on many factors. To mitigate that situation, the following things have been implemented:
 
 *   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences, you must increase the default value.
 
-*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.owncloud.com/ocis/next/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details.
+*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.opencloud.eu/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details.
 
 ## CLI Commands
 
@@ -29,7 +29,7 @@ The `storage-users` CLI tool uses the default address to establish the connectio
 
 <!-- referencing: [oCIS FS] clean up aborted uploads https://github.com/owncloud/ocis/issues/2622 -->
 
-When using Infinite Scale as user storage, a directory named `storage/users/uploads` can be found in the Infinite Scale data folder. This is an intermediate directory based on [TUS](https://tus.io) which is an open protocol for resumable uploads. Each upload consists of a _blob_ and a _blob.info_ file. Note that the term _blob_ is just a placeholder.
+When using OpenCloud as user storage, a directory named `storage/users/uploads` can be found in the OpenCloud data folder. This is an intermediate directory based on [TUS](https://tus.io) which is an open protocol for resumable uploads. Each upload consists of a _blob_ and a _blob.info_ file. Note that the term _blob_ is just a placeholder.
 
 *   **If an upload succeeds**, the _blob_ file will be moved to the target and the _blob.info_ file will be deleted.
 
@@ -50,7 +50,7 @@ Example cases for expired uploads:
 The following commands are available to manage unfinished uploads:
 
 ```bash
-ocis storage-users uploads <command>
+opencloud storage-users uploads <command>
 ```
 
 ```plaintext
@@ -71,15 +71,15 @@ The `sessions` command is the entry point for listing, restarting and cleaning u
 > When resuming an upload, processing will continue unfinished items from their last completed step.
 
 ```bash
-ocis storage-users uploads sessions <commandoptions>
+opencloud storage-users uploads sessions <commandoptions>
 ```
 
 ```
 NAME:
-   ocis storage-users uploads sessions - Print a list of upload sessions
+   opencloud storage-users uploads sessions - Print a list of upload sessions
 
 USAGE:
-   ocis storage-users uploads sessions [command options]
+   opencloud storage-users uploads sessions [command options]
 
 OPTIONS:
    --id value    filter sessions by upload session id (default: unset)
@@ -105,7 +105,7 @@ Some additional information on returned information:
 Command to list ongoing upload sessions
 
 ```bash
-ocis storage-users uploads sessions --expired=false --processing=false
+opencloud storage-users uploads sessions --expired=false --processing=false
 ```
 
 ```plaintext
@@ -121,12 +121,12 @@ Not expired sessions:
 The sessions command can also output json
 
 ```bash
-ocis storage-users uploads sessions --expired=false --processing=false --json
+opencloud storage-users uploads sessions --expired=false --processing=false --json
 ```
 
 ```json
-{"id":"5e387954-7313-4223-a904-bf996da6ec0b","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"foo.txt","offset":0,"size":1234,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:04:31+01:00","processing":false, "scanDate": "2024-04-24T11:24:14+02:00", "scanResult": "infected: virus A"}
-{"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false, "scanDate": "2024-04-24T14:38:29+02:00", "scanResult": ""}
+{"id":"5e387954-7313-4223-a904-bf996da6ec0b","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"foo.txt","offset":0,"size":1234,"executant":{"idp":"https://cloud.opencloud.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:04:31+01:00","processing":false, "scanDate": "2024-04-24T11:24:14+02:00", "scanResult": "infected: virus A"}
+{"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.opencloud.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false, "scanDate": "2024-04-24T14:38:29+02:00", "scanResult": ""}
 ```
 
 The sessions command can also clear and restart/resume uploads. The output is the same as if run without `--clean` or `--restart` flag.
@@ -134,19 +134,19 @@ Note: It is recommended to run to command first without the `--clean` (`--proces
 
 ```bash
 # cleans all expired uploads regardless of processing and virus state.
-ocis storage-users uploads sessions --expired=true --clean
+opencloud storage-users uploads sessions --expired=true --clean
 
 # resumes all uploads that are processing and are not virus infected
-ocis storage-users uploads sessions --processing=false --has-virus=false --resume
+opencloud storage-users uploads sessions --processing=false --has-virus=false --resume
 ```
 
 ### Manage Trash-Bin Items
 
 This command set provides commands to get an overview of trash-bin items, restore items and purge old items of `personal` spaces and `project` spaces (spaces that have been created manually). `trash-bin` commands require a `spaceID` as parameter. See [List all spaces
-](https://owncloud.dev/apis/http/graph/spaces/#list-all-spaces-get-drives) or [Listing Space IDs](https://doc.owncloud.com/ocis/5.0/maintenance/space-ids/space-ids.html) for details of how to get them.
+](https://doc.opencloud.eu/apis/http/graph/spaces/#list-all-spaces-get-drives) or [Listing Space IDs](https://doc.opencloud.eu/maintenance/space-ids/space-ids.html) for details of how to get them.
 
 ```bash
-ocis storage-users trash-bin <command>
+opencloud storage-users trash-bin <command>
 ```
 
 ```plaintext
@@ -161,7 +161,7 @@ COMMANDS:
 
 *   Purge all expired items from the trash-bin.
     ```bash
-    ocis storage-users trash-bin purge-expired
+    opencloud storage-users trash-bin purge-expired
     ```
 
 The behaviour of the `purge-expired` command can be configured by using the following environment variables.
@@ -170,10 +170,10 @@ The behaviour of the `purge-expired` command can be configured by using the foll
 Used to obtain space trash-bin information and takes the system admin user as the default which is the `OC_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OC_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.opencloud.eu/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.owncloud.com/ocis/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.opencloud.eu/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
 
 #### List and Restore Trash-Bins Items
 
@@ -193,7 +193,7 @@ The `storage-users` CLI tool uses the default address to establish the connectio
 
 *   Print a list of all trash-bin items of a space
     ```bash
-    ocis storage-users trash-bin list [command options] ['spaceID' required]
+    opencloud storage-users trash-bin list [command options] ['spaceID' required]
     ```
 
 The restore option defines the behavior for an item to be restored, when the item name already exists in the target space. Supported options are: `skip`, `replace` and `keep-both`. The default value is `skip`.
@@ -202,12 +202,12 @@ When the CLI tool restores the item with the `replace` option, the existing item
 
 * Restore all trash-bin items for a space
     ```bash
-    ocis storage-users trash-bin restore-all [command options] ['spaceID' required]
+    opencloud storage-users trash-bin restore-all [command options] ['spaceID' required]
     ```
 
 * Restore a trash-bin item by ID
     ```bash
-    ocis storage-users trash-bin restore [command options] ['spaceID' required] ['itemID' required]
+    opencloud storage-users trash-bin restore [command options] ['spaceID' required] ['itemID' required]
     ```
 
 ## Caching

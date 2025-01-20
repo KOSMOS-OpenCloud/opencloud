@@ -13,8 +13,8 @@ func DefaultApp(app *cli.App) *cli.App {
 	// author info
 	app.Authors = []*cli.Author{
 		{
-			Name:  "ownCloud GmbH",
-			Email: "support@owncloud.com",
+			Name:  "OpenCloud GmbH",
+			Email: "support@opencloud.eu",
 		},
 	}
 

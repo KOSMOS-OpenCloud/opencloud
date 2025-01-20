@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ocisbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
+	ocbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
 	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -27,7 +27,7 @@ var (
 func RevisionsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "revisions",
-		Usage: "ocis revisions functionality",
+		Usage: "OpenCloud revisions functionality",
 		Subcommands: []*cli.Command{
 			PurgeRevisionsCommand(cfg),
 		},
@@ -50,7 +50,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:     "basepath",
 				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/ocis/storage/metadata)",
+				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/metadata)",
 				Required: true,
 			},
 			&cli.StringFlag{
@@ -103,7 +103,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 					s3bs.Options{},
 				)
 			case "ocis":
-				bs, err = ocisbs.New(basePath)
+				bs, err = ocbs.New(basePath)
 			case "none":
 				bs = nil
 			default:

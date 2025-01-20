@@ -93,7 +93,7 @@ type Service struct {
 // When used as a library, flags are not parsed, and in order to avoid introducing a global state with init functions
 // calls are done explicitly to loadFromEnv().
 // Since this is the public constructor, options need to be added, at the moment only logging options
-// are supported in order to match the running OwnCloud services structured log.
+// are supported in order to match the running OpenCloud services structured log.
 func NewService(ctx context.Context, options ...Option) (*Service, error) {
 	opts := NewOptions()
 
@@ -349,9 +349,9 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 }
 
 // Start a rpc service. By default, the package scope Start will run all default services to provide with a working
-// oCIS instance.
+// OpenCloud instance.
 func Start(ctx context.Context, o ...Option) error {
-	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect
+	// Start the runtime. Most likely this was called ONLY by the `opencloud server` subcommand, but since we cannot protect
 	// from the caller, the previous statement holds truth.
 
 	// prepare a new rpc Service struct.
@@ -367,7 +367,7 @@ func Start(ctx context.Context, o ...Option) error {
 	tolerance := 5
 	totalBackoff := 0
 
-	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
+	// Start creates its own supervisor. Running services under `opencloud server` will create its own supervision tree.
 	s.Supervisor = suture.New("opencloud", suture.Spec{
 		EventHook: func(e suture.Event) {
 			if e.Type() == suture.EventTypeBackoff {

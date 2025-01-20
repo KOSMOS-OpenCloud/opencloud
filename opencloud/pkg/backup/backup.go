@@ -1,4 +1,4 @@
-// Package backup contains ocis backup functionality.
+// Package backup contains OpenCloud backup functionality.
 package backup
 
 import (

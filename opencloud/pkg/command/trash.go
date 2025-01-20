@@ -15,7 +15,7 @@ import (
 func TrashCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "trash",
-		Usage: "ocis trash functionality",
+		Usage: "OpenCloud trash functionality",
 		Subcommands: []*cli.Command{
 			TrashPurgeEmptyDirsCommand(cfg),
 		},
@@ -37,7 +37,7 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:     "basepath",
 				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/ocis/storage/users)",
+				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)",
 				Required: true,
 			},
 			&cli.BoolFlag{

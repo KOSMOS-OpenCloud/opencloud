@@ -1,13 +1,4 @@
----
-title: "Acceptance Testing"
-date: 2018-05-02T00:00:00+00:00
-weight: 20
-geekdocRepo: https://github.com/opencloud-eu/opencloud
-geekdocEditPath: edit/master/docs/opencloud/development
-geekdocFilePath: testing.md
----
-
-{{< toc >}}
+# Acceptance Testing
 
 To run tests in the test suite you have two options. You may go the easy way and just run the test suite in docker. But for some tasks you could also need to install the test suite natively, which requires a little more setup since PHP and some dependencies need to be installed.
 
@@ -57,7 +48,7 @@ make -C tests/acceptance/docker localApiTests-apiGraph-s3ng
 
 runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `s3ng` storage.
 
-{{< hint info >}}
+Note:
 While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
 
 ```bash
@@ -67,9 +58,8 @@ make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
 But some test suites that are tagged with `@env-config` require the OpenCloud server to be run with ocwrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
-{{< /hint >}}
 
-{{< hint info >}}
+Note:
 To run the tests that require an email server (tests tagged with `@email`), you need to provide `START_EMAIL=true` while running the tests.
 
 ```bash
@@ -78,9 +68,7 @@ BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.featu
 make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
-{{< /hint >}}
-
-{{< hint info >}}
+Note:
 To run the tests that require tika service (tests tagged with `@tikaServiceNeeded`), you need to provide `START_TIKA=true` while running the tests.
 
 ```bash
@@ -89,9 +77,7 @@ BEHAT_FEATURE='tests/acceptance/features/apiSearchContent/contentSearch.feature'
 make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
-{{< /hint >}}
-
-{{< hint info >}}
+Note:
 To run the tests that require an antivirus service (tests tagged with `@antivirus`), you need to provide the following environment variables while running the tests.
 
 ```bash
@@ -102,8 +88,6 @@ POSTPROCESSING_STEPS=virusscan \
 BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
 make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
-
-{{< /hint >}}
 
 #### Tests Transferred From Core (prefix `coreApi`)
 
@@ -122,15 +106,13 @@ BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
 make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
 ```
 
-{{< hint info >}}
+Note:
 `BEHAT_FEATURE` must be pointing to a valid feature file
-{{< /hint >}}
 
 And to run a single scenario in a feature, you can do:
 
-{{< hint info >}}
+Note:
 A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUserGroup/createUser.feature`, simply add the line number like this: `apiGraphUserGroup/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
-{{< /hint >}}
 
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
@@ -161,9 +143,8 @@ BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:15' \
 make -C tests/acceptance/docker test-core-feature-ocis-storage
 ```
 
-{{< hint info >}}
+Note:
 The test suites transferred from core have `coreApi` prefixed
-{{< /hint >}}
 
 ### OpenCloud Image to Be Tested (Skip Local Image Build)
 
@@ -182,9 +163,8 @@ While a test is running or when it is finished, you can attach to the logs gener
 make -C tests/acceptance/docker show-test-logs
 ```
 
-{{< hint info >}}
+Note:
 The log output is opened in `less`. You can navigate up and down with your cursors. By pressing "F" you can follow the latest line of the output.
-{{< /hint >}}
 
 ### Cleanup
 
@@ -225,9 +205,8 @@ Useful environment variables:
 
 `BEHAT_FEATURE`: to run a single feature
 
-{{< hint info >}}
+Note:
 A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUserGroup/createUser.feature`, simply add the line number like this: `apiGraphUserGroup/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
-{{< /hint >}}
 
 > Example:
 >
@@ -438,9 +417,8 @@ Make sure that the clamAV daemon is up and running
 sudo service clamav-daemon status
 ```
 
-{{< hint info >}}
+Note:
 The commands are ubuntu specific and may differ according to your system. You can find information related to installation of clamAV in their official documentation [here](https://docs.clamav.net/manual/Installing/Packages.html).
-{{< /hint>}}
 
 ##### Mac OS user
 
@@ -486,13 +464,12 @@ OC_ADD_RUN_SERVICES="antivirus"
 opencloud/bin/opencloud server
 ```
 
-{{< hint info >}}
+Note:
 The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
 
 For antivirus running localy on Linux OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/var/run/clamav/clamd.ctl"`.
 For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.socket"`.
 For antivirus running with docker, use `ANTIVIRUS_CLAMAV_SOCKET= "tcp://host.docker.internal:3310"`
-{{< /hint>}}
 
 #### Run the Acceptance Test
 
@@ -551,11 +528,10 @@ opencloud/bin/opencloud server
 
 The second OpenCloud instance should be available at: https://localhost:10200/
 
-{{< hint info >}}
+Note:
 To enable ocm in the web interface, you need to set the following envs:
 `OC_ENABLE_OCM="true"`
 `OC_ADD_RUN_SERVICES="ocm"`
-{{< /hint>}}
 
 #### Run the Acceptance Test
 

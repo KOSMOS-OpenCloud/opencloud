@@ -280,6 +280,7 @@ Feature: copy file
       | sharee          | Alice         |
       | shareType       | user          |
       | permissionsRole | Secure Viewer |
+    And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Personal" should not contain these entries:

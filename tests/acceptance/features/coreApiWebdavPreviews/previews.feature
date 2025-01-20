@@ -323,7 +323,7 @@ Feature: previews of files downloaded through the webdav API
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testavatar.jpg"
     When user "Alice" tries to download the preview of "/testavatar.jpg" with width "32" and height "32" and preview set to 0 using the WebDAV API
     Then the HTTP status code should be "200"
-    And the downloaded image should be "1240" pixels wide and "648" pixels high
+    And the downloaded image should be "1402" pixels wide and "500" pixels high
     Examples:
       | dav-path-version |
       | old              |
@@ -376,8 +376,8 @@ Feature: previews of files downloaded through the webdav API
       | THUMBNAILS_MAX_INPUT_WIDTH           | 200   |
       | THUMBNAILS_MAX_INPUT_HEIGHT          | 200   |
     And using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testimage.jpg"
-    When user "Alice" downloads the preview of "/testimage.jpg" with width "36" and height "36" and processor thumbnail using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testimage.png"
+    When user "Alice" downloads the preview of "/testimage.png" with width "36" and height "36" and processor thumbnail using the WebDAV API
     Then the HTTP status code should be "403"
     And the value of the item "/d:error/s:message" in the response should be "thumbnails: image is too large"
     Examples:

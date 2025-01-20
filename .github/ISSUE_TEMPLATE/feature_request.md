@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for improving oCIS
+about: Suggest an idea for improving OpenCloud
 title: ''
 labels: Category:Feature, Topic:needs-triage
 assignees: ''

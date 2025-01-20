@@ -112,9 +112,6 @@ func DefaultConfig() *config.Config {
 					TokenStorageLocal:      true,
 					UserListRequiresFilter: false,
 				},
-				Styles: []config.CustomStyle{
-					{Href: "/themes/opencloud/font.css"},
-				},
 			},
 		},
 	}

@@ -71,7 +71,7 @@ func (s *defaultLanguageDecorator) ListValues(ctx context.Context, req *settings
 func (s *defaultLanguageDecorator) withDefaultLanguageSetting(accountUUID string) *settingsmsg.ValueWithIdentifier {
 	return &settingsmsg.ValueWithIdentifier{
 		Identifier: &settingsmsg.Identifier{
-			Extension: "ocis-accounts",
+			Extension: "opencloud-accounts",
 			Bundle:    "profile",
 			Setting:   "language",
 		},

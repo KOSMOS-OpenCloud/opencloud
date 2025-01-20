@@ -11,7 +11,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/sharing/pkg/config"
 )
 
-// SharingConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// SharingConfigFromStruct will adapt an OpenCloud config struct into a reva mapstructure to start a reva service.
 func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]interface{}, error) {
 	passwordPolicyCfg, err := passwordPolicyConfig(cfg)
 	if err != nil {

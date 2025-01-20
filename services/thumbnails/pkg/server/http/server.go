@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/opencloud-eu/opencloud/pkg/cors"
-	ocismiddleware "github.com/opencloud-eu/opencloud/pkg/middleware"
+	opencloudmiddleware "github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/pkg/service/http"
 	"github.com/opencloud-eu/opencloud/pkg/version"
 	svc "github.com/opencloud-eu/opencloud/services/thumbnails/pkg/service/http/v0"
@@ -40,18 +40,18 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,
-			ocismiddleware.Cors(
+			opencloudmiddleware.Cors(
 				cors.Logger(options.Logger),
 				cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
 				cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
 				cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
 				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 			),
-			ocismiddleware.Version(
+			opencloudmiddleware.Version(
 				options.Config.Service.Name,
 				version.GetString(),
 			),
-			ocismiddleware.Logger(options.Logger),
+			opencloudmiddleware.Logger(options.Logger),
 		),
 		svc.ThumbnailStorage(
 			storage.NewFileSystemStorage(

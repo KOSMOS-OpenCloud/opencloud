@@ -1,4 +1,4 @@
-// Package config contains the configuration for the ocis-thumbnails service
+// Package config contains the configuration for the opencloud-thumbnails service
 package config
 
 import (

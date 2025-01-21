@@ -279,7 +279,7 @@ Feature: checksums
     And user "Alice" has uploaded file with content "OpenCloud test text file 0" to "/textfile0.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" with checksum "SHA1:f005ba11f005ba11f005ba11f005ba11f005ba11" using the WebDAV API
     Then the HTTP status code should be "400"
-    And as user "Alice" the webdav checksum of "/textfile0.txt" via propfind should match "SHA1:2052377dec0724bda0d57aeab67fa819278b7f74 MD5:096e350e9ff1339a997a14145f9fc4b9 ADLER32:7d5a0921"
+    And as user "Alice" the webdav checksum of "/textfile0.txt" via propfind should match "SHA1:294acb3a34f7e11f8eac865183d30aac04fba0c7 MD5:7f41994bdd25f722cd715bb376eff10e ADLER32:83ca095f"
     And the content of file "/textfile0.txt" for user "Alice" should be "OpenCloud test text file 0"
     Examples:
       | dav-path-version |

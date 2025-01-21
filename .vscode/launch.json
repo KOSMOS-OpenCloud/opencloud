@@ -4,7 +4,8 @@
     {
       "name": "Listen for Xdebug",
       "type": "php",
-      "request": "launch"
+      "request": "launch",
+      "port": 9003
     },
     {
       "name": "Debug remote :40000",

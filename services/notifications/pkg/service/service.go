@@ -23,8 +23,6 @@ import (
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
@@ -32,6 +30,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/email"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 // validate is the package level validator instance

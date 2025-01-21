@@ -17,7 +17,6 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
-	github.com/cs3org/reva/v2 v2.27.1-0.20250109115603-fe9caac22593
 	github.com/davidbyttow/govips/v2 v2.15.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -66,6 +65,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.36.0
 	github.com/open-policy-agent/opa v0.70.0
+	github.com/opencloud-eu/reva/v2 v2.27.3-0.20250121094357-24f23b6a27ed
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240829135935-80dc00d6f5ea
 	github.com/pkg/errors v0.9.1
@@ -129,7 +129,6 @@ require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
-	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
@@ -199,11 +198,6 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-micro/plugins/v4/events/natsjs v1.2.2 // indirect
-	github.com/go-micro/plugins/v4/registry/consul v1.2.1 // indirect
-	github.com/go-micro/plugins/v4/registry/etcd v1.2.0 // indirect
-	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2-0.20230605104008-a179a6b8f8e6 // indirect
-	github.com/go-micro/plugins/v4/registry/mdns v1.2.0 // indirect
-	github.com/go-micro/plugins/v4/registry/nats v1.2.1 // indirect
 	github.com/go-micro/plugins/v4/store/nats-js v1.2.1 // indirect
 	github.com/go-micro/plugins/v4/store/redis v1.2.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -237,14 +231,8 @@ require (
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
-	github.com/hashicorp/consul/api v1.15.2 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
-	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-plugin v1.6.2 // indirect
-	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
-	github.com/hashicorp/golang-lru v0.6.0 // indirect
-	github.com/hashicorp/serf v0.10.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
@@ -275,8 +263,6 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.78 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -288,7 +274,6 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/runtime-spec v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/owncloud/ocis/v2 v2.0.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pablodz/inotifywaitgo v0.0.7 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect

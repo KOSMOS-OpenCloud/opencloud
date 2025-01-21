@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/eventhistory/v0"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"go-micro.dev/v4/store"
 )
 

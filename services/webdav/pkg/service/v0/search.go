@@ -14,16 +14,16 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/tags"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/constants"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/net"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/prop"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/propfind"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/tags"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
 const (

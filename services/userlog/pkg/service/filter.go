@@ -5,11 +5,11 @@ import (
 	"errors"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 	micrometadata "go-micro.dev/v4/metadata"
 )
 

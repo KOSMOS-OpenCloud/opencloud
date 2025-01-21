@@ -8,9 +8,6 @@ import (
 	"time"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -18,6 +15,9 @@ import (
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/eventhistory/pkg/service"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
 )

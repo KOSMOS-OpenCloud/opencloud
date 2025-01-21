@@ -13,12 +13,12 @@ packages:
             HTTPClient:
             Permissions:
             RoleService:
-    github.com/cs3org/reva/v2/pkg/events:
+    github.com/opencloud-eu/reva/v2/pkg/events:
         config:
             dir: "mocks"
         interfaces:
             Publisher:
-    github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool:
+    github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool:
         config:
             dir: "mocks"
         interfaces:

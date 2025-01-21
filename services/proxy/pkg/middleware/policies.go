@@ -13,9 +13,9 @@ import (
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"google.golang.org/grpc/metadata"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
 	pMessage "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/policies/v0"
 	pService "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/policies/v0"

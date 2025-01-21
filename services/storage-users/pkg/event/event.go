@@ -1,8 +1,8 @@
 package event
 
 import (
-	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
 	"go-micro.dev/v4/events"
 )
 

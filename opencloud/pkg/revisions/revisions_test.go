@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/google/uuid"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/test-go/testify/require"
 )
 

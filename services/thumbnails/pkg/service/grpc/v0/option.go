@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail/storage"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 // Option defines a single option function.

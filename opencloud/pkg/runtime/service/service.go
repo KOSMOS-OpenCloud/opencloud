@@ -14,12 +14,12 @@ import (
 	authapp "github.com/opencloud-eu/opencloud/services/auth-app/pkg/command"
 
 	"github.com/cenkalti/backoff"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/logger"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 	notifications "github.com/opencloud-eu/opencloud/services/notifications/pkg/command"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/reva/v2/pkg/logger"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/thejerf/suture/v4"
 
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"

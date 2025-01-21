@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
-	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/oklog/run"
 	"github.com/opencloud-eu/opencloud/pkg/broker"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -16,6 +14,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/ocdav/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/ocdav/pkg/logging"
 	"github.com/opencloud-eu/opencloud/services/ocdav/pkg/server/debug"
+	"github.com/opencloud-eu/reva/v2/pkg/micro/ocdav"
+	"github.com/opencloud-eu/reva/v2/pkg/sharedconf"
 	"github.com/urfave/cli/v2"
 )
 

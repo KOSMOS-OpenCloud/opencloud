@@ -13,15 +13,15 @@ import (
 	"github.com/urfave/cli/v2"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/storage"
-	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/event"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/revaconfig"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/storage"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/registry"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
 // Session contains the information of an upload session

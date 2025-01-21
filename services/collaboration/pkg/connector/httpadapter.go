@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector/utf7"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/locks"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/rs/zerolog"
 	microstore "go-micro.dev/v4/store"
 )

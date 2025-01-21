@@ -3,7 +3,7 @@ package command
 import (
 	"testing"
 
-	"github.com/cs3org/reva/v2/pkg/storage"
+	"github.com/opencloud-eu/reva/v2/pkg/storage"
 	"github.com/test-go/testify/require"
 )
 

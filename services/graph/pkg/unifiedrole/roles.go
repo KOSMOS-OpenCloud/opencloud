@@ -8,7 +8,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/cs3org/reva/v2/pkg/conversions"
+	"github.com/opencloud-eu/reva/v2/pkg/conversions"
 
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 )

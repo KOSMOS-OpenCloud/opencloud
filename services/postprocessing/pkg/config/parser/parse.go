@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/defaults"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 )

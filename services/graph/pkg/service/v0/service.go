@@ -17,10 +17,10 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
-	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
 	ocldap "github.com/opencloud-eu/opencloud/pkg/ldap"
 	"github.com/opencloud-eu/opencloud/pkg/log"

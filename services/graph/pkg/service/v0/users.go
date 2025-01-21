@@ -17,10 +17,6 @@ import (
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
@@ -30,6 +26,10 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	ocsettingssvc "github.com/opencloud-eu/opencloud/services/settings/pkg/service/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 

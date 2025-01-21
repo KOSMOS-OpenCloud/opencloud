@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/cs3org/reva/v2/pkg/store"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/registry"

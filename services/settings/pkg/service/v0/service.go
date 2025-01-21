@@ -9,8 +9,6 @@ import (
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/leonelquinteros/gotext"
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -22,6 +20,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/settings"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	metastore "github.com/opencloud-eu/opencloud/services/settings/pkg/store/metadata"
+	ctxpkg "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"

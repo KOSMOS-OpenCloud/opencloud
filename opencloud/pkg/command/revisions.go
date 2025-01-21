@@ -6,15 +6,15 @@ import (
 	"path/filepath"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ocbs "github.com/cs3org/reva/v2/pkg/storage/fs/ocis/blobstore"
-	"github.com/cs3org/reva/v2/pkg/storage/fs/posix/lookup"
-	s3bs "github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/revisions"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
+	ocbs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/ocis/blobstore"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/lookup"
+	s3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/s3ng/blobstore"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/urfave/cli/v2"
 )
 

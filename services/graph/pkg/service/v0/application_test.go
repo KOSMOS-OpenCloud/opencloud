@@ -8,8 +8,6 @@ import (
 	"net/http/httptest"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -21,6 +19,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"

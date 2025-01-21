@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/channels"
 	"github.com/opencloud-eu/opencloud/services/notifications/pkg/email"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
 func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMeshInviteTokenGenerated) {

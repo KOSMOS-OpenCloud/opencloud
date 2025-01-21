@@ -6,12 +6,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/pkg/appctx"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/pkg/roles"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	settings "github.com/opencloud-eu/opencloud/services/settings/pkg/service/v0"
+	"github.com/opencloud-eu/reva/v2/pkg/appctx"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	"go.opentelemetry.io/otel/attribute"
 )
 

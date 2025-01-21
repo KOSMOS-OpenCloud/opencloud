@@ -41,7 +41,7 @@ LABEL maintainer="OpenCloud GmbH <devops@opencloud.eu>" \
         org.opencontainers.image.documentation="https://github.com/opencloud-eu/opencloud" \
         org.opencontainers.image.source="https://github.com/opencloud-eu/opencloud"
 
-ENTRYPOINT ["/usr/bin/ocis"]
+ENTRYPOINT ["/usr/bin/opencloud"]
 CMD ["server"]
 
-COPY --from=build /ocis/ocis/bin/ocis /usr/bin/ocis
+COPY --from=build /opencloud/opencloud/bin/opencloud /usr/bin/opencloud

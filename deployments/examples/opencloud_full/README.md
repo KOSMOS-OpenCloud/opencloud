@@ -2,13 +2,13 @@
 document this deployment example in: docs/ocis/deployment/opencloud_full.md
 ---
 
-# Infinite Scale WOPI Deployment Example
+# OpenCloud WOPI Deployment Example
 
 This deployment example is documented in two locations for different audiences:
 
 * In the [Admin Documentation](https://doc.owncloud.com/ocis/latest/index.html)\
   Providing two variants using detailed configuration step by step guides:\
-  [Local Production Setup](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) and [Deploy Infinite Scale on the Hetzner Cloud](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-hetzner.html).\
+  [Local Production Setup](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) and [Deploy OpenCloud on the Hetzner Cloud](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-hetzner.html).\
   Note that these examples use LetsEncrypt certificates and are intended for production use.
 
 * In the [Developer Documentation](https://owncloud.dev/ocis/deployment/ocis_full/)\

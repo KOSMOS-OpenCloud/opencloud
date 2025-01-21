@@ -126,21 +126,21 @@ all other groups that he is currently a member of.
 Groups that do not exist in the external IDP yet will be created. Note: This can be a
 somewhat costly operation, especially if the user is a member of a large number of
 groups. If the group memberships of a user are changed in the IDP after the
-first login, it can take up to 5 minutes until the changes are reflected in Infinite Scale.
+first login, it can take up to 5 minutes until the changes are reflected in OpenCloud.
 
 ### Claim Updates
 
 OpenID Connect (OIDC) scopes are used by an application during authentication to authorize access to a user's detail, like name, email or picture information. A scope can also contain among other things groups, roles, and permissions data. Each scope returns a set of attributes, which are called claims. The scopes an application requests, depends on which  attributes the application needs. Once the user authorizes the requested scopes, the claims are returned in a token.
 
-These issued JWT tokens are immutable and integrity-protected. Which means, any change in the source requires issuing a new token containing updated claims. On the other hand side, there is no active synchronisation process between the identity provider (IDP) who issues the token and Infinite Scale. The earliest possible time that Infinite Scale will notice changes is, when the current access token has expired and a new access token is issued by the IDP, or the user logs out and relogs in.
+These issued JWT tokens are immutable and integrity-protected. Which means, any change in the source requires issuing a new token containing updated claims. On the other hand side, there is no active synchronisation process between the identity provider (IDP) who issues the token and OpenCloud. The earliest possible time that OpenCloud will notice changes is, when the current access token has expired and a new access token is issued by the IDP, or the user logs out and relogs in.
 
 **NOTES**
 
-* For resource optimisation, Infinite Scale skips any checks and updates on groupmemberships, if the last update happened less than 5min ago.
+* For resource optimisation, OpenCloud skips any checks and updates on groupmemberships, if the last update happened less than 5min ago.
 
-* Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
+* OpenCloud can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare.
+* OpenCloud does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. OpenCloud does not track a claim history to compare.
 
 #### Impacts
 
@@ -180,7 +180,7 @@ When `PROXY_ROLE_ASSIGNMENT_DRIVER` is set to `oidc` the role assignment for a u
 based on the values of an OpenID Connect Claim of that user. The name of the OpenID Connect Claim to
 be used for the role assignment can be configured via the `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`
 environment variable. It is also possible to define a mapping of claim values to role names defined
-in Infinite Scale via a `yaml` configuration. See the following `proxy.yaml` snippet for an example.
+in OpenCloud via a `yaml` configuration. See the following `proxy.yaml` snippet for an example.
 
 ```yaml
 role_assignment:
@@ -233,9 +233,9 @@ In a production deployment, you want to have basic authentication (`PROXY_ENABLE
 
 ### Content Security Policy
 
-For Infinite Scale, external resources like an IDP (e.g. Keycloak) or when using web office documents or web apps, require defining a CSP. If not defined, the referenced services will not work.
+For OpenCloud, external resources like an IDP (e.g. Keycloak) or when using web office documents or web apps, require defining a CSP. If not defined, the referenced services will not work.
 
-To create a Content Security Policy (CSP), you need to create a yaml file containing the CSP definitions. To activate the settings, reference the file as value in the `PROXY_CSP_CONFIG_FILE_LOCATION` environment variable. For each change, a restart of the Infinite Scale deployment or the proxy service is required.
+To create a Content Security Policy (CSP), you need to create a yaml file containing the CSP definitions. To activate the settings, reference the file as value in the `PROXY_CSP_CONFIG_FILE_LOCATION` environment variable. For each change, a restart of the OpenCloud deployment or the proxy service is required.
 
 A working example for a CSP can be found in a sub path of the `config` directory of the [opencloud_full](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples/opencloud_full/config) deployment example.
 

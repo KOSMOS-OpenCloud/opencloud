@@ -9,11 +9,11 @@ The corresponding CS3 API [user types](https://cs3org.github.io/cs3apis/#cs3.ide
 
 ## Provisioning Backends
 
-When Infinite Scale is used via the IDM service for the user management, users are created using the `/graph/v1.0/users` endpoint via the libre graph API. For larger deployments, the Keycloak admin API can be used to provision users. In a future step, the endpoint, credentials and body might be made configurable using templates.
+When OpenCloud is used via the IDM service for the user management, users are created using the `/graph/v1.0/users` endpoint via the libre graph API. For larger deployments, the Keycloak admin API can be used to provision users. In a future step, the endpoint, credentials and body might be made configurable using templates.
 
 ### Keycloak
 
-The default and currently only available backend used to handle invitations is [Keycloak](https://www.keycloak.org/). Keycloak is an open source identity and access management (IAM) system which is also integrated by other Infinite Scale services as an authentication and authorization backend.
+The default and currently only available backend used to handle invitations is [Keycloak](https://www.keycloak.org/). Keycloak is an open source identity and access management (IAM) system which is also integrated by other OpenCloud services as an authentication and authorization backend.
 
 #### Keycloak Realm Configuration
 
@@ -42,4 +42,4 @@ After Keycloak has been configured, the invitation service needs to be configure
 
 ## Bridging Provisioning Delay
 
-Consider that when a guest account has to be provisioned in an external user management, there might be a delay between creating the user and the user being available in the local Infinite Scale system.
+Consider that when a guest account has to be provisioned in an external user management, there might be a delay between creating the user and the user being available in the local OpenCloud system.

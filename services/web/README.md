@@ -45,7 +45,7 @@ and does not support injection of dynamic web applications (custom dynamic backe
 
 ### Loading Themes
 
-Web themes are loaded, if added in the Infinite Scale source code, at build-time from
+Web themes are loaded, if added in the OpenCloud source code, at build-time from
 `<opencloud_repo>/services/web/assets/themes`.
 This cannot be manipulated at runtime.
 
@@ -67,19 +67,19 @@ Such mandatory keys are injected automatically at runtime if not provided.
 
 ### Loading Applications
 
-Web applications are loaded, if added in the Infinite Scale source code, at build-time from
+Web applications are loaded, if added in the OpenCloud source code, at build-time from
 `<opencloud_repo>/services/web/assets/apps`. This cannot be manipulated at runtime.
 
 Additionally, the administrator can provide custom applications by storing them in the path defined by the environment
 variable `WEB_ASSET_APPS_PATH`.
 
-This environment variable defaults to the Infinite Scale base data directory `$OC_BASE_DATA_PATH/web/assets/apps`,
+This environment variable defaults to the OpenCloud base data directory `$OC_BASE_DATA_PATH/web/assets/apps`,
 but can be redefined with any path set manually.
 
 The final list of available applications is composed of the built-in and the custom applications provided by the
 administrator via `WEB_ASSET_APPS_PATH`.
 
-For example, if Infinite Scale contains a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
+For example, if OpenCloud contains a built-in extension named `image-viewer-dfx` and the administrator provides a custom application named `image-viewer-obj` via the `WEB_ASSET_APPS_PATH` directory, the user will be able to access both
 applications from the WebUI.
 
 ### Application Structure
@@ -164,7 +164,7 @@ Besides the configuration and application registration, in the process of loadin
 
 This is useful for cases where just a single asset should be overwritten, like a logo or similar.
 
-Consider the following: Infinite Scale is shipped with a default web app named `image-viewer-dfx` which contains a logo,
+Consider the following: OpenCloud is shipped with a default web app named `image-viewer-dfx` which contains a logo,
 but the administrator wants to provide a custom logo for that application.
 
 This can be achieved using the path defined via `WEB_ASSET_APPS_PATH` and adding a custom structure like `WEB_ASSET_APPS_PATH/image-viewer-dfx/`. Here you can add all custom assets to load like `logo.png`. On loading the web app, custom assets defined overwrite default ones.
@@ -173,4 +173,4 @@ This also applies for the `manifest.json` file, if the administrator wants to pr
 
 ## Miscellaneous
 
-Please note that Infinite Scale, in particular the web service, needs a restart to load new applications or changes to the `apps.yaml` file.
+Please note that OpenCloud, in particular the web service, needs a restart to load new applications or changes to the `apps.yaml` file.

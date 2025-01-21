@@ -10,8 +10,8 @@ release-dirs:
 	@mkdir -p $(DIST)/binaries $(DIST)/release
 
 # docker specific packaging flags
-DOCKER_LDFLAGS += -X "$(OC_REPO)/ocis-pkg/config/defaults.BaseDataPathType=path" -X "$(OC_REPO)/ocis-pkg/config/defaults.BaseDataPathValue=/var/lib/ocis"
-DOCKER_LDFLAGS += -X "$(OC_REPO)/ocis-pkg/config/defaults.BaseConfigPathType=path" -X "$(OC_REPO)/ocis-pkg/config/defaults.BaseConfigPathValue=/etc/ocis"
+DOCKER_LDFLAGS += -X "$(OC_REPO)/pkg/config/defaults.BaseDataPathType=path" -X "$(OC_REPO)/pkg/config/defaults.BaseDataPathValue=/var/lib/opencloud"
+DOCKER_LDFLAGS += -X "$(OC_REPO)/pkg/config/defaults.BaseConfigPathType=path" -X "$(OC_REPO)/pkg/config/defaults.BaseConfigPathValue=/etc/opencloud"
 
 # We can't link statically when vips is enabled but we still
 # prefer static linking where possible

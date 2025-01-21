@@ -7,14 +7,14 @@
     initial_ssh_key_names:
       - opencloud@drone.opencloud.com
     labels:
-      owner: ocis-team
+      owner: opencloud-team
       for: opencloud-continuous-deployment-examples
     rebuild: $REBUILD
     rebuild_carry_paths:
       - /var/lib/docker/volumes/opencloud_certs
 
   domains:
-    - "*.ocis.main.opencloud.works"
+    - "*.cloud.main.opencloud.works"
 
   vars:
     ssh_authorized_keys:

@@ -117,7 +117,7 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 //	   }
 //	 },
 //
-// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
+// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OpenCloud and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
 
@@ -171,7 +171,7 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 //	   }
 //	 },
 //
-// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
+// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OpenCloud and
 func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
 	regexRules := []*regexRule{}
 	sort.Slice(cfg.MatchesPolicies, func(i, j int) bool {

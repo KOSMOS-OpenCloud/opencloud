@@ -19,7 +19,7 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment, both can be applied to OpenCloud.
 
-As a storage backend, we support the oCIS native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `s3ng` storage driver.
+As a storage backend, we support the OpenCloud native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `s3ng` storage driver.
 
 You can invoke two types of test suite runs:
 

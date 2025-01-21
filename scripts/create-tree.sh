@@ -38,14 +38,14 @@ create_tree()
     fi
 }
 
-#     creating 20/20 https://cloud.ocis.test/webdav/w20 x d1 folders/w20d1
-#   creating 420/400 https://cloud.ocis.test/webdav/w20 x d2 folders/w20d2/w20d1
-# creating 8420/8000 https://cloud.ocis.test/webdav/w20 x d3 folders/w20d3/w20d2/w20d1
+#     creating 20/20 https://cloud.opencloud.test/webdav/w20 x d1 folders/w20d1
+#   creating 420/400 https://cloud.opencloud.test/webdav/w20 x d2 folders/w20d2/w20d1
+# creating 8420/8000 https://cloud.opencloud.test/webdav/w20 x d3 folders/w20d3/w20d2/w20d1
 
-#      creating 10/10 https://cloud.ocis.test/webdav/w10 x d1 folders/w10d1
-#    creating 110/100 https://cloud.ocis.test/webdav/w10 x d2 folders/w10d2/w10d1
-#  creating 1110/1000 https://cloud.ocis.test/webdav/w10 x d3 folders/w10d3/w10d2/w10d1
-#creating 11110/10000 https://cloud.ocis.test/webdav/w10 x d4 folders/w10d4/w10d3/w10d2/w10d1  
+#      creating 10/10 https://cloud.opencloud.test/webdav/w10 x d1 folders/w10d1
+#    creating 110/100 https://cloud.opencloud.test/webdav/w10 x d2 folders/w10d2/w10d1
+#  creating 1110/1000 https://cloud.opencloud.test/webdav/w10 x d3 folders/w10d3/w10d2/w10d1
+#creating 11110/10000 https://cloud.opencloud.test/webdav/w10 x d4 folders/w10d4/w10d3/w10d2/w10d1  
 
 # w^d + 
 

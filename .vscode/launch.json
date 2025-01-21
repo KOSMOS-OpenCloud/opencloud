@@ -15,14 +15,14 @@
       "port": 40000
     },
     {
-      "name": "oCIS server",
+      "name": "OpenCloud server",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "buildFlags": [
         // "-tags", "enable_vips"
       ],
-      "program": "${workspaceFolder}/ocis/cmd/ocis",
+      "program": "${workspaceFolder}/opencloud/cmd/opencloud",
       "args": ["server"],
       "env": {
         // log settings for human developers
@@ -49,9 +49,9 @@
         "OC_SYSTEM_USER_ID": "some-system-user-id-000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
         "OC_SYSTEM_USER_API_KEY": "some-system-user-machine-auth-api-key",
         // set some hardcoded secrets
-        "OC_JWT_SECRET": "some-ocis-jwt-secret",
-        "OC_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
-        "OC_TRANSFER_SECRET": "some-ocis-transfer-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
+        "OC_MACHINE_AUTH_API_KEY": "some-opencloud-machine-auth-api-key",
+        "OC_TRANSFER_SECRET": "some-opencloud-transfer-secret",
         // collaboration
         "COLLABORATION_WOPIAPP_SECRET": "some-wopi-secret",
         // idm ldap
@@ -77,20 +77,20 @@
       }
     },
     {
-      "name": "Fed oCIS server",
+      "name": "Fed OpenCloud server",
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/ocis/cmd/ocis/main.go",
+      "program": "${workspaceFolder}/opencloud/cmd/opencloud/main.go",
       "args": ["server"],
       "env": {
-        "WEB_UI_CONFIG_FILE": "${workspaceFolder}/tests/config/local/fed-ocis-web.json",
+        "WEB_UI_CONFIG_FILE": "${workspaceFolder}/tests/config/local/fed-opencloud-web.json",
         "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "${workspaceFolder}/tests/config/local/providers.json",
         "OCM_OCM_INVITE_MANAGER_INSECURE": "true",
         "OCM_OCM_SHARE_PROVIDER_INSECURE": "true",
         "OCM_OCM_STORAGE_PROVIDER_INSECURE": "true",
-        "OC_BASE_DATA_PATH": "${env:HOME}/.ocis-10200",
-        "OC_CONFIG_DIR": "${env:HOME}/.ocis-10200/config",
+        "OC_BASE_DATA_PATH": "${env:HOME}/.opencloud-10200",
+        "OC_CONFIG_DIR": "${env:HOME}/.opencloud-10200/config",
         "OC_EVENTS_ENDPOINT": "127.0.0.1:10233",
         "OC_LDAP_URI": "ldaps://localhost:10235",
         "OC_RUNTIME_PORT": "10250",
@@ -194,9 +194,9 @@
         "IDM_ADMIN_PASSWORD": "admin",
         "OC_SYSTEM_USER_ID": "some-system-user-id-000-000000000000",
         "OC_SYSTEM_USER_API_KEY": "some-system-user-machine-auth-api-key",
-        "OC_JWT_SECRET": "some-ocis-jwt-secret",
-        "OC_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
-        "OC_TRANSFER_SECRET": "some-ocis-transfer-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
+        "OC_MACHINE_AUTH_API_KEY": "some-opencloud-machine-auth-api-key",
+        "OC_TRANSFER_SECRET": "some-opencloud-transfer-secret",
         "IDM_SVC_PASSWORD": "some-ldap-idm-password",
         "GRAPH_LDAP_BIND_PASSWORD": "some-ldap-idm-password",
         "IDM_REVASVC_PASSWORD": "some-ldap-reva-password",

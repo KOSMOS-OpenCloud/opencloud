@@ -61,7 +61,7 @@ Clients, for example OpenCloud Web, need to offer users the available apps to op
 **Request example**:
 
 ```bash
-curl 'https://ocis.test/app/list'
+curl 'https://opencloud.test/app/list'
 ```
 
 **Response example**:
@@ -150,7 +150,7 @@ HTTP status code: 200
 
 **Authentication** (one of them):
 
-- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in OpenCloud)
 - `X-Access-Token` header with a REVA token for authenticated users
 
 **Query parameters**:
@@ -163,9 +163,9 @@ HTTP status code: 200
 **Request examples**:
 
 ```bash
-curl -X POST 'https://ocis.test/app/open-with-web?file_id=ZmlsZTppZAo='
+curl -X POST 'https://opencloud.test/app/open-with-web?file_id=ZmlsZTppZAo='
 
-curl -X POST 'https://ocis.test/app/open-with-web?file_id=ZmlsZTppZAo=&app_name=Collabora'
+curl -X POST 'https://opencloud.test/app/open-with-web?file_id=ZmlsZTppZAo=&app_name=Collabora'
 ```
 
 **Response examples**:
@@ -192,7 +192,7 @@ See error cases for [Open a file with the app provider](#open-a-file-with-the-ap
 
 **Authentication** (one of them):
 
-- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in OpenCloud)
 - `Public-Token` header with public link token for public links
 - `X-Access-Token` header with a REVA token for authenticated users
 
@@ -219,15 +219,15 @@ See error cases for [Open a file with the app provider](#open-a-file-with-the-ap
 **Request examples**:
 
 ```bash
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo='
+curl -X POST 'https://opencloud.test/app/open?file_id=ZmlsZTppZAo='
 
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&lang=de'
+curl -X POST 'https://opencloud.test/app/open?file_id=ZmlsZTppZAo=&lang=de'
 
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora'
+curl -X POST 'https://opencloud.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora'
 
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&view_mode=read'
+curl -X POST 'https://opencloud.test/app/open?file_id=ZmlsZTppZAo=&view_mode=read'
 
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora&view_mode=write'
+curl -X POST 'https://opencloud.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora&view_mode=write'
 ```
 
 **Response examples**:
@@ -353,7 +353,7 @@ HTTP status code: 200
 
 **Authentication** (one of them):
 
-- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in OpenCloud)
 - `Public-Token` header with public link token for public links
 - `X-Access-Token` header with a REVA token for authenticated users
 
@@ -366,7 +366,7 @@ HTTP status code: 200
 **Request examples**:
 
 ```bash
-curl -X POST 'https://ocis.test/app/new?parent_container_id=c2lkOmNpZAo=&filename=test.odt'
+curl -X POST 'https://opencloud.test/app/new?parent_container_id=c2lkOmNpZAo=&filename=test.odt'
 ```
 
 **Response example**:

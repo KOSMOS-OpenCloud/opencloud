@@ -16,8 +16,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 
 	"github.com/opencloud-eu/opencloud/pkg/keycloak"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"

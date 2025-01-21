@@ -10,19 +10,19 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/bytesize"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/rhttp"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/errors"
+	"github.com/opencloud-eu/reva/v2/pkg/bytesize"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/rhttp"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
 	// TokenTransportHeader holds the header key for the reva transfer token
-	// "github.com/cs3org/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
+	// "github.com/opencloud-eu/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
 	TokenTransportHeader = "X-Reva-Transfer"
 )
 

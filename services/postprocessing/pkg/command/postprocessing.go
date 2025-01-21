@@ -3,12 +3,12 @@ package command
 import (
 	"context"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config/parser"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	"github.com/urfave/cli/v2"
 )
 

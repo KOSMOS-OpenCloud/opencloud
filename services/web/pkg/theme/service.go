@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
 	"github.com/opencloud-eu/opencloud/pkg/x/path/filepathx"

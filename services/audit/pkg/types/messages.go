@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 )
 
 // short identifiers for audit actions

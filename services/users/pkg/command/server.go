@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -19,6 +18,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/users/pkg/logging"
 	"github.com/opencloud-eu/opencloud/services/users/pkg/revaconfig"
 	"github.com/opencloud-eu/opencloud/services/users/pkg/server/debug"
+	"github.com/opencloud-eu/reva/v2/cmd/revad/runtime"
 	"github.com/urfave/cli/v2"
 )
 

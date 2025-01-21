@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/auth/scope"
+	"github.com/opencloud-eu/reva/v2/pkg/auth/scope"
 
 	"time"
 
@@ -14,13 +14,13 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config/parser"
+	ctxpkg "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/grpc/metadata"
 )

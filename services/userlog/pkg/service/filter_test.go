@@ -4,11 +4,11 @@ import (
 	"context"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	settingsmocks "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0/mocks"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 

@@ -11,11 +11,11 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	l10n_pkg "github.com/opencloud-eu/opencloud/services/graph/pkg/l10n"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
 var (

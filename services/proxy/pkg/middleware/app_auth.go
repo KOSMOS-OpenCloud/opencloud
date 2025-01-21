@@ -5,9 +5,9 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/pkg/log"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 // AppAuthAuthenticator defines the app auth authenticator

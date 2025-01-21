@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	cs3Conversions "github.com/cs3org/reva/v2/pkg/conversions"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
+	cs3Conversions "github.com/opencloud-eu/reva/v2/pkg/conversions"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/opencloud-eu/opencloud/pkg/conversions"

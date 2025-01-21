@@ -2,10 +2,10 @@ package service
 
 import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/clientlog/pkg/config"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"go.opentelemetry.io/otel/trace"
 )
 

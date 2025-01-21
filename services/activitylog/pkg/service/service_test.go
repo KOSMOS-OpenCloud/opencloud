@@ -5,7 +5,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/store"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
 	"github.com/stretchr/testify/require"
 )
 

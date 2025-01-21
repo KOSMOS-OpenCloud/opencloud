@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"sort"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 )
 
 var (

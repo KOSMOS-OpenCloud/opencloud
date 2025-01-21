@@ -13,11 +13,11 @@ import (
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	rjwt "github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
+	ctxpkg "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	rjwt "github.com/opencloud-eu/reva/v2/pkg/token/manager/jwt"
 	"github.com/rs/zerolog"
 	microstore "go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"

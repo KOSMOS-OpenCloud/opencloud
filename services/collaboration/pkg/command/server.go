@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	registry "github.com/opencloud-eu/opencloud/pkg/registry"
@@ -19,6 +17,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/grpc"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/http"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 )

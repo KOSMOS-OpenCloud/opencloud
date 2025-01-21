@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"go-micro.dev/v4"
 
 	"github.com/opencloud-eu/opencloud/pkg/cors"

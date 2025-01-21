@@ -11,14 +11,14 @@ import (
 	appprovider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/token"
-	rjwt "github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/wopisrc"
+	"github.com/opencloud-eu/reva/v2/pkg/token"
+	rjwt "github.com/opencloud-eu/reva/v2/pkg/token/manager/jwt"
 )
 
 var _ = Describe("Wopi Context Middleware", func() {

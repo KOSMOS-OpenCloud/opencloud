@@ -5,7 +5,6 @@ import (
 
 	stdhttp "net/http"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/google/uuid"
@@ -16,6 +15,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/pkg/version"
 	svc "github.com/opencloud-eu/opencloud/services/sse/pkg/service"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )

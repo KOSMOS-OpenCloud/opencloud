@@ -6,9 +6,9 @@ import (
 	"errors"
 	"net/http"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/data"
 	"github.com/opencloud-eu/opencloud/services/ocs/pkg/service/v0/response"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"go-micro.dev/v4/store"
 )
 

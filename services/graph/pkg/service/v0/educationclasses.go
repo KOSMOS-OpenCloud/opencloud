@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

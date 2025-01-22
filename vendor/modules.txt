@@ -1006,11 +1006,11 @@ github.com/mschoch/smat
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 ## explicit
 github.com/munnerz/goautoneg
-# github.com/nats-io/jwt/v2 v2.5.8
-## explicit; go 1.18
+# github.com/nats-io/jwt/v2 v2.7.3
+## explicit; go 1.22
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.22
-## explicit; go 1.21.0
+# github.com/nats-io/nats-server/v2 v2.10.24
+## explicit; go 1.22
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand
 github.com/nats-io/nats-server/v2/internal/ldap
@@ -1028,7 +1028,7 @@ github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
 github.com/nats-io/nats.go/internal/parser
 github.com/nats-io/nats.go/util
-# github.com/nats-io/nkeys v0.4.7
+# github.com/nats-io/nkeys v0.4.9
 ## explicit; go 1.20
 github.com/nats-io/nkeys
 # github.com/nats-io/nuid v1.0.1
@@ -1679,7 +1679,6 @@ github.com/rogpeppe/go-internal/internal/syscall/windows
 github.com/rogpeppe/go-internal/internal/syscall/windows/sysdll
 github.com/rogpeppe/go-internal/lockedfile
 github.com/rogpeppe/go-internal/lockedfile/internal/filelock
-github.com/rogpeppe/go-internal/semver
 # github.com/rs/cors v1.11.1
 ## explicit; go 1.13
 github.com/rs/cors

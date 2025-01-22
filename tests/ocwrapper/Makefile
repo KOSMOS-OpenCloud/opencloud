@@ -1,3 +1,6 @@
 .PHONY: build
+
+GOARCH := $(shell go env GOARCH)
+
 build:
-	env GOOS=linux GOARCH=arm64 go build -o bin/ocwrapper
+	env GOOS=linux GOARCH=$(GOARCH) go build -o bin/ocwrapper

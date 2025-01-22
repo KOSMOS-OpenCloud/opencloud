@@ -7,5 +7,5 @@ opencloud init
 if [ "$WITH_WRAPPER" = "true" ]; then
     ocwrapper serve --bin=opencloud
 else
-    oc server
+    opencloud server
 fi

@@ -16,7 +16,7 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
-- [coreApiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L14)
+- [coreApiVersions/fileVersionAuthor.feature:14](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L14)
 - [coreApiVersions/fileVersionAuthor.feature:60](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L60)
 - [coreApiVersions/fileVersionAuthor.feature:92](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L92)
 - [coreApiVersions/fileVersionAuthor.feature:123](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L123)
@@ -163,9 +163,9 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavMove1/moveFolder.feature:217](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L217)
 - [coreApiWebdavMove1/moveFolder.feature:218](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L218)
 - [coreApiWebdavMove1/moveFolder.feature:219](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L219)
-- [coreApiWebdavMove2/moveShareOnOpencloud.feature:334](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpenCloud.feature#L334)
+- [coreApiWebdavMove2/moveShareOnOpencloud.feature:334](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpencloud.feature#L334)
 - [coreApiWebdavMove2/moveShareOnOpenCloud.feature:337](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpenCloud.feature#L337)
-- [coreApiWebdavMove2/moveShareOnOpencloud.feature:340](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpenCloud.feature#L340)
+- [coreApiWebdavMove2/moveShareOnOpencloud.feature:340](https://github.com/opencloud-eu/opencloud/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpencloud.feature#L340)
 
 #### [COPY file/folder to same name is possible (but 500 code error for folder with spaces path)](https://github.com/owncloud/ocis/issues/8711)
 

@@ -1,3 +1,3 @@
 .PHONY: build
 build:
-	go build -o bin/ocwrapper
+	env GOOS=linux GOARCH=arm64 go build -o bin/ocwrapper

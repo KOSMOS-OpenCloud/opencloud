@@ -32,29 +32,14 @@ ci-node-generate: assets
 .PHONY: assets
 assets: pnpm-build \
 		assets/identifier/static \
-		assets/identifier/static/favicon.ico \
-		assets/identifier/static/opencloud-500.woff2 \
-		assets/identifier/static/opencloud-750.woff2
+		assets/identifier/static/favicon.ico
 
 assets/identifier/static:
 	mkdir -p assets/identifier/static
 
-# check if urls are stable, if not replace with stable location
-FAVICON_URL = https://opencloud.eu/themes/cloudy/src/assets/favicon/favicon.ico
-FONT_VARIATION_500_URL = https://gitlab.opencode.de/opentalk/web-frontend/-/raw/main/app/public/assets/fonts/opentalk/regular/opentalk-regular.woff2
-FONT_VARIATION_750_URL = https://gitlab.opencode.de/opentalk/web-frontend/-/raw/main/app/public/assets/fonts/opentalk/bold/opentalk-bold.woff2
-
 .PHONY: assets/identifier/static/favicon.ico # force overwrite
 assets/identifier/static/favicon.ico:
-	curl --fail -o assets/identifier/static/favicon.ico ${FAVICON_URL}
-
-.PHONY: assets/identifier/static/opencloud-500.woff2
-assets/identifier/static/opencloud-500.woff2:
-	curl --fail -o assets/identifier/static/opencloud-500.woff2 ${FONT_VARIATION_500_URL}
-
-.PHONY: assets/identifier/static/opencloud-750.woff2
-assets/identifier/static/opencloud-750.woff2:
-	curl --fail -o assets/identifier/static/opencloud-750.woff2 ${FONT_VARIATION_750_URL}
+	cp src/images/favicon.ico assets/identifier/static/favicon.ico
 
 .PHONY: pnpm-build
 pnpm-build: node_modules

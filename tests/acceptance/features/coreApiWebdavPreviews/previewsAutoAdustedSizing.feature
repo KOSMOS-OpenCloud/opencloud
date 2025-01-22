@@ -4,7 +4,7 @@ Feature: sizing of previews of files downloaded through the webdav API
   I want the aspect-ratio of previews to be preserved even when I ask for an unusual preview size
   So that the previews always have a similar look-and-feel to the original file
 
-  This is optional behavior of an implementation. OCIS happens like this,
+  This is optional behavior of an implementation. OpenCloud happens like this,
   but oC10 does not do this auto-fix of the aspect ratio.
 
   Background:

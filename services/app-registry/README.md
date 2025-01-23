@@ -142,7 +142,7 @@ HTTP status code: 200
 }
 ```
 
-### Open a File With ownCloud Web
+### Open a File With OpenCloud Web
 
 **Endpoint**: specified in the capabilities in `open_web_url`, currently `/app/open-with-web`
 
@@ -170,7 +170,7 @@ curl -X POST 'https://opencloud.test/app/open-with-web?file_id=ZmlsZTppZAo=&app_
 
 **Response examples**:
 
-The URI from the response JSON is intended to be opened with a GET request in a browser. If the user has not yet a session in the browser, a login flow is handled by ownCloud Web.
+The URI from the response JSON is intended to be opened with a GET request in a browser. If the user has not yet a session in the browser, a login flow is handled by OpenCloud Web.
 
 HTTP status code: 200
 

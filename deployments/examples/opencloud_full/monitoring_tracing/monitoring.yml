@@ -8,7 +8,7 @@ services:
       OC_TRACING_TYPE: "jaeger"
       OC_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
-      # if oCIS runs as a single process, all  <debug>/metrics endpoints
+      # if OpenCloud runs as a single process, all  <debug>/metrics endpoints
       # will expose the same metrics, so it's sufficient to query one endpoint
       PROXY_DEBUG_ADDR: 0.0.0.0:9205
 

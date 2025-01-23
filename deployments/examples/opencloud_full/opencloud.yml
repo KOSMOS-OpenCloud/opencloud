@@ -24,11 +24,11 @@ services:
       OC_LOG_LEVEL: ${LOG_LEVEL:-info}
       OC_LOG_COLOR: "${LOG_PRETTY:-false}"
       OC_LOG_PRETTY: "${LOG_PRETTY:-false}"
-      # do not use SSL between Traefik and oCIS
+      # do not use SSL between Traefik and OpenCloud
       PROXY_TLS: "false"
       # make the REVA gateway accessible to the app drivers
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142
-      # INSECURE: needed if oCIS / Traefik is using self generated certificates
+      # INSECURE: needed if OpenCloud / Traefik is using self generated certificates
       OC_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
@@ -39,7 +39,7 @@ services:
       # email server (if configured)
       NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
       NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
-      NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER:-oCIS notifications <notifications@${OC_DOMAIN:-cloud.opencloud.test}>}"
+      NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER:-OpenCloud notifications <notifications@${OC_DOMAIN:-cloud.opencloud.test}>}"
       NOTIFICATIONS_SMTP_USERNAME: "${SMTP_USERNAME}"
       NOTIFICATIONS_SMTP_INSECURE: "${SMTP_INSECURE}"
       # make the registry available to the app provider containers

@@ -1,4 +1,4 @@
-"""oCIS CI definition
+"""OpenCloud CI definition
 """
 
 # Production release tags
@@ -50,19 +50,19 @@ dirs = {
     "webPnpmZip": "/drone/src/zip/pnpm-store.tar.gz",
     "gobinTar": "go-bin.tar.gz",
     "gobinTarPath": "/drone/src/go-bin.tar.gz",
-    "ocisConfig": "tests/config/drone/ocis-config.json",
-    "ocis": "/srv/app/tmp/ocis",
-    "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
-    "ocisWrapper": "/drone/src/tests/ociswrapper",
+    "opencloudConfig": "tests/config/drone/opencloud-config.json",
+    "opencloud": "/srv/app/tmp/opencloud",
+    "opencloudRevaDataRoot": "/srv/app/tmp/opencloud/opencloud/data",
+    "ocWrapper": "/drone/src/tests/ocwrapper",
     "bannedPasswordList": "tests/config/drone/banned-password-list.txt",
     "ocmProviders": "tests/config/drone/providers.json",
 }
 
-# OCIS URLs
-OC_SERVER_NAME = "ocis-server"
+# OpenCloud URLs
+OC_SERVER_NAME = "opencloud-server"
 OC_URL = "https://%s:9200" % OC_SERVER_NAME
 OC_DOMAIN = "%s:9200" % OC_SERVER_NAME
-FED_OC_SERVER_NAME = "federation-ocis-server"
+FED_OC_SERVER_NAME = "federation-opencloud-server"
 OC_FED_URL = "https://%s:10200" % FED_OC_SERVER_NAME
 OC_FED_DOMAIN = "%s:10200" % FED_OC_SERVER_NAME
 
@@ -181,7 +181,7 @@ config = {
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_SMTP_SENDER": "OpenCloud <noreply@example.com>",
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
         },
@@ -230,7 +230,7 @@ config = {
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_SMTP_SENDER": "OpenCloud <noreply@example.com>",
             },
         },
         "wopi": {
@@ -407,10 +407,10 @@ def main(ctx):
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
-        buildOcisBinaryForTesting(ctx) + \
+        buildOpenCloudBinaryForTesting(ctx) + \
         checkStarlark() + \
         build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
+        testOpenCloudAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -473,8 +473,8 @@ def buildWebCache(ctx):
         cachePipeline("web-pnpm", generateWebPnpmCache(ctx)),
     ]
 
-def testOcisAndUploadResults(ctx):
-    pipeline = testOcis(ctx)
+def testOpenCloudAndUploadResults(ctx):
+    pipeline = testOpenCloud(ctx)
 
     ######################################################################
     # The triggers have been disabled for now, since the govulncheck can #
@@ -486,7 +486,7 @@ def testOcisAndUploadResults(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
-    #security_scan = scanOcis(ctx)
+    #security_scan = scanOpenCloud(ctx)
     #return [security_scan, pipeline, scan_result_upload]
     return [pipeline, scan_result_upload]
 
@@ -494,13 +494,13 @@ def testPipelines(ctx):
     pipelines = []
 
     if config["litmus"]:
-        pipelines += litmus(ctx, "ocis")
+        pipelines += litmus(ctx, "opencloud")
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+        pipelines.append(cs3ApiTests(ctx, "opencloud", "default"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "opencloud", "builtin", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "opencloud", "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
@@ -582,7 +582,7 @@ def cacheGoBin():
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
                 # cache using the minio client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r %s s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH" % (dirs["gobinTarPath"]),
+                "mc cp -r %s s3/$CACHE_BUCKET/opencloud/go-bin/$BINGO_HASH" % (dirs["gobinTarPath"]),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -597,7 +597,7 @@ def restoreGoBinCache():
             "commands": [
                 "BINGO_HASH=$(cat %s/.bingo/* | sha256sum | cut -d ' ' -f 1)" % dirs["base"],
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/%s %s" % (dirs["gobinTar"], dirs["base"]),
+                "mc cp -r -a s3/$CACHE_BUCKET/opencloud/go-bin/$BINGO_HASH/%s %s" % (dirs["gobinTar"], dirs["base"]),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -611,7 +611,7 @@ def restoreGoBinCache():
         },
     ]
 
-def testOcis(ctx):
+def testOpenCloud(ctx):
     steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
         {
             "name": "golangci-lint",
@@ -675,7 +675,7 @@ def testOcis(ctx):
         "volumes": [pipelineVolumeGo],
     }
 
-def scanOcis(ctx):
+def scanOpenCloud(ctx):
     steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
         {
             "name": "govulncheck",
@@ -707,11 +707,11 @@ def scanOcis(ctx):
         "volumes": [pipelineVolumeGo],
     }
 
-def buildOcisBinaryForTesting(ctx):
+def buildOpenCloudBinaryForTesting(ctx):
     return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "build_ocis_binary_for_testing",
+        "name": "build_opencloud_binary_for_testing",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -720,7 +720,7 @@ def buildOcisBinaryForTesting(ctx):
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +
-                 rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
+                 rebuildBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin"),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -975,7 +975,7 @@ def localApiTestPipeline(ctx):
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": ["ocis"],
+        "storages": ["opencloud"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -1003,21 +1003,21 @@ def localApiTestPipeline(ctx):
                                 "arch": "amd64",
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                     restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                                     restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
+                                     opencloudServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (opencloudServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
-                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
+                                     (opencloudHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
                                      logRequests(),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                            "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -1028,14 +1028,14 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
+def localApiTests(ctx, name, suites, storage = "opencloud", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
     environment = {
         "TEST_SERVER_URL": OC_URL,
         "TEST_SERVER_FED_URL": OC_FED_URL,
-        "OC_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+        "OC_REVA_DATA_ROOT": "%s" % (dirs["opencloudRevaDataRoot"] if storage == "owncloud" else ""),
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
@@ -1071,8 +1071,8 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
+                 restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin") +
+                 opencloudServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
                  [
                      {
                          "name": "cs3ApiTests",
@@ -1083,7 +1083,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          ],
                      },
                  ],
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+        "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1109,7 +1109,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "RenameFileIfCreateChildFileIsNotSupported",
     ]
 
-    ocis_bin = "ocis/bin/ocis"
+    opencloud_bin = "opencloud/bin/opencloud"
     validatorTests = []
     wopiServer = []
     extra_server_environment = {}
@@ -1175,10 +1175,10 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                 restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin") +
                  fakeOffice() +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
-                 ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
+                 opencloudServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
                  waitForServices("wopi-fakeoffice", ["wopi-fakeoffice:9300"]) +
                  [
@@ -1202,7 +1202,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                      },
                  ] +
                  validatorTests,
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+        "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1211,7 +1211,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         },
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "opencloud", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
@@ -1225,15 +1225,15 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
+                 restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin") +
+                 opencloudServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
                      {
                          "name": "oC10ApiTests-%s" % part_number,
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "TEST_SERVER_URL": OC_URL,
-                             "OC_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+                             "OC_REVA_DATA_ROOT": "%s" % (dirs["opencloudRevaDataRoot"] if storage == "owncloud" else ""),
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": filterTags,
@@ -1254,7 +1254,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                  ] +
                  logRequests(),
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+        "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1343,20 +1343,20 @@ def e2eTestPipeline(ctx):
 
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+            restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin/opencloud") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            opencloudServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "environment": {
-                "BASE_URL_OCIS": OC_DOMAIN,
+                "BASE_URL_OPENCLOUD": OC_DOMAIN,
                 "HEADLESS": "true",
                 "RETRY": "1",
-                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
                 "LOCAL_UPLOAD_DIR": "/uploads",
             },
             "commands": [
@@ -1381,7 +1381,7 @@ def e2eTestPipeline(ctx):
                     "type": "docker",
                     "name": "e2e-tests-%s-%s" % (name, run_part),
                     "steps": steps_before + [run_e2e] + steps_after,
-                    "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
+                    "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
                 })
@@ -1392,7 +1392,7 @@ def e2eTestPipeline(ctx):
                 "type": "docker",
                 "name": "e2e-tests-%s" % name,
                 "steps": steps_before + [step_e2e] + steps_after,
-                "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
+                "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx) + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
             })
@@ -1425,7 +1425,7 @@ def multiServiceE2ePipeline(ctx):
 
     extra_server_environment = {
         "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
-        "OC_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
         "OC_SERVICE_ACCOUNT_ID": "service-account-id",
         "OC_SERVICE_ACCOUNT_SECRET": "service-account-secret",
         "OC_EXCLUDE_RUN_SERVICES": "storage-users",
@@ -1436,7 +1436,7 @@ def multiServiceE2ePipeline(ctx):
 
     storage_users_environment = {
         "OC_CORS_ALLOW_ORIGINS": "%s,https://%s:9201" % (OC_URL, OC_SERVER_NAME),
-        "STORAGE_USERS_JWT_SECRET": "some-ocis-jwt-secret",
+        "STORAGE_USERS_JWT_SECRET": "some-opencloud-jwt-secret",
         "STORAGE_USERS_MOUNT_ID": "storage-users-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_ID": "service-account-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
@@ -1467,11 +1467,11 @@ def multiServiceE2ePipeline(ctx):
 
     storage_volume = [{
         "name": "storage",
-        "path": "/root/.ocis",
+        "path": "/root/.opencloud",
     }]
-    storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
-                             startOcisService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
-                             ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
+    storage_users_services = startOpenCloudService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
+                             startOpenCloudService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
+                             opencloudHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
 
     for _, suite in config["e2eMultiService"].items():
         if "skip" in suite and suite["skip"]:
@@ -1491,17 +1491,17 @@ def multiServiceE2ePipeline(ctx):
 
         steps = \
             skipIfUnchanged(ctx, "e2e-tests") + \
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+            restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin/opencloud") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            opencloudServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
-                    "BASE_URL_OCIS": OC_DOMAIN,
+                    "BASE_URL_OPENCLOUD": OC_DOMAIN,
                     "HEADLESS": "true",
                     "RETRY": "1",
                 },
@@ -1518,7 +1518,7 @@ def multiServiceE2ePipeline(ctx):
             "type": "docker",
             "name": "e2e-tests-multi-service",
             "steps": steps,
-            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
+            "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx) + buildWebCache(ctx)),
             "trigger": e2e_trigger,
             "volumes": [
                 {
@@ -1573,7 +1573,7 @@ def logTracingResults():
         "commands": [
             "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
             'echo "To see the trace, please open the following link in the console"',
-            'for f in *.zip; do echo "npx playwright show-trace https://cache.owncloud.com/public/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n"; done',
+            'for f in *.zip; do echo "npx playwright show-trace https://cache.opencloud.eu/public/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n"; done',
         ],
         "when": {
             "status": [
@@ -1592,7 +1592,7 @@ def dockerReleases(ctx):
     build_type = "daily"
 
     # dockerhub repo
-    #  - "owncloud/ocis-rolling"
+    #  - "opencloud/opencloud-rolling"
     repo = ctx.repo.slug + "-rolling"
     docker_repos.append(repo)
 
@@ -1629,7 +1629,7 @@ def dockerRelease(ctx, arch, repo, build_type):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "master"),
     ]
-    depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(testOpenCloudAndUploadResults(ctx) + testPipelines(ctx))
 
     if ctx.build.event == "tag":
         depends_on = []
@@ -1650,7 +1650,7 @@ def dockerRelease(ctx, arch, repo, build_type):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-linux-docker-%s ENABLE_VIPS=true" % (arch),
+                    "make -C opencloud release-linux-docker-%s ENABLE_VIPS=true" % (arch),
                 ],
             },
             {
@@ -1658,9 +1658,9 @@ def dockerRelease(ctx, arch, repo, build_type):
                 "image": PLUGINS_DOCKER,
                 "settings": {
                     "dry_run": True,
-                    "context": "ocis",
+                    "context": "opencloud",
                     "tags": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "dockerfile": "opencloud/docker/Dockerfile.linux.%s" % (arch),
                     "repo": repo,
                     "build_args": build_args,
                 },
@@ -1683,9 +1683,9 @@ def dockerRelease(ctx, arch, repo, build_type):
                         "from_secret": "docker_password",
                     },
                     "auto_tag": True,
-                    "context": "ocis",
+                    "context": "opencloud",
                     "auto_tag_suffix": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "dockerfile": "opencloud/docker/Dockerfile.linux.%s" % (arch),
                     "repo": repo,
                     "build_args": build_args,
                 },
@@ -1714,15 +1714,14 @@ def binaryReleases(ctx):
     targets = []
     build_type = "daily"
 
-    # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
-    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    depends_on = getPipelineNames(testOcisAndUploadResults(ctx) + testPipelines(ctx))
+    target = "/opencloud/%s/daily" % (ctx.repo.name.replace("opencloud-", ""))
+    depends_on = getPipelineNames(testOpenCloudAndUploadResults(ctx) + testPipelines(ctx))
 
     if ctx.build.event == "tag":
         depends_on = []
 
         buildref = ctx.build.ref.replace("refs/tags/v", "").lower()
-        target_path = "/ocis/%s" % ctx.repo.name.replace("ocis-", "")
+        target_path = "/opencloud/%s" % ctx.repo.name.replace("opencloud-", "")
 
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
@@ -1730,14 +1729,14 @@ def binaryReleases(ctx):
             targets.append(target)
             build_type = "testing"
         else:
-            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/rolling/1.0.0/
+            # uploads binary to eg. https://download.opencloud.eu/opencloud/rolling/1.0.0/
             folder = "rolling"
             target = "%s/%s/%s" % (target_path, folder, buildref)
             targets.append(target)
 
             for prod_tag in PRODUCTION_RELEASE_TAGS:
                 if buildref.startswith(prod_tag):
-                    # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
+                    # uploads binary to eg. https://download.opencloud.eu/opencloud/stable/2.0.0/
                     folder = "stable"
                     target = "%s/%s/%s" % (target_path, folder, buildref)
                     targets.append(target)
@@ -1774,8 +1773,8 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
             "from_secret": "upload_s3_bucket",
         },
         "path_style": True,
-        "strip_prefix": "ocis/dist/release/",
-        "source": "ocis/dist/release/*",
+        "strip_prefix": "opencloud/dist/release/",
+        "source": "opencloud/dist/release/*",
         "target": target,
     }
 
@@ -1795,7 +1794,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-%s" % (arch),
+                    "make -C opencloud release-%s" % (arch),
                 ],
             },
             {
@@ -1803,7 +1802,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis release-finish",
+                    "make -C opencloud release-finish",
                 ],
                 "when": {
                     "ref": [
@@ -1844,10 +1843,10 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                         "from_secret": "github_token",
                     },
                     "files": [
-                        "ocis/dist/release/*",
+                        "opencloud/dist/release/*",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
+                    "note": "opencloud/dist/CHANGELOG.md",
                     "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
@@ -1870,16 +1869,16 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     }
 
 def licenseCheck(ctx):
-    # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
-    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    # uploads third-party-licenses to https://download.opencloud.eu/opencloud/daily/
+    target = "/opencloud/%s/daily" % (ctx.repo.name.replace("opencloud-", ""))
     if ctx.build.event == "tag":
-        # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
+        # uploads third-party-licenses to eg. https://download.opencloud.eu/opencloud/1.0.0-beta9/
         folder = "stable"
         buildref = ctx.build.ref.replace("refs/tags/v", "")
         buildref = buildref.lower()
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
-        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        target = "/opencloud/%s/%s/%s" % (ctx.repo.name.replace("opencloud-", ""), folder, buildref)
 
     settings = {
         "endpoint": {
@@ -1982,7 +1981,7 @@ def licenseCheck(ctx):
                         "third-party-licenses.tar.gz",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
+                    "note": "opencloud/dist/CHANGELOG.md",
                     "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
@@ -2021,7 +2020,7 @@ def releaseDockerManifest(ctx, repo, build_type):
                 "password": {
                     "from_secret": "docker_password",
                 },
-                "spec": "ocis/docker/%s" % spec,
+                "spec": "opencloud/docker/%s" % spec,
                 "auto_tag": True if ctx.build.event == "tag" else False,
                 "ignore_missing": True,
             },
@@ -2039,7 +2038,7 @@ def releaseDockerManifest(ctx, repo, build_type):
                     "password": {
                         "from_secret": "docker_password",
                     },
-                    "spec": "ocis/docker/%s" % spec_latest,
+                    "spec": "opencloud/docker/%s" % spec_latest,
                     "auto_tag": True,
                     "ignore_missing": True,
                 },
@@ -2083,7 +2082,7 @@ def changelog():
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C ocis changelog",
+                    "make -C opencloud changelog",
                 ],
             },
             {
@@ -2110,8 +2109,8 @@ def changelog():
                     ],
                     "message": "Automated changelog update [skip ci]",
                     "branch": "master",
-                    "author_email": "devops@owncloud.com",
-                    "author_name": "ownClouders",
+                    "author_email": "devops@opencloud.eu",
+                    "author_name": "opencloud-bot",
                     "netrc_machine": "github.com",
                     "netrc_username": {
                         "from_secret": "github_username",
@@ -2317,24 +2316,24 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def opencloudServer(storage = "opencloud", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = OC_SERVER_NAME
     environment = {
         "OC_URL": OC_URL,
-        "OC_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
+        "OC_CONFIG_DIR": "/root/.opencloud/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
-        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
         "OC_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
-        "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
+        "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `opencloud init`
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OC_ASYNC_UPLOADS": True,
         "OC_EVENTS_ENABLE_TLS": False,
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
-        "OC_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OC_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
         # debug addresses required for running services health tests
@@ -2387,7 +2386,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
-        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
+        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.opencloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
@@ -2407,7 +2406,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
-    # That will allow OCIS to use whatever its built-in default is.
+    # That will allow OpenCloud to use whatever its built-in default is.
     # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
     # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
     if (accounts_hash_difficulty != "default"):
@@ -2416,18 +2415,18 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
 
-    ocis_bin = "ocis/bin/ocis"
+    opencloud_bin = "opencloud/bin/opencloud"
 
     wrapper_commands = [
-        "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OC_URL"]),
+        "make -C %s build" % dirs["ocWrapper"],
+        "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], opencloud_bin, environment["OC_URL"]),
     ]
 
-    wait_for_ocis = {
+    wait_for_opencloud = {
         "name": "wait-for-%s" % (container_name),
         "image": OC_CI_ALPINE,
         "commands": [
-            # wait for ocis-server to be ready (5 minutes)
+            # wait for opencloud-server to be ready (5 minutes)
             "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
             "%s/graph/v1.0/users/admin " % environment["OC_URL"] +
             "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
@@ -2443,19 +2442,19 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
             "environment": environment,
             "user": user,
             "commands": [
-                "%s init --insecure true" % ocis_bin,
-                "cat $OC_CONFIG_DIR/ocis.yaml",
-                "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
+                "%s init --insecure true" % opencloud_bin,
+                "cat $OC_CONFIG_DIR/opencloud.yaml",
+                "cp tests/config/drone/app-registry.yaml /root/.opencloud/config/app-registry.yaml",
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,
         },
-        wait_for_ocis,
+        wait_for_opencloud,
     ]
 
-def startOcisService(service = None, name = None, environment = {}, volumes = []):
+def startOpenCloudService(service = None, name = None, environment = {}, volumes = []):
     """
-    Starts an OCIS service in a detached container.
+    Starts an OpenCloud service in a detached container.
 
     Args:
         service (str): The name of the service to start.
@@ -2479,7 +2478,7 @@ def startOcisService(service = None, name = None, environment = {}, volumes = []
             "detach": True,
             "environment": environment,
             "commands": [
-                "ocis/bin/ocis %s server" % service,
+                "opencloud/bin/opencloud %s server" % service,
             ],
             "volumes": volumes,
         },
@@ -2493,7 +2492,7 @@ def redis():
         },
     ]
 
-def redisForOCStorage(storage = "ocis"):
+def redisForOCStorage(storage = "opencloud"):
     if storage == "owncloud":
         return redis()
     else:
@@ -2505,7 +2504,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build'",
+                "retry -t 3 'make -C opencloud build'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2561,16 +2560,16 @@ def skipIfUnchanged(ctx, type):
 
 def example_deploys(ctx):
     on_merge_deploy = [
-        "ocis_full/master.yml",
-        "ocis_full/onlyoffice-master.yml",
+        "opencloud_full/master.yml",
+        "opencloud_full/onlyoffice-master.yml",
     ]
     nightly_deploy = [
-        "ocis_ldap/rolling.yml",
-        "ocis_keycloak/rolling.yml",
-        "ocis_full/production.yml",
-        "ocis_full/rolling.yml",
-        "ocis_full/onlyoffice-rolling.yml",
-        "ocis_full/s3-rolling.yml",
+        "opencloud_ldap/rolling.yml",
+        "opencloud_keycloak/rolling.yml",
+        "opencloud_full/production.yml",
+        "opencloud_full/rolling.yml",
+        "opencloud_full/onlyoffice-rolling.yml",
+        "opencloud_full/s3-rolling.yml",
     ]
 
     # if on master branch:
@@ -2606,7 +2605,7 @@ def deploy(ctx, config, rebuild):
                 "image": ALPINE_GIT,
                 "commands": [
                     "cd deployments/continuous-deployment-config",
-                    "git clone https://github.com/owncloud-devops/continuous-deployment.git",
+                    "git clone https://github.com/opencloud-devops/continuous-deployment.git",
                 ],
             },
             {
@@ -2861,8 +2860,8 @@ def litmus(ctx, storage):
             "path": "src",
         },
         "steps": skipIfUnchanged(ctx, "litmus") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage) +
+                 restoreBuildArtifactCache(ctx, "opencloud-binary-amd64", "opencloud/bin") +
+                 opencloudServer(storage) +
                  setupForLitmus() +
                  [
                      {
@@ -2931,7 +2930,7 @@ def litmus(ctx, storage):
                      },
                  ],
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+        "depends_on": getPipelineNames(buildOpenCloudBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -2957,9 +2956,9 @@ def setupForLitmus():
     }]
 
 def getDroneEnvAndCheckScript(ctx):
-    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
-    path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
-    path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
+    opencloud_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
+    path_to_drone_env = "%s/%s/.drone.env" % (opencloud_git_base_url, ctx.build.commit)
+    path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (opencloud_git_base_url, ctx.build.commit)
     return {
         "name": "get-drone-env-and-check-script",
         "image": OC_UBUNTU,
@@ -2993,7 +2992,7 @@ def cloneWeb():
         "commands": [
             ". ./.drone.env",
             "rm -rf %s" % dirs["web"],
-            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
+            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/opencloud-eu/web.git %s" % dirs["web"],
             "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
         ],
     }
@@ -3031,7 +3030,7 @@ def generateWebPnpmCache(ctx):
                 "source ./.drone.env",
                 # cache using the minio/mc client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["webPnpmZip"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webPnpmZip"],
             ],
         },
     ]
@@ -3055,9 +3054,9 @@ def generateWebCache(ctx):
             "environment": MINIO_MC_ENV,
             "commands": [
                 "source ./.drone.env",
-                # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
+                # cache using the minio/mc client to the 'opencloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
             ],
         },
     ]
@@ -3072,7 +3071,7 @@ def restoreWebCache():
             "rm -rf %s" % dirs["web"],
             "mkdir -p %s" % dirs["web"],
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/web.tar.gz %s" % dirs["zip"],
+            "mc cp -r -a s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID/web.tar.gz %s" % dirs["zip"],
         ],
     }, {
         "name": "unzip-web-cache",
@@ -3090,7 +3089,7 @@ def restoreWebPnpmCache():
         "commands": [
             "source ./.drone.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz %s" % dirs["zip"],
+            "mc cp -r -a s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz %s" % dirs["zip"],
         ],
     }, {
         # we need to install again because the node_modules are not cached
@@ -3162,7 +3161,7 @@ def wopiCollaborationService(name):
         "COLLABORATION_APP_PROOF_DISABLE": "true",
         "COLLABORATION_APP_INSECURE": "true",
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
-        "OC_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
     }
 
@@ -3183,7 +3182,7 @@ def wopiCollaborationService(name):
 
     environment["COLLABORATION_WOPI_SRC"] = "http://%s:9300" % service_name
 
-    return startOcisService("collaboration", service_name, environment)
+    return startOpenCloudService("collaboration", service_name, environment)
 
 def tikaService():
     return [{
@@ -3214,18 +3213,18 @@ def logRequests():
     }]
 
 def k6LoadTests(ctx):
-    ocis_remote_environment = {
+    opencloud_remote_environment = {
         "SSH_OC_REMOTE": {
-            "from_secret": "k6_ssh_ocis_remote",
+            "from_secret": "k6_ssh_opencloud_remote",
         },
         "SSH_OC_USERNAME": {
-            "from_secret": "k6_ssh_ocis_user",
+            "from_secret": "k6_ssh_opencloud_user",
         },
         "SSH_OC_PASSWORD": {
-            "from_secret": "k6_ssh_ocis_pass",
+            "from_secret": "k6_ssh_opencloud_pass",
         },
         "TEST_SERVER_URL": {
-            "from_secret": "k6_ssh_ocis_server_url",
+            "from_secret": "k6_ssh_opencloud_server_url",
         },
     }
     k6_remote_environment = {
@@ -3240,14 +3239,14 @@ def k6LoadTests(ctx):
         },
     }
     environment = {}
-    environment.update(ocis_remote_environment)
+    environment.update(opencloud_remote_environment)
     environment.update(k6_remote_environment)
 
     if "skip" in config["k6LoadTests"] and config["k6LoadTests"]["skip"]:
         return []
 
-    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
-    script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+    opencloud_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
+    script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (opencloud_git_base_url, ctx.build.commit)
 
     event_array = ["cron"]
 
@@ -3273,13 +3272,13 @@ def k6LoadTests(ctx):
                 ],
             },
             {
-                "name": "ocis-log",
+                "name": "opencloud-log",
                 "image": OC_CI_ALPINE,
-                "environment": ocis_remote_environment,
+                "environment": opencloud_remote_environment,
                 "commands": [
                     "curl -s -o run_k6_tests.sh %s" % script_link,
                     "apk add --no-cache openssh-client sshpass",
-                    "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
+                    "sh %s/run_k6_tests.sh --opencloud-log" % (dirs["base"]),
                 ],
                 "when": {
                     "status": [
@@ -3292,7 +3291,7 @@ def k6LoadTests(ctx):
                 "name": "open-grafana-dashboard",
                 "image": OC_CI_ALPINE,
                 "commands": [
-                    "echo 'Grafana Dashboard: https://grafana.k6.infra.owncloud.works'",
+                    "echo 'Grafana Dashboard: https://grafana.k6.infra.opencloud.works'",
                 ],
                 "when": {
                     "status": [
@@ -3318,7 +3317,7 @@ def waitForServices(name, services = []):
         ],
     }]
 
-def ocisHealthCheck(name, services = []):
+def opencloudHealthCheck(name, services = []):
     commands = []
     timeout = 300
     curl_command = ["timeout %s bash -c 'while [ $(curl -s %s/%s ", "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'"]

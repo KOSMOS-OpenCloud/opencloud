@@ -251,7 +251,7 @@ If you want to work on a specific issue
    ```bash
    make test-acceptance-api \
    TEST_SERVER_URL=https://localhost:9200 \
-   STORAGE_DRIVER=OCIS \
+   STORAGE_DRIVER=ocis \
    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:141'
    ```
 
@@ -367,8 +367,7 @@ docker run -d -p 127.0.0.1:9998:9998 apache/tika
 
 ### Run OpenCloud
 
-TODO: change for valid link
-Documentation related to the content based search and tika extractor can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/search.html#content-extraction)
+TODO: Documentation related to the content based search and tika extractor will be added later.
 
 ```bash
 # init OpenCloud
@@ -396,8 +395,7 @@ make test-acceptance-api
 
 ## Running Test Suite With Antivirus Service (@antivirus)
 
-TODO: change for valid link
-Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
+Test suites that are tagged with `@antivirus` require antivirus service. TODO The available antivirus and the configuration related to them will be added latert. This documentation is only going to use `clamav` as antivirus.
 
 ### Setup clamAV
 
@@ -483,8 +481,7 @@ make test-acceptance-api
 
 ## Running Test Suite With Federated Sharing (@ocm)
 
-TODO: change for valid link
-Test suites that are tagged with `@ocm` require running two different OpenCloud instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
+Test suites that are tagged with `@ocm` require running two different OpenCloud instances. TODO More detailed information and configuration related to it will be added later.
 
 ### Setup First OpenCloud Instance
 

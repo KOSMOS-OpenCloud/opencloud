@@ -42,9 +42,9 @@ func DefaultConfig() *config.Config {
 		},
 		Reva:          shared.DefaultRevaConfig(),
 		DataServerURL: "http://localhost:9216/data",
-		Driver:        "ocis",
+		Driver:        "decomposed",
 		Drivers: config.Drivers{
-			OCIS: config.OCISDriver{
+			Decomposed: config.DecomposedDriver{
 				Root:                    filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				MaxAcquireLockCycles:    20,
 				LockCycleDurationFactor: 30,

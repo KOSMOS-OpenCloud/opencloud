@@ -752,7 +752,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getStorageUsersRoot(): string {
 		$ocDataPath = getenv("OC_BASE_DATA_PATH") ? getenv("OC_BASE_DATA_PATH") : getenv("HOME") . '/.opencloud';
-		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocDataPath . "/storage/users";
+		return getenv("STORAGE_USERS_DECOMPOSED_ROOT") ? getenv("STORAGE_USERS_DECOMPOSED_ROOT") : $ocDataPath . "/storage/users";
 	}
 
 	/**
@@ -3008,9 +3008,9 @@ class FeatureContext extends BehatVariablesContext {
 	public static function isExpectedToFail(string $scenarioLine): bool {
 		$expectedFailFile = \getenv('EXPECTED_FAILURES_FILE');
 		if (!$expectedFailFile) {
-			$expectedFailFile = __DIR__ . '/../expected-failures-localAPI-on-OCIS-storage.md';
+			$expectedFailFile = __DIR__ . '/../expected-failures-localAPI-on-decomposed-storage.md';
 			if (\strpos($scenarioLine, "coreApi") === 0) {
-				$expectedFailFile = __DIR__ . '/../expected-failures-API-on-OCIS-storage.md';
+				$expectedFailFile = __DIR__ . '/../expected-failures-API-on-decomposed-storage.md';
 			}
 		}
 

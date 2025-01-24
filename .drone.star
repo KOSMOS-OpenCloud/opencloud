@@ -1039,7 +1039,7 @@ def localApiTests(ctx, name, suites, storage = "opencloud", extra_environment = 
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
-        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnDecomposed-%s-Storage" % ("OC" if storage == "owncloud" else "DECOMPOSED"),
         "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
@@ -1212,7 +1212,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "opencloud", accounts_hash_difficulty = 4):
-    filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnDecomposed-%s-Storage" % ("OC" if storage == "owncloud" else "DECOMPOSED")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
 

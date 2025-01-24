@@ -31,10 +31,10 @@ use GuzzleHttp\Exception\GuzzleException;
  * @package TestHelpers
  */
 abstract class StorageDriver {
-	public const OCIS = "OCIS";
+	public const DECOMPOSED = "DECOMPOSED";
 	public const EOS = "EOS";
 	public const OWNCLOUD = "OWNCLOUD";
-	public const S3NG = "S3NG";
+	public const DECOMPOSEDS3 = "DECOMPOSED_S3";
 	public const POSIX = "POSIX";
 }
 
@@ -47,10 +47,10 @@ abstract class StorageDriver {
  */
 class OcHelper {
 	public const STORAGE_DRIVERS = [
-		StorageDriver::OCIS,
+		StorageDriver::DECOMPOSED,
 		StorageDriver::EOS,
 		StorageDriver::OWNCLOUD,
-		StorageDriver::S3NG,
+		StorageDriver::DECOMPOSEDS3,
 		StorageDriver::POSIX
 	];
 
@@ -109,7 +109,7 @@ class OcHelper {
 	public static function getStorageDriver(): string {
 		$storageDriver = (\getenv("STORAGE_DRIVER"));
 		if ($storageDriver === false) {
-			return StorageDriver::OCIS;
+			return StorageDriver::DECOMPOSED;
 		}
 		$storageDriver = \strtoupper($storageDriver);
 		if (!\in_array($storageDriver, self::STORAGE_DRIVERS)) {

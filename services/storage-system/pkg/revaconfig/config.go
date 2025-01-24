@@ -148,30 +148,33 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 }
 
 func metadataDrivers(localEndpoint string, cfg *config.Config) map[string]interface{} {
-	return map[string]interface{}{
-		"ocis": map[string]interface{}{
-			"metadata_backend":           "messagepack",
-			"root":                       cfg.Drivers.OCIS.Root,
-			"user_layout":                "{{.Id.OpaqueId}}",
-			"treetime_accounting":        false,
-			"treesize_accounting":        false,
-			"permissionssvc":             localEndpoint,
-			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
-			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
-			"disable_versioning":         true,
-			"statcache": map[string]interface{}{
-				"cache_store":    "noop",
-				"cache_database": "system",
-			},
-			"filemetadatacache": map[string]interface{}{
-				"cache_store":               cfg.FileMetadataCache.Store,
-				"cache_nodes":               cfg.FileMetadataCache.Nodes,
-				"cache_database":            cfg.FileMetadataCache.Database,
-				"cache_ttl":                 cfg.FileMetadataCache.TTL,
-				"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
-				"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
-				"cache_auth_password":       cfg.FileMetadataCache.AuthPassword,
-			},
+	m := map[string]interface{}{
+		"metadata_backend":           "messagepack",
+		"root":                       cfg.Drivers.Decomposed.Root,
+		"user_layout":                "{{.Id.OpaqueId}}",
+		"treetime_accounting":        false,
+		"treesize_accounting":        false,
+		"permissionssvc":             localEndpoint,
+		"max_acquire_lock_cycles":    cfg.Drivers.Decomposed.MaxAcquireLockCycles,
+		"lock_cycle_duration_factor": cfg.Drivers.Decomposed.LockCycleDurationFactor,
+		"disable_versioning":         true,
+		"statcache": map[string]interface{}{
+			"cache_store":    "noop",
+			"cache_database": "system",
 		},
+		"filemetadatacache": map[string]interface{}{
+			"cache_store":               cfg.FileMetadataCache.Store,
+			"cache_nodes":               cfg.FileMetadataCache.Nodes,
+			"cache_database":            cfg.FileMetadataCache.Database,
+			"cache_ttl":                 cfg.FileMetadataCache.TTL,
+			"cache_disable_persistence": cfg.FileMetadataCache.DisablePersistence,
+			"cache_auth_username":       cfg.FileMetadataCache.AuthUsername,
+			"cache_auth_password":       cfg.FileMetadataCache.AuthPassword,
+		},
+	}
+
+	return map[string]interface{}{
+		"ocis":       m, // deprecated: use decomposed
+		"decomposed": m,
 	}
 }

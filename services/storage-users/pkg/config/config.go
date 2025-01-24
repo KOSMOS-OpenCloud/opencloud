@@ -24,7 +24,7 @@ type Config struct {
 	SkipUserGroupsInToken   bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 	GracefulShutdownTimeout int  `yaml:"graceful_shutdown_timeout" env:"STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT" desc:"The number of seconds to wait for the 'storage-users' service to shutdown cleanly before exiting with an error that gets logged. Note: This setting is only applicable when running the 'storage-users' service as a standalone service. See the text description for more details." introductionVersion:"pre5.0"`
 
-	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
+	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'decomposed', Supported values are: 'decomposed', 'decomposed_s3' and 'owncloudsql'. For backwards compatibility reasons it's also possible to use the 'ocis' and 's3ng' driver and configure them using the 'decomposed'/'decomposed_s3' options. The 'decomposed' driver stores all data (blob and meta data) in an POSIX compliant volume. The 'decomposed_s3' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
 	Drivers        Drivers `yaml:"drivers"`
 	DataServerURL  string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed." introductionVersion:"pre5.0"`
 	DataGatewayURL string  `yaml:"data_gateway_url" env:"STORAGE_USERS_DATA_GATEWAY_URL" desc:"URL of the data gateway server" introductionVersion:"pre5.0"`
@@ -98,10 +98,10 @@ type CORS struct {
 
 // Drivers combine all storage driver configurations
 type Drivers struct {
-	OCIS        OCISDriver        `yaml:"ocis"`
-	S3NG        S3NGDriver        `yaml:"s3ng"`
-	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
-	Posix       PosixDriver       `yaml:"posix"`
+	Decomposed   DecomposedDriver   `yaml:"decomposed"`
+	DecomposedS3 DecomposedS3Driver `yaml:"decomposed_s3"`
+	OwnCloudSQL  OwnCloudSQLDriver  `yaml:"owncloudsql"`
+	Posix        PosixDriver        `yaml:"posix"`
 
 	S3    S3Driver    `yaml:",omitempty"` // not supported by the OpenCloud product, therefore not part of docs
 	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the OpenCloud product, therefore not part of docs
@@ -113,64 +113,65 @@ type AsyncPropagatorOptions struct {
 	PropagationDelay time.Duration `yaml:"propagation_delay" env:"STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY" desc:"The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details." introductionVersion:"pre5.0"`
 }
 
-// OCISDriver is the storage driver configuration when using 'ocis' storage driver
-type OCISDriver struct {
-	Propagator             string                 `yaml:"propagator" env:"OC_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_OCIS_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
+// DecomposedDriver is the storage driver configuration when using 'decomposed' storage driver
+type DecomposedDriver struct {
+	Propagator             string                 `yaml:"propagator" env:"OC_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_DECOMPOSED_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_USERS_OCIS_ROOT" desc:"The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
-	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_OCIS_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
-	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'." introductionVersion:"pre5.0"`
+	Root                string `yaml:"root" env:"STORAGE_USERS_DECOMPOSED_ROOT" desc:"The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
+	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_DECOMPOSED_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSED_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposed_s3'." introductionVersion:"pre5.0"`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
-	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
-	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
+	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_DECOMPOSED_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
+	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_DECOMPOSED_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
 	// GeneralSpaceAliasTemplate contains the template used to construct
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
-	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
-	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
+	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_DECOMPOSED_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
+	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_DECOMPOSED_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
 	// ShareFolder defines the name of the folder jailing all shares
-	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_OCIS_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
-	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, OpenCloud will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
-	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, OpenCloud will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
-	MaxConcurrency          int    `yaml:"max_concurrency" env:"OC_MAX_CONCURRENCY;STORAGE_USERS_OCIS_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
+	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_DECOMPOSED_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
+	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_DECOMPOSED_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, OpenCloud will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
+	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_DECOMPOSED_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, OpenCloud will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
+	MaxConcurrency          int    `yaml:"max_concurrency" env:"OC_MAX_CONCURRENCY;STORAGE_USERS_DECOMPOSED_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"pre5.0"`
 	AsyncUploads            bool   `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"pre5.0"`
-	MaxQuota                uint64 `yaml:"max_quota" env:"OC_SPACES_MAX_QUOTA;STORAGE_USERS_OCIS_MAX_QUOTA" desc:"Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OC_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service." introductionVersion:"pre5.0"`
+	MaxQuota                uint64 `yaml:"max_quota" env:"OC_SPACES_MAX_QUOTA;STORAGE_USERS_DECOMPOSED_MAX_QUOTA" desc:"Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OC_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service." introductionVersion:"pre5.0"`
 	DisableVersioning       bool   `yaml:"disable_versioning" env:"OC_DISABLE_VERSIONING" desc:"Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version." introductionVersion:"7.0.0"`
 }
 
-// S3NGDriver is the storage driver configuration when using 's3ng' storage driver
-type S3NGDriver struct {
-	Propagator             string                 `yaml:"propagator" env:"OC_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_S3NG_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
+// DecomposedS3Driver is the storage driver configuration when using 'decomposed_s3' storage driver
+type DecomposedS3Driver struct {
+	Propagator             string                 `yaml:"propagator" env:"OC_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_DECOMPOSEDS3_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data
-	Root                  string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
-	UserLayout            string `yaml:"user_layout" env:"STORAGE_USERS_S3NG_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
-	PermissionsEndpoint   string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'." introductionVersion:"pre5.0"`
-	Region                string `yaml:"region" env:"STORAGE_USERS_S3NG_REGION" desc:"Region of the S3 bucket." introductionVersion:"pre5.0"`
-	AccessKey             string `yaml:"access_key" env:"STORAGE_USERS_S3NG_ACCESS_KEY" desc:"Access key for the S3 bucket." introductionVersion:"pre5.0"`
-	SecretKey             string `yaml:"secret_key" env:"STORAGE_USERS_S3NG_SECRET_KEY" desc:"Secret key for the S3 bucket." introductionVersion:"pre5.0"`
-	Endpoint              string `yaml:"endpoint" env:"STORAGE_USERS_S3NG_ENDPOINT" desc:"Endpoint for the S3 bucket." introductionVersion:"pre5.0"`
-	Bucket                string `yaml:"bucket" env:"STORAGE_USERS_S3NG_BUCKET" desc:"Name of the S3 bucket." introductionVersion:"pre5.0"`
-	DisableContentSha256  bool   `yaml:"put_object_disable_content_sha254" env:"STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_CONTENT_SHA256" desc:"Disable sending content sha256 when copying objects to S3." introductionVersion:"5.0"`
-	DisableMultipart      bool   `yaml:"put_object_disable_multipart" env:"STORAGE_USERS_S3NG_PUT_OBJECT_DISABLE_MULTIPART" desc:"Disable multipart uploads when copying objects to S3" introductionVersion:"5.0"`
-	SendContentMd5        bool   `yaml:"put_object_send_content_md5" env:"STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5" desc:"Send a Content-MD5 header when copying objects to S3." introductionVersion:"5.0"`
-	ConcurrentStreamParts bool   `yaml:"put_object_concurrent_stream_parts" env:"STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS" desc:"Always precreate parts when copying objects to S3." introductionVersion:"5.0"`
-	NumThreads            uint   `yaml:"put_object_num_threads" env:"STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS" desc:"Number of concurrent uploads to use when copying objects to S3." introductionVersion:"5.0"`
-	PartSize              uint64 `yaml:"put_object_part_size" env:"STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE" desc:"Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB." introductionVersion:"5.0"`
+	Root                  string `yaml:"root" env:"STORAGE_USERS_DECOMPOSEDS3_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
+	UserLayout            string `yaml:"user_layout" env:"STORAGE_USERS_DECOMPOSEDS3_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
+	PermissionsEndpoint   string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSEDS3_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposed_s3'." introductionVersion:"pre5.0"`
+	Region                string `yaml:"region" env:"STORAGE_USERS_DECOMPOSEDS3_REGION" desc:"Region of the S3 bucket." introductionVersion:"pre5.0"`
+	AccessKey             string `yaml:"access_key" env:"STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY" desc:"Access key for the S3 bucket." introductionVersion:"pre5.0"`
+	SecretKey             string `yaml:"secret_key" env:"STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY" desc:"Secret key for the S3 bucket." introductionVersion:"pre5.0"`
+	Endpoint              string `yaml:"endpoint" env:"STORAGE_USERS_DECOMPOSEDS3_ENDPOINT" desc:"Endpoint for the S3 bucket." introductionVersion:"pre5.0"`
+	Bucket                string `yaml:"bucket" env:"STORAGE_USERS_DECOMPOSEDS3_BUCKET" desc:"Name of the S3 bucket." introductionVersion:"pre5.0"`
+	DisableContentSha256  bool   `yaml:"put_object_disable_content_sha254" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_DISABLE_CONTENT_SHA256" desc:"Disable sending content sha256 when copying objects to S3." introductionVersion:"5.0"`
+	DisableMultipart      bool   `yaml:"put_object_disable_multipart" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_DISABLE_MULTIPART" desc:"Disable multipart uploads when copying objects to S3" introductionVersion:"5.0"`
+	SendContentMd5        bool   `yaml:"put_object_send_content_md5" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_SEND_CONTENT_MD5" desc:"Send a Content-MD5 header when copying objects to S3." introductionVersion:"5.0"`
+	ConcurrentStreamParts bool   `yaml:"put_object_concurrent_stream_parts" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_CONCURRENT_STREAM_PARTS" desc:"Always precreate parts when copying objects to S3." introductionVersion:"5.0"`
+	NumThreads            uint   `yaml:"put_object_num_threads" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_NUM_THREADS" desc:"Number of concurrent uploads to use when copying objects to S3." introductionVersion:"5.0"`
+	PartSize              uint64 `yaml:"put_object_part_size" env:"STORAGE_USERS_DECOMPOSEDS3_PUT_OBJECT_PART_SIZE" desc:"Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB." introductionVersion:"5.0"`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
-	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
-	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
+	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_DECOMPOSEDS3_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
+	PersonalSpacePathTemplate  string `yaml:"personalspacepath_template" env:"STORAGE_USERS_DECOMPOSEDS3_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
 	// GeneralSpaceAliasTemplate contains the template used to construct
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
-	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
-	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
+	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_DECOMPOSEDS3_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"pre5.0"`
+	GeneralSpacePathTemplate  string `yaml:"generalspacepath_template" env:"STORAGE_USERS_DECOMPOSEDS3_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
 	// ShareFolder defines the name of the folder jailing all shares
-	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
-	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, OpenCloud will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used." introductionVersion:"pre5.0"`
-	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, OpenCloud will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used." introductionVersion:"pre5.0"`
-	MaxConcurrency          int    `yaml:"max_concurrency" env:"OC_MAX_CONCURRENCY;STORAGE_USERS_S3NG_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used." introductionVersion:"pre5.0"`
+	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_DECOMPOSEDS3_SHARE_FOLDER" desc:"Name of the folder jailing all shares." introductionVersion:"pre5.0"`
+	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_DECOMPOSEDS3_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, OpenCloud will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used." introductionVersion:"pre5.0"`
+	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_DECOMPOSEDS3_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, OpenCloud will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used." introductionVersion:"pre5.0"`
+	MaxConcurrency          int    `yaml:"max_concurrency" env:"OC_MAX_CONCURRENCY;STORAGE_USERS_DECOMPOSEDS3_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used." introductionVersion:"pre5.0"`
+	AsyncUploads            bool   `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"pre5.0"`
 	DisableVersioning       bool   `yaml:"disable_versioning" env:"OC_DISABLE_VERSIONING" desc:"Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version." introductionVersion:"7.0.0"`
 }
 
@@ -196,7 +197,7 @@ type PosixDriver struct {
 	Root                      string        `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"6.0.0"`
 	PersonalSpacePathTemplate string        `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
 	GeneralSpacePathTemplate  string        `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
-	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'." introductionVersion:"6.0.0"`
+	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed', 'posix' and 'decomposed_s3'." introductionVersion:"6.0.0"`
 	AsyncUploads              bool          `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"pre5.0"`
 	ScanDebounceDelay         time.Duration `yaml:"scan_debounce_delay" env:"STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY" desc:"The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected." introductionVersion:"6.0.0"`
 

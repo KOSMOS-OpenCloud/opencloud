@@ -19,7 +19,7 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment, both can be applied to OpenCloud.
 
-As a storage backend, we support the OpenCloud native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `s3ng` storage driver.
+As a storage backend, we support the OpenCloud native storage, also called `decomposed`. This stores files directly on disk. Along with that we also provide `decomposed_s3` storage driver.
 
 You can invoke two types of test suite runs:
 
@@ -30,23 +30,23 @@ You can invoke two types of test suite runs:
 
 #### Local OpenCloud Tests (prefix `api`)
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features). They can be run with `ocis` storage and `s3ng` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features). They can be run with `decomposed` storage and `decomposed_s3` storage.
 
 For example, command:
 
 ```bash
-make -C tests/acceptance/docker localApiTests-apiGraph-ocis
+make -C tests/acceptance/docker localApiTests-apiGraph-decomposed
 ```
 
-runs the same tests as the `localApiTests-apiGraph-ocis` CI pipeline, which runs the OpenCloud test suite "apiGraph" against the OpenCloud server with `ocis` storage.
+runs the same tests as the `localApiTests-apiGraph-decomposed` CI pipeline, which runs the OpenCloud test suite "apiGraph" against the OpenCloud server with `decomposed` storage.
 
 And command:
 
 ```bash
-make -C tests/acceptance/docker localApiTests-apiGraph-s3ng
+make -C tests/acceptance/docker localApiTests-apiGraph-decomposed_s3
 ```
 
-runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `s3ng` storage.
+runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `decomposed_s3` storage.
 
 Note:
 While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
@@ -54,7 +54,7 @@ While running the tests, OpenCloud server is started with [ocwrapper](https://gi
 ```bash
 WITH_WRAPPER=false \
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
 But some test suites that are tagged with `@env-config` require the OpenCloud server to be run with ocwrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
@@ -65,7 +65,7 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 ```bash
 START_EMAIL=true \
 BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
 Note:
@@ -74,7 +74,7 @@ To run the tests that require tika service (tests tagged with `@tikaServiceNeede
 ```bash
 START_TIKA=true \
 BEHAT_FEATURE='tests/acceptance/features/apiSearchContent/contentSearch.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
 Note:
@@ -86,14 +86,14 @@ OC_ASYNC_UPLOADS=true \
 OC_ADD_RUN_SERVICES=antivirus \
 POSTPROCESSING_STEPS=virusscan \
 BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
 #### Tests Transferred From Core (prefix `coreApi`)
 
-Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `ocis` storage.
+Command `make -C tests/acceptance/docker Core-API-Tests-decomposed-storage-3` runs the same tests as the `Core-API-Tests-decomposed-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `decomposed` storage.
 
-And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `s3ng` storage.
+And `make -C tests/acceptance/docker Core-API-Tests-decomposed_s3-storage-3` runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `decomposed_s3` storage.
 
 ### Run Single Feature Test
 
@@ -103,7 +103,7 @@ For example;
 
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
 Note:
@@ -116,19 +116,19 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-opencloud-feature-ocis-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
-Similarly, with `s3ng` storage;
+Similarly, with `decomposed_s3` storage;
 
 ```bash
 # run a whole feature
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-s3ng-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed_s3-storage
 
 # run a single scenario
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-opencloud-feature-s3ng-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposed_s3-storage
 ```
 
 In the same way, tests transferred from core can be run as:
@@ -136,11 +136,11 @@ In the same way, tests transferred from core can be run as:
 ```bash
 # run a whole feature
 BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature' \
-make -C tests/acceptance/docker test-core-feature-ocis-storage
+make -C tests/acceptance/docker test-core-feature-decomposed-storage
 
 # run a single scenario
 BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:15' \
-make -C tests/acceptance/docker test-core-feature-ocis-storage
+make -C tests/acceptance/docker test-core-feature-decomposed-storage
 ```
 
 Note:
@@ -222,7 +222,7 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 >
 > BEHAT_SUITE=apiGraph
 
-`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `ocis` (default), `owncloudsql` and `s3ng`
+`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `decomposed` (default), `owncloudsql` and `decomposed_s3`
 
 > Example:
 >
@@ -237,7 +237,7 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 ### Use Existing Tests for BDD
 
 As a lot of scenarios are written for core, we can use those tests for Behaviour driven development in OpenCloud.
-Every scenario that does not work in OpenCloud with `ocis` storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
+Every scenario that does not work in OpenCloud with `decomposed` storage, is listed in `tests/acceptance/expected-failures-API-on-decomposed-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
@@ -251,7 +251,7 @@ If you want to work on a specific issue
    ```bash
    make test-acceptance-api \
    TEST_SERVER_URL=https://localhost:9200 \
-   STORAGE_DRIVER=ocis \
+   STORAGE_DRIVER=decomposed \
    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:141'
    ```
 

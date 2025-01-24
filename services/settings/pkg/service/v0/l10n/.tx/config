@@ -1,10 +1,10 @@
 [main]
 host = https://www.transifex.com
 
-[o:owncloud-org:p:owncloud:r:ocis-settings]
+[o:opencloud-eu:p:opencloud-eu:r:opencloud-settings]
 file_filter = locale/<lang>/LC_MESSAGES/settings.po
 minimum_perc = 75
-resource_name = ocis-settings
+resource_name = opencloud-settings
 source_file = settings.pot
 source_lang = en
 type = PO

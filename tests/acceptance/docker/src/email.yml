@@ -6,3 +6,5 @@ services:
     command: email:9000
   email:
     image: inbucket/inbucket
+    ports:
+      - '9000:9000'

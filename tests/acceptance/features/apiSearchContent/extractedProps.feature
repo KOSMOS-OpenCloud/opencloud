@@ -34,8 +34,8 @@ Feature: propfind extracted props
     Then the HTTP status code should be "207"
     And as user "Alice" the REPORT response should contain a resource "testavatar.jpg" with these key and value pairs:
       | key                              | value                |
-      | oc:image/oc:width                | 640                  |
-      | oc:image/oc:height               | 480                  |
+      | oc:image/oc:width                | 1402                 |
+      | oc:image/oc:height               | 500                  |
       | oc:location/oc:latitude          | 43.467157            |
       | oc:location/oc:longitude         | 11.885395            |
       | oc:photo/oc:camera-make          | NIKON                |
@@ -67,8 +67,8 @@ Feature: propfind extracted props
     Then the HTTP status code should be "207"
     And as user "Alice" the REPORT response should contain a resource "testavatar.jpg" with these key and value pairs:
       | key                              | value                |
-      | oc:image/oc:width                | 640                  |
-      | oc:image/oc:height               | 480                  |
+      | oc:image/oc:width                | 1402                 |
+      | oc:image/oc:height               | 500                  |
       | oc:location/oc:latitude          | 43.467157            |
       | oc:location/oc:longitude         | 11.885395            |
       | oc:photo/oc:camera-make          | NIKON                |
@@ -117,8 +117,8 @@ Feature: propfind extracted props
     Then the HTTP status code should be "207"
     And as user "Brian" the REPORT response should contain a resource "testavatar.jpg" with these key and value pairs:
       | key                              | value                |
-      | oc:image/oc:width                | 640                  |
-      | oc:image/oc:height               | 480                  |
+      | oc:image/oc:width                | 1402                 |
+      | oc:image/oc:height               | 500                  |
       | oc:location/oc:latitude          | 43.467157            |
       | oc:location/oc:longitude         | 11.885395            |
       | oc:photo/oc:camera-make          | NIKON                |
@@ -194,10 +194,10 @@ Feature: propfind extracted props
               "required": [ "height", "width" ],
               "properties": {
                 "height": {
-                  "const": 480
+                  "const": 500
                 },
                 "width": {
-                  "const": 640
+                  "const": 1402
                 }
               }
             },
@@ -328,10 +328,10 @@ Feature: propfind extracted props
               "required": [ "height", "width" ],
               "properties": {
                 "height": {
-                  "const": 480
+                  "const": 1402
                 },
                 "width": {
-                  "const": 640
+                  "const": 500
                 }
               }
             },
@@ -474,10 +474,10 @@ Feature: propfind extracted props
               "required": [ "height", "width" ],
               "properties": {
                 "height": {
-                  "const": 480
+                  "const": 1402
                 },
                 "width": {
-                  "const": 640
+                  "const": 500
                 }
               }
             },

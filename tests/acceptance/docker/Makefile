@@ -274,3 +274,20 @@ clean-files:
 
 .PHONY: clean
 clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-files ## clean all
+
+.PHONY: start-server
+start-server: ## build and start server
+	@echo "Build and start server..."
+	COMPOSE_FILE=src/opencloud-base.yml:src/tika.yml:src/email.yml \
+	COMPOSE_PROJECT_NAME=opencloud \
+	SEARCH_EXTRACTOR_TYPE=tika \
+	OC_IMAGE_TAG=dev \
+	WITH_WRAPPER=true \
+	TEST_SOURCE=opencloud \
+	STORAGE_DRIVER=ocis \
+	OC_ASYNC_UPLOADS=true \
+	START_TIKA=true \
+	SEARCH_EXTRACTOR_TYPE=tika \
+	START_EMAIL=true \
+	OC_ADD_RUN_SERVICES=notifications \
+	docker compose up -d --build --force-recreate

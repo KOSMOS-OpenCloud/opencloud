@@ -15,7 +15,7 @@ is_extension_allowed(identifier) {
 }
 
 is_mimetype_allowed(mimetype) {
-     extensions := ocis.mimetype.extensions(mimetype)
+     extensions := opencloud.mimetype.extensions(mimetype)
      extension := extensions[_]
      is_extension_allowed(extension)
 }

@@ -10,8 +10,8 @@ granted = false if {
 }
 
 granted = false if {
-    bytes := ocis.resource.download(input.resource.url)
-    mimetype := ocis.mimetype.detect(bytes)
+    bytes := opencloud.resource.download(input.resource.url)
+    mimetype := opencloud.mimetype.detect(bytes)
 
     not utils.is_mimetype_allowed(mimetype)
 }

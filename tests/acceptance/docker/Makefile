@@ -65,7 +65,7 @@ help:
 	@echo -e "You also can select the OpenCloud Docker image for all tests by setting"
 	@echo -e "\tmake ... ${YELLOW}OC_IMAGE_TAG=latest${RESET}"
 	@echo -e "where ${YELLOW}latest${RESET} is an example for any valid Docker image tag from"
-	@echo -e "https://hub.docker.com/r/opencloud/opencloud."
+	@echo -e "https://hub.docker.com/r/opencloud-eu/opencloud."
 	@echo
 	@echo -e "${GREEN}Run full OpenCloud test suites with ocis storage:${RESET}\n"
 	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-ocis\t\t${BLUE}run apiAccountsHashDifficulty test suite,  where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
@@ -242,7 +242,7 @@ build-dev-image:
 
 .PHONY: clean-dev-docker-image
 clean-dev-docker-image: ## clean docker image built during acceptance tests
-	@docker image rm opencloud/opencloud:dev || true
+	@docker image rm opencloud-eu/opencloud:dev || true
 
 .PHONY: clean-docker-container
 clean-docker-container: ## clean docker containers created during acceptance tests

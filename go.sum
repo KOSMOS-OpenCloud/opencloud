@@ -873,6 +873,8 @@ github.com/open-policy-agent/opa v0.70.0 h1:B3cqCN2iQAyKxK6+GI+N40uqkin+wzIrM7YA
 github.com/open-policy-agent/opa v0.70.0/go.mod h1:Y/nm5NY0BX0BqjBriKUiV81sCl8XOjjvqQG7dXrggtI=
 github.com/opencloud-eu/reva/v2 v2.27.3-0.20250121094357-24f23b6a27ed h1:0rVMOlcGXgFRNrNgjeCGTyuGKXwD+Y+wQGzm/uVe3CU=
 github.com/opencloud-eu/reva/v2 v2.27.3-0.20250121094357-24f23b6a27ed/go.mod h1:lk0GfBt0cLaOcc1nWJikinTK5ibFtKRxp10ATxtCalU=
+github.com/opencloud-eu/reva/v2 v2.27.3-0.20250127153848-a84e6c39c206 h1:sTbtA2hU40r6eh24aswG0oP7NiJrVyEiqM1nn72TrHA=
+github.com/opencloud-eu/reva/v2 v2.27.3-0.20250127153848-a84e6c39c206/go.mod h1:lk0GfBt0cLaOcc1nWJikinTK5ibFtKRxp10ATxtCalU=
 github.com/opencontainers/runtime-spec v1.1.0 h1:HHUyrt9mwHUjtasSbXSMvs4cyFxh+Bll4AjJ9odEGpg=
 github.com/opencontainers/runtime-spec v1.1.0/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=

@@ -154,31 +154,31 @@ func OwnCloudSQL(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// Ocis is the config mapping for the Ocis storage driver
-func Ocis(cfg *config.Config) map[string]interface{} {
+// Decomposed is the config mapping for the Decomposed storage driver
+func Decomposed(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",
-		"propagator":       cfg.Drivers.OCIS.Propagator,
+		"propagator":       cfg.Drivers.Decomposed.Propagator,
 		"async_propagator_options": map[string]interface{}{
-			"propagation_delay": cfg.Drivers.OCIS.AsyncPropagatorOptions.PropagationDelay,
+			"propagation_delay": cfg.Drivers.Decomposed.AsyncPropagatorOptions.PropagationDelay,
 		},
-		"root":                        cfg.Drivers.OCIS.Root,
-		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
-		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
-		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
-		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
-		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
+		"root":                        cfg.Drivers.Decomposed.Root,
+		"user_layout":                 cfg.Drivers.Decomposed.UserLayout,
+		"share_folder":                cfg.Drivers.Decomposed.ShareFolder,
+		"personalspacealias_template": cfg.Drivers.Decomposed.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.Decomposed.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.Decomposed.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.Decomposed.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
-		"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
+		"permissionssvc":              cfg.Drivers.Decomposed.PermissionsEndpoint,
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
-		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
-		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
-		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
-		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
-		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
-		"disable_versioning":          cfg.Drivers.OCIS.DisableVersioning,
+		"max_acquire_lock_cycles":     cfg.Drivers.Decomposed.MaxAcquireLockCycles,
+		"lock_cycle_duration_factor":  cfg.Drivers.Decomposed.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.Decomposed.MaxConcurrency,
+		"asyncfileuploads":            cfg.Drivers.Decomposed.AsyncUploads,
+		"max_quota":                   cfg.Drivers.Decomposed.MaxQuota,
+		"disable_versioning":          cfg.Drivers.Decomposed.DisableVersioning,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -209,30 +209,30 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// OcisNoEvents is the config mapping for the ocis storage driver emitting no events
-func OcisNoEvents(cfg *config.Config) map[string]interface{} {
+// DecomposedsNoEvents is the config mapping for the Decomposed storage driver emitting no events
+func DecomposedNoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",
-		"propagator":       cfg.Drivers.OCIS.Propagator,
+		"propagator":       cfg.Drivers.Decomposed.Propagator,
 		"async_propagator_options": map[string]interface{}{
-			"propagation_delay": cfg.Drivers.OCIS.AsyncPropagatorOptions.PropagationDelay,
+			"propagation_delay": cfg.Drivers.Decomposed.AsyncPropagatorOptions.PropagationDelay,
 		},
-		"root":                        cfg.Drivers.OCIS.Root,
-		"user_layout":                 cfg.Drivers.OCIS.UserLayout,
-		"share_folder":                cfg.Drivers.OCIS.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
-		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
-		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
-		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
+		"root":                        cfg.Drivers.Decomposed.Root,
+		"user_layout":                 cfg.Drivers.Decomposed.UserLayout,
+		"share_folder":                cfg.Drivers.Decomposed.ShareFolder,
+		"personalspacealias_template": cfg.Drivers.Decomposed.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.Decomposed.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.Decomposed.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.Decomposed.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
-		"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
+		"permissionssvc":              cfg.Drivers.Decomposed.PermissionsEndpoint,
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
-		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
-		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
-		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
-		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
-		"disable_versioning":          cfg.Drivers.OCIS.DisableVersioning,
+		"max_acquire_lock_cycles":     cfg.Drivers.Decomposed.MaxAcquireLockCycles,
+		"lock_cycle_duration_factor":  cfg.Drivers.Decomposed.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.Decomposed.MaxConcurrency,
+		"max_quota":                   cfg.Drivers.Decomposed.MaxQuota,
+		"disable_versioning":          cfg.Drivers.Decomposed.DisableVersioning,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -267,41 +267,41 @@ func S3(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// S3NG is the config mapping for the s3ng storage driver
-func S3NG(cfg *config.Config) map[string]interface{} {
+// DecomposedS3 is the config mapping for the Decomposed-S3 storage driver
+func DecomposedS3(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",
-		"propagator":       cfg.Drivers.S3NG.Propagator,
+		"propagator":       cfg.Drivers.DecomposedS3.Propagator,
 		"async_propagator_options": map[string]interface{}{
-			"propagation_delay": cfg.Drivers.S3NG.AsyncPropagatorOptions.PropagationDelay,
+			"propagation_delay": cfg.Drivers.DecomposedS3.AsyncPropagatorOptions.PropagationDelay,
 		},
-		"root":                        cfg.Drivers.S3NG.Root,
-		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
-		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
-		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
-		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
-		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
+		"root":                        cfg.Drivers.DecomposedS3.Root,
+		"user_layout":                 cfg.Drivers.DecomposedS3.UserLayout,
+		"share_folder":                cfg.Drivers.DecomposedS3.ShareFolder,
+		"personalspacealias_template": cfg.Drivers.DecomposedS3.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.DecomposedS3.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.DecomposedS3.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.DecomposedS3.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
-		"permissionssvc":              cfg.Drivers.S3NG.PermissionsEndpoint,
+		"permissionssvc":              cfg.Drivers.DecomposedS3.PermissionsEndpoint,
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
-		"s3.region":                   cfg.Drivers.S3NG.Region,
-		"s3.access_key":               cfg.Drivers.S3NG.AccessKey,
-		"s3.secret_key":               cfg.Drivers.S3NG.SecretKey,
-		"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
-		"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
-		"s3.disable_content_sha254":   cfg.Drivers.S3NG.DisableContentSha256,
-		"s3.disable_multipart":        cfg.Drivers.S3NG.DisableMultipart,
-		"s3.send_content_md5":         cfg.Drivers.S3NG.SendContentMd5,
-		"s3.concurrent_stream_parts":  cfg.Drivers.S3NG.ConcurrentStreamParts,
-		"s3.num_threads":              cfg.Drivers.S3NG.NumThreads,
-		"s3.part_size":                cfg.Drivers.S3NG.PartSize,
-		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
-		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
-		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
-		"disable_versioning":          cfg.Drivers.S3NG.DisableVersioning,
-		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+		"s3.region":                   cfg.Drivers.DecomposedS3.Region,
+		"s3.access_key":               cfg.Drivers.DecomposedS3.AccessKey,
+		"s3.secret_key":               cfg.Drivers.DecomposedS3.SecretKey,
+		"s3.endpoint":                 cfg.Drivers.DecomposedS3.Endpoint,
+		"s3.bucket":                   cfg.Drivers.DecomposedS3.Bucket,
+		"s3.disable_content_sha254":   cfg.Drivers.DecomposedS3.DisableContentSha256,
+		"s3.disable_multipart":        cfg.Drivers.DecomposedS3.DisableMultipart,
+		"s3.send_content_md5":         cfg.Drivers.DecomposedS3.SendContentMd5,
+		"s3.concurrent_stream_parts":  cfg.Drivers.DecomposedS3.ConcurrentStreamParts,
+		"s3.num_threads":              cfg.Drivers.DecomposedS3.NumThreads,
+		"s3.part_size":                cfg.Drivers.DecomposedS3.PartSize,
+		"max_acquire_lock_cycles":     cfg.Drivers.DecomposedS3.MaxAcquireLockCycles,
+		"lock_cycle_duration_factor":  cfg.Drivers.DecomposedS3.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.DecomposedS3.MaxConcurrency,
+		"disable_versioning":          cfg.Drivers.DecomposedS3.DisableVersioning,
+		"asyncfileuploads":            cfg.Drivers.DecomposedS3.AsyncUploads,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,
@@ -332,34 +332,34 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// S3NGNoEvents is the config mapping for the s3ng storage driver emitting no events
-func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
+// DecomposedS3NoEvents is the config mapping for the Decomposed-S3 storage driver emitting no events
+func DecomposedS3NoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",
-		"propagator":       cfg.Drivers.S3NG.Propagator,
+		"propagator":       cfg.Drivers.DecomposedS3.Propagator,
 		"async_propagator_options": map[string]interface{}{
-			"propagation_delay": cfg.Drivers.S3NG.AsyncPropagatorOptions.PropagationDelay,
+			"propagation_delay": cfg.Drivers.DecomposedS3.AsyncPropagatorOptions.PropagationDelay,
 		},
-		"root":                        cfg.Drivers.S3NG.Root,
-		"user_layout":                 cfg.Drivers.S3NG.UserLayout,
-		"share_folder":                cfg.Drivers.S3NG.ShareFolder,
-		"personalspacealias_template": cfg.Drivers.OCIS.PersonalSpaceAliasTemplate,
-		"personalspacepath_template":  cfg.Drivers.OCIS.PersonalSpacePathTemplate,
-		"generalspacealias_template":  cfg.Drivers.OCIS.GeneralSpaceAliasTemplate,
-		"generalspacepath_template":   cfg.Drivers.OCIS.GeneralSpacePathTemplate,
+		"root":                        cfg.Drivers.DecomposedS3.Root,
+		"user_layout":                 cfg.Drivers.DecomposedS3.UserLayout,
+		"share_folder":                cfg.Drivers.DecomposedS3.ShareFolder,
+		"personalspacealias_template": cfg.Drivers.Decomposed.PersonalSpaceAliasTemplate,
+		"personalspacepath_template":  cfg.Drivers.Decomposed.PersonalSpacePathTemplate,
+		"generalspacealias_template":  cfg.Drivers.Decomposed.GeneralSpaceAliasTemplate,
+		"generalspacepath_template":   cfg.Drivers.Decomposed.GeneralSpacePathTemplate,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
-		"permissionssvc":              cfg.Drivers.S3NG.PermissionsEndpoint,
+		"permissionssvc":              cfg.Drivers.DecomposedS3.PermissionsEndpoint,
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
-		"s3.region":                   cfg.Drivers.S3NG.Region,
-		"s3.access_key":               cfg.Drivers.S3NG.AccessKey,
-		"s3.secret_key":               cfg.Drivers.S3NG.SecretKey,
-		"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
-		"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
-		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
-		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
-		"disable_versioning":          cfg.Drivers.S3NG.DisableVersioning,
-		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
+		"s3.region":                   cfg.Drivers.DecomposedS3.Region,
+		"s3.access_key":               cfg.Drivers.DecomposedS3.AccessKey,
+		"s3.secret_key":               cfg.Drivers.DecomposedS3.SecretKey,
+		"s3.endpoint":                 cfg.Drivers.DecomposedS3.Endpoint,
+		"s3.bucket":                   cfg.Drivers.DecomposedS3.Bucket,
+		"max_acquire_lock_cycles":     cfg.Drivers.DecomposedS3.MaxAcquireLockCycles,
+		"max_concurrency":             cfg.Drivers.DecomposedS3.MaxConcurrency,
+		"disable_versioning":          cfg.Drivers.DecomposedS3.DisableVersioning,
+		"lock_cycle_duration_factor":  cfg.Drivers.DecomposedS3.LockCycleDurationFactor,
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":               cfg.FilemetadataCache.Store,
 			"cache_nodes":               cfg.FilemetadataCache.Nodes,

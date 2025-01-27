@@ -9,12 +9,12 @@ git config --global advice.detachedHead false
 
 if [ "$TEST_SOURCE" = "core" ]; then
     export ACCEPTANCE_TEST_TYPE='core-api'
-    if [ "$STORAGE_DRIVER" = "ocis" ]; then
+    if [ "$STORAGE_DRIVER" = "decomposed" ]; then
         export OC_REVA_DATA_ROOT=''
-        export BEHAT_FILTER_TAGS='~@skipOnOpencloud-OCIS-Storage'
-        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
-    elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-S3NG-Storage'
+        export BEHAT_FILTER_TAGS='~@skipOnOpencloud-decomposed-Storage'
+        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-decomposed-storage.md'
+    elif [ "$STORAGE_DRIVER" = "decomposed_s3" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed_s3-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing STORAGE selected"
@@ -24,11 +24,11 @@ if [ "$TEST_SOURCE" = "core" ]; then
     unset BEHAT_SUITE
 
 elif [ "$TEST_SOURCE" = "opencloud" ]; then
-    if [ "$STORAGE_DRIVER" = "ocis" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-OCIS-Storage'
+    if [ "$STORAGE_DRIVER" = "decomposed" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed-Storage'
         export OC_REVA_DATA_ROOT=''
-    elif [ "$STORAGE_DRIVER" = "s3ng" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-S3NG-Storage'
+    elif [ "$STORAGE_DRIVER" = "decomposed_s3" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed_s3-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing storage selected"

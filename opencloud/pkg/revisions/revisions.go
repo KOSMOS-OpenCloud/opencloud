@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node"
 	"github.com/shamaton/msgpack/v2"
 )
 
@@ -247,7 +247,7 @@ func getBlobID(path string) (string, error) {
 		return "", err
 	}
 
-	if bid := m["user.ocis.blobid"]; string(bid) != "" {
+	if bid := m["user.oc.blobid"]; string(bid) != "" {
 		return string(bid), nil
 	}
 

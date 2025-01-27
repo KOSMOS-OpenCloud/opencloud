@@ -7,7 +7,7 @@ The thumbnails service provides methods to generate thumbnails for various files
 The relevant environment variables defining file locations are:
 
 -   (1) `OC_BASE_DATA_PATH`
--   (2) `STORAGE_USERS_OCIS_ROOT`
+-   (2) `STORAGE_USERS_DECOMPOSED_ROOT`
 -   (3) `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 
 (1) ... Having a default set by the OpenCloud code, but if defined, used as base path for other services.

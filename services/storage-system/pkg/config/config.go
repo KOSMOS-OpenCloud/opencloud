@@ -27,7 +27,7 @@ type Config struct {
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
 	FileMetadataCache Cache   `yaml:"cache"`
-	Driver            string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service." introductionVersion:"pre5.0"`
+	Driver            string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service. The only supported driver is 'decomposed'. For backwards compatibility reasons it's also possible to use the 'ocis' driver and configure it using the 'decomposed' options. " introductionVersion:"pre5.0"`
 	Drivers           Drivers `yaml:"drivers"`
 	DataServerURL     string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by other services using this service." introductionVersion:"pre5.0"`
 
@@ -72,11 +72,11 @@ type HTTPConfig struct {
 
 // Drivers holds Drivers config
 type Drivers struct {
-	OCIS OCISDriver `yaml:"ocis"`
+	Decomposed DecomposedDriver `yaml:"decomposed"`
 }
 
-// OCISDriver holds ocis Driver config
-type OCISDriver struct {
+// DecomposedDriver holds the decomposed Driver config
+type DecomposedDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root" env:"STORAGE_SYSTEM_OC_ROOT" desc:"Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage." introductionVersion:"pre5.0"`
 

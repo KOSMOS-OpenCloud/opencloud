@@ -11,9 +11,9 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
-	ocbs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/ocis/blobstore"
+	ocbs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed/blobstore"
+	s3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed_s3/blobstore"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/lookup"
-	s3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/urfave/cli/v2"
 )
@@ -56,8 +56,8 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:    "blobstore",
 				Aliases: []string{"b"},
-				Usage:   "the blobstore type. Can be (none, ocis, s3ng). Default ocis. Note: When using s3ng this needs same configuration as the storage-users service",
-				Value:   "ocis",
+				Usage:   "the blobstore type. Can be (none, decomposed, decomposed_s3). Default decomposed. Note: When using s3ng this needs same configuration as the storage-users service",
+				Value:   "decomposed",
 			},
 			&cli.BoolFlag{
 				Name:  "dry-run",
@@ -93,16 +93,16 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				err error
 			)
 			switch c.String("blobstore") {
-			case "s3ng":
+			case "decomposed_s3":
 				bs, err = s3bs.New(
-					cfg.StorageUsers.Drivers.S3NG.Endpoint,
-					cfg.StorageUsers.Drivers.S3NG.Region,
-					cfg.StorageUsers.Drivers.S3NG.Bucket,
-					cfg.StorageUsers.Drivers.S3NG.AccessKey,
-					cfg.StorageUsers.Drivers.S3NG.SecretKey,
+					cfg.StorageUsers.Drivers.DecomposedS3.Endpoint,
+					cfg.StorageUsers.Drivers.DecomposedS3.Region,
+					cfg.StorageUsers.Drivers.DecomposedS3.Bucket,
+					cfg.StorageUsers.Drivers.DecomposedS3.AccessKey,
+					cfg.StorageUsers.Drivers.DecomposedS3.SecretKey,
 					s3bs.Options{},
 				)
-			case "ocis":
+			case "decomposed":
 				bs, err = ocbs.New(basePath)
 			case "none":
 				bs = nil

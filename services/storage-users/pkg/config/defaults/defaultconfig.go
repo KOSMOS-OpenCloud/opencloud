@@ -91,7 +91,7 @@ func DefaultConfig() *config.Config {
 		TransferExpires:         86400,
 		UploadExpiration:        24 * 60 * 60,
 		GracefulShutdownTimeout: 30,
-		Driver:                  "ocis",
+		Driver:                  "decomposed",
 		Drivers: config.Drivers{
 			OwnCloudSQL: config.OwnCloudSQLDriver{
 				Root:                  filepath.Join(defaults.BaseDataPath(), "storage", "owncloud"),
@@ -105,7 +105,7 @@ func DefaultConfig() *config.Config {
 				DBName:                "owncloud",
 				UsersProviderEndpoint: "eu.opencloud.api.users",
 			},
-			S3NG: config.S3NGDriver{
+			DecomposedS3: config.DecomposedS3Driver{
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
@@ -124,7 +124,7 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor:    30,
 				DisableMultipart:           true,
 			},
-			OCIS: config.OCISDriver{
+			Decomposed: config.DecomposedDriver{
 				Propagator:                 "sync",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",

@@ -1,10 +1,10 @@
 [main]
 host = https://www.transifex.com
 
-[o:owncloud-org:p:owncloud:r:ocis-userlog]
+[o:opencloud-eu:p:opencloud-eu:r:opencloud-userlog]
 file_filter = locale/<lang>/LC_MESSAGES/userlog.po
 minimum_perc = 75
-resource_name = ocis-userlog
+resource_name = opencloud-userlog
 source_file = userlog.pot
 source_lang = en
 type = PO

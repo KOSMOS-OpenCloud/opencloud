@@ -47,6 +47,12 @@ $(GO_LICENSES): $(BINGO_DIR)/go-licenses.mod
 	@echo "(re)installing $(GOBIN)/go-licenses-v1.5.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=go-licenses.mod -o=$(GOBIN)/go-licenses-v1.5.0 "github.com/google/go-licenses"
 
+GO_XGETTEXT := $(GOBIN)/go-xgettext-v0.0.0-20160830220431-74466a0a0c4a
+$(GO_XGETTEXT): $(BINGO_DIR)/go-xgettext.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/go-xgettext-v0.0.0-20160830220431-74466a0a0c4a"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=go-xgettext.mod -o=$(GOBIN)/go-xgettext-v0.0.0-20160830220431-74466a0a0c4a "github.com/gosexy/gettext/go-xgettext"
+
 GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.56.2
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

@@ -61,7 +61,7 @@ l10n-push:
 
 .PHONY: l10n-read
 l10n-read: $(GO_XGETTEXT)
-	go-xgettext -o $(OUTPUT_DIR)/settings.pot \
+	$(GO_XGETTEXT) -o $(OUTPUT_DIR)/settings.pot \
 	--keyword=l10n.Template --add-comments -s \
 	pkg/store/defaults/templates.go
 

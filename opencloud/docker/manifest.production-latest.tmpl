@@ -1,10 +1,10 @@
-image: owncloud/ocis:latest
+image: opencloud-eu/opencloud:latest
 manifests:
-  - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
+  - image: opencloud-eu/opencloud:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
     platform:
       architecture: amd64
       os: linux
-  - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm64
+  - image: opencloud-eu/opencloud:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm64
     platform:
       architecture: arm64
       variant: v8

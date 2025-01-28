@@ -4,8 +4,8 @@ WIDTH=${WIDTH:-10}
 OC_URL=${OC_URL:-https://localhost:9200}
 ENDPOINT=${ENDPOINT:-/webdav}
 FOLDER=${FOLDER:-w$WIDTH x d$DEPTH folders}
-USER=${USER:-einstein}
-PASSWORD=${PASSWORD:-relativity}
+USER=${USER:-alan}
+PASSWORD=${PASSWORD:-demo}
 CURL_OPTS=${CURL_OPTS:--k}
 
 COUNT=0

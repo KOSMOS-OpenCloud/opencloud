@@ -160,12 +160,12 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 //	"policy_selector": {
 //	   "regex": {
 //	     "matches_policies": [
-//	       {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "opencloud"},
+//	       {"priority": 10, "property": "mail", "match": "mary@example.org", "policy": "opencloud"},
 //	       {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
-//	       {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "opencloud"},
+//	       {"priority": 30, "property": "username", "match": "(dennis|feynman)", "policy": "opencloud"},
 //	       {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
-//	       {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "opencloud"},
-//	       {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"}
+//	       {"priority": 50, "property": "id", "match": "b1f74ec4-dd7e-11ef-a543-03775734d0f7", "policy": "opencloud"},
+//	       {"priority": 60, "property": "id", "match": "056fc874-dd7f-11ef-ba84-af6fca4b7289", "policy": "oc10"}
 //	     ],
 //	     "unauthenticated_policy": "oc10"
 //	   }

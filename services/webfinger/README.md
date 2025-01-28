@@ -31,7 +31,7 @@ The default configuration will simply return the `OC_URL` and direct clients to 
 
 ```json
 {
-    "subject": "acct:einstein@drive.opencloud.test",
+    "subject": "acct:alan@drive.opencloud.test",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
@@ -56,18 +56,18 @@ A more complex example for configuring different instances could look like this:
 webfinger:
   instances:
   -  claim: email
-     regex: einstein@example\.org
+     regex: alan@example\.org
      href: "https://{{.preferred_username}}.cloud.opencloud.test"
      title: 
-       "en": "OpenCloud Instance for Einstein"
-       "de": "OpenCloud Instanz für Einstein"
+       "en": "OpenCloud Instance for Alan"
+       "de": "OpenCloud Instanz für Alan"
      break: true
   -  claim: "email"
-     regex: marie@example\.org
+     regex: mary@example\.org
      href: "https://{{.preferred_username}}.cloud.opencloud.test"
      title: 
-       "en": "OpenCloud Instance for Marie"
-       "de": "OpenCloud Instanz für Marie"
+       "en": "OpenCloud Instance for Mary"
+       "de": "OpenCloud Instanz für Mary"
      break: false
   -  claim: "email"
      regex: .+@example\.org
@@ -92,11 +92,11 @@ webfinger:
      break: true
 ```
 
-Now, an authenticated webfinger request for `acct:me@example.org` (when logged in as marie) would return two instances, based on her `email` claim, the regex matches and break flags:
+Now, an authenticated webfinger request for `acct:me@example.org` (when logged in as mary) would return two instances, based on her `email` claim, the regex matches and break flags:
 
 ```json
 {
-    "subject": "acct:marie@example.org",
+    "subject": "acct:mary@example.org",
     "links": [
         {
             "rel": "http://openid.net/specs/connect/1.0/issuer",
@@ -104,10 +104,10 @@ Now, an authenticated webfinger request for `acct:me@example.org` (when logged i
         },
         {
             "rel": "http://webfinger.opencloud/rel/server-instance",
-            "href": "https://marie.cloud.opencloud.test",
+            "href": "https://mary.cloud.opencloud.test",
             "titles": {
-                "en": "OpenCloud Instance for Marie",
-                "de": "OpenCloud Instanz für Marie"
+                "en": "OpenCloud Instance for Mary",
+                "de": "OpenCloud Instanz für Mary"
             }
         },
         {

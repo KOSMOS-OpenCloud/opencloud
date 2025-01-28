@@ -4,8 +4,8 @@ COUNT=${COUNT:-100}
 OC_URL=${OC_URL:-https://localhost:9200}
 ENDPOINT=${ENDPOINT:-/webdav}
 FOLDER=${FOLDER:-c$CLIENTS x i$COUNT files}
-USER=${USER:-einstein}
-PASSWORD=${PASSWORD:-relativity}
+USER=${USER:-alan}
+PASSWORD=${PASSWORD:-demo}
 CURL_OPTS=${CURL_OPTS:--k}
 
 curl -X MKCOL "$OC_URL$ENDPOINT/$FOLDER/" -u $USER:$PASSWORD $CURL_OPTS || { echo "could not create collection '$OC_URL$ENDPOINT/$FOLDER/'" >&2; exit 1; }

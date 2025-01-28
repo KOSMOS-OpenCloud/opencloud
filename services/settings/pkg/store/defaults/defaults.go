@@ -651,25 +651,21 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 		assignments = []*settingsmsg.UserRoleAssignment{
 			// default users with role "user"
 			{
-				AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
+				AccountUuid: "b1f74ec4-dd7e-11ef-a543-03775734d0f7",
 				RoleId:      BundleUUIDRoleUser,
 			},
 			{
-				AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
-				RoleId:      BundleUUIDRoleUser,
-			},
-			{
-				AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
+				AccountUuid: "056fc874-dd7f-11ef-ba84-af6fca4b7289",
 				RoleId:      BundleUUIDRoleUser,
 			},
 			{
 				// additional admin user
-				AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
+				AccountUuid: "cd88bf9a-dd7f-11ef-a609-7f78deb2345f", // demo user "dennis"
 				RoleId:      BundleUUIDRoleAdmin,
 			},
 			{
 				// default users with role "spaceadmin"
-				AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+				AccountUuid: "801abee4-dd7f-11ef-a324-83f55a754b62",
 				RoleId:      BundleUUIDRoleSpaceAdmin,
 			},
 			{

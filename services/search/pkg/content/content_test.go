@@ -18,8 +18,8 @@ func TestCleanContent(t *testing.T) {
 			expect: "keeper keeper",
 		},
 		{
-			given:  "user1 shares the file to Marie",
-			expect: "user1 shares file marie",
+			given:  "user1 shares the file to Mary",
+			expect: "user1 shares file mary",
 		},
 		{
 			given:  "content contains https://localhost/remote.php/dav/files/admin/Photos/San%20Francisco.jpg and stop word",

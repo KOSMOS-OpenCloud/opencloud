@@ -1,6 +1,6 @@
 importer:
   config:
-    companionUrl: https://${COMPANION_DOMAIN|companion.owncloud.test}
+    companionUrl: https://${COMPANION_DOMAIN|companion.opencloud.test}
     supportedClouds:
       - WebdavPublicLink
       #- OneDrive # needs a client id and secret
@@ -8,9 +8,9 @@ importer:
 external-sites:
   config:
     sites:
-      # For settings see: https://github.com/owncloud/web-extensions/tree/main/packages/web-app-external-sites
-      - name: ownCloud
-        url: "https://owncloud.dev"
+      # For settings see: https://github.com/opencloud-eu/web-extensions/tree/main/packages/web-app-external-sites
+      - name: OpenCloud
+        url: "https://opencloud.eu"
         target: embedded
         color: "#0D856F"
         icon: cloud

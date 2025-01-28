@@ -30,13 +30,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/opencloud-eu/reva/v2/pkg/appctx"
 	"github.com/opencloud-eu/reva/v2/pkg/errtypes"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/options"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata/prefixes"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/usermapper"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/templates"
-	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/options"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"go.opentelemetry.io/otel"
@@ -45,83 +42,29 @@ import (
 
 var tracer trace.Tracer
 
-var _spaceTypePersonal = "personal"
-var _spaceTypeProject = "project"
+const (
+	_spaceTypePersonal = "personal"
+)
 
 func init() {
-	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/pkg/decomposedfs/lookup")
-}
-
-// IDCache is a cache for node ids
-type IDCache interface {
-	Get(ctx context.Context, spaceID, nodeID string) (string, bool)
-	GetByPath(ctx context.Context, path string) (string, string, bool)
-
-	Set(ctx context.Context, spaceID, nodeID, val string) error
-
-	Delete(ctx context.Context, spaceID, nodeID string) error
-	DeleteByPath(ctx context.Context, path string) error
-
-	DeletePath(ctx context.Context, path string) error
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs/lookup")
 }
 
 // Lookup implements transformations from filepath to node and back
 type Lookup struct {
 	Options *options.Options
 
-	IDCache         IDCache
 	metadataBackend metadata.Backend
-	userMapper      usermapper.Mapper
 	tm              node.TimeManager
 }
 
 // New returns a new Lookup instance
-func New(b metadata.Backend, um usermapper.Mapper, o *options.Options, tm node.TimeManager) *Lookup {
-	lu := &Lookup{
+func New(b metadata.Backend, o *options.Options, tm node.TimeManager) *Lookup {
+	return &Lookup{
 		Options:         o,
 		metadataBackend: b,
-		IDCache:         NewStoreIDCache(&o.Options),
-		userMapper:      um,
 		tm:              tm,
 	}
-
-	return lu
-}
-
-// CacheID caches the path for the given space and node id
-func (lu *Lookup) CacheID(ctx context.Context, spaceID, nodeID, val string) error {
-	return lu.IDCache.Set(ctx, spaceID, nodeID, val)
-}
-
-// GetCachedID returns the cached path for the given space and node id
-func (lu *Lookup) GetCachedID(ctx context.Context, spaceID, nodeID string) (string, bool) {
-	return lu.IDCache.Get(ctx, spaceID, nodeID)
-}
-
-// IDsForPath returns the space and opaque id for the given path
-func (lu *Lookup) IDsForPath(ctx context.Context, path string) (string, string, error) {
-	spaceID, nodeID, ok := lu.IDCache.GetByPath(ctx, path)
-	if !ok {
-		return "", "", fmt.Errorf("path %s not found in cache", path)
-	}
-	return spaceID, nodeID, nil
-}
-
-// NodeFromPath returns the node for the given path
-func (lu *Lookup) NodeIDFromParentAndName(ctx context.Context, parent *node.Node, name string) (string, error) {
-	id, err := lu.metadataBackend.Get(ctx, filepath.Join(parent.InternalPath(), name), prefixes.IDAttr)
-	if err != nil {
-		if metadata.IsNotExist(err) {
-			return "", errtypes.NotFound(name)
-		}
-		return "", err
-	}
-	_, err = os.Stat(filepath.Join(parent.InternalPath(), name))
-	if err != nil {
-		return "", err
-	}
-
-	return string(id), nil
 }
 
 // MetadataBackend returns the metadata backend
@@ -129,12 +72,50 @@ func (lu *Lookup) MetadataBackend() metadata.Backend {
 	return lu.metadataBackend
 }
 
-func (lu *Lookup) ReadBlobIDAndSizeAttr(ctx context.Context, path string, _ node.Attributes) (string, int64, error) {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return "", 0, errors.Wrap(err, "error stating file")
+func (lu *Lookup) ReadBlobIDAndSizeAttr(ctx context.Context, path string, attrs node.Attributes) (string, int64, error) {
+	blobID := ""
+	blobSize := int64(0)
+	var err error
+
+	if attrs != nil {
+		blobID = attrs.String(prefixes.BlobIDAttr)
+		if blobID != "" {
+			blobSize, err = attrs.Int64(prefixes.BlobsizeAttr)
+			if err != nil {
+				return "", 0, err
+			}
+		}
+	} else {
+		attrs, err := lu.metadataBackend.All(ctx, path)
+		if err != nil {
+			return "", 0, errors.Wrapf(err, "error reading blobid xattr")
+		}
+		nodeAttrs := node.Attributes(attrs)
+		blobID = nodeAttrs.String(prefixes.BlobIDAttr)
+		blobSize, err = nodeAttrs.Int64(prefixes.BlobsizeAttr)
+		if err != nil {
+			return "", 0, errors.Wrapf(err, "error reading blobsize xattr")
+		}
 	}
-	return "", fi.Size(), nil
+	return blobID, blobSize, nil
+}
+
+func readChildNodeFromLink(path string) (string, error) {
+	link, err := os.Readlink(path)
+	if err != nil {
+		return "", err
+	}
+	nodeID := strings.TrimLeft(link, "/.")
+	nodeID = strings.ReplaceAll(nodeID, "/", "")
+	return nodeID, nil
+}
+
+func (lu *Lookup) NodeIDFromParentAndName(ctx context.Context, parent *node.Node, name string) (string, error) {
+	nodeID, err := readChildNodeFromLink(filepath.Join(parent.InternalPath(), name))
+	if err != nil {
+		return "", errors.Wrap(err, "decomposedfs: Wrap: readlink error")
+	}
+	return nodeID, nil
 }
 
 // TypeFromPath returns the type of the node at the given path
@@ -241,15 +222,30 @@ func (lu *Lookup) NodeFromSpaceID(ctx context.Context, spaceID string) (n *node.
 	return node, nil
 }
 
+// GenerateSpaceID generates a new space id and alias
+func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, error) {
+	switch spaceType {
+	case _spaceTypePersonal:
+		return owner.Id.OpaqueId, nil
+	default:
+		return uuid.New().String(), nil
+	}
+}
+
 // Path returns the path for node
 func (lu *Lookup) Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (p string, err error) {
 	root := n.SpaceRoot
+	var child *node.Node
 	for n.ID != root.ID {
 		p = filepath.Join(n.Name, p)
+		child = n
 		if n, err = n.Parent(ctx); err != nil {
 			appctx.GetLogger(ctx).
 				Error().Err(err).
 				Str("path", p).
+				Str("spaceid", child.SpaceID).
+				Str("nodeid", child.ID).
+				Str("parentid", child.ParentID).
 				Msg("Path()")
 			return
 		}
@@ -310,9 +306,7 @@ func (lu *Lookup) InternalRoot() string {
 
 // InternalPath returns the internal path for a given ID
 func (lu *Lookup) InternalPath(spaceID, nodeID string) string {
-	path, _ := lu.IDCache.Get(context.Background(), spaceID, nodeID)
-
-	return path
+	return filepath.Join(lu.Options.Root, "spaces", Pathify(spaceID, 1, 2), "nodes", Pathify(nodeID, 4, 2))
 }
 
 // // ReferenceFromAttr returns a CS3 reference from xattr of a node.
@@ -391,33 +385,28 @@ func (lu *Lookup) CopyMetadataWithSourceLock(ctx context.Context, sourcePath, ta
 	return lu.MetadataBackend().SetMultiple(ctx, targetPath, newAttrs, acquireTargetLock)
 }
 
-// GenerateSpaceID generates a space id for the given space type and owner
-func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, error) {
-	switch spaceType {
-	case _spaceTypeProject:
-		return uuid.New().String(), nil
-	case _spaceTypePersonal:
-		path := templates.WithUser(owner, lu.Options.UserLayout)
-
-		spaceID, err := lu.metadataBackend.Get(context.Background(), filepath.Join(lu.Options.Root, path), prefixes.IDAttr)
-		if err != nil {
-			if metadata.IsNotExist(err) || metadata.IsAttrUnset(err) {
-				return uuid.New().String(), nil
-			} else {
-				return "", err
-			}
-		}
-		resID, err := storagespace.ParseID(string(spaceID))
-		if err != nil {
-			return "", err
-		}
-		return resID.SpaceId, nil
-	default:
-		return "", fmt.Errorf("unsupported space type: %s", spaceType)
-	}
-}
-
 // TimeManager returns the time manager
 func (lu *Lookup) TimeManager() node.TimeManager {
 	return lu.tm
+}
+
+// DetectBackendOnDisk returns the name of the metadata backend being used on disk
+func DetectBackendOnDisk(root string) string {
+	matches, _ := filepath.Glob(filepath.Join(root, "spaces", "*", "*"))
+	if len(matches) > 0 {
+		base := matches[len(matches)-1]
+		spaceid := strings.ReplaceAll(
+			strings.TrimPrefix(base, filepath.Join(root, "spaces")),
+			"/", "")
+		spaceRoot := Pathify(spaceid, 4, 2)
+		_, err := os.Stat(filepath.Join(base, "nodes", spaceRoot+".mpk"))
+		if err == nil {
+			return "mpk"
+		}
+		_, err = os.Stat(filepath.Join(base, "nodes", spaceRoot+".ini"))
+		if err == nil {
+			return "ini"
+		}
+	}
+	return "xattrs"
 }

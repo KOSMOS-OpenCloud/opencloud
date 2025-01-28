@@ -58,7 +58,7 @@ func printBanner(targetPath, ocAdminServicePassword, targetBackupConfig string) 
 		targetPath, ocAdminServicePassword)
 	if targetBackupConfig != "" {
 		fmt.Printf("\n=========================================\n"+
-			"An older config file has been backuped to\n %s\n\n",
+			"An older config file has been backed up to\n %s\n\n",
 			targetBackupConfig)
 	}
 }

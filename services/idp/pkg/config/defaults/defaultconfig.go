@@ -107,7 +107,7 @@ func DefaultConfig() *config.Config {
 				Name:            "OpenCloud iOS app",
 				ApplicationType: "native",
 				RedirectURIs: []string{
-					"oc://ios.opencloud.com",
+					"oc://ios.opencloud.eu",
 				},
 			},
 		},

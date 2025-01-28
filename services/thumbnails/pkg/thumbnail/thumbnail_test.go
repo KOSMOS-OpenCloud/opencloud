@@ -47,7 +47,7 @@ func BenchmarkGet(b *testing.B) {
 		Checksum:   "1872ade88f3013edeb33decd74a4f947",
 	}
 	cwd, _ := os.Getwd()
-	p := filepath.Join(cwd, "../../testdata/oc.png")
+	p := filepath.Join(cwd, "../../testdata/test.png")
 	f, _ := os.Open(p)
 	defer f.Close()
 	img, ext, _ := image.Decode(f)
@@ -150,8 +150,8 @@ func TestPreviewGenerationTooBigImage(t *testing.T) {
 		fileName string
 		mimeType string
 	}{
-		{name: "png", mimeType: "image/png", fileName: "../../testdata/oc.png"},
-		{name: "gif", mimeType: "image/gif", fileName: "../../testdata/oc.gif"},
+		{name: "png", mimeType: "image/png", fileName: "../../testdata/test.png"},
+		{name: "jpg", mimeType: "image/jpeg", fileName: "../../testdata/test.jpg"},
 		{name: "ggs", mimeType: "application/vnd.geogebra.slides", fileName: "../../testdata/test.ggs"},
 	}
 

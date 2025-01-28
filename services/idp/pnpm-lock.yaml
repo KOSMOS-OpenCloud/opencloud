@@ -75,8 +75,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2
       react-app-polyfill:
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^3.0.0
+        version: 3.0.0
       react-dom:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
@@ -2455,8 +2455,8 @@ packages:
   core-js-pure@3.37.1:
     resolution: {integrity: sha512-J/r5JTHSmzTxbiYYrzXg9w1VpqrYt+gexenBE9pugeyhwPZTAEJddyiReJWsLO6uNQ8xJZFbod6XC7KKwatCiA==}
 
-  core-js@3.37.1:
-    resolution: {integrity: sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==}
+  core-js@3.40.0:
+    resolution: {integrity: sha512-7vsMc/Lty6AGnn7uFpYT56QesI5D2Y/UkgKounk87OP9Z2H9Z8kj6jzcSGAxFmUtDOS0ntK6lbQz+Nsa0Jj6mQ==}
 
   core-js@3.40.0:
     resolution: {integrity: sha512-7vsMc/Lty6AGnn7uFpYT56QesI5D2Y/UkgKounk87OP9Z2H9Z8kj6jzcSGAxFmUtDOS0ntK6lbQz+Nsa0Jj6mQ==}
@@ -4994,9 +4994,9 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
-  react-app-polyfill@2.0.0:
-    resolution: {integrity: sha512-0sF4ny9v/B7s6aoehwze9vJNWcmCemAUYBVasscVr92+UYiEqDXOxfKjXN685mDaMRNF3WdhHQs76oTODMocFA==}
-    engines: {node: '>=10'}
+  react-app-polyfill@3.0.0:
+    resolution: {integrity: sha512-sZ41cxiU5llIB003yxxQBYrARBqe0repqPTTYBTmMqTz9szeBbE37BehCE891NZsmdZqqP+xWKdT3eo3vOzN8w==}
+    engines: {node: '>=14'}
 
   react-dev-utils@12.0.1:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
@@ -9401,7 +9401,7 @@ snapshots:
 
   core-js-pure@3.37.1: {}
 
-  core-js@3.37.1: {}
+  core-js@3.40.0: {}
 
   core-js@3.40.0: {}
 
@@ -12415,9 +12415,9 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  react-app-polyfill@2.0.0:
+  react-app-polyfill@3.0.0:
     dependencies:
-      core-js: 3.37.1
+      core-js: 3.40.0
       object-assign: 4.1.1
       promise: 8.3.0
       raf: 3.4.1

@@ -445,8 +445,8 @@ trait Provisioning {
 		$entry['uidNumber'] = $uidNumber;
 
 		if (!OcHelper::isTestingOnReva()) {
-			$entry['objectclass'][] = 'ownCloud';
-			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+			$entry['objectclass'][] = 'openCloudObject';
+			$entry['openCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
 
 		try {
@@ -490,8 +490,8 @@ trait Provisioning {
 			$entry['member'] = "";
 		}
 		if (!OcHelper::isTestingOnReva()) {
-			$entry['objectclass'][] = 'ownCloud';
-			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+			$entry['objectclass'][] = 'openCloudObject';
+			$entry['openCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
 
 		try {

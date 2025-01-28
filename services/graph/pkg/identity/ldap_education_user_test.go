@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/go-ldap/ldap/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -20,7 +20,7 @@ var eduUserAttrs = []string{
 	"givenname",
 	"userEnabledAttribute",
 	"userTypeAttribute",
-	"oCExternalIdentity",
+	"openCloudExternalIdentity",
 	"userClass",
 	"ocMemberOfSchool",
 }
@@ -32,7 +32,7 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 		"userClass":   {"student"},
-		"oCExternalIdentity": {
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
@@ -46,7 +46,7 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 		"userClass":   {"student"},
-		"oCExternalIdentity": {
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
@@ -61,7 +61,7 @@ var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
 		"entryuuid":        {"abcd-defg"},
 		"userClass":        {"student"},
 		"ocMemberOfSchool": {"abcd-defg"},
-		"oCExternalIdentity": {
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},

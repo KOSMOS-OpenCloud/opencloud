@@ -49,7 +49,7 @@ type Ldap struct {
 	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE" desc:"LDAP User uuid attribute type like 'text'." introductionVersion:"pre5.0"`
 
 	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"OC_LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." introductionVersion:"pre5.0"`
-	Filter               string `yaml:"filter" env:"OC_LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'." introductionVersion:"pre5.0"`
+	Filter               string `yaml:"filter" env:"OC_LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=openCloudUser)'." introductionVersion:"pre5.0"`
 	ObjectClass          string `yaml:"objectclass" env:"OC_LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'." introductionVersion:"pre5.0"`
 }
 

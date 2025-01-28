@@ -14,7 +14,7 @@ const (
 	UIDNumber              = "uidnumber"
 	GIDNumber              = "gidnumber"
 	Groups                 = "groups"
-	OwncloudUUID           = "ownclouduuid"
+	OpenCloudUUID          = "openclouduuid"
 	OpenCloudRoutingPolicy = "opencloud.routing.policy"
 )
 

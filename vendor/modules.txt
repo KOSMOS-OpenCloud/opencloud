@@ -1202,7 +1202,7 @@ github.com/open-policy-agent/opa/types
 github.com/open-policy-agent/opa/util
 github.com/open-policy-agent/opa/util/decoding
 github.com/open-policy-agent/opa/version
-# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250121094357-24f23b6a27ed
+# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250127153848-a84e6c39c206
 ## explicit; go 1.22.7
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
@@ -1488,6 +1488,10 @@ github.com/opencloud-eu/reva/v2/pkg/storage/favorite/loader
 github.com/opencloud-eu/reva/v2/pkg/storage/favorite/memory
 github.com/opencloud-eu/reva/v2/pkg/storage/favorite/registry
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/cephfs
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed/blobstore
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed_s3
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed_s3/blobstore
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eos
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eosgrpc
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eosgrpchome
@@ -1512,6 +1516,23 @@ github.com/opencloud-eu/reva/v2/pkg/storage/fs/registry
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/s3
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/s3ng
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/s3ng/blobstore
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/aspects
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/lookup
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata/prefixes
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/migrator
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/mtimesyncedcache
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/options
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/permissions
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/spaceidindex
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/timemanager
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/trashbin
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/tree
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/tree/propagator
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/upload
+github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/usermapper
 github.com/opencloud-eu/reva/v2/pkg/storage/registry/loader
 github.com/opencloud-eu/reva/v2/pkg/storage/registry/registry
 github.com/opencloud-eu/reva/v2/pkg/storage/registry/spaces

@@ -38,11 +38,11 @@ func TestIsResourceMatched(t *testing.T) {
 			"same resource types with different ids don't match",
 			&settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_USER,
-				Id:   "einstein",
+				Id:   "alan",
 			},
 			&settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_USER,
-				Id:   "marie",
+				Id:   "mary",
 			},
 			false,
 		},
@@ -50,11 +50,11 @@ func TestIsResourceMatched(t *testing.T) {
 			"same resource types with same ids match",
 			&settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_USER,
-				Id:   "einstein",
+				Id:   "alan",
 			},
 			&settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_USER,
-				Id:   "einstein",
+				Id:   "alan",
 			},
 			true,
 		},
@@ -77,7 +77,7 @@ func TestIsResourceMatched(t *testing.T) {
 			},
 			&settingsmsg.Resource{
 				Type: settingsmsg.Resource_TYPE_USER,
-				Id:   "einstein",
+				Id:   "alan",
 			},
 			true,
 		},

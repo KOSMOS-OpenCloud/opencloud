@@ -108,7 +108,7 @@ To impersonate, the respective requests from the CLI commands above extend with 
 
 * The `userName` in the form of: `userName={value}`\
   Example:\
-  `userName=einstein`
+  `userName=alan`
 
 Example:\
 A final create request would then look like:

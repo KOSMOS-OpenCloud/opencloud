@@ -408,7 +408,7 @@ Feature: add users to group
     Examples:
       | invalid-uuidv4                        | comment                                                |
       | �ϰ�Ϧ-@$@^-¶Ëøœ-ɧɸɱʨΌϖЁϿ               | UTF characters                                         |
-      | 4c510ada-c86b-4815-8820-42cdf82c3d511 | adding an extra character at end of valid UUID pattern |
+      | b1f74ec4-dd7e-11ef-a543-03775734d0f71 | adding an extra character at end of valid UUID pattern |
       | 4c510adac8-6b-4815-882042cdf-82c3d51  | invalid UUID pattern                                   |
 
 
@@ -423,7 +423,7 @@ Feature: add users to group
     Examples:
       | invalid-uuidv4                        | comment                                                |
       | �ϰ�Ϧ-@$@^-¶Ëøœ-ɧɸɱʨΌϖЁϿ               | UTF characters                                         |
-      | 4c510ada-c86b-4815-8820-42cdf82c3d511 | adding an extra character at end of valid UUID pattern |
+      | b1f74ec4-dd7e-11ef-a543-03775734d0f71 | adding an extra character at end of valid UUID pattern |
       | 4c510adac8-6b-4815-882042cdf-82c3d51  | invalid UUID pattern                                   |
 
   @issue-5855

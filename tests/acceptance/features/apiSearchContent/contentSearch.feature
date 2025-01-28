@@ -31,7 +31,7 @@ Feature: content search
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "Using k6, you can test the reliability and performance of your systems" to "wordWithNumber.md"
     And user "Alice" has uploaded file with content "see our web site https://opencloud.eu/en/contact-us" to "findByWebSite.txt"
-    And user "Alice" has uploaded file with content "einstein@example.org want to say hello" to "findByEmail.docs"
+    And user "Alice" has uploaded file with content "alan@example.org want to say hello" to "findByEmail.docs"
     When user "Alice" searches for "Content:k6" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
@@ -40,7 +40,7 @@ Feature: content search
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | findByWebSite.txt |
-    When user "Alice" searches for "Content:einstein@" using the WebDAV API
+    When user "Alice" searches for "Content:alan@" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these files:
       | findByEmail.docs |

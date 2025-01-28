@@ -22,9 +22,9 @@ var time3, time5, time6 *time.Time
 var time4 = time.Date(2022, 02, 05, 15, 00, 00, 00, time.UTC)
 var drives = []*libregraph.Drive{
 	drive("3", "project", "Admin", time3),
-	drive("1", "project", "Einstein", &time1),
-	drive("2", "project", "Marie", &time2),
-	drive("4", "project", "Richard", &time4),
+	drive("1", "project", "Alan", &time1),
+	drive("2", "project", "Mary", &time2),
+	drive("4", "project", "Margaret", &time4),
 }
 var drivesLong = append(drives, []*libregraph.Drive{
 	drive("5", "project", "bob", time5),
@@ -45,9 +45,9 @@ var sortTests = []sortTest{
 		},
 		DrivesSorted: []*libregraph.Drive{
 			drive("3", "project", "Admin", time3),
-			drive("1", "project", "Einstein", &time1),
-			drive("2", "project", "Marie", &time2),
-			drive("4", "project", "Richard", &time4),
+			drive("1", "project", "Alan", &time1),
+			drive("2", "project", "Mary", &time2),
+			drive("4", "project", "Margaret", &time4),
 		},
 	},
 	{
@@ -62,9 +62,9 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			drive("4", "project", "Richard", &time4),
-			drive("2", "project", "Marie", &time2),
-			drive("1", "project", "Einstein", &time1),
+			drive("4", "project", "Margaret", &time4),
+			drive("2", "project", "Mary", &time2),
+			drive("1", "project", "Alan", &time1),
 			drive("3", "project", "Admin", time3),
 		},
 	},
@@ -83,9 +83,9 @@ var sortTests = []sortTest{
 			drive("3", "project", "Admin", time3),
 			drive("6", "project", "alice", time6),
 			drive("5", "project", "bob", time5),
-			drive("1", "project", "Einstein", &time1),
-			drive("2", "project", "Marie", &time2),
-			drive("4", "project", "Richard", &time4),
+			drive("1", "project", "Alan", &time1),
+			drive("2", "project", "Mary", &time2),
+			drive("4", "project", "Margaret", &time4),
 		},
 	},
 	{
@@ -100,9 +100,9 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			drive("4", "project", "Richard", &time4),
-			drive("2", "project", "Marie", &time2),
-			drive("1", "project", "Einstein", &time1),
+			drive("4", "project", "Margaret", &time4),
+			drive("2", "project", "Mary", &time2),
+			drive("1", "project", "Alan", &time1),
 			drive("5", "project", "bob", time5),
 			drive("6", "project", "alice", time6),
 			drive("3", "project", "Admin", time3),

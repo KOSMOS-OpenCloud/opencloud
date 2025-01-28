@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	einstein = "00000000-0000-0000-0000-000000000001"
-	marie    = "00000000-0000-0000-0000-000000000002"
-	moss     = "00000000-0000-0000-0000-000000000003"
+	alan   = "00000000-0000-0000-0000-000000000001"
+	mary   = "00000000-0000-0000-0000-000000000002"
+        dennis = "00000000-0000-0000-0000-000000000003"
 
 	role1 = "11111111-1111-1111-1111-111111111111"
 	role2 = "22222222-2222-2222-2222-222222222222"
@@ -119,7 +119,7 @@ func TestAssignmentUniqueness(t *testing.T) {
 	}{
 		{
 			"roles assignments",
-			einstein,
+			alan,
 			"f36db5e6-a03c-40df-8413-711c67e40b47",
 			"44f1a664-0a7f-461a-b0be-5b59e46bbc7a",
 		},
@@ -169,10 +169,10 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			name: "just 2 assignments",
 			assignments: []assignment{
 				{
-					userID: einstein,
+					userID: alan,
 					roleID: role1,
 				}, {
-					userID: marie,
+					userID: mary,
 					roleID: role1,
 				},
 			},
@@ -183,10 +183,10 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			name: "no assignments match",
 			assignments: []assignment{
 				{
-					userID: einstein,
+					userID: alan,
 					roleID: role1,
 				}, {
-					userID: marie,
+					userID: mary,
 					roleID: role1,
 				},
 			},
@@ -197,13 +197,13 @@ func TestListRoleAssignmentByRole(t *testing.T) {
 			name: "only one assignment matches",
 			assignments: []assignment{
 				{
-					userID: einstein,
+					userID: alan,
 					roleID: role1,
 				}, {
-					userID: marie,
+					userID: mary,
 					roleID: role1,
 				}, {
-					userID: moss,
+					userID: dennis,
 					roleID: role2,
 				},
 			},
@@ -241,7 +241,7 @@ func TestDeleteAssignment(t *testing.T) {
 	}{
 		{
 			"roles assignments",
-			einstein,
+			alan,
 			"f36db5e6-a03c-40df-8413-711c67e40b47",
 			"44f1a664-0a7f-461a-b0be-5b59e46bbc7a",
 		},

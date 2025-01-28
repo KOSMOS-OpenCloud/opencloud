@@ -9,9 +9,9 @@ SPACE_ID=$(curl -ks -uadmin:admin "${TEST_SERVER_URL}/graph/v1.0/me/drives" | jq
 ENV+=${SPACE_ID}
 
 # create a folder
-curl -ks -ueinstein:relativity -X MKCOL "${TEST_SERVER_URL}/remote.php/webdav/new_folder"
+curl -ks -ualan:demo -X MKCOL "${TEST_SERVER_URL}/remote.php/webdav/new_folder"
 
-SHARE_ID=$(curl -ks -ueinstein:relativity "${TEST_SERVER_URL}/${SHARE_ENDPOINT}" -d "path=/new_folder&shareType=0&permissions=15&name=new_folder&shareWith=admin" | grep -oP "(?<=<id>).*(?=</id>)")
+SHARE_ID=$(curl -ks -ualan:demo "${TEST_SERVER_URL}/${SHARE_ENDPOINT}" -d "path=/new_folder&shareType=0&permissions=15&name=new_folder&shareWith=admin" | grep -oP "(?<=<id>).*(?=</id>)")
 # accept share
 if [ ! -z "${SHARE_ID}" ];
 then
@@ -19,7 +19,7 @@ then
 fi
 
 # create public share
-PUBLIC_TOKEN=$(curl -ks -ueinstein:relativity "${TEST_SERVER_URL}/${SHARE_ENDPOINT}" -d "path=/new_folder&shareType=3&permissions=15&name=new_folder" | grep -oP "(?<=<token>).*(?=</token>)")
+PUBLIC_TOKEN=$(curl -ks -ualan:demo "${TEST_SERVER_URL}/${SHARE_ENDPOINT}" -d "path=/new_folder&shareType=3&permissions=15&name=new_folder" | grep -oP "(?<=<token>).*(?=</token>)")
 ENV+="\nPUBLIC_TOKEN="
 ENV+=${PUBLIC_TOKEN}
 

@@ -834,39 +834,6 @@
   ],
   "clientScopes": [
     {
-      "id": "c2db58e8-ea51-4151-83dd-c862c6d28ee3",
-      "name": "opencloud",
-      "description": "OpenCloud UUID",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "true",
-        "gui.order": "",
-        "consent.screen.text": ""
-      },
-      "protocolMappers": [
-        {
-          "id": "596f067b-ae2f-4771-96c5-d0c3942b04da",
-          "name": "opencloud-uuid",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-attribute-mapper",
-          "consentRequired": false,
-          "config": {
-            "aggregate.attrs": "false",
-            "introspection.token.claim": "true",
-            "multivalued": "false",
-            "userinfo.token.claim": "true",
-            "user.attribute": "LDAP_ID",
-            "lightweight.claim": "false",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "opencloud\\.user\\.uuid",
-            "jsonType.label": "String"
-          }
-        }
-      ]
-    },
-    {
       "id": "b71c1814-9e82-4215-8a96-88c4a11033c7",
       "name": "role_list",
       "description": "SAML role list",
@@ -929,6 +896,39 @@
             "claim.name": "phone_number_verified",
             "jsonType.label": "boolean",
             "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c2db58e8-ea51-4151-83dd-c862c6d28ee3",
+      "name": "opencloud",
+      "description": "OpenCloud UUID",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "id": "596f067b-ae2f-4771-96c5-d0c3942b04da",
+          "name": "opencloud-uuid",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "aggregate.attrs": "false",
+            "introspection.token.claim": "true",
+            "multivalued": "false",
+            "userinfo.token.claim": "true",
+            "user.attribute": "LDAP_ID",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "opencloud\\.user\\.uuid",
+            "jsonType.label": "String"
           }
         }
       ]
@@ -1003,8 +1003,9 @@
           "consentRequired": false,
           "config": {
             "user.session.note": "AUTH_TIME",
-            "id.token.claim": "true",
             "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "auth_time",
             "jsonType.label": "long"
@@ -1575,14 +1576,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-full-name-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "saml-user-property-mapper",
             "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "oidc-address-mapper",
+            "saml-user-attribute-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1594,14 +1595,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-user-property-mapper",
+            "oidc-full-name-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-full-name-mapper",
+            "oidc-address-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-user-attribute-mapper"
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1687,17 +1688,20 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "ignore.missing.groups": [
-                  "false"
+                "membership.ldap.attribute": [
+                  "member"
                 ],
                 "membership.user.ldap.attribute": [
                   "uid"
                 ],
+                "ignore.missing.groups": [
+                  "false"
+                ],
                 "preserve.group.inheritance": [
                   "false"
                 ],
-                "membership.ldap.attribute": [
-                  "member"
+                "groups.dn": [
+                  "ou=groups,dc=example,dc=org"
                 ],
                 "group.object.classes": [
                   "groupOfNames"
@@ -1705,14 +1709,11 @@
                 "memberof.ldap.attribute": [
                   "memberOf"
                 ],
-                "groups.dn": [
-                  "ou=groups,dc=opencloud,dc=eu"
+                "drop.non.existing.groups.during.sync": [
+                  "false"
                 ],
                 "groups.path": [
                   "/"
-                ],
-                "drop.non.existing.groups.during.sync": [
-                  "false"
                 ]
               }
             },
@@ -1728,10 +1729,10 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1769,7 +1770,7 @@
               "subComponents": {},
               "config": {
                 "ldap.attribute": [
-                  "ownCloudUserType"
+                  "openCloudUserType"
                 ],
                 "attribute.default.value": [
                   "Guest"
@@ -1806,10 +1807,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "false"
                 ],
                 "user.model.attribute": [
@@ -1875,11 +1876,11 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
-                  "true"
-                ],
                 "read.only": [
                   "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
                 ],
                 "user.model.attribute": [
                   "lastName"
@@ -1893,13 +1894,13 @@
               "subComponents": {},
               "config": {
                 "ldap.attribute": [
-                  "ownCloudUUID"
-                ],
-                "attribute.force.default": [
-                  "false"
+                  "openCloudUUID"
                 ],
                 "is.mandatory.in.ldap": [
                   "true"
+                ],
+                "attribute.force.default": [
+                  "false"
                 ],
                 "is.binary.attribute": [
                   "false"
@@ -1918,29 +1919,29 @@
           ]
         },
         "config": {
-          "fullSyncPeriod": [
-            "299"
-          ],
           "pagination": [
             "false"
+          ],
+          "fullSyncPeriod": [
+            "299"
           ],
           "startTls": [
             "false"
           ],
-          "usersDn": [
-            "ou=users,dc=opencloud,dc=eu"
-          ],
           "connectionPooling": [
             "false"
+          ],
+          "usersDn": [
+            "ou=users,dc=example,dc=org"
           ],
           "cachePolicy": [
             "EVICT_DAILY"
           ],
-          "useKerberosForPasswordAuthentication": [
-            "false"
-          ],
           "evictionHour": [
             "0"
+          ],
+          "useKerberosForPasswordAuthentication": [
+            "false"
           ],
           "importEnabled": [
             "true"
@@ -1948,17 +1949,17 @@
           "enabled": [
             "true"
           ],
-          "bindCredential": [
-            "**********"
+          "usernameLDAPAttribute": [
+            "uid"
           ],
           "changedSyncPeriod": [
             "-1"
           ],
-          "bindDn": [
-            "cn=admin,dc=opencloud,dc=eu"
+          "bindCredential": [
+            "**********"
           ],
-          "usernameLDAPAttribute": [
-            "uid"
+          "bindDn": [
+            "cn=admin,dc=example,dc=org"
           ],
           "lastSync": [
             "1679575179"
@@ -1967,7 +1968,7 @@
             "other"
           ],
           "uuidLDAPAttribute": [
-            "ownCloudUUID"
+            "openCloudUUID"
           ],
           "allowKerberosAuthentication": [
             "false"
@@ -1982,7 +1983,7 @@
             "simple"
           ],
           "searchScope": [
-            "1"
+            "2"
           ],
           "useTruststoreSpi": [
             "always"
@@ -1994,7 +1995,7 @@
             "true"
           ],
           "userObjectClasses": [
-            "inetOrgPerson, organizationalPerson, ownCloudUser"
+            "inetOrgPerson, organizationalPerson, openCloudUser"
           ],
           "evictionMinute": [
             "0"

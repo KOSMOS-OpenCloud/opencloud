@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Niraj Acharya <niraj@jankaritech.com>
  * @copyright Copyright (c) 2024 Niraj Acharya niraj@jankaritech.com
  *

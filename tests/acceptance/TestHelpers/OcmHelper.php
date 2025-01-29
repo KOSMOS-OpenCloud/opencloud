@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Viktor Scharf <scharf.vi@gmail.com>
  * @copyright Copyright (c) 2024 Viktor Scharf <scharf.vi@gmail.com>
  *

@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Joas Schilling <coding@schilljs.com>
  * @author Sergio Bertolin <sbertolin@owncloud.com>
  * @author Phillip Davis <phil@jankaritech.com>

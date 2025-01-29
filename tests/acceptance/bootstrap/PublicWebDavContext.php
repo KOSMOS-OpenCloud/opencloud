@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Artur Neumann <artur@jankaritech.com>
  * @copyright Copyright (c) 2018, ownCloud GmbH
  *

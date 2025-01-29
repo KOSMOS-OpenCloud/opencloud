@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Prajwol Amatya <prajwol@jankaritech.com>
  * @copyright Copyright (c) 2023 Prajwol Amatya prajwol@jankaritech.com
  *

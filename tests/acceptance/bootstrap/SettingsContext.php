@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 /**
- * ownCloud
- *
  * @author Viktor Scharf <v.scharf@owncloud.com>
  * @copyright Copyright (c) 2022 Viktor Scharf v.scharf@owncloud.com
  */

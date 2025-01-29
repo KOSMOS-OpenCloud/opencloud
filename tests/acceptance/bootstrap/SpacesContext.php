@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Michael Barz <mbarz@owncloud.com>
  * @copyright Copyright (c) 2021 Michael Barz mbarz@owncloud.com
  *

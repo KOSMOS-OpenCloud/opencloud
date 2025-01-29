@@ -206,7 +206,7 @@ class OcHelper {
 	 */
 	public static function getBaseDN(): string {
 		$dn = \getenv("REVA_LDAP_BASE_DN");
-		return $dn ?: "dc=owncloud,dc=com";
+		return $dn ?: "dc=example,dc=org";
 	}
 
 	/**
@@ -245,7 +245,7 @@ class OcHelper {
 	 */
 	public static function getBindDN(): string {
 		$dn = \getenv("REVA_LDAP_BIND_DN");
-		return $dn ?: "cn=admin,dc=owncloud,dc=com";
+		return $dn ?: "cn=admin,dc=example,dc=org";
 	}
 
 	/**

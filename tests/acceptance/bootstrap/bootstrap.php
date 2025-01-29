@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 
 /**
- * ownCloud
- *
  * @author Phil Davis <phil@jankaritech.com>
  * @copyright Copyright (c) 2020 Phil Davis phil@jankaritech.com
  *

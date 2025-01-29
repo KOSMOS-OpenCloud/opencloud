@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Talank Baral <talank@jankaritech.com>
  * @copyright Copyright (c) 2021 Talank Baral talank@jankaritech.com
  *

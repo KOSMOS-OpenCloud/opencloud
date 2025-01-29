@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 
 /**
- * ownCloud
- *
  * @author Sergio Bertolin <sbertolin@owncloud.com>
  * @author Phillip Davis <phil@jankaritech.com>
  * @copyright Copyright (c) 2018, ownCloud GmbH

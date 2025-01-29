@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Sajan Gurung <sajan@jankaritech.com>
  * @copyright Copyright (c) 2023, ownCloud GmbH
  *

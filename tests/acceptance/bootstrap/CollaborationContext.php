@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 /**
- * ownCloud
- *
  * @author Amrita Shrestha <amrita@jankaritech.com>
  * @copyright Copyright (c) 2024 Amrita Shrestha <amrita@jankaritech.com>
  *

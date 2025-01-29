@@ -9,7 +9,7 @@ Feature: sharing
       | username |
       | Alice    |
       | Brian    |
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "example test text file 0" to "/textfile0.txt"
 
   @issue-7555
   Scenario Outline: delete all group shares

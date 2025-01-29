@@ -3,8 +3,8 @@
 # LOCAL TEST WITHOUT EXTRA ENVS
 TEST_SERVER_URL="https://opencloud-server:9200"
 OC_WRAPPER_URL="http://opencloud-server:5200"
-EXPECTED_FAILURES_FILE="tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md"
-EXPECTED_FAILURES_FILE_FROM_CORE="tests/acceptance/expected-failures-API-on-OCIS-storage.md"
+EXPECTED_FAILURES_FILE="tests/acceptance/expected-failures-localAPI-on-decomposed-storage.md"
+EXPECTED_FAILURES_FILE_FROM_CORE="tests/acceptance/expected-failures-API-on-decomposed-storage.md"
 
 # List of suites to run
 SUITES=(

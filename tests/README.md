@@ -49,7 +49,7 @@ make -C tests/acceptance/docker localApiTests-apiGraph-decomposed_s3
 runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `decomposed_s3` storage.
 
 Note:
-While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
+While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/main/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
 
 ```bash
 WITH_WRAPPER=false \
@@ -273,7 +273,7 @@ make test-acceptance-api
 
 ## Running ENV Config Tests (@env-Config)
 
-Test suites tagged with `@env-config` are used to test the environment variables that are used to configure OpenCloud. These tests are special tests that require the OpenCloud server to be run using [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/master/tests/ocwrapper/README.md).
+Test suites tagged with `@env-config` are used to test the environment variables that are used to configure OpenCloud. These tests are special tests that require the OpenCloud server to be run using [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/main/tests/ocwrapper/README.md).
 
 ### Run OpenCloud With ocwrapper
 

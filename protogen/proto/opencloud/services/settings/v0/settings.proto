@@ -20,7 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
     license: {
       name: "Apache-2.0";
-      url: "https://github.com/opencloud-eu/opencloud/blob/master/LICENSE";
+      url: "https://github.com/opencloud-eu/opencloud/blob/main/LICENSE";
     };
   };
   schemes: HTTP;

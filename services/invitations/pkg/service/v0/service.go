@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	OwnCloudInstanceRel = "http://invitations.owncloud/rel/server-instance"
+	OwnCloudInstanceRel = "http://invitations.opencloud/rel/server-instance"
 	OpenIDConnectRel    = "http://openid.net/specs/connect/1.0/issuer"
 )
 

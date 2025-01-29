@@ -37,7 +37,7 @@ That will produce the binary `opencloud/bin/opencloud`.
 
 For more information consult the [Development Documentation](https://docs.opencloud.eu/opencloud/).
 
-Please always refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/master/CONTRIBUTING.md).
+Please always refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/main/CONTRIBUTING.md).
 
 ## Security
 

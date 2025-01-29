@@ -10,13 +10,13 @@ Currently, the webdav service handles request for two functionalities, which are
 
 The webdav service provides various `GET` endpoints to get the thumbnails of a file in authenticated and unauthenticated contexts. It also provides thumbnails for spaces on different endpoints. 
 
-See the [thumbnail](https://github.com/opencloud-eu/opencloud/tree/master/services/thumbnails) service for more information about thumbnails.
+See the [thumbnail](https://github.com/opencloud-eu/opencloud/tree/main/services/thumbnails) service for more information about thumbnails.
 
 ### Search
 
 The webdav service provides access to the search functionality. It offers multiple `REPORT` endpoints for getting search results. 
 
-See the [search](https://github.com/opencloud-eu/opencloud/tree/master/services/search) service for more details about search functionality. 
+See the [search](https://github.com/opencloud-eu/opencloud/tree/main/services/search) service for more details about search functionality. 
 
 ## Scalability
 

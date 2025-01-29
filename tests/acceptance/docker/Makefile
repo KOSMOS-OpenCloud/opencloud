@@ -56,10 +56,10 @@ help:
 	@echo -e "${PURPLE}docs: https://docs.opencloud.eu/opencloud/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo
 	@echo -e "OpenCloud feature tests and test suites can be found here:"
-	@echo -e "\thttps://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features"
+	@echo -e "\thttps://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features"
 	@echo
 	@echo -e "test suites that test core compatibility are found here and they start with prefix coreApi-:"
-	@echo -e "\thttps://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features"
+	@echo -e "\thttps://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features"
 	@echo
 	@echo -e "The OpenCloud to be tested will be build from your current working state."
 	@echo -e "You also can select the OpenCloud Docker image for all tests by setting"

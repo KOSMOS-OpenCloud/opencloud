@@ -14,8 +14,8 @@ make -C tests/acceptance/docker help
 
 Basically we have two sources for feature tests and test suites:
 
-- [OpenCloud feature test and test suites](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features)
-- [tests and test suites transferred from core, they have prefix coreApi](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features)
+- [OpenCloud feature test and test suites](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features)
+- [tests and test suites transferred from core, they have prefix coreApi](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features)
 
 At the moment, both can be applied to OpenCloud.
 
@@ -30,7 +30,7 @@ You can invoke two types of test suite runs:
 
 #### Local OpenCloud Tests (prefix `api`)
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/master/tests/acceptance/features). They can be run with `decomposed` storage and `decomposed_s3` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features). They can be run with `decomposed` storage and `decomposed_s3` storage.
 
 For example, command:
 

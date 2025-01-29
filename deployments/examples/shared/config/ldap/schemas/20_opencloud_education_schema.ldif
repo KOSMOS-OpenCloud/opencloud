@@ -1,0 +1,45 @@
+# This LDIF files describes the LDAP schema related to the Education
+# endpoints of the libregraph API
+dn: cn=openCloudEdu,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: openCloudEdu
+olcAttributeTypes: ( openCloudOid:1.1.6 NAME 'openCloudMemberOfSchool'
+  DESC 'Used as a backreference to the school(s) to which a user or class is assigned'
+  EQUALITY uuidMatch
+  SYNTAX 1.3.6.1.1.16.1 )
+olcAttributeTypes: ( openCloudOid:1.1.7 NAME 'openCloudEducationExternalId'
+  DESC 'An externally assigned string id for an education related object'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( openCloudOid:1.1.8 NAME 'openCloudEducationClassType'
+  DESC 'category of a class e.g. "course" or "class"'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( openCloudOid:1.1.9 NAME 'openCloudEducationTeacherMember'
+  DESC 'references a user who is assigned as a teacher to a class'
+  EQUALITY distinguishedNameMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+olcAttributeTypes: ( openCloudOid:1.1.10 NAME 'openCloudEducationSchoolNumber'
+  DESC 'An externally assigned identifier for a school'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( openCloudOid:1.1.11 NAME 'openCloudEducationSchoolTerminationTimestamp'
+  DESC 'A Timestamp at which a school is considered to be disabled'
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
+olcObjectClasses: ( openCloudOid:1.2.3 NAME 'openCloudEducationUser'
+  DESC 'OpenCloud education user objectclass'
+  SUP openCloudUser
+  AUXILIARY
+  MAY ( userClass $ openCloudMemberOfSchool ) )
+olcObjectClasses: ( openCloudOid:1.2.4 NAME 'openCloudEducationClass'
+  DESC 'OpenCloud education class objectclass'
+  SUP openCloudObject
+  AUXILIARY
+  MAY ( openCloudEducationExternalId $ openCloudEducationClassType $ openCloudEducationTeacherMember $ openCloudMemberOfSchool ) )
+olcObjectClasses: ( openCloudOid:1.2.5 NAME 'openCloudEducationSchool'
+  DESC 'OpenCloud education school objectclass'
+  SUP openCloudObject
+  AUXILIARY
+  MAY ( openCloudEducationSchoolNumber $ openCloudEducationSchoolTerminationTimestamp ) )

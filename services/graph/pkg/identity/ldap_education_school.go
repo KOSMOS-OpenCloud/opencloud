@@ -55,15 +55,15 @@ var (
 
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
-		schoolObjectClass:       "ocEducationSchool",
+		schoolObjectClass:       "openCloudEducationSchool",
 		schoolScope:             ldap.ScopeWholeSubtree,
-		memberOfSchoolAttribute: "ocMemberOfSchool",
+		memberOfSchoolAttribute: "openCloudMemberOfSchool",
 		schoolAttributeMap:      newSchoolAttributeMap(),
 
-		userObjectClass:  "ocEducationUser",
+		userObjectClass:  "openCloudEducationUser",
 		userAttributeMap: newEducationUserAttributeMap(),
 
-		classObjectClass:  "ocEducationClass",
+		classObjectClass:  "openCloudEducationClass",
 		classAttributeMap: newEducationClassAttributeMap(),
 	}
 }
@@ -104,9 +104,9 @@ func newEducationConfig(config config.LDAP) (educationConfig, error) {
 func newSchoolAttributeMap() schoolAttributeMap {
 	return schoolAttributeMap{
 		displayName:     "ou",
-		schoolNumber:    "ocEducationSchoolNumber",
-		id:              "owncloudUUID",
-		terminationDate: "ocEducationSchoolTerminationTimestamp",
+		schoolNumber:    "openCloudEducationSchoolNumber",
+		id:              "openCloudUUID",
+		terminationDate: "openCloudEducationSchoolTerminationTimestamp",
 	}
 }
 

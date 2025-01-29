@@ -10,11 +10,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/invitations"
 )
 
-const (
-	OwnCloudInstanceRel = "http://invitations.opencloud/rel/server-instance"
-	OpenIDConnectRel    = "http://openid.net/specs/connect/1.0/issuer"
-)
-
 // Service defines the extension handlers.
 type Service interface {
 	// Invite creates a new invitation. Invitation adds an external user to the organization.

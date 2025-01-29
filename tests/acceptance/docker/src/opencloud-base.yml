@@ -24,7 +24,7 @@ services:
       OC_ASYNC_UPLOADS: $OC_ASYNC_UPLOADS
       OC_ADD_RUN_SERVICES: $OC_ADD_RUN_SERVICES
       PROXY_HTTP_ADDR: "0.0.0.0:9200"
-      OC_JWT_SECRET: "some-ocis-jwt-secret"
+      OC_JWT_SECRET: "some-random-jwt-secret"
 
       # s3ng specific settings
       STORAGE_USERS_S3NG_ENDPOINT: http://ceph:8080

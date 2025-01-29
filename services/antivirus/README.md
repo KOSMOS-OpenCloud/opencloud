@@ -55,7 +55,7 @@ The antivirus service can scan files during `postprocessing`. `on demand` scanni
 
 ### Postprocessing
 
-The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/opencloud-eu/opencloud/tree/master/services/postprocessing) for more details.
+The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/opencloud-eu/opencloud/tree/main/services/postprocessing) for more details.
 
 The number of concurrent scans can be increased by setting `ANTIVIRUS_WORKERS`, but be aware that this will also increase the memory usage.
 

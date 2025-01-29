@@ -39,7 +39,7 @@ Not all parts are supported, the following list gives an overview of parts that 
 *   NEAR operator
 *   Date intervals
 
-In the following [ADR](https://github.com/opencloud-eu/opencloud/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why we chose KQL.
+ In [this ADR](https://github.com/owncloud/ocis/blob/docs/ocis/adr/0020-file-search-query-language.md) you can read why KQL whas chosen.
 
 ## Extraction Engines
 
@@ -74,7 +74,7 @@ When extracting content, you can specify whether [stop words](https://en.wikiped
 
 When using the Tika container and docker-compose, consider the following:
 
-*   See the [opencloud_full](https://github.com/opencloud-eu/opencloud/tree/master/deployments/examples/opencloud_full) example.
+*   See the [opencloud_full](https://github.com/opencloud-eu/opencloud/tree/main/deployments/examples/opencloud_full) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
 
 If using the `tika` extractor, make sure to also set `FRONTEND_FULL_TEXT_SEARCH_ENABLED` in the frontend service to `true`. This will tell the webclient that full-text search has been enabled.

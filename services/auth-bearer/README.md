@@ -13,7 +13,7 @@ OpenCloud uses serveral authentication services for different use cases. All ser
 
 ## Built in OpenID Connect Identity Provider
 
-A default OpenCloud deployment will start a [built in OpenID Connect identity provider](https://github.com/opencloud-eu/opencloud/tree/master/services/idp) but can be configured to use an external one as well.
+A default OpenCloud deployment will start a [built in OpenID Connect identity provider](https://github.com/opencloud-eu/opencloud/tree/main/services/idp) but can be configured to use an external one as well.
 
 ## Scalability
 

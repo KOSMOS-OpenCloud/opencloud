@@ -6,36 +6,36 @@ import (
 	"testing"
 
 	"github.com/go-ldap/ldap/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-var classEntry = ldap.NewEntry("ocEducationExternalId=Math0123",
+var classEntry = ldap.NewEntry("openCloudEducationExternalId=Math0123",
 	map[string][]string{
-		"cn":                    {"Math"},
-		"ocEducationExternalId": {"Math0123"},
-		"ocEducationClassType":  {"course"},
-		"entryUUID":             {"abcd-defg"},
+		"cn":                           {"Math"},
+		"openCloudEducationExternalId": {"Math0123"},
+		"openCloudEducationClassType":  {"course"},
+		"entryUUID":                    {"abcd-defg"},
 	})
 
-var classEntryWithSchool = ldap.NewEntry("ocEducationExternalId=Math0123",
+var classEntryWithSchool = ldap.NewEntry("openCloudEducationExternalId=Math0123",
 	map[string][]string{
-		"cn":                    {"Math"},
-		"ocEducationExternalId": {"Math0123"},
-		"ocEducationClassType":  {"course"},
-		"entryUUID":             {"abcd-defg"},
-		"ocMemberOfSchool":      {"abcd-defg"},
+		"cn":                           {"Math"},
+		"openCloudEducationExternalId": {"Math0123"},
+		"openCloudEducationClassType":  {"course"},
+		"entryUUID":                    {"abcd-defg"},
+		"openCloudMemberOfSchool":      {"abcd-defg"},
 	})
 
-var classEntryWithMember = ldap.NewEntry("ocEducationExternalId=Math0123",
+var classEntryWithMember = ldap.NewEntry("openCloudEducationExternalId=Math0123",
 	map[string][]string{
-		"cn":                    {"Math"},
-		"ocEducationExternalId": {"Math0123"},
-		"ocEducationClassType":  {"course"},
-		"entryUUID":             {"abcd-defg"},
-		"member":                {"uid=user"},
+		"cn":                           {"Math"},
+		"openCloudEducationExternalId": {"Math0123"},
+		"openCloudEducationClassType":  {"course"},
+		"entryUUID":                    {"abcd-defg"},
+		"member":                       {"uid=user"},
 	})
 
 func TestCreateEducationClass(t *testing.T) {
@@ -107,25 +107,25 @@ func TestGetEducationClass(t *testing.T) {
 		{
 			name:                 "Test search class using id",
 			id:                   "abcd-defg",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=abcd-defg)(ocEducationExternalId=abcd-defg)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=abcd-defg)(openCloudEducationExternalId=abcd-defg)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search class using unknown Id",
 			id:                   "xxxx-xxxx",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=xxxx-xxxx)(ocEducationExternalId=xxxx-xxxx)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=xxxx-xxxx)(openCloudEducationExternalId=xxxx-xxxx)))",
 			expectedItemNotFound: true,
 		},
 		{
 			name:                 "Test search class using external ID",
 			id:                   "Math0123",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Math0123)(ocEducationExternalId=Math0123)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Math0123)(openCloudEducationExternalId=Math0123)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search school using unknown externalID",
 			id:                   "Unknown3210",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Unknown3210)(ocEducationExternalId=Unknown3210)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Unknown3210)(openCloudEducationExternalId=Unknown3210)))",
 			expectedItemNotFound: true,
 		},
 	}
@@ -137,7 +137,7 @@ func TestGetEducationClass(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember"},
+			Attributes: []string{"cn", "entryUUID", "openCloudEducationClassType", "openCloudEducationExternalId", "openCloudMemberOfSchool", "openCloudEducationTeacherMember"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -174,25 +174,25 @@ func TestDeleteEducationClass(t *testing.T) {
 		{
 			name:                 "Test search class using id",
 			id:                   "abcd-defg",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=abcd-defg)(ocEducationExternalId=abcd-defg)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=abcd-defg)(openCloudEducationExternalId=abcd-defg)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search class using unknown Id",
 			id:                   "xxxx-xxxx",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=xxxx-xxxx)(ocEducationExternalId=xxxx-xxxx)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=xxxx-xxxx)(openCloudEducationExternalId=xxxx-xxxx)))",
 			expectedItemNotFound: true,
 		},
 		{
 			name:                 "Test search class using external ID",
 			id:                   "Math0123",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Math0123)(ocEducationExternalId=Math0123)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Math0123)(openCloudEducationExternalId=Math0123)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search school using unknown externalID",
 			id:                   "Unknown3210",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Unknown3210)(ocEducationExternalId=Unknown3210)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Unknown3210)(openCloudEducationExternalId=Unknown3210)))",
 			expectedItemNotFound: true,
 		},
 	}
@@ -204,7 +204,7 @@ func TestDeleteEducationClass(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember"},
+			Attributes: []string{"cn", "entryUUID", "openCloudEducationClassType", "openCloudEducationExternalId", "openCloudMemberOfSchool", "openCloudEducationTeacherMember"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -213,7 +213,7 @@ func TestDeleteEducationClass(t *testing.T) {
 			lm.On("Search", sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{classEntry}}, nil)
 		}
 		dr := &ldap.DelRequest{
-			DN: "ocEducationExternalId=Math0123",
+			DN: "openCloudEducationExternalId=Math0123",
 		}
 		lm.On("Del", dr).Return(nil)
 
@@ -243,25 +243,25 @@ func TestGetEducationClassMembers(t *testing.T) {
 		{
 			name:                 "Test search class using id",
 			id:                   "abcd-defg",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=abcd-defg)(ocEducationExternalId=abcd-defg)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=abcd-defg)(openCloudEducationExternalId=abcd-defg)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search class using unknown Id",
 			id:                   "xxxx-xxxx",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=xxxx-xxxx)(ocEducationExternalId=xxxx-xxxx)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=xxxx-xxxx)(openCloudEducationExternalId=xxxx-xxxx)))",
 			expectedItemNotFound: true,
 		},
 		{
 			name:                 "Test search class using external ID",
 			id:                   "Math0123",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Math0123)(ocEducationExternalId=Math0123)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Math0123)(openCloudEducationExternalId=Math0123)))",
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search school using unknown externalID",
 			id:                   "Unknown3210",
-			filter:               "(&(objectClass=ocEducationClass)(|(entryUUID=Unknown3210)(ocEducationExternalId=Unknown3210)))",
+			filter:               "(&(objectClass=openCloudEducationClass)(|(entryUUID=Unknown3210)(openCloudEducationExternalId=Unknown3210)))",
 			expectedItemNotFound: true,
 		},
 	}
@@ -282,7 +282,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember", "member"},
+			Attributes: []string{"cn", "entryUUID", "openCloudEducationClassType", "openCloudEducationExternalId", "openCloudMemberOfSchool", "openCloudEducationTeacherMember", "member"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -346,7 +346,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{
-					DN: "ocEducationExternalId=Math0123",
+					DN: "openCloudEducationExternalId=Math0123",
 					Changes: []ldap.Change{
 						{
 							Operation: ldap.ReplaceAttribute,
@@ -383,8 +383,8 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			},
 			modifyDNData: modifyDNData{
 				arg: &ldap.ModifyDNRequest{
-					DN:           "ocEducationExternalId=Math0123",
-					NewRDN:       "ocEducationExternalId=Math3210",
+					DN:           "openCloudEducationExternalId=Math0123",
+					NewRDN:       "openCloudEducationExternalId=Math3210",
 					DeleteOldRDN: true,
 					NewSuperior:  "",
 				},
@@ -409,7 +409,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
 			modifyData: modifyData{
 				arg: &ldap.ModifyRequest{
-					DN: "ocEducationExternalId=Math3210,ou=groups,dc=test",
+					DN: "openCloudEducationExternalId=Math3210,ou=groups,dc=test",
 					Changes: []ldap.Change{
 						{
 							Operation: ldap.ReplaceAttribute,
@@ -423,8 +423,8 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			},
 			modifyDNData: modifyDNData{
 				arg: &ldap.ModifyDNRequest{
-					DN:           "ocEducationExternalId=Math0123",
-					NewRDN:       "ocEducationExternalId=Math3210",
+					DN:           "openCloudEducationExternalId=Math0123",
+					NewRDN:       "openCloudEducationExternalId=Math3210",
 					DeleteOldRDN: true,
 					NewSuperior:  "",
 				},

@@ -72,7 +72,7 @@ var invalidUserEntry = ldap.NewEntry("uid=user",
 
 var logger = log.NewLogger(log.Level("debug"))
 
-var ldapUserAttributes = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute", "oCExternalIdentity", "oCLastSignInTimestamp"}
+var ldapUserAttributes = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute", "openCloudExternalIdentity", "openCloudLastSignInTimestamp"}
 
 func TestNewLDAPBackend(t *testing.T) {
 	l := &mocks.Client{}
@@ -123,7 +123,7 @@ func TestCreateUser(t *testing.T) {
 	ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
 	ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
 	ar.Attribute("cn", []string{userName})
-	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
+	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "openCloudUser"})
 
 	l := &mocks.Client{}
 	l.On("Search", mock.Anything).

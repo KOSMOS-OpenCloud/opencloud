@@ -55,14 +55,14 @@ func DefaultConfig() *config.Config {
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{
-					ID:          "ownclouduuid",
+					ID:          "openCloudUUID",
 					Mail:        "mail",
 					DisplayName: "displayname",
 					Username:    "uid",
-					Enabled:     "ownCloudUserEnabled",
+					Enabled:     "openCloudUserEnabled",
 				},
 				GroupSchema: config.LDAPGroupSchema{
-					ID:          "ownclouduuid",
+					ID:          "openCloudUUID",
 					Mail:        "mail",
 					DisplayName: "cn",
 					Groupname:   "cn",

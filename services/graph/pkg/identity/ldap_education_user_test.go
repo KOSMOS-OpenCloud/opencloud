@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/go-ldap/ldap/v3"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -20,9 +20,9 @@ var eduUserAttrs = []string{
 	"givenname",
 	"userEnabledAttribute",
 	"userTypeAttribute",
-	"oCExternalIdentity",
+	"openCloudExternalIdentity",
 	"userClass",
-	"ocMemberOfSchool",
+	"openCloudMemberOfSchool",
 }
 
 var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
@@ -32,7 +32,7 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 		"userClass":   {"student"},
-		"oCExternalIdentity": {
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
@@ -46,7 +46,7 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 		"userClass":   {"student"},
-		"oCExternalIdentity": {
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
@@ -55,13 +55,13 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 	})
 var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
-		"uid":              {"testuser"},
-		"displayname":      {"Test User"},
-		"mail":             {"user@example"},
-		"entryuuid":        {"abcd-defg"},
-		"userClass":        {"student"},
-		"ocMemberOfSchool": {"abcd-defg"},
-		"oCExternalIdentity": {
+		"uid":                     {"testuser"},
+		"displayname":             {"Test User"},
+		"mail":                    {"user@example"},
+		"entryuuid":               {"abcd-defg"},
+		"userClass":               {"student"},
+		"openCloudMemberOfSchool": {"abcd-defg"},
+		"openCloudExternalIdentity": {
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
@@ -71,7 +71,7 @@ var sr1 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "ou=people,dc=test",
 	Scope:      2,
 	SizeLimit:  1,
-	Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
+	Filter:     "(&(objectClass=openCloudEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
 	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
@@ -79,7 +79,7 @@ var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "ou=people,dc=test",
 	Scope:      2,
 	SizeLimit:  1,
-	Filter:     "(&(objectClass=ocEducationUser)(|(uid=xxxx-xxxx)(entryUUID=xxxx-xxxx)))",
+	Filter:     "(&(objectClass=openCloudEducationUser)(|(uid=xxxx-xxxx)(entryUUID=xxxx-xxxx)))",
 	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
@@ -166,7 +166,7 @@ func TestGetEducationUsers(t *testing.T) {
 		BaseDN:     "ou=people,dc=test",
 		Scope:      2,
 		SizeLimit:  0,
-		Filter:     "(objectClass=ocEducationUser)",
+		Filter:     "(objectClass=openCloudEducationUser)",
 		Attributes: eduUserAttrs,
 		Controls:   []ldap.Control(nil),
 	}
@@ -186,7 +186,7 @@ func TestUpdateEducationUser(t *testing.T) {
 		BaseDN:     "ou=people,dc=test",
 		Scope:      2,
 		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationUser)(|(uid=testuser)(entryUUID=testuser)))",
+		Filter:     "(&(objectClass=openCloudEducationUser)(|(uid=testuser)(entryUUID=testuser)))",
 		Attributes: eduUserAttrs,
 	}
 	userLookupReq := &ldap.SearchRequest{
@@ -200,7 +200,7 @@ func TestUpdateEducationUser(t *testing.T) {
 		BaseDN:     "uid=newtestuser,ou=people,dc=test",
 		Scope:      0,
 		SizeLimit:  1,
-		Filter:     "(objectClass=ocEducationUser)",
+		Filter:     "(objectClass=openCloudEducationUser)",
 		Attributes: eduUserAttrs,
 	}
 	groupSearchReq := &ldap.SearchRequest{

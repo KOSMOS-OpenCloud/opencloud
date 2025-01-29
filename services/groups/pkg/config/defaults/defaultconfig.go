@@ -53,13 +53,13 @@ func DefaultConfig() *config.Config {
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
 				IDP:                      "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{
-					ID:          "ownclouduuid",
+					ID:          "openCloudUUID",
 					Mail:        "mail",
 					DisplayName: "displayname",
 					Username:    "uid",
 				},
 				GroupSchema: config.LDAPGroupSchema{
-					ID:          "ownclouduuid",
+					ID:          "openCloudUUID",
 					Mail:        "mail",
 					DisplayName: "cn",
 					Groupname:   "cn",

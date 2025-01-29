@@ -120,11 +120,11 @@ func DefaultConfig() *config.Config {
 			LoginAttribute:       "uid",
 			EmailAttribute:       "mail",
 			NameAttribute:        "displayName",
-			UUIDAttribute:        "ownCloudUUID",
+			UUIDAttribute:        "openCloudUUID",
 			UUIDAttributeType:    "text",
 			Filter:               "",
 			ObjectClass:          "inetOrgPerson",
-			UserEnabledAttribute: "ownCloudUserEnabled",
+			UserEnabledAttribute: "openCloudUserEnabled",
 		},
 	}
 }

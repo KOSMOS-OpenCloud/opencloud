@@ -317,7 +317,7 @@ func TestGetGroupsSearch(t *testing.T) {
 	}
 }
 func TestUpdateGroupName(t *testing.T) {
-	groupDn := "cn=TheGroup,ou=groups,dc=owncloud,dc=com"
+	groupDn := "cn=TheGroup,ou=groups,dc=example,dc=org"
 
 	type args struct {
 		groupId   string
@@ -404,7 +404,7 @@ func TestUpdateGroupName(t *testing.T) {
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
-									DN: "cn=TheGroup,ou=groups,dc=owncloud,dc=com",
+									DN: "cn=TheGroup,ou=groups,dc=example,dc=org",
 									Attributes: []*ldap.EntryAttribute{
 										{
 											Name:   "cn",

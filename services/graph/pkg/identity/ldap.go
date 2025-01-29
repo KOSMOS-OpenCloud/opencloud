@@ -24,8 +24,8 @@ import (
 const (
 	givenNameAttribute  = "givenname"
 	surNameAttribute    = "sn"
-	identitiesAttribute = "oCExternalIdentity"
-	lastSignAttribute   = "oCLastSignInTimestamp"
+	identitiesAttribute = "openCloudExternalIdentity"
+	lastSignAttribute   = "openCloudLastSignInTimestamp"
 	ldapDateFormat      = "20060102150405Z0700"
 )
 
@@ -884,7 +884,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		i.userAttributeMap.displayName: {user.GetDisplayName()},
 		i.userAttributeMap.userName:    {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.mail:        {user.GetMail()},
-		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
+		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "openCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
 	}

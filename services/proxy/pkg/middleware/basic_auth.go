@@ -45,7 +45,7 @@ func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		oidc.Iss:               user.Id.Idp,
 		oidc.PreferredUsername: user.Username,
 		oidc.Email:             user.Mail,
-		oidc.OwncloudUUID:      user.Id.OpaqueId,
+		oidc.OpenCloudUUID:     user.Id.OpaqueId,
 	}
 
 	if m.UserCS3Claim == "userid" {

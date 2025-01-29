@@ -95,9 +95,9 @@ func DefaultConfig() *config.Config {
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:           "owncloudUUID",
-				UserTypeAttribute:         "ownCloudUserType",
-				UserEnabledAttribute:      "ownCloudUserEnabled",
+				UserIDAttribute:           "openCloudUUID",
+				UserTypeAttribute:         "openCloudUserType",
+				UserEnabledAttribute:      "openCloudUserEnabled",
 				DisableUserMechanism:      "attribute",
 				LdapDisabledUsersGroupDN:  "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				GroupBaseDN:               "ou=groups,o=libregraph-idm",
@@ -106,7 +106,7 @@ func DefaultConfig() *config.Config {
 				GroupObjectClass:          "groupOfNames",
 				GroupNameAttribute:        "cn",
 				GroupMemberAttribute:      "member",
-				GroupIDAttribute:          "owncloudUUID",
+				GroupIDAttribute:          "openCloudUUID",
 				EducationResourcesEnabled: false,
 			},
 		},

@@ -47,7 +47,7 @@ respect to the available schema:
     object class for groups.
   * The graph service maintains a few additional attributes for users and groups that are not
     available in the standard LDAP schema. An schema file, ready to use with OpenLDAP, defining those
-    additional attributes is available [here](https://github.com/opencloud-eu/opencloud/blob/main/deployments/examples/opencloud_ldap/config/ldap/schemas/10_owncloud_schema.ldif).
+    additional attributes is available [here](https://github.com/opencloud-eu/opencloud/blob/main/deployments/examples/shared/config/ldap/schemas/10_opencloud_schema.ldif)
 
 ## Query Filters Provided by the Graph API
 

@@ -24,10 +24,9 @@ var (
 	Date = "dev"
 
 	// Legacy defines the old long 4 number OpenCloud version needed for some clients
-	Legacy = "10.11.0.0"
-
+	Legacy = "0.1.0.0"
 	// LegacyString defines the old OpenCloud version needed for some clients
-	LegacyString = "10.11.0"
+	LegacyString = "0.1.0"
 )
 
 // Compiled returns the compile time of this service.

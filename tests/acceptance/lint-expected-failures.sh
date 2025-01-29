@@ -50,10 +50,6 @@ then
 		FINAL_EXIT_STATUS=1
 	fi
 	# Check the expected-failures file to ensure that the lines are self-consistent
-	# In most cases the features that are being run are in owncloud/core,
-	# so assume that by default.
-	FEATURE_FILE_REPO="owncloud/core"
-	FEATURE_FILE_PATH="tests/acceptance/features"
 	LINE_NUMBER=0
 	while read -r INPUT_LINE
 		do
@@ -62,25 +58,6 @@ then
 			# Ignore comment lines (starting with hash)
 			if [[ "${INPUT_LINE}" =~ ^# ]]
 			then
-				continue
-			fi
-			# A line of text in the feature file can be used to indicate that the
-			# features being run are actually from some other repo. For example:
-			# "The expected failures in this file are from features in the owncloud/ocis repo."
-			# Write a line near the top of the expected-failures file to "declare" this,
-			# overriding the default "owncloud/core"
-			FEATURE_FILE_SPEC_LINE_FOUND="false"
-			if [[ "${INPUT_LINE}" =~ features[[:blank:]]in[[:blank:]]the[[:blank:]]([a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+)[[:blank:]]repo ]]; then
-				FEATURE_FILE_REPO="${BASH_REMATCH[1]}"
-				log_info "Features are expected to be in the ${FEATURE_FILE_REPO} repo\n"
-				FEATURE_FILE_SPEC_LINE_FOUND="true"
-			fi
-			if [[ "${INPUT_LINE}" =~ repo[[:blank:]]in[[:blank:]]the[[:blank:]]([a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+)[[:blank:]]folder[[:blank:]]tree ]]; then
-				FEATURE_FILE_PATH="${BASH_REMATCH[1]}"
-				log_info "Features are expected to be in the ${FEATURE_FILE_PATH} folder tree\n"
-				FEATURE_FILE_SPEC_LINE_FOUND="true"
-			fi
-			if [[ $FEATURE_FILE_SPEC_LINE_FOUND == "true" ]]; then
 				continue
 			fi
 			# Match lines that have "- [someSuite/someName.feature:n]" pattern on start
@@ -122,7 +99,7 @@ then
 			IFS=${OLD_IFS}
 			SUITE_FEATURE="${FEATURE_PARTS[0]}"
 			FEATURE_LINE="${FEATURE_PARTS[1]}"
-			EXPECTED_LINK="https://github.com/${FEATURE_FILE_REPO}/blob/master/${FEATURE_FILE_PATH}/${SUITE_FEATURE}#L${FEATURE_LINE}"
+			EXPECTED_LINK="https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/${SUITE_FEATURE}#L${FEATURE_LINE}"
 			if [[ "${ACTUAL_LINK}" != "${EXPECTED_LINK}" ]]; then
 				log_error "> Line ${LINE_NUMBER}: Link is not correct for ${SUITE_SCENARIO_LINE}"
 				log_error "  + Actual link   : ${ACTUAL_LINK}"

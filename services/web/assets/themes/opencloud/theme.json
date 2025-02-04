@@ -49,15 +49,9 @@
     "ios": {},
     "web": {
       "defaults": {
-        "appBanner": {},
-        "logo": {
-          "topbar": "themes/opencloud/assets/logo.svg",
-          "favicon": "themes/opencloud/assets/favicon.ico",
-          "login": "themes/opencloud/assets/logo.svg"
-        },
-        "loginPage": {
-          "backgroundImg": "themes/opencloud/assets/background.png"
-        },
+        "logo": "themes/opencloud/assets/logo.svg",
+        "favicon": "themes/opencloud/assets/favicon.ico",
+        "background": "themes/opencloud/assets/background.png",
         "designTokens": {
           "breakpoints": {
             "xsmall-max": "",
@@ -98,7 +92,7 @@
       "themes": [
         {
           "isDark": false,
-          "name": "Light Theme",
+          "label": "Light Theme",
           "designTokens": {
             "colorPalette": {
               "background-accentuate": "rgba(255, 255, 5, 0.1)",

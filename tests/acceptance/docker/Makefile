@@ -13,7 +13,14 @@ WHITE        := $(shell tput -Txterm setaf 7)
 RESET := $(shell tput -Txterm sgr0)
 
 ## default values only for sub-make calls
-COMPOSE_FILE ?= src/redis.yml:src/opencloud-base.yml:src/acceptance.yml
+ifeq ($(LOCAL_TEST),true)
+	COMPOSE_FILE ?= src/opencloud-base.yml:src/tika.yml
+	ifeq ($(START_EMAIL),true)
+		COMPOSE_FILE := $(COMPOSE_FILE):src/email.yml
+	endif
+else 
+	COMPOSE_FILE ?= src/redis.yml:src/opencloud-base.yml:src/acceptance.yml
+endif
 
 ## user input
 BEHAT_FEATURE ?=
@@ -188,14 +195,14 @@ $(targets):
 .PHONY: testSuite
 testSuite: $(OC_WRAPPER) build-dev-image clean-docker-container
 	@if [ -n "${START_CEPH}" ]; then \
-		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
-		COMPOSE_FILE=src/ceph.yml \
-		docker compose run start_ceph; \
+			COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+			COMPOSE_FILE=src/ceph.yml \
+			docker compose run start_ceph; \
 	fi; \
 	if [ "${START_EMAIL}" == "true" ]; then \
-		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
-		COMPOSE_FILE=src/email.yml \
-		docker compose run start_email; \
+			COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+			COMPOSE_FILE=src/email.yml \
+			docker compose run start_email; \
 	fi; \
 	if [ "${START_ANTIVIRUS}" == "true" ]; then \
     		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
@@ -278,16 +285,15 @@ clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-
 .PHONY: start-server
 start-server: ## build and start server
 	@echo "Build and start server..."
-	COMPOSE_FILE=src/opencloud-base.yml:src/tika.yml:src/email.yml \
+	COMPOSE_FILE=$(COMPOSE_FILE) \
 	COMPOSE_PROJECT_NAME=opencloud \
-	SEARCH_EXTRACTOR_TYPE=tika \
 	OC_IMAGE_TAG=dev \
-	WITH_WRAPPER=true \
+	WITH_WRAPPER=$(WITH_WRAPPER) \
 	TEST_SOURCE=opencloud \
-	STORAGE_DRIVER=ocis \
+	STORAGE_DRIVER=decomposed \
 	OC_ASYNC_UPLOADS=true \
-	START_TIKA=true \
 	SEARCH_EXTRACTOR_TYPE=tika \
-	START_EMAIL=true \
 	OC_ADD_RUN_SERVICES=notifications \
+	GRAPH_AVAILABLE_ROLES=$(GRAPH_AVAILABLE_ROLES) \
+	OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST=$(OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST) \
 	docker compose up -d --build --force-recreate

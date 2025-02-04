@@ -1,4 +1,5 @@
 ![OpenCloud logo](opencloud_logo.png)
+
 -[![Matrix](https://img.shields.io/matrix/opencloud%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#opencloud:matrix.org)
 -[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -9,18 +10,6 @@
 > For general information about OpenCloud and how to install please visit [OpenCloud on Github](https://github.com/opencloud-eu/) and [OpenCloud GmbH](https://opencloud.eu).
 
 This the main repository of the OpenCloud server. It contains the golang codebase for the backend services.
-
-## Technology
-
-Important information for contributors about the technology in use. 
-
-### Authentication
-
-The OpenCloud backend authenticates users via [OpenID Connect](https://openid.net/connect/) using either an external IdP like [Keycloak](https://www.keycloak.org/) or the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider.
-
-### Database
-
-The OpenCloud backend does not use a database. It stores all data in the filesystem. By default, the root directory of the backend is `$HOME/.opencloud/`.
 
 ## Getting Involved
 
@@ -33,14 +22,31 @@ To build the backend, follow the following instructions:
 ``` console
 make -C opencloud build
 ```
-That will produce the binary `opencloud/bin/opencloud`.
+That will produce the binary `opencloud/bin/opencloud`. It can be started as a local test instance right away with a two step command:
 
-For more information consult the [Development Documentation](https://docs.opencloud.eu/opencloud/).
+```bash
+opencloud/bin/opencloud init && opencloud/bin/opencloud server
+```
+This creates a server configuration (by default in `$HOME/.opencloud`) and starts the server.
 
-Please always refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/main/CONTRIBUTING.md).
+For more setup- and installation options consult the [Development Documentation](https://docs.opencloud.eu/opencloud/).
+
+### Contribute
+
+We very much appreciate contributions from the community. Please refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/main/CONTRIBUTING.md) on how to get started.
+
+## Technology
+
+Important information for contributors about the technology in use.
+
+### Authentication
+
+The OpenCloud backend authenticates users via [OpenID Connect](https://openid.net/connect/) using either an external IdP like [Keycloak](https://www.keycloak.org/) or the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider.
+
+### Database
+
+The OpenCloud backend does not use a database. It stores all data in the filesystem. By default, the root directory of the backend is `$HOME/.opencloud/`.
 
 ## Security
 
-See the [Security Aspects](https://docs.opencloud.eu/security/) for security related topics.
-
-If you find a security issue, please contact [security@opencloud.eu](mailto:security@opencloud.eu) first.
+If you find a security related issue, please contact [security@opencloud.eu](mailto:security@opencloud.eu) immediately.

@@ -4,9 +4,6 @@ Feature: attempt to PUT files with invalid password
   I want the system to be secure when passwords are stored with the full hash difficulty
   So that unauthorised users do not have access to data
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"

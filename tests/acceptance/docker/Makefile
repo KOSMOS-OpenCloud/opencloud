@@ -236,6 +236,12 @@ show-test-logs: ## show logs of test
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	docker compose logs --no-log-prefix -f acceptance-tests | less
 
+.PHONY: ps
+ps: ## show docker status
+	@COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+	COMPOSE_FILE=$(COMPOSE_FILE) \
+	docker compose ps
+
 $(OC_WRAPPER):
 	@if [ "$(WITH_WRAPPER)" == "true" ]; then \
 		$(MAKE) --no-print-directory -C ../../ocwrapper build \
@@ -286,7 +292,7 @@ clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-
 start-server: ## build and start server
 	@echo "Build and start server..."
 	COMPOSE_FILE=$(COMPOSE_FILE) \
-	COMPOSE_PROJECT_NAME=opencloud \
+	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	OC_IMAGE_TAG=dev \
 	WITH_WRAPPER=$(WITH_WRAPPER) \
 	TEST_SOURCE=opencloud \

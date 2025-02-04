@@ -290,7 +290,7 @@ start-server: ## build and start server
 	OC_IMAGE_TAG=dev \
 	WITH_WRAPPER=$(WITH_WRAPPER) \
 	TEST_SOURCE=opencloud \
-	STORAGE_DRIVER=ocis \
+	STORAGE_DRIVER=decomposed \
 	OC_ASYNC_UPLOADS=true \
 	SEARCH_EXTRACTOR_TYPE=tika \
 	OC_ADD_RUN_SERVICES=notifications \

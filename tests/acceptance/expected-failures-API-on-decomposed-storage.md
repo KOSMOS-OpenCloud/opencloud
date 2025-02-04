@@ -40,12 +40,12 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
-- [coreApiWebdavProperties/getQuota.feature:57](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L57)
-- [coreApiWebdavProperties/getQuota.feature:58](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L58)
-- [coreApiWebdavProperties/getQuota.feature:59](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L59)
-- [coreApiWebdavProperties/getQuota.feature:73](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L73)
-- [coreApiWebdavProperties/getQuota.feature:74](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L74)
-- [coreApiWebdavProperties/getQuota.feature:75](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L75)
+- [coreApiWebdavProperties/getQuota.feature:54](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L54)
+- [coreApiWebdavProperties/getQuota.feature:55](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L55)
+- [coreApiWebdavProperties/getQuota.feature:56](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L56)
+- [coreApiWebdavProperties/getQuota.feature:70](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L70)
+- [coreApiWebdavProperties/getQuota.feature:71](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L71)
+- [coreApiWebdavProperties/getQuota.feature:72](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L72)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 

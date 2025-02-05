@@ -70,17 +70,6 @@ class TrashbinContext implements Context {
 	public function userEmptiesTrashbin(string $user): void {
 		$this->featureContext->setResponse($this->emptyTrashbin($user));
 	}
-	/**
-	 * @Given user :user has emptied the trashbin
-	 *
-	 * @param string $user user
-	 *
-	 * @return void
-	 */
-	public function userHasEmptiedTrashbin(string $user): void {
-		$response = $this->emptyTrashbin($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
-	}
 
 	/**
 	 * Get files list from the response from trashbin api
@@ -471,29 +460,6 @@ class TrashbinContext implements Context {
 	): void {
 		$response = $this->sendTrashbinListRequest($user, $asUser, $password);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Then the last webdav response should contain the following elements
-	 *
-	 * @param TableNode $elements
-	 *
-	 * @return void
-	 */
-	public function theLastWebdavResponseShouldContainFollowingElements(TableNode $elements): void {
-		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($response, __METHOD__));
-		$elementRows = $elements->getHash();
-		foreach ($elementRows as $expectedElement) {
-			$found = false;
-			$expectedPath = $expectedElement['path'];
-			foreach ($files as $file) {
-				if (\ltrim($expectedPath, "/") === \ltrim($file['original-location'], "/")) {
-					$found = true;
-					break;
-				}
-			}
-			Assert::assertTrue($found, "$expectedPath expected to be listed in response but not found");
-		}
 	}
 
 	/**
@@ -947,37 +913,6 @@ class TrashbinContext implements Context {
 					)
 				);
 			}
-		}
-	}
-
-	/**
-	 * @Then /^the content of file "([^"]*)" for user "([^"]*)" if the file is also in the trashbin should be "([^"]*)" otherwise "([^"]*)"$/
-	 *
-	 * Note: this is a special step for an unusual bug combination.
-	 *       Delete it when the bug is fixed and the step is no longer needed.
-	 *
-	 * @param string|null $fileName
-	 * @param string|null $user
-	 * @param string|null $content
-	 * @param string|null $alternativeContent
-	 *
-	 * @return void
-	 * @throws JsonException
-	 * @throws Exception
-	 */
-	public function contentOfFileForUserIfAlsoInTrashShouldBeOtherwise(
-		?string $fileName,
-		?string $user,
-		?string $content,
-		?string $alternativeContent
-	): void {
-		$isInTrash = $this->isInTrash($user, $fileName);
-		$user = $this->featureContext->getActualUsername($user);
-		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
-		if ($isInTrash) {
-			$this->featureContext->checkDownloadedContentMatches($content, '', $response);
-		} else {
-			$this->featureContext->checkDownloadedContentMatches($alternativeContent, '', $response);
 		}
 	}
 

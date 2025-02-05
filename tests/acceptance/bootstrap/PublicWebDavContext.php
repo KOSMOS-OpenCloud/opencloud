@@ -132,10 +132,7 @@ class PublicWebDavContext implements Context {
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileName";
-		$userName = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$userName = $this->getUsernameForPublicWebdavApi($password);
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest'
 		];
@@ -205,10 +202,7 @@ class PublicWebDavContext implements Context {
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileName";
 		$password = $this->featureContext->getActualPassword($password);
 		$destination = $this->featureContext->getBaseUrl() . "/$davPath/$toFileName";
-		$userName = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$userName = $this->getUsernameForPublicWebdavApi($password);
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest',
 			'Destination' => $destination
@@ -321,10 +315,7 @@ class PublicWebDavContext implements Context {
 			"public-files"
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$path";
-		$userName = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$userName = $this->getUsernameForPublicWebdavApi($password);
 
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest'
@@ -408,48 +399,6 @@ class PublicWebDavContext implements Context {
 			$destination
 		);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * This only works with the old API, auto-rename is not supported in the new API
-	 * auto renaming is handled on files drop folders implicitly
-	 *
-	 * @param string $filename target file name
-	 * @param string $body content to upload
-	 *
-	 * @return ResponseInterface
-	 */
-	public function publiclyUploadingContentAutoRename(string $filename, string $body = 'test'): ResponseInterface {
-		return $this->publicUploadContent($filename, '', $body, true);
-	}
-
-	/**
-	 * @When the public uploads file :filename with content :body with auto-rename mode using the old public WebDAV API
-	 *
-	 * @param string $filename target file name
-	 * @param string $body content to upload
-	 *
-	 * @return void
-	 */
-	public function thePublicUploadsFileWithContentWithAutoRenameMode(string $filename, string $body = 'test'): void {
-		$response = $this->publiclyUploadingContentAutoRename($filename, $body);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given the public has uploaded file :filename with content :body with auto-rename mode
-	 *
-	 * @param string $filename target file name
-	 * @param string $body content to upload
-	 *
-	 * @return void
-	 */
-	public function thePublicHasUploadedFileWithContentWithAutoRenameMode(
-		string $filename,
-		string $body = 'test'
-	): void {
-		$response = $this->publiclyUploadingContentAutoRename($filename, $body);
-		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
 	}
 
 	/**
@@ -997,10 +946,7 @@ class PublicWebDavContext implements Context {
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath/";
 		$password = $this->featureContext->getActualPassword($password);
-		$userName = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$userName = $this->getUsernameForPublicWebdavApi($password);
 		$foldername = \implode(
 			'/',
 			\array_map('rawurlencode', \explode('/', $destination))
@@ -1152,10 +1098,7 @@ class PublicWebDavContext implements Context {
 			$token,
 			"public-files"
 		);
-		$userName = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$userName = $this->getUsernameForPublicWebdavApi($password);
 
 		$filename = \implode(
 			'/',
@@ -1184,13 +1127,11 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @param string $token
 	 * @param string $password
 	 *
 	 * @return string|null
 	 */
 	private function getUsernameForPublicWebdavApi(
-		string $token,
 		string $password
 	): ?string {
 		if ($password !== '') {
@@ -1249,10 +1190,7 @@ class PublicWebDavContext implements Context {
 			"public-files"
 		);
 		$password = $this->featureContext->getActualPassword($password);
-		$username = $this->getUsernameForPublicWebdavApi(
-			$token,
-			$password
-		);
+		$username = $this->getUsernameForPublicWebdavApi($password);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,

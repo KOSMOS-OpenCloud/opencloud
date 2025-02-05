@@ -20,7 +20,6 @@
  *
  */
 
-use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
@@ -409,24 +408,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created a share with settings$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body {@link createShareWithSettings}
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasCreatedAShareWithSettings(string $user, ?TableNode $body) {
-		$response = $this->createShareWithSettings(
-			$user,
-			$body
-		);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
 	 * @param string $user
 	 * @param TableNode $body
 	 *
@@ -452,49 +433,6 @@ trait Sharing {
 	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode $body): void {
 		$this->setResponse($this->createPublicLinkShare($user, $body));
 		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has created a public link share with settings$/
-	 *
-	 * @param string $user
-	 * @param TableNode $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasCreatedAPublicLinkShareWithSettings(string $user, TableNode $body): void {
-		$response = $this->createPublicLinkShare($user, $body);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-		$this->clearStatusCodeArrays();
-	}
-
-	/**
-	 * @When /^the user creates a public link share using the sharing API with settings$/
-	 *
-	 * @param TableNode $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserCreatesAPublicLinkShareWithSettings(TableNode $body): void {
-		$this->setResponse($this->createPublicLinkShare($this->currentUser, $body));
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @Given /^the user has created a public link share with settings$/
-	 *
-	 * @param TableNode $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserHasCreatedAPublicLinkShareWithSettings(TableNode $body): void {
-		$response = $this->createPublicLinkShare($this->currentUser, $body);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
 	}
 
 	/**
@@ -531,70 +469,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates a public link share of (?:file|folder) "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userCreatesAPublicLinkShareOf(string $user, string $path): void {
-		$response = $this->createAPublicShare($user, $path);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has created a public link share of (?:file|folder) "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userHasCreatedAPublicLinkShareOf(string $user, string $path): void {
-		$response = $this->createAPublicShare($user, $path);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" creates a public link share of (?:file|folder) "([^"]*)" using the sharing API with (read|update|create|delete|change|uploadwriteonly|share|all) permission(?:s|)$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function userCreatesAPublicLinkShareOfWithPermission(
-		string $user,
-		string $path,
-		$permissions
-	): void {
-		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has created a public link share of (?:file|folder) "([^"]*)" with (read|update|create|delete|change|uploadwriteonly|share|all) permission(?:s|)$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string|int|string[]|int[]|null $permissions
-	 *
-	 * @return void
-	 */
-	public function userHasCreatedAPublicLinkShareOfWithPermission(
-		string $user,
-		string $path,
-		$permissions
-	): void {
-		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $path
 	 * @param string $expiryDate in a valid date format, e.g. "+30 days"
@@ -615,105 +489,6 @@ trait Sharing {
 			null,
 			$expiryDate
 		);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" creates a public link share of (?:file|folder) "([^"]*)" using the sharing API with expiry "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string $expiryDate in a valid date format, e.g. "+30 days"
-	 *
-	 * @return void
-	 */
-	public function userCreatesAPublicLinkShareOfWithExpiry(
-		string $user,
-		string $path,
-		string $expiryDate
-	): void {
-		$this->createPublicLinkShareOfResourceWithExpiry(
-			$user,
-			$path,
-			$expiryDate
-		);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has created a public link share of (?:file|folder) "([^"]*)" with expiry "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string $expiryDate in a valid date format, e.g. "+30 days"
-	 *
-	 * @return void
-	 */
-	public function userHasCreatedAPublicLinkShareOfWithExpiry(
-		string $user,
-		string $path,
-		string $expiryDate
-	): void {
-		$this->createPublicLinkShareOfResourceWithExpiry(
-			$user,
-			$path,
-			$expiryDate
-		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
-	 * @Then /^user "([^"]*)" should not be able to create a public link share of (?:file|folder) "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $sharer
-	 * @param string $filepath
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $filepath): void {
-		$this->createAPublicShare($sharer, $filepath);
-		Assert::assertEquals(
-			404,
-			$this->ocsContext->getOCSResponseStatusCode($this->response),
-			__METHOD__
-			. " Expected response status code is '404' but got '"
-			. $this->ocsContext->getOCSResponseStatusCode($this->response)
-			. "'"
-		);
-	}
-
-	/**
-	 * @param TableNode|null $body
-	 *
-	 * @return ResponseInterface
-	 * @throws Exception
-	 */
-	public function updateLastShareByCurrentUser(?TableNode $body): ResponseInterface {
-		return $this->updateLastShareWithSettings($this->currentUser, $body);
-	}
-
-	/**
-	 * @When /^the user updates the last share using the sharing API with$/
-	 *
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserUpdatesTheLastShareWith(?TableNode $body): void {
-		$this->setResponse($this->updateLastShareByCurrentUser($body));
-	}
-
-	/**
-	 * @Given /^the user has updated the last share with$/
-	 *
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserHasUpdatedTheLastShareWith(?TableNode $body): void {
-		$response = $this->updateLastShareByCurrentUser($body);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -836,42 +611,6 @@ trait Sharing {
 	public function userHasUpdatedTheLastShareWith(string $user, ?TableNode $body): void {
 		$response = $this->updateLastShareWithSettings($user, $body);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has updated the last public link share with$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUpdatedTheLastPublicLinkShareWith(string $user, ?TableNode $body): void {
-		$response = $this->updateLastShareWithSettings($user, $body, null, true);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has updated the last share of "([^"]*)" with$/
-	 *
-	 * @param string $user
-	 * @param string $shareOwner
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUpdatedTheLastShareOfWith(string $user, string $shareOwner, ?TableNode $body): void {
-		$response = $this->updateLastShareWithSettings($user, $body, $shareOwner);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-		if ($this->ocsApiVersion == 1) {
-			$this->ocsContext->theOCSStatusCodeShouldBe("100", "", $response);
-		} elseif ($this->ocsApiVersion === 2) {
-			$this->ocsContext->theOCSStatusCodeShouldBe("200", "", $response);
-		} else {
-			throw new Exception('Invalid ocs api version used');
-		}
 	}
 
 	/**
@@ -1353,82 +1092,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @Given /^the user has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)"(?: with permissions (\d+))?$/
-	 * @Given /^the user has shared (?:file|folder|entry) "([^"]*)" with user "([^"]*)" with permissions "([^"]*)"$/
-	 *
-	 * @param string $filepath
-	 * @param string $user2
-	 * @param string|int|string[]|int[] $permissions
-	 *
-	 * @return void
-	 */
-	public function theUserHasSharedFileWithUserUsingTheSharingApi(
-		string $filepath,
-		string $user2,
-		$permissions = null
-	): void {
-		$user2 = $this->getActualUsername($user2);
-		$response = $this->createAUserShare(
-			$this->getCurrentUser(),
-			$filepath,
-			$this->getActualUsername($user2),
-			$permissions
-		);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
-	 * @When /^the user shares (?:file|folder|entry) "([^"]*)" with group "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
-	 * @When /^the user shares (?:file|folder|entry) "([^"]*)" with group "([^"]*)" with permissions "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $filepath
-	 * @param string $group
-	 * @param string|int|string[]|int[] $permissions
-	 *
-	 * @return void
-	 */
-	public function theUserSharesFileWithGroupUsingTheSharingApi(
-		string $filepath,
-		string $group,
-		$permissions = null
-	): void {
-		$response = $this->createAGroupShare(
-			$this->currentUser,
-			$filepath,
-			$group,
-			$permissions
-		);
-		$this->setResponse($response);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @Given /^the user has shared (?:file|folder|entry) "([^"]*)" with group "([^"]*)"(?: with permissions (\d+))?$/
-	 * @Given /^the user has shared (?:file|folder|entry) "([^"]*)" with group "([^"]*)" with permissions "([^"]*)"$/
-	 *
-	 * @param string $filepath
-	 * @param string $group
-	 * @param string|int|string[]|int[] $permissions
-	 *
-	 * @return void
-	 */
-	public function theUserHasSharedFileWithGroupUsingTheSharingApi(
-		string $filepath,
-		string $group,
-		$permissions = null
-	): void {
-		$response = $this->createAGroupShare(
-			$this->currentUser,
-			$filepath,
-			$group,
-			$permissions
-		);
-		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
 	 *
 	 * @param string $user
 	 * @param string $filepath
@@ -1542,35 +1205,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" tries to update the last share using the sharing API with$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToUpdateTheLastShareUsingTheSharingApiWith(string $user, ?TableNode $body): void {
-		$this->response = $this->updateLastShareWithSettings($user, $body);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" tries to update the last public link share using the sharing API with$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userTriesToUpdateTheLastPublicLinkShareUsingTheSharingApiWith(
-		string $user,
-		?TableNode $body
-	): void {
-		$this->response = $this->updateLastShareWithSettings($user, $body, null, true);
-	}
-
-	/**
 	 * @Then /^user "([^"]*)" should not be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)"(?: with permissions (\d+))? using the sharing API$/
 	 * @Then /^user "([^"]*)" should not be able to share (?:file|folder|entry) "([^"]*)" with (user|group) "([^"]*)" with permissions "([^"]*)" using the sharing API$/
 	 *
@@ -1646,25 +1280,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^the user deletes the last share using the sharing API$/
-	 *
-	 * @return void
-	 */
-	public function theUserDeletesLastShareUsingTheSharingAPI(): void {
-		$this->setResponse($this->deleteLastShareUsingSharingApiByCurrentUser());
-	}
-
-	/**
-	 * @Given /^the user has deleted the last share$/
-	 *
-	 * @return void
-	 */
-	public function theUserHasDeletedLastShareUsingTheSharingAPI(): void {
-		$response = $this->deleteLastShareUsingSharingApiByCurrentUser();
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-	}
-
-	/**
 	 * @param string $user the user who will do the delete request
 	 * @param string|null $sharer the specific user whose share will be deleted (if specified)
 	 * @param bool $deleteLastPublicLink
@@ -1705,7 +1320,6 @@ trait Sharing {
 
 	/**
 	 * @When /^user "([^"]*)" deletes the last share using the sharing API$/
-	 * @When /^user "([^"]*)" tries to delete the last share using the sharing API$/
 	 *
 	 * @param string $user
 	 *
@@ -1713,19 +1327,6 @@ trait Sharing {
 	 */
 	public function userDeletesLastShareUsingTheSharingApi(string $user): void {
 		$this->setResponse($this->deleteLastShareUsingSharingApi($user));
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @When /^user "([^"]*)" deletes the last public link share using the sharing API$/
-	 * @When /^user "([^"]*)" tries to delete the last public link share using the sharing API$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function userDeletesLastPublicLinkShareUsingTheSharingApi(string $user): void {
-		$this->setResponse($this->deleteLastShareUsingSharingApi($user, null, true));
 		$this->pushToLastStatusCodesArrays();
 	}
 
@@ -1780,7 +1381,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets the info of the last share in language "([^"]*)" using the sharing API$/
 	 * @When /^user "([^"]*)" gets the info of the last share using the sharing API$/
 	 *
 	 * @param string $user username that requests the information (might not be the user that has initiated the share)
@@ -1795,7 +1395,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets the info of the last public link share in language "([^"]*)" using the sharing API$/
 	 * @When /^user "([^"]*)" gets the info of the last public link share using the sharing API$/
 	 *
 	 * @param string $user username that requests the information (might not be the user that has initiated the share)
@@ -2055,145 +1654,6 @@ trait Sharing {
 		$this->setResponse($this->getAllShares($user, "?path=$path"));
 	}
 
-	/**
-	 * @When user :user gets all the shares with reshares of the file :path using the sharing API
-	 *
-	 * @param string $user
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userGetsAllTheSharesWithResharesFromTheFileUsingTheSharingApi(
-		string $user,
-		string $path
-	): void {
-		$this->setResponse($this->getAllShares($user, "?reshares=true&path=$path"));
-	}
-
-	/**
-	 * @When user :user gets all the shares inside the folder :path using the sharing API
-	 *
-	 * @param string $user
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path): void {
-		$this->setResponse($this->getAllShares($user, "?path=$path&subfiles=true"));
-	}
-
-	/**
-	 * @Then /^the response when user "([^"]*)" gets the info of the last public link share should include$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theResponseWhenUserGetsInfoOfLastPublicLinkShareShouldInclude(
-		string $user,
-		?TableNode $body
-	): void {
-		$user = $this->getActualUsername($user);
-		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
-		$this->getShareData($user, (string) $this->getLastCreatedPublicShare()->id);
-		$this->theHTTPStatusCodeShouldBe(
-			200,
-			"Error getting info of last public link share for user $user"
-		);
-		$this->ocsContext->assertOCSResponseIndicatesSuccess(
-			__METHOD__ .
-			' Error getting info of last public link share for user $user\n' .
-			$this->ocsContext->getOCSResponseStatusMessage(
-				$this->getResponse()
-			) . '"'
-		);
-		$this->checkTheFields($user, $body);
-	}
-
-	/**
-	 * @Then the information of the last share of user :user should include
-	 *
-	 * @param string $user
-	 * @param TableNode $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function informationOfLastShareShouldInclude(
-		string $user,
-		TableNode $body
-	): void {
-		$user = $this->getActualUsername($user);
-		$shareId = $this->getLastCreatedUserGroupShareId($user);
-		$this->getShareData($user, $shareId);
-		$this->theHTTPStatusCodeShouldBe(
-			200,
-			"Error getting info of last share for user $user with share id $shareId"
-		);
-		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
-		$this->checkTheFields($user, $body);
-	}
-
-	/**
-	 * @Then /^the information for user "((?:[^']*)|(?:[^"]*))" about the received share of (file|folder) "((?:[^']*)|(?:[^"]*))" shared with a (user|group) should include$/
-	 *
-	 * @param string $user
-	 * @param string $fileOrFolder
-	 * @param string $fileName
-	 * @param string $type
-	 * @param TableNode $body should provide share_type
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theFieldsOfTheResponseForUserForResourceShouldInclude(
-		string $user,
-		string $fileOrFolder,
-		string $fileName,
-		string $type,
-		TableNode $body
-	): void {
-		$user = $this->getActualUsername($user);
-		$this->verifyTableNodeColumnsCount($body, 2);
-		$fileName = $fileName[0] === "/" ? $fileName : '/' . $fileName;
-		$data = $this->getAllSharesSharedWithUser($user);
-		Assert::assertNotEmpty($data, 'No shares found for ' . $user);
-
-		$bodyRows = $body->getRowsHash();
-		Assert::assertArrayHasKey('share_type', $bodyRows, 'share_type is not provided');
-		$share_id = null;
-		foreach ($data as $share) {
-			if ($share['file_target'] === $fileName && $share['item_type'] === $fileOrFolder) {
-				if (($share['share_type'] === SharingHelper::getShareType($bodyRows['share_type']))
-				) {
-					$share_id = $share['id'];
-				}
-			}
-		}
-
-		Assert::assertNotNull($share_id, "Could not find share id for " . $user);
-
-		if (\array_key_exists('expiration', $bodyRows) && $bodyRows['expiration'] !== '') {
-			$bodyRows['expiration'] = \date('d-m-Y', \strtotime($bodyRows['expiration']));
-		}
-
-		$this->getShareData($user, $share_id);
-		foreach ($bodyRows as $field => $value) {
-			if ($type === "user" && $field == "share_with") {
-				$value = $this->getActualUsername($value);
-			}
-			if ($field == "uid_owner") {
-				$value = $this->getActualUsername($value);
-			}
-			$value = $this->replaceValuesFromTable($field, $value);
-			Assert::assertTrue(
-				$this->isFieldInResponse($field, $value),
-				"$field doesn't have value '$value'"
-			);
-		}
-	}
 
 	/**
 	 * @Then /^the last share_id should be included in the response/
@@ -2223,21 +1683,6 @@ trait Sharing {
 		if ($this->isFieldInResponse('id', $shareId, false)) {
 			Assert::fail(
 				"Share id $shareId has been found in response"
-			);
-		}
-	}
-
-	/**
-	 * @Then /^the last public link share id should not be included in the response/
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function checkLastPublicLinkShareIDIsNotIncluded(): void {
-		$shareId = (string) $this->getLastCreatedPublicShare()->id;
-		if ($this->isFieldInResponse('id', $shareId, false)) {
-			Assert::fail(
-				"Public link share id $shareId has been found in response"
 			);
 		}
 	}
@@ -2489,20 +1934,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then the last response should be empty
-	 *
-	 * @return void
-	 */
-	public function theFieldsOfTheLastResponseShouldBeEmpty(): void {
-		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
-		Assert::assertEquals(
-			\count($data->element),
-			0,
-			"last response contains data but was expected to be empty"
-		);
-	}
-
-	/**
 	 *
 	 * @return string
 	 *
@@ -2523,88 +1954,6 @@ trait Sharing {
 		}
 
 		throw new Exception("No 'attributes' found inside the response of the last share.");
-	}
-
-	/**
-	 * @Then the additional sharing attributes for the response should include
-	 *
-	 * @param TableNode $attributes
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function checkingAttributesInLastShareResponse(TableNode $attributes): void {
-		$this->verifyTableNodeColumns($attributes, ['scope', 'key', 'enabled']);
-		$attributes = $attributes->getHash();
-
-		// change string "true"/"false" to boolean inside array
-		\array_walk_recursive(
-			$attributes,
-			function (&$value, $key) {
-				if ($key !== 'enabled') {
-					return;
-				}
-				if ($value === 'true') {
-					$value = true;
-				}
-				if ($value === 'false') {
-					$value = false;
-				}
-			}
-		);
-
-		$actualAttributes = $this->getSharingAttributesFromLastResponse();
-
-		// parse json to array
-		$actualAttributesArray = \json_decode($actualAttributes, true);
-		if (\json_last_error() !== JSON_ERROR_NONE) {
-			$errMsg = \strtolower(\json_last_error_msg());
-			throw new Exception(
-				"JSON decoding failed because of $errMsg in json\n" .
-				'Expected data to be json with array of objects. ' .
-				"\nReceived:\n $actualAttributes"
-			);
-		}
-
-		// check if the expected attributes received from table match actualAttributes
-		foreach ($attributes as $row) {
-			$foundRow = false;
-			foreach ($actualAttributesArray as $item) {
-				if (($item['scope'] === $row['scope'])
-					&& ($item['key'] === $row['key'])
-					&& ($item['enabled'] === $row['enabled'])
-				) {
-					$foundRow = true;
-				}
-			}
-			Assert::assertTrue(
-				$foundRow,
-				"Could not find expected attribute with scope '" . $row['scope'] . "' and key '" . $row['key'] . "'"
-			);
-		}
-	}
-
-	/**
-	 * @Then the downloading of file :fileName for user :user should fail with error message
-	 *
-	 * @param string $fileName
-	 * @param string $user
-	 * @param PyStringNode $errorMessage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userDownloadsFailWithMessage(string $fileName, string $user, PyStringNode $errorMessage): void {
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
-		$receivedErrorMessage = HttpRequestHelper::getResponseXml($response, __METHOD__)->xpath('//s:message');
-		Assert::assertEquals(
-			$errorMessage,
-			(string) $receivedErrorMessage[0],
-			"Expected error message was '$errorMessage' but got '"
-			. $receivedErrorMessage[0]
-			. "'"
-		);
 	}
 
 	/**
@@ -2789,28 +2138,6 @@ trait Sharing {
 			$path
 		);
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has deleted public link share named "([^"]*)" in (?:file|folder) "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $name
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function userHasDeletedPublicLinkShareNamedUsingTheSharingApi(
-		string $user,
-		string $name,
-		string $path
-	): void {
-		$response = $this->deletePublicLinkShareUsingTheSharingApi(
-			$user,
-			$name,
-			$path
-		);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
 
 	/**
@@ -3039,42 +2366,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" accepts the (?:first|next|) pending share "([^"]*)" offered by user "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $user
-	 * @param string $share
-	 * @param string $offeredBy
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userAcceptsThePendingShareOfferedBy(string $user, string $share, string $offeredBy): void {
-		$response = $this->reactToShareOfferedBy($user, 'accepts', $share, $offeredBy, 'pending');
-		$this->setResponse($response);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has accepted the (?:first|next|) pending share "([^"]*)" offered by user "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $share
-	 * @param string $offeredBy
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasAcceptedThePendingShareOfferedBy(string $user, string $share, string $offeredBy) {
-		$response = $this->reactToShareOfferedBy($user, 'accepts', $share, $offeredBy, 'pending');
-		$this->theHTTPStatusCodeShouldBe(
-			200,
-			__METHOD__ . " could not accept the pending share $share to $user by $offeredBy",
-			$response
-		);
-		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-	}
-
-	/**
 	 * @Then /^user "([^"]*)" should be able to (decline|accept) pending share "([^"]*)" offered by user "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -3099,7 +2390,6 @@ trait Sharing {
 				$response
 			);
 			$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-			// $this->ocsContext->assertOCSResponseIndicatesSuccess();
 		} elseif ($action === 'decline') {
 			$response = $this->reactToShareOfferedBy($user, 'declined', $share, $offeredBy);
 			$this->theHTTPStatusCodeShouldBe(
@@ -3108,8 +2398,6 @@ trait Sharing {
 				$response
 			);
 			$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
-			// $this->emptyLastHTTPStatusCodesArray();
-			// $this->emptyLastOCSStatusCodesArray();
 		}
 	}
 
@@ -3416,41 +2704,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has added the public share created from server "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $user
-	 * @param string $shareServer
-	 *
-	 * @return void
-	 */
-	public function userHasAddedPublicShareCreatedByUser(string $user, string $shareServer): void {
-		$this->saveLastSharedPublicLinkShare($user, $shareServer);
-
-		$resBody = json_decode($this->response->getBody()->getContents());
-		$status = '';
-		$message = '';
-		if ($resBody) {
-			$status = $resBody->status;
-			$message = $resBody->data->message;
-		}
-
-		Assert::assertEquals(
-			200,
-			$this->response->getStatusCode(),
-			__METHOD__
-			. " Expected status code is '200' but got '"
-			. $this->response->getStatusCode()
-			. "'"
-		);
-		Assert::assertNotEquals(
-			'error',
-			$status,
-			__METHOD__
-			. "\nFailed to save public share.\n'$message'"
-		);
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $path
 	 * @param string $type
@@ -3480,46 +2733,6 @@ trait Sharing {
 			],
 			"path" => $path
 		];
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has created a read only public link for (file|folder) "([^"]*)"$/
-	 *
-	 * @param string $user
-	 * @param string $type
-	 * @param string $path
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theUserHasCreatedAReadOnlyPublicLinkForFileFolder(string $user, string $type, string $path): void {
-		$user = $this->getActualUsername($user);
-		$userPassword = $this->getPasswordForUser($user);
-
-		$requestPayload = $this->preparePublicQuickLinkPayload($user, $path, $type);
-		$url = $this->getBaseUrl() . "/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json";
-
-		$response = HttpRequestHelper::post(
-			$url,
-			$this->getStepLineRef(),
-			$user,
-			$userPassword,
-			null,
-			$requestPayload
-		);
-		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" adds the public share created from server "([^"]*)" using the sharing API$/
-	 *
-	 * @param string $user
-	 * @param string $shareServer
-	 *
-	 * @return void
-	 */
-	public function userAddsPublicShareCreatedByUser(string $user, string $shareServer): void {
-		$this->setResponse($this->saveLastSharedPublicLinkShare($user, $shareServer));
 	}
 
 	/**
@@ -3557,78 +2770,6 @@ trait Sharing {
 			$this->getOcsApiVersion()
 		);
 		return $response;
-	}
-
-	/**
-	 * @Given the administrator has expired the last created share using the testing API
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorHasExpiredTheLastCreatedShare(): void {
-		$this->expireShare();
-		$httpStatus = $this->getResponse()->getStatusCode();
-		Assert::assertSame(
-			200,
-			$httpStatus,
-			"Request to expire last share failed. HTTP status was '$httpStatus'"
-		);
-		$ocsStatusMessage = $this->ocsContext->getOCSResponseStatusMessage($this->getResponse());
-		if ($this->getOcsApiVersion() === 1) {
-			$expectedOcsStatusCode = "100";
-		} else {
-			$expectedOcsStatusCode = "200";
-		}
-		$this->ocsContext->theOCSStatusCodeShouldBe(
-			$expectedOcsStatusCode,
-			"Request to expire last share failed: '$ocsStatusMessage'"
-		);
-	}
-
-	/**
-	 * @Given the administrator has expired the last created public link share using the testing API
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorHasExpiredTheLastCreatedPublicLinkShare(): void {
-		$this->expireLastCreatedPublicLinkShare();
-		$httpStatus = $this->getResponse()->getStatusCode();
-		Assert::assertSame(
-			200,
-			$this->getResponse()->getStatusCode(),
-			"Request to expire last public link share failed. HTTP status was '$httpStatus'"
-		);
-		$ocsStatusMessage = $this->ocsContext->getOCSResponseStatusMessage($this->getResponse());
-		if ($this->getOcsApiVersion() === 1) {
-			$expectedOcsStatusCode = "100";
-		} else {
-			$expectedOcsStatusCode = "200";
-		}
-		$this->ocsContext->theOCSStatusCodeShouldBe(
-			$expectedOcsStatusCode,
-			"Request to expire last public link share failed: '$ocsStatusMessage'"
-		);
-	}
-
-	/**
-	 * @When the administrator expires the last created share using the testing API
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorExpiresTheLastCreatedShare(): void {
-		$this->setResponse($this->expireShare());
-	}
-
-	/**
-	 * @When the administrator expires the last created public link share using the testing API
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorExpiresTheLastCreatedPublicLinkShare(): void {
-		$this->setResponse($this->expireLastCreatedPublicLinkShare());
 	}
 
 	/**
@@ -3674,219 +2815,5 @@ trait Sharing {
 			$value = (string)SharingHelper::getShareType($value);
 		}
 		return $value;
-	}
-
-	/**
-	 * @return array of common sharing capability settings for testing
-	 */
-	protected function getCommonSharingConfigs(): array {
-		return [
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'auto_accept_share',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_auto_accept_share',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'api_enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_enabled',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_links',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@upload',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_public_upload',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'group_sharing',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_group_sharing',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'share_with_group_members_only',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_only_share_with_group_members',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'share_with_membership_groups_only',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_only_share_with_membership_groups',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'exclude_groups_from_sharing',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_exclude_groups',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'exclude_groups_from_sharing_list',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_exclude_groups_list',
-				'testingState' => ''
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' =>
-					'user_enumeration@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' =>
-					'shareapi_allow_share_dialog_user_enumeration',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' =>
-					'user_enumeration@@@group_members_only',
-				'testingApp' => 'core',
-				'testingParameter' =>
-					'shareapi_share_dialog_user_enumeration_group_members',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'resharing',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_resharing',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' =>
-					'public@@@password@@@enforced_for@@@read_only',
-				'testingApp' => 'core',
-				'testingParameter' =>
-					'shareapi_enforce_links_password_read_only',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' =>
-					'public@@@password@@@enforced_for@@@read_write',
-				'testingApp' => 'core',
-				'testingParameter' =>
-					'shareapi_enforce_links_password_read_write',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' =>
-					'public@@@password@@@enforced_for@@@upload_only',
-				'testingApp' => 'core',
-				'testingParameter' =>
-					'shareapi_enforce_links_password_write_only',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@send_mail',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_public_notification',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@social_share',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_social_share',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@expire_date@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_default_expire_date',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'public@@@expire_date@@@enforced',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_enforce_expire_date',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'user@@@send_mail',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_allow_mail_notification',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'user@@@expire_date@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_default_expire_date_user_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'user@@@expire_date@@@enforced',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_enforce_expire_date_user_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'group@@@expire_date@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_default_expire_date_group_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'group@@@expire_date@@@enforced',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_enforce_expire_date_group_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'remote@@@expire_date@@@enabled',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_default_expire_date_remote_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'remote@@@expire_date@@@enforced',
-				'testingApp' => 'core',
-				'testingParameter' => 'shareapi_enforce_expire_date_remote_share',
-				'testingState' => false
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'federation@@@outgoing',
-				'testingApp' => 'files_sharing',
-				'testingParameter' => 'outgoing_server2server_share_enabled',
-				'testingState' => true
-			],
-			[
-				'capabilitiesApp' => 'files_sharing',
-				'capabilitiesParameter' => 'federation@@@incoming',
-				'testingApp' => 'files_sharing',
-				'testingParameter' => 'incoming_server2server_share_enabled',
-				'testingState' => true
-			]
-		];
 	}
 }

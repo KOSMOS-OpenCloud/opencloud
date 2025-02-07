@@ -171,20 +171,6 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When user :user gets the version metadata of file :file
-	 *
-	 * @param string $user
-	 * @param string $file
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userGetsVersionMetadataOfFile(string $user, string $file): void {
-		$response = $this->getFileVersionMetadata($user, $file);
-		$this->featureContext->setResponse($response, $user);
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $file
 	 *
@@ -332,24 +318,6 @@ class FilesVersionsContext implements Context {
 			__METHOD__
 			. ". file '$path' for user '$user' not found (the file may not exist)"
 		);
-		$this->assertFileVersionsCount($user, $fileId, $count);
-	}
-
-	/**
-	 * @Then the version folder of fileId :fileId for user :user should contain :count element(s)
-	 *
-	 * @param string $fileId
-	 * @param string $user
-	 * @param int $count
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theVersionFolderOfFileIdShouldContainElements(
-		string $fileId,
-		string $user,
-		int $count
-	): void {
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 

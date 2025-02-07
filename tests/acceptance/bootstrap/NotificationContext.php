@@ -25,7 +25,6 @@ require_once 'bootstrap.php';
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
-	private SettingsContext $settingsContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
 	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
@@ -99,7 +98,6 @@ class NotificationContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
-		$this->settingsContext = BehatHelper::getContext($scope, $environment, 'SettingsContext');
 	}
 
 	/**

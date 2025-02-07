@@ -37,21 +37,6 @@ class ShareesContext implements Context {
 	private FeatureContext $featureContext;
 	private OCSContext $ocsContext;
 
-	/**
-	 * @When /^the user gets the sharees using the sharing API with parameters$/
-	 *
-	 * @param TableNode $body
-	 *
-	 * @return void
-	 */
-	public function theUserGetsTheShareesWithParameters(TableNode $body): void {
-		$this->featureContext->setResponse(
-			$this->getShareesWithParameters(
-				$this->featureContext->getCurrentUser(),
-				$body
-			)
-		);
-	}
 
 	/**
 	 * @When /^user "([^"]*)" gets the sharees using the sharing API with parameters$/

@@ -24,7 +24,6 @@ require_once 'bootstrap.php';
  */
 class SettingsContext implements Context {
 	private FeatureContext $featureContext;
-	private string $settingsUrl = '/api/v0/settings/';
 
 	/**
 	 * This will run before EVERY scenario.

@@ -933,26 +933,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Given /^as user "([^"]*)"$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function asUser(string $user): void {
-		$this->currentUser = $this->getActualUsername($user);
-	}
-
-	/**
-	 * @Given as the administrator
-	 *
-	 * @return void
-	 */
-	public function asTheAdministrator(): void {
-		$this->currentUser = $this->getAdminUsername();
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getCurrentUser(): string {
@@ -1685,21 +1665,6 @@ class FeatureContext extends BehatVariablesContext {
 		);
 		Assert::assertLessThanOrEqual(
 			$maxStatusCode,
-			$statusCode,
-			$message
-		);
-	}
-
-	/**
-	 * @Then the HTTP status code should be failure
-	 *
-	 * @return void
-	 */
-	public function theHTTPStatusCodeShouldBeFailure(): void {
-		$statusCode = $this->response->getStatusCode();
-		$message = "The HTTP status code $statusCode is not greater than or equals to 400";
-		Assert::assertGreaterThanOrEqual(
-			400,
 			$statusCode,
 			$message
 		);

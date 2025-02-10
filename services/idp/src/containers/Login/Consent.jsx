@@ -35,11 +35,9 @@ const styles = theme => ({
         marginLeft: -12
     },
     header: {
-        textAlign: 'center',
         margin: 0,
     },
     subHeader: {
-        textAlign: 'center',
         marginBottom: theme.spacing(2)
     },
     scopesList: {

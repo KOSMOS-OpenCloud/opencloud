@@ -324,5 +324,15 @@
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:116](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L116)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:125](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L125)
 
+#### [Skip tests for different languages](https://github.com/opencloud-eu/opencloud/issues/183)
+- [apiAntivirus/antivirus.feature:309](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L309)
+- [apiAntivirus/antivirus.feature:310](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L310)
+- [apiAntivirus/antivirus.feature:311](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L310)
+- [apiNotification/deprovisioningNotification.feature:128](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/deprovisioningNotification.feature#L128)
+- [apiNotification/notification.feature:284](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/notification.feature#L284)
+- [apiNotification/notification.feature:285](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/notification.feature#L285)
+- [apiNotification/spaceNotification.feature:435](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/spaceNotification.feature#435)
+
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

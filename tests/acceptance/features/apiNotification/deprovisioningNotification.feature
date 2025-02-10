@@ -99,7 +99,7 @@ Feature: Deprovisioning notification
       | User        |
       | User Light  |
 
-
+  @issue-183
   Scenario Outline: get a deprovisioning notification in various languages
     Given the administrator has created a deprovisioning notification
     And user "Alice" has switched the system language to "<language>" using the Graph API

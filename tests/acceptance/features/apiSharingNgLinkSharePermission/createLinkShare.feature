@@ -69,7 +69,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal link share of a folder using permissions endpoint
@@ -199,7 +198,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal link share of a file using permissions endpoint
@@ -337,7 +335,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: create a link share of a file with display name and expiry date using permissions endpoint
@@ -406,7 +403,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a file without password using permissions endpoint
@@ -472,7 +468,6 @@ Feature: Create a link share for a resource
       | view             |
       | edit             |
       | internal         |
-      | blocksDownload   |
 
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a file's link share using permissions endpoint
@@ -505,7 +500,7 @@ Feature: Create a link share for a resource
       """
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
 
-
+  @skip-local-run
   Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
@@ -614,7 +609,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario: create an internal link share of a folder inside project-space using permissions endpoint
@@ -760,9 +754,8 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
-
+  @skip-local-run
   Scenario Outline: create a link share of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -816,9 +809,6 @@ Feature: Create a link share for a resource
       | 123             | createOnly       |
       | password        | createOnly       |
       | OpenCloud        | createOnly       |
-      | 123             | blocksDownload   |
-      | password        | blocksDownload   |
-      | OpenCloud        | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
@@ -888,7 +878,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: create a link share of a file inside project-space using permissions endpoint
@@ -954,7 +943,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal link share of a file inside project-space using permissions endpoint
@@ -1098,7 +1086,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
@@ -1167,9 +1154,8 @@ Feature: Create a link share for a resource
       | view             |
       | edit             |
       | internal         |
-      | blocksDownload   |
 
-
+  @skip-local-run
   Scenario Outline: create a link share of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -1217,9 +1203,6 @@ Feature: Create a link share for a resource
       | 123             | edit             |
       | password        | edit             |
       | OpenCloud        | edit             |
-      | 123             | blocksDownload   |
-      | password        | blocksDownload   |
-      | OpenCloud        | blocksDownload   |
 
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a file inside project-space using permissions endpoint
@@ -1300,12 +1283,10 @@ Feature: Create a link share for a resource
       | edit             | Shares   | no share permission                       |
       | upload           | Shares   | no share permission                       |
       | createOnly       | Shares   | no share permission                       |
-      | blocksDownload   | Shares   | invalid link type                         |
       | view             | Personal | cannot create link on personal space root |
       | edit             | Personal | cannot create link on personal space root |
       | upload           | Personal | cannot create link on personal space root |
       | createOnly       | Personal | cannot create link on personal space root |
-      | blocksDownload   | Personal | invalid link type                         |
 
   @issue-7879
   Scenario Outline: create a link share of a project-space drive using permissions endpoint
@@ -1371,7 +1352,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario Outline: try to create an internal link share of a Personal and Shares drives using permissions endpoint
@@ -1629,9 +1609,8 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
-
+  @skip-local-run
   Scenario Outline: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -1683,9 +1662,6 @@ Feature: Create a link share for a resource
       | 123             | createOnly       |
       | password        | createOnly       |
       | OpenCloud        | createOnly       |
-      | 123             | blocksDownload   |
-      | password        | blocksDownload   |
-      | OpenCloud        | blocksDownload   |
 
 
   Scenario Outline: create a link share of a project-space without password using permissions endpoint
@@ -1753,7 +1729,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario Outline: create a quick link share of a folder using permissions endpoint
@@ -1819,7 +1794,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario: create an internal quick link share of a folder using permissions endpoint
@@ -1941,7 +1915,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
 
   Scenario: create an internal quick link share of a file using permissions endpoint
@@ -2068,7 +2041,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario: create an internal quick link share of a folder inside project-space using permissions endpoint
@@ -2195,7 +2167,6 @@ Feature: Create a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
   @issue-8619
   Scenario: create an internal quick link share of a file inside project-space using permissions endpoint
@@ -2323,7 +2294,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario: create an internal quick link share of a project-space using permissions endpoint

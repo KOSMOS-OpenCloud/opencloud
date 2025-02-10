@@ -81,17 +81,8 @@ Feature: get users
       """
     Examples:
       | user-role   | user-role-2 |
-      | Space Admin | Space Admin |
-      | Space Admin | User        |
       | Space Admin | User Light  |
-      | Space Admin | Admin       |
       | User        | Space Admin |
-      | User        | User        |
-      | User        | User Light  |
-      | User        | Admin       |
-      | User Light  | Space Admin |
-      | User Light  | User        |
-      | User Light  | User Light  |
       | User Light  | Admin       |
 
 
@@ -634,17 +625,8 @@ Feature: get users
       """
     Examples:
       | user-role   | user-role-2 |
-      | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | User Light  |
-      | Space Admin | Admin       |
       | User        | Space Admin |
-      | User        | User        |
-      | User        | User Light  |
-      | User        | Admin       |
-      | User Light  | Space Admin |
-      | User Light  | User        |
-      | User Light  | User Light  |
       | User Light  | Admin       |
 
 

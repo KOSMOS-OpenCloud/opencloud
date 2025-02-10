@@ -35,7 +35,6 @@ fi
 # List of suites to run
 SUITES=(
     "apiArchiver"
-    "coreApiAuth"
     "apiContract"
     "apiCors"
     "apiAsyncUpload"

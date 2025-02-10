@@ -360,41 +360,6 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @Then /^as (?:users|user) "([^"]*)" the authors of the versions of file "([^"]*)" should be:$/
-	 *
-	 * @param string $users comma-separated list of usernames
-	 * @param string $filename
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function asUsersAuthorsOfVersionsOfFileShouldBe(
-		string $users,
-		string $filename,
-		TableNode $table
-	): void {
-		$this->featureContext->verifyTableNodeColumns(
-			$table,
-			['index', 'author']
-		);
-		$requiredVersionMetadata = $table->getHash();
-		$usersArray = \explode(",", $users);
-		foreach ($usersArray as $username) {
-			$actualUsername = $this->featureContext->getActualUsername($username);
-			$this->featureContext->setResponse(
-				$this->getFileVersionMetadata($actualUsername, $filename)
-			);
-			foreach ($requiredVersionMetadata as $versionMetadata) {
-				$this->featureContext->checkAuthorOfAVersionOfFile(
-					$versionMetadata['index'],
-					$versionMetadata['author']
-				);
-			}
-		}
-	}
-
-	/**
 	 * @param string $user
 	 * @param string $path
 	 * @param string $index

@@ -12,20 +12,6 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 - [coreApiWebdavProperties/setFileProperties.feature:129](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L129)
 - [coreApiWebdavProperties/setFileProperties.feature:130](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/setFileProperties.feature#L130)
 
-#### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
-
-- [coreApiVersions/fileVersionAuthor.feature:14](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L14)
-- [coreApiVersions/fileVersionAuthor.feature:60](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L60)
-- [coreApiVersions/fileVersionAuthor.feature:92](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L92)
-- [coreApiVersions/fileVersionAuthor.feature:123](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L123)
-- [coreApiVersions/fileVersionAuthor.feature:161](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L161)
-- [coreApiVersions/fileVersionAuthor.feature:193](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L193)
-- [coreApiVersions/fileVersionAuthor.feature:229](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L229)
-- [coreApiVersions/fileVersionAuthor.feature:274](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L274)
-- [coreApiVersions/fileVersionAuthor.feature:356](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L356)
-- [coreApiVersions/fileVersionAuthor.feature:435](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L435)
-- [coreApiVersions/fileVersionAuthor.feature:466](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L466)
-
 ### Sync
 
 Synchronization features like etag propagation, setting mtime and locking files
@@ -40,12 +26,12 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 #### [d:quota-available-bytes in dprop of PROPFIND give wrong response value](https://github.com/owncloud/ocis/issues/8197)
 
-- [coreApiWebdavProperties/getQuota.feature:54](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L54)
-- [coreApiWebdavProperties/getQuota.feature:55](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L55)
-- [coreApiWebdavProperties/getQuota.feature:56](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L56)
-- [coreApiWebdavProperties/getQuota.feature:70](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L70)
-- [coreApiWebdavProperties/getQuota.feature:71](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L71)
-- [coreApiWebdavProperties/getQuota.feature:72](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L72)
+- [coreApiWebdavProperties/getQuota.feature:57](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L57)
+- [coreApiWebdavProperties/getQuota.feature:58](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L58)
+- [coreApiWebdavProperties/getQuota.feature:59](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L59)
+- [coreApiWebdavProperties/getQuota.feature:73](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L73)
+- [coreApiWebdavProperties/getQuota.feature:74](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L74)
+- [coreApiWebdavProperties/getQuota.feature:75](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavProperties/getQuota.feature#L75)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
@@ -162,7 +148,7 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavMove1/moveFolder.feature:218](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L218)
 - [coreApiWebdavMove1/moveFolder.feature:219](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L219)
 - [coreApiWebdavMove2/moveShareOnOpencloud.feature:334](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpencloud.feature#L334)
-- [coreApiWebdavMove2/moveShareOnOpenCloud.feature:337](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpenCloud.feature#L337)
+- [coreApiWebdavMove2/moveShareOnOpencloud.feature:337](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpencloud.feature#L337)
 - [coreApiWebdavMove2/moveShareOnOpencloud.feature:340](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOpencloud.feature#L340)
 
 #### [COPY file/folder to same name is possible (but 500 code error for folder with spaces path)](https://github.com/owncloud/ocis/issues/8711)

@@ -131,7 +131,7 @@
     {
       "id": "c3adac0c-94b5-46ee-a851-5274be719ab6",
       "clientId": "OpenCloudAndroid",
-      "name": "OpenCloud Android app",
+      "name": "OpenCloud Android App",
       "description": "",
       "rootUrl": "",
       "adminUrl": "",
@@ -214,7 +214,7 @@
     {
       "id": "dba27084-63ad-4718-8195-a2abd9cebe2e",
       "clientId": "OpenCloudDesktop",
-      "name": "OpenCloud desktop client",
+      "name": "OpenCloud Desktop Client",
       "description": "",
       "rootUrl": "",
       "adminUrl": "",
@@ -297,7 +297,7 @@
     {
       "id": "72b2cef0-6c24-424e-9204-03aef6e6f520",
       "clientId": "OpenCloudIOS",
-      "name": "OpenCloud iOS app",
+      "name": "OpenCloud iOS App",
       "description": "",
       "rootUrl": "",
       "adminUrl": "",

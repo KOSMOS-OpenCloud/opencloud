@@ -300,6 +300,4 @@ start-server: ## build and start server
 	OC_ASYNC_UPLOADS=true \
 	SEARCH_EXTRACTOR_TYPE=tika \
 	OC_ADD_RUN_SERVICES=notifications \
-	GRAPH_AVAILABLE_ROLES=$(GRAPH_AVAILABLE_ROLES) \
-	OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST=$(OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST) \
 	docker compose up -d --build --force-recreate

@@ -51,12 +51,10 @@ Feature: Create a link share for a resource
       | edit             | Shares   |
       | upload           | Shares   |
       | createOnly       | Shares   |
-      | blocksDownload   | Shares   |
       | view             | Personal |
       | edit             | Personal |
       | upload           | Personal |
       | createOnly       | Personal |
-      | blocksDownload   | Personal |
 
 
   Scenario Outline: try to create an internal link share of a Personal and Share drives using root endpoint
@@ -209,7 +207,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario: create an internal link share of a project-space using root endpoint
@@ -349,9 +346,8 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
-  @issue-7879
+  @issue-7879 @skip-local-run
   Scenario Outline: try to create a link share of a project-space drive with a password that is listed in the Banned-Password-List using root endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -403,9 +399,6 @@ Feature: Create a link share for a resource
       | 123             | createOnly       |
       | password        | createOnly       |
       | OpenCloud        | createOnly       |
-      | 123             | blocksDownload   |
-      | password        | blocksDownload   |
-      | OpenCloud        | blocksDownload   |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a project-space drive without password using root endpoint
@@ -473,7 +466,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: create a link share of a project-space drive with display name using root endpoint
@@ -540,7 +532,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
   @issue-7879
   Scenario Outline: create a link share of a project-space drive with expiry date using root endpoint
@@ -611,7 +602,6 @@ Feature: Create a link share for a resource
       | edit             |
       | upload           |
       | createOnly       |
-      | blocksDownload   |
 
 
   Scenario Outline: create quick link share of a project space drive using root endpoint

@@ -70,11 +70,7 @@ Feature: Update a link share for a resource
     Examples:
       | permissions-role | new-permissions-role |
       | view             | edit                 |
-      | view             | blocksDownload       |
       | edit             | view                 |
-      | edit             | blocksDownload       |
-      | blocksDownload   | edit                 |
-      | blocksDownload   | blocksDownload       |
 
   @issue-8619
   Scenario Outline: update role of a file's to internal link share using permissions endpoint
@@ -140,7 +136,6 @@ Feature: Update a link share for a resource
       | permissions-role |
       | view             |
       | edit             |
-      | blocksDownload   |
 
 
   Scenario: update expiration date of a file's link share using permissions endpoint
@@ -235,7 +230,7 @@ Feature: Update a link share for a resource
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
     And the public download of file "textfile1.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
 
-
+  @skip-local-run
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
@@ -402,7 +397,6 @@ Feature: Update a link share for a resource
       | createOnly       | view                 |
       | createOnly       | edit                 |
       | createOnly       | upload               |
-      | blocksDownload   | blocksDownload       |
 
 
   Scenario Outline: update role of a folder's link share inside project-space using permissions endpoint
@@ -789,7 +783,6 @@ Feature: Update a link share for a resource
       | createOnly       | view                 |
       | createOnly       | edit                 |
       | createOnly       | upload               |
-      | blocksDownload   | blocksDownload       |
 
   @issues-8405
   Scenario Outline: remove expiration date of a resource link share using permissions endpoint

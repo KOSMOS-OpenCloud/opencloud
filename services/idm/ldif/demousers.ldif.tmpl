@@ -17,6 +17,25 @@ openCloudUUID: b1f74ec4-dd7e-11ef-a543-03775734d0f7
 openCloudExternalIdentity:  $ {{.}} $ b1f74ec4-dd7e-11ef-a543-03775734d0f7
 userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTE2JGg1NUxqckhWVjdEdXVzTkxjbXRoa0EkMzZ3aGZSMjdyTDFOYXQxa0xTajdrVGFubTBnb3VKRGZ0ck9DTStuRHo5cw==
 
+dn: uid=lynn,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: openCloudUser
+objectClass: openCloudObject
+objectClass: person
+objectClass: top
+uid: lynn
+givenName: Lynn
+sn: Conway
+cn: lynn
+displayName: Lynn Conway
+description:  An American computer scientist, electrical engineer, and transgender activist.
+mail: lynn@example.org
+openCloudUserEnabled: TRUE
+openCloudUUID: 60708dda-e897-11ef-919f-bbb7437d6ec2
+openCloudExternalIdentity:  $ {{.}} $ 60708dda-e897-11ef-919f-bbb7437d6ec2
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTE2JGg1NUxqckhWVjdEdXVzTkxjbXRoa0EkMzZ3aGZSMjdyTDFOYXQxa0xTajdrVGFubTBnb3VKRGZ0ck9DTStuRHo5cw==
+
 dn: uid=mary,ou=users,o=libregraph-idm
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
@@ -85,6 +104,7 @@ member: uid=alan,ou=users,o=libregraph-idm
 member: uid=mary,ou=users,o=libregraph-idm
 member: uid=margaret,ou=users,o=libregraph-idm
 member: uid=dennis,ou=users,o=libregraph-idm
+member: uid=lynn,ou=users,o=libregraph-idm
 member: uid=admin,ou=users,o=libregraph-idm
 
 dn: cn=chess-lovers,ou=groups,o=libregraph-idm
@@ -141,6 +161,15 @@ description: Haters of the Basic programming language
 openCloudUUID: a4eb2c12-dd94-11ef-9ebe-eb96f938d517
 member: uid=dennis,ou=users,o=libregraph-idm
 
+dn: cn=vlsi-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: openCloudObject
+objectClass: top
+cn: vlsi-lovers
+description: Lovers of VSLI microchip design
+openCloudUUID: 914ce3de-e899-11ef-9a4b-732fbb2acc42
+member: uid=lynn,ou=users,o=libregraph-idm
+
 dn: cn=programmers,ou=groups,o=libregraph-idm
 objectClass: groupOfNames
 objectClass: openCloudObject
@@ -151,3 +180,4 @@ openCloudUUID: ce4aa240-dd94-11ef-82b8-4f4828849072
 member: uid=alan,ou=users,o=libregraph-idm
 member: uid=margaret,ou=users,o=libregraph-idm
 member: uid=dennis,ou=users,o=libregraph-idm
+member: uid=lynn,ou=users,o=libregraph-idm

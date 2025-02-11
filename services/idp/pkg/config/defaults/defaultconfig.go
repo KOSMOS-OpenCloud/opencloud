@@ -74,7 +74,7 @@ func DefaultConfig() *config.Config {
 		Clients: []config.Client{
 			{
 				ID:      "web",
-				Name:    "OpenCloud Web app",
+				Name:    "OpenCloud Web App",
 				Trusted: true,
 				RedirectURIs: []string{
 					"{{OC_URL}}/",
@@ -87,7 +87,7 @@ func DefaultConfig() *config.Config {
 			},
 			{
 				ID:              "OpenCloudDesktop",
-				Name:            "OpenCloud Desktop client",
+				Name:            "OpenCloud Desktop Client",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"http://127.0.0.1",
@@ -96,7 +96,7 @@ func DefaultConfig() *config.Config {
 			},
 			{
 				ID:              "OpenCloudAndroid",
-				Name:            "OpenCloud Android app",
+				Name:            "OpenCloud Android App",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"oc://android.opencloud.eu",
@@ -104,7 +104,7 @@ func DefaultConfig() *config.Config {
 			},
 			{
 				ID:              "OpenCloudIOS",
-				Name:            "OpenCloud iOS app",
+				Name:            "OpenCloud iOS App",
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"oc://ios.opencloud.eu",

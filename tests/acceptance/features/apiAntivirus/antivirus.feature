@@ -294,7 +294,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-  @issue-enterprise-5706
+  @issue-enterprise-5706 @issue-183
   Scenario Outline: upload a file with virus and get notification in different languages
     Given user "Alice" has switched the system language to "<language>" using the Graph API
     And using <dav-path-version> DAV path

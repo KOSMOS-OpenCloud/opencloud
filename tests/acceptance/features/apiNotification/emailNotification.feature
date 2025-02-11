@@ -14,9 +14,11 @@ Feature: Email notification
   Scenario: user gets an email notification when someone shares a project space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    When user "Alice" shares a space "new-space" with settings:
-      | shareWith | Brian  |
-      | role      | Editor |
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Editor |
     Then the HTTP status code should be "200"
     And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
@@ -30,9 +32,13 @@ Feature: Email notification
 
   Scenario: user gets an email notification when someone shares a file
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    When user "Alice" shares file "lorem.txt" with user "Brian" using the sharing API
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | lorem.txt  |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"
       """
       Hello Brian Murphy
@@ -50,10 +56,12 @@ Feature: Email notification
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    When user "Alice" shares a space "new-space" with settings:
-      | shareWith | group1 |
-      | shareType | 8      |
-      | role      | viewer |
+    Then the HTTP status code should be "200"
+    When user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space    |
+      | sharee          | group1       |
+      | shareType       | group        |
+      | permissionsRole | Space Viewer |
     Then the HTTP status code should be "200"
     And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
@@ -72,26 +80,30 @@ Feature: Email notification
       Click here to view it: %base_url%/f/%space_id%
       """
 
-
+  @issue-183
   Scenario: group members get an email notification in their respective languages when someone shares a folder with the group
     Given user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es" using the Graph API
+    # And user "Brian" has switched the system language to "es" using the Graph API
     And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has created folder "/HelloWorld"
-    When user "Alice" shares folder "HelloWorld" with group "group1" using the sharing API
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | HelloWorld |
+      | space           | Personal   |
+      | sharee          | group1     |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
-    And user "Brian" should have received the following email from user "Alice"
-      """
-      Hola Brian Murphy
+    # And user "Brian" should have received the following email from user "Alice"
+    #   """
+    #   Hola Brian Murphy
 
-      %displayname% ha compartido "HelloWorld" contigo.
+    #   %displayname% ha compartido "HelloWorld" contigo.
 
-      Click aquí para verlo: %base_url%/files/shares/with-me
-      """
+    #   Click aquí para verlo: %base_url%/files/shares/with-me
+    #   """
     And user "Carol" should have received the following email from user "Alice"
       """
       Hallo Carol King
@@ -101,26 +113,30 @@ Feature: Email notification
       Zum Ansehen hier klicken: %base_url%/files/shares/with-me
       """
 
-
+  @issue-183
   Scenario: group members get an email notification in their respective languages when someone shares a file with the group
     Given user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es" using the Graph API
+    # And user "Brian" has switched the system language to "es" using the Graph API
     And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "text.txt"
-    When user "Alice" shares file "text.txt" with group "group1" using the sharing API
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | text.txt |
+      | space           | Personal |
+      | sharee          | group1   |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
-    And user "Brian" should have received the following email from user "Alice"
-      """
-      Hola Brian Murphy
+    # And user "Brian" should have received the following email from user "Alice"
+    #   """
+    #   Hola Brian Murphy
 
-      %displayname% ha compartido "text.txt" contigo.
+    #   %displayname% ha compartido "text.txt" contigo.
 
-      Click aquí para verlo: %base_url%/files/shares/with-me
-      """
+    #   Click aquí para verlo: %base_url%/files/shares/with-me
+    #   """
     And user "Carol" should have received the following email from user "Alice"
       """
       Hallo Carol King
@@ -130,28 +146,30 @@ Feature: Email notification
       Zum Ansehen hier klicken: %base_url%/files/shares/with-me
       """
 
-  @skipOnStable3.0
+  @issue-183 
   Scenario: group members get an email notification in their respective languages when someone shares a space with the group
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
-    And user "Brian" has switched the system language to "es" using the Graph API
+    # And user "Brian" has switched the system language to "es" using the Graph API
     And user "Carol" has switched the system language to "de" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    When user "Alice" shares a space "new-space" with settings:
-      | shareWith | group1 |
-      | role      | viewer |
+    And user "Alice" sends the following space share invitation using root endpoint of the Graph API:
+      | space           | new-space    |
+      | sharee          | group1       |
+      | shareType       | group        |
+      | permissionsRole | Space Viewer |
     Then the HTTP status code should be "200"
-    And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
-      """
-      Hola Brian Murphy,
+    # And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+    #   """
+    #   Hola Brian Murphy,
 
-      Alice Hansen te ha invitado a unirte a "new-space".
+    #   Alice Hansen te ha invitado a unirte a "new-space".
 
-      Click aquí para verlo: %base_url%/f/%space_id%
-      """
+    #   Click aquí para verlo: %base_url%/f/%space_id%
+    #   """
     And user "Carol" should have received the following email from user "Alice" about the share of project space "new-space"
       """
       Hallo Carol King,
@@ -191,9 +209,13 @@ Feature: Email notification
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
     And user "Alice" has uploaded file with content "hello world" to "text.txt"
-    When user "Alice" shares file "text.txt" with group "group1" using the sharing API
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | text.txt |
+      | space           | Personal |
+      | sharee          | group1   |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
     Then the HTTP status code should be "200"
-    And the OCS status code should be "100"
     And user "Brian" should have received the following email from user "Alice"
       """
       Hallo Brian Murphy

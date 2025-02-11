@@ -115,6 +115,7 @@ func Posix(cfg *config.Config, enableFSWatch bool) map[string]interface{} {
 			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
 		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
+		"enable_fs_revisions":        cfg.Drivers.Posix.EnableFSRevisions,
 		"watch_fs":                   enableFSWatch,
 		"watch_type":                 cfg.Drivers.Posix.WatchType,
 		"watch_path":                 cfg.Drivers.Posix.WatchPath,

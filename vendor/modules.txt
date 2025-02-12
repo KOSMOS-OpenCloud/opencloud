@@ -412,9 +412,10 @@ github.com/fatih/color
 # github.com/felixge/httpsnoop v1.0.4
 ## explicit; go 1.13
 github.com/felixge/httpsnoop
-# github.com/fsnotify/fsnotify v1.7.0
+# github.com/fsnotify/fsnotify v1.8.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
+github.com/fsnotify/fsnotify/internal
 # github.com/gabriel-vasile/mimetype v1.4.8
 ## explicit; go 1.20
 github.com/gabriel-vasile/mimetype
@@ -687,8 +688,6 @@ github.com/golang/snappy
 # github.com/gomodule/redigo v1.9.2
 ## explicit; go 1.17
 github.com/gomodule/redigo/redis
-# github.com/google/flatbuffers v2.0.8+incompatible
-## explicit
 # github.com/google/go-cmp v0.6.0
 ## explicit; go 1.13
 github.com/google/go-cmp/cmp
@@ -1087,18 +1086,12 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/open-policy-agent/opa v0.70.0
-## explicit; go 1.21
+# github.com/open-policy-agent/opa v1.1.0
+## explicit; go 1.22.7
 github.com/open-policy-agent/opa/ast
-github.com/open-policy-agent/opa/ast/internal/scanner
-github.com/open-policy-agent/opa/ast/internal/tokens
 github.com/open-policy-agent/opa/ast/json
-github.com/open-policy-agent/opa/ast/location
 github.com/open-policy-agent/opa/bundle
 github.com/open-policy-agent/opa/capabilities
-github.com/open-policy-agent/opa/config
-github.com/open-policy-agent/opa/format
-github.com/open-policy-agent/opa/hooks
 github.com/open-policy-agent/opa/internal/bundle
 github.com/open-policy-agent/opa/internal/cidr/merge
 github.com/open-policy-agent/opa/internal/compiler
@@ -1150,33 +1143,48 @@ github.com/open-policy-agent/opa/internal/wasm/opcode
 github.com/open-policy-agent/opa/internal/wasm/sdk/opa/capabilities
 github.com/open-policy-agent/opa/internal/wasm/types
 github.com/open-policy-agent/opa/internal/wasm/util
-github.com/open-policy-agent/opa/ir
-github.com/open-policy-agent/opa/keys
 github.com/open-policy-agent/opa/loader
-github.com/open-policy-agent/opa/loader/extension
-github.com/open-policy-agent/opa/loader/filter
-github.com/open-policy-agent/opa/logging
-github.com/open-policy-agent/opa/metrics
-github.com/open-policy-agent/opa/plugins
-github.com/open-policy-agent/opa/plugins/rest
 github.com/open-policy-agent/opa/rego
-github.com/open-policy-agent/opa/resolver
-github.com/open-policy-agent/opa/resolver/wasm
-github.com/open-policy-agent/opa/schemas
 github.com/open-policy-agent/opa/storage
-github.com/open-policy-agent/opa/storage/inmem
-github.com/open-policy-agent/opa/storage/internal/errors
-github.com/open-policy-agent/opa/storage/internal/ptr
-github.com/open-policy-agent/opa/topdown
-github.com/open-policy-agent/opa/topdown/builtins
-github.com/open-policy-agent/opa/topdown/cache
-github.com/open-policy-agent/opa/topdown/copypropagation
 github.com/open-policy-agent/opa/topdown/print
-github.com/open-policy-agent/opa/tracing
 github.com/open-policy-agent/opa/types
-github.com/open-policy-agent/opa/util
-github.com/open-policy-agent/opa/util/decoding
-github.com/open-policy-agent/opa/version
+github.com/open-policy-agent/opa/v1/ast
+github.com/open-policy-agent/opa/v1/ast/internal/scanner
+github.com/open-policy-agent/opa/v1/ast/internal/tokens
+github.com/open-policy-agent/opa/v1/ast/json
+github.com/open-policy-agent/opa/v1/ast/location
+github.com/open-policy-agent/opa/v1/bundle
+github.com/open-policy-agent/opa/v1/capabilities
+github.com/open-policy-agent/opa/v1/config
+github.com/open-policy-agent/opa/v1/format
+github.com/open-policy-agent/opa/v1/hooks
+github.com/open-policy-agent/opa/v1/ir
+github.com/open-policy-agent/opa/v1/keys
+github.com/open-policy-agent/opa/v1/loader
+github.com/open-policy-agent/opa/v1/loader/extension
+github.com/open-policy-agent/opa/v1/loader/filter
+github.com/open-policy-agent/opa/v1/logging
+github.com/open-policy-agent/opa/v1/metrics
+github.com/open-policy-agent/opa/v1/plugins
+github.com/open-policy-agent/opa/v1/plugins/rest
+github.com/open-policy-agent/opa/v1/rego
+github.com/open-policy-agent/opa/v1/resolver
+github.com/open-policy-agent/opa/v1/resolver/wasm
+github.com/open-policy-agent/opa/v1/schemas
+github.com/open-policy-agent/opa/v1/storage
+github.com/open-policy-agent/opa/v1/storage/inmem
+github.com/open-policy-agent/opa/v1/storage/internal/errors
+github.com/open-policy-agent/opa/v1/storage/internal/ptr
+github.com/open-policy-agent/opa/v1/topdown
+github.com/open-policy-agent/opa/v1/topdown/builtins
+github.com/open-policy-agent/opa/v1/topdown/cache
+github.com/open-policy-agent/opa/v1/topdown/copypropagation
+github.com/open-policy-agent/opa/v1/topdown/print
+github.com/open-policy-agent/opa/v1/tracing
+github.com/open-policy-agent/opa/v1/types
+github.com/open-policy-agent/opa/v1/util
+github.com/open-policy-agent/opa/v1/util/decoding
+github.com/open-policy-agent/opa/v1/version
 # github.com/opencloud-eu/reva/v2 v2.27.3-0.20250127153848-a84e6c39c206
 ## explicit; go 1.22.7
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
@@ -1809,7 +1817,7 @@ github.com/stretchr/testify/require
 # github.com/studio-b12/gowebdav v0.9.0 => github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202
 ## explicit; go 1.17
 github.com/studio-b12/gowebdav
-# github.com/tchap/go-patricia/v2 v2.3.1
+# github.com/tchap/go-patricia/v2 v2.3.2
 ## explicit; go 1.16
 github.com/tchap/go-patricia/v2/patricia
 # github.com/test-go/testify v1.1.4

@@ -107,7 +107,7 @@ func DefaultConfig() *config.Config {
 func DefaultPolicies() []config.Policy {
 	return []config.Policy{
 		{
-			Name: "opencloud",
+			Name: "default",
 			Routes: []config.Route{
 				{
 					Endpoint:    "/",
@@ -330,7 +330,7 @@ func Sanitize(cfg *config.Config) {
 	if cfg.PolicySelector == nil {
 		cfg.PolicySelector = &config.PolicySelector{
 			Static: &config.StaticSelectorConf{
-				Policy: "opencloud",
+				Policy: "default",
 			},
 		}
 	}

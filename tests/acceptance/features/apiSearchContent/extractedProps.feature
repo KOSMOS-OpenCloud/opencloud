@@ -36,8 +36,8 @@ Feature: propfind extracted props
       | key                              | value                |
       | oc:image/oc:width                | 1402                 |
       | oc:image/oc:height               | 500                  |
-      | oc:location/oc:latitude          | 43.467157            |
-      | oc:location/oc:longitude         | 11.885395            |
+      | oc:location/oc:latitude          | 52.437804            |
+      | oc:location/oc:longitude         | 13.341866            |
       | oc:photo/oc:camera-make          | NIKON                |
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
@@ -69,8 +69,8 @@ Feature: propfind extracted props
       | key                              | value                |
       | oc:image/oc:width                | 1402                 |
       | oc:image/oc:height               | 500                  |
-      | oc:location/oc:latitude          | 43.467157            |
-      | oc:location/oc:longitude         | 11.885395            |
+      | oc:location/oc:latitude          | 52.437804            |
+      | oc:location/oc:longitude         | 13.341866            |
       | oc:photo/oc:camera-make          | NIKON                |
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
@@ -119,8 +119,8 @@ Feature: propfind extracted props
       | key                              | value                |
       | oc:image/oc:width                | 1402                 |
       | oc:image/oc:height               | 500                  |
-      | oc:location/oc:latitude          | 43.467157            |
-      | oc:location/oc:longitude         | 11.885395            |
+      | oc:location/oc:latitude          | 52.437804            |
+      | oc:location/oc:longitude         | 13.341866            |
       | oc:photo/oc:camera-make          | NIKON                |
       | oc:photo/oc:camera-model         | COOLPIX P6000        |
       | oc:photo/oc:f-number             | 4.5                  |
@@ -206,10 +206,10 @@ Feature: propfind extracted props
               "required": [ "latitude", "longitude" ],
               "properties": {
                 "latitude": {
-                  "const": 43.467157
+                  "const": 52.437804
                 },
                 "longitude": {
-                  "const": 11.885395
+                  "const": 13.341866
                 }
               }
             },
@@ -218,12 +218,9 @@ Feature: propfind extracted props
               "required": [
                 "cameraMake",
                 "cameraModel",
-                "exposureDenominator",
-                "exposureNumerator",
                 "fNumber",
                 "focalLength",
-                "orientation",
-                "takenDateTime"
+                "orientation"
               ],
               "properties": {
                 "cameraMake": {
@@ -231,12 +228,6 @@ Feature: propfind extracted props
                 },
                 "cameraModel": {
                   "const": "COOLPIX P6000"
-                },
-                "exposureDenominator": {
-                  "const": 178
-                },
-                "exposureNumerator": {
-                  "const": 1
                 },
                 "fNumber": {
                   "const": 4.5
@@ -246,9 +237,6 @@ Feature: propfind extracted props
                 },
                 "orientation": {
                   "const": 1
-                },
-                "takenDateTime": {
-                  "const": "2008-10-22T16:29:49Z"
                 }
               }
             }
@@ -328,10 +316,10 @@ Feature: propfind extracted props
               "required": [ "height", "width" ],
               "properties": {
                 "height": {
-                  "const": 1402
+                  "const": 500
                 },
                 "width": {
-                  "const": 500
+                  "const": 1402
                 }
               }
             },
@@ -340,10 +328,10 @@ Feature: propfind extracted props
               "required": [ "latitude", "longitude" ],
               "properties": {
                 "latitude": {
-                  "const": 43.467157
+                  "const": 52.437804
                 },
                 "longitude": {
-                  "const": 11.885395
+                  "const": 13.341866
                 }
               }
             },
@@ -352,12 +340,9 @@ Feature: propfind extracted props
               "required": [
                 "cameraMake",
                 "cameraModel",
-                "exposureDenominator",
-                "exposureNumerator",
                 "fNumber",
                 "focalLength",
-                "orientation",
-                "takenDateTime"
+                "orientation"
               ],
               "properties": {
                 "cameraMake": {
@@ -365,12 +350,6 @@ Feature: propfind extracted props
                 },
                 "cameraModel": {
                   "const": "COOLPIX P6000"
-                },
-                "exposureDenominator": {
-                  "const": 178
-                },
-                "exposureNumerator": {
-                  "const": 1
                 },
                 "fNumber": {
                   "const": 4.5
@@ -380,9 +359,6 @@ Feature: propfind extracted props
                 },
                 "orientation": {
                   "const": 1
-                },
-                "takenDateTime": {
-                  "const": "2008-10-22T16:29:49Z"
                 }
               }
             }
@@ -474,10 +450,10 @@ Feature: propfind extracted props
               "required": [ "height", "width" ],
               "properties": {
                 "height": {
-                  "const": 1402
+                  "const": 500
                 },
                 "width": {
-                  "const": 500
+                  "const": 1402
                 }
               }
             },
@@ -486,10 +462,10 @@ Feature: propfind extracted props
               "required": [ "latitude", "longitude" ],
               "properties": {
                 "latitude": {
-                  "const": 43.467157
+                  "const": 52.437804
                 },
                 "longitude": {
-                  "const": 11.885395
+                  "const": 13.341866
                 }
               }
             },
@@ -498,12 +474,9 @@ Feature: propfind extracted props
               "required": [
                 "cameraMake",
                 "cameraModel",
-                "exposureDenominator",
-                "exposureNumerator",
                 "fNumber",
                 "focalLength",
-                "orientation",
-                "takenDateTime"
+                "orientation"
               ],
               "properties": {
                 "cameraMake": {
@@ -511,12 +484,6 @@ Feature: propfind extracted props
                 },
                 "cameraModel": {
                   "const": "COOLPIX P6000"
-                },
-                "exposureDenominator": {
-                  "const": 178
-                },
-                "exposureNumerator": {
-                  "const": 1
                 },
                 "fNumber": {
                   "const": 4.5
@@ -526,9 +493,6 @@ Feature: propfind extracted props
                 },
                 "orientation": {
                   "const": 1
-                },
-                "takenDateTime": {
-                  "const": "2008-10-22T16:29:49Z"
                 }
               }
             }

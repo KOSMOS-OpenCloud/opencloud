@@ -1,8 +1,7 @@
 module github.com/opencloud-eu/opencloud
 
 go 1.22.7
-
-toolchain go1.22.9
+toolchain go1.23.6
 
 require (
 	dario.cat/mergo v1.0.1
@@ -89,7 +88,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.11.0
-	go.etcd.io/bbolt v1.3.11
+	go.etcd.io/bbolt v1.4.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.59.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0
 	go.opentelemetry.io/contrib/zpages v0.57.0
@@ -295,7 +294,7 @@ require (
 	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
 	github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/studio-b12/gowebdav v0.9.0 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect

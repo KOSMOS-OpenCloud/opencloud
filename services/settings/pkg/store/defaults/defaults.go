@@ -659,6 +659,10 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 				RoleId:      BundleUUIDRoleUser,
 			},
 			{
+                                AccountUuid: "60708dda-e897-11ef-919f-bbb7437d6ec2",
+                                RoleId:      BundleUUIDRoleUser,
+                        },
+			{
 				// additional admin user
 				AccountUuid: "cd88bf9a-dd7f-11ef-a609-7f78deb2345f", // demo user "dennis"
 				RoleId:      BundleUUIDRoleAdmin,

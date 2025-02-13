@@ -19,8 +19,10 @@ FROM owncloudci/nodejs:18 AS generate
 COPY ./ /opencloud/
 
 WORKDIR /opencloud/opencloud
+RUN make ci-node-generate
 
-FROM owncloudci/golang:1.22 AS build
+FROM golang:1.23-alpine AS build
+RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
 COPY --from=generate /opencloud /opencloud
 

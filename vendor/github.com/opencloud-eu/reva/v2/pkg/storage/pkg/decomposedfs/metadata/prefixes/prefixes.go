@@ -19,13 +19,13 @@
 package prefixes
 
 // Declare a list of xattr keys
-// TODO the below comment is currently copied from the owncloud driver, revisit
+
 // Currently,extended file attributes have four separated
 // namespaces (user, trusted, security and system) followed by a dot.
 // A non root user can only manipulate the user. namespace, which is what
-// we will use to store ownCloud specific metadata. To prevent name
+// we will use to store decomposedfs specific metadata. To prevent name
 // collisions with other apps We are going to introduce a sub namespace
-// "user.ocis." in the xattrs_prefix*.go files.
+// "user.oc." in the xattrs_prefix*.go files.
 const (
 	TypeAttr      string = OcPrefix + "type"
 	IDAttr        string = OcPrefix + "id"
@@ -59,7 +59,7 @@ const (
 	// a temporary etag for a folder that is removed when the mtime propagation happens
 	TmpEtagAttr     string = OcPrefix + "tmp.etag"
 	ReferenceAttr   string = OcPrefix + "cs3.ref"      // arbitrary metadata
-	ChecksumPrefix  string = OcPrefix + "cs."          // followed by the algorithm, eg. ocis.cs.sha1
+	ChecksumPrefix  string = OcPrefix + "cs."          // followed by the algorithm, eg. oc.cs.sha1
 	TrashOriginAttr string = OcPrefix + "trash.origin" // trash origin
 
 	// we use a single attribute to enable or disable propagation of both: synctime and treesize
@@ -71,7 +71,7 @@ const (
 	MTimeAttr string = OcPrefix + "mtime"
 	// the tree modification time of the tree below this node,
 	// propagated when synctime_accounting is true and
-	// user.ocis.propagation=1 is set
+	// user.oc.propagation=1 is set
 	// stored as a readable time.RFC3339Nano
 	TreeMTimeAttr string = OcPrefix + "tmtime"
 
@@ -82,7 +82,7 @@ const (
 
 	// the size of the tree below this node,
 	// propagated when treesize_accounting is true and
-	// user.ocis.propagation=1 is set
+	// user.oc.propagation=1 is set
 	// stored as uint64, little endian
 	TreesizeAttr string = OcPrefix + "treesize"
 

@@ -291,7 +291,6 @@ func (s *Service) InitiateFileDownload(ctx context.Context, req *provider.Initia
 	// TODO(labkode): maybe add short-lived token?
 	// We now simply point the client to the data server.
 	// For example, https://data-server.example.org/home/docs/myfile.txt
-	// or ownclouds://data-server.example.org/home/docs/myfile.txt
 	log := appctx.GetLogger(ctx)
 	u := *s.dataServerURL
 	log.Info().Str("data-server", u.String()).Interface("ref", req.Ref).Msg("file download")
@@ -399,7 +398,7 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		if req.Opaque.Map["Upload-Checksum"] != nil {
 			metadata["checksum"] = string(req.Opaque.Map["Upload-Checksum"].Value)
 		}
-		// ownCloud mtime to set for the uploaded file
+		// OpenCloud mtime to set for the uploaded file
 		if req.Opaque.Map["X-OC-Mtime"] != nil {
 			metadata["mtime"] = string(req.Opaque.Map["X-OC-Mtime"].Value)
 		}
@@ -430,7 +429,7 @@ func (s *Service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 			// - it is also unassigned
 			// - ends in 9 as the 409 conflict
 			// - is near the 4xx errors about conditions: 415 Unsupported Media Type, 416 Range Not Satisfiable or 417 Expectation Failed
-			// owncloud only expects a 400 Bad request so InvalidArg is good enough for now
+			// OpenCloud only expects a 400 Bad request so InvalidArg is good enough for now
 			// seealso errtypes.StatusChecksumMismatch
 		case errtypes.PermissionDenied:
 			st = status.NewPermissionDenied(ctx, err, "permission denied")

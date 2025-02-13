@@ -246,7 +246,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 
 	utils.AppendPlainToOpaque(opaque, net.HeaderUploadLength, strconv.FormatInt(length, 10))
 
-	// curl -X PUT https://demo.owncloud.com/remote.php/webdav/testcs.bin -u demo:demo -d '123' -v -H 'OC-Checksum: SHA1:40bd001563085fc35165329ea1ff5c5ecbdbbeef'
+	// curl -X PUT https://demo.example.org/remote.php/webdav/testcs.bin -u demo:demo -d '123' -v -H 'OC-Checksum: SHA1:40bd001563085fc35165329ea1ff5c5ecbdbbeef'
 
 	var cparts []string
 	// TUS Upload-Checksum header takes precedence
@@ -257,7 +257,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		// Then try owncloud header
+		// Then try OpenCloud header
 	} else if checksum := r.Header.Get(net.HeaderOCChecksum); checksum != "" {
 		cparts = strings.SplitN(checksum, ":", 2)
 		if len(cparts) != 2 {

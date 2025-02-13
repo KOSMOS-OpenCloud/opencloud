@@ -21,6 +21,7 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/options"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/permissions"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/tree"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
@@ -97,7 +98,7 @@ func check(c *cli.Context) error {
 		return err
 	}
 
-	tree := tree.New(lu, bs, o, store.Create(), &zerolog.Logger{})
+	tree := tree.New(lu, bs, o, permissions.Permissions{}, store.Create(), &zerolog.Logger{})
 
 	nId := c.String("node")
 	n, err := lu.NodeFromSpaceID(context.Background(), nId)

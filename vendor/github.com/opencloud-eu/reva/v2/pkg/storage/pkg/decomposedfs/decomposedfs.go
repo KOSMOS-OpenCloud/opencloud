@@ -90,7 +90,7 @@ func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/decomposedfs")
 }
 
-// Session is the interface that OcisSession implements. By combining tus.Upload,
+// Session is the interface that DecomposedfsSession implements. By combining tus.Upload,
 // storage.UploadSession and custom functions we can reuse the same struct throughout
 // the whole upload lifecycle.
 //
@@ -104,9 +104,9 @@ type Session interface {
 }
 
 type SessionStore interface {
-	New(ctx context.Context) *upload.OcisSession
-	List(ctx context.Context) ([]*upload.OcisSession, error)
-	Get(ctx context.Context, id string) (*upload.OcisSession, error)
+	New(ctx context.Context) *upload.DecomposedFsSession
+	List(ctx context.Context) ([]*upload.DecomposedFsSession, error)
+	Get(ctx context.Context, id string) (*upload.DecomposedFsSession, error)
 	Cleanup(ctx context.Context, session upload.Session, revertNodeMetadata, keepUpload, unmarkPostprocessing bool)
 }
 
@@ -151,7 +151,13 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, l
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
 
-	tp := tree.New(lu, bs, o, store.Create(
+	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
+	if err != nil {
+		return nil, err
+	}
+	p := permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector)
+
+	tp := tree.New(lu, bs, o, p, store.Create(
 		store.Store(o.IDCache.Store),
 		store.TTL(o.IDCache.TTL),
 		store.Size(o.IDCache.Size),
@@ -162,15 +168,10 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, l
 		store.Authentication(o.IDCache.AuthUsername, o.IDCache.AuthPassword),
 	), log)
 
-	permissionsSelector, err := pool.PermissionsSelector(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
-	if err != nil {
-		return nil, err
-	}
-
 	aspects := aspects.Aspects{
 		Lookup:            lu,
 		Tree:              tp,
-		Permissions:       permissions.NewPermissions(node.NewPermissions(lu), permissionsSelector),
+		Permissions:       p,
 		EventStream:       es,
 		DisableVersioning: o.DisableVersioning,
 		Trashbin:          &DecomposedfsTrashbin{},

@@ -1604,7 +1604,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					// see everts stance on this https://stackoverflow.com/a/31621912, he points to http://tools.ietf.org/html/rfc4918#section-15.3
 					// > Purpose: Contains the Content-Length header returned by a GET without accept headers.
 					// which only would make sense when eg. rendering a plain HTML filelisting when GETing a collection,
-					// which is not the case ... so we don't return it on collections. owncloud has oc:size for that
+					// which is not the case ... so we don't return it on collections. OpenCloud has oc:size for that
 					// TODO we cannot find out if md.Size is set or not because ints in go default to 0
 					if md.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						appendToNotFound(prop.NotFound("d:getcontentlength"))
@@ -1638,7 +1638,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					if md.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 						// always returns the current usage,
 						// in oc10 there seems to be a bug that makes the size in webdav differ from the one in the user properties, not taking shares into account
-						// in ocis we plan to always mak the quota a property of the storage space
+						// in OpenCloud we plan to always mak the quota a property of the storage space
 						appendToOK(prop.Escaped("d:quota-used-bytes", size))
 					} else {
 						appendToNotFound(prop.NotFound("d:quota-used-bytes"))

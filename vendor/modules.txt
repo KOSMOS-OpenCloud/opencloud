@@ -47,8 +47,8 @@ github.com/Nerzal/gocloak/v13/pkg/jwx
 # github.com/OneOfOne/xxhash v1.2.8
 ## explicit; go 1.11
 github.com/OneOfOne/xxhash
-# github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
-## explicit; go 1.13
+# github.com/ProtonMail/go-crypto v1.1.5
+## explicit; go 1.17
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
 github.com/ProtonMail/go-crypto/eax
@@ -59,6 +59,8 @@ github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
 github.com/ProtonMail/go-crypto/openpgp/armor
 github.com/ProtonMail/go-crypto/openpgp/ecdh
 github.com/ProtonMail/go-crypto/openpgp/ecdsa
+github.com/ProtonMail/go-crypto/openpgp/ed25519
+github.com/ProtonMail/go-crypto/openpgp/ed448
 github.com/ProtonMail/go-crypto/openpgp/eddsa
 github.com/ProtonMail/go-crypto/openpgp/elgamal
 github.com/ProtonMail/go-crypto/openpgp/errors
@@ -67,6 +69,8 @@ github.com/ProtonMail/go-crypto/openpgp/internal/ecc
 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
 github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
+github.com/ProtonMail/go-crypto/openpgp/x25519
+github.com/ProtonMail/go-crypto/openpgp/x448
 # github.com/RoaringBitmap/roaring v1.9.3
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
@@ -350,8 +354,8 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cyphar/filepath-securejoin v0.2.4
-## explicit; go 1.13
+# github.com/cyphar/filepath-securejoin v0.3.6
+## explicit; go 1.18
 github.com/cyphar/filepath-securejoin
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
@@ -448,16 +452,16 @@ github.com/go-git/gcfg
 github.com/go-git/gcfg/scanner
 github.com/go-git/gcfg/token
 github.com/go-git/gcfg/types
-# github.com/go-git/go-billy/v5 v5.5.0
-## explicit; go 1.19
+# github.com/go-git/go-billy/v5 v5.6.2
+## explicit; go 1.21
 github.com/go-git/go-billy/v5
 github.com/go-git/go-billy/v5/helper/chroot
 github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git/v5 v5.11.0
-## explicit; go 1.19
+# github.com/go-git/go-git/v5 v5.13.2
+## explicit; go 1.21
 github.com/go-git/go-git/v5
 github.com/go-git/go-git/v5/config
 github.com/go-git/go-git/v5/internal/path_util
@@ -1185,8 +1189,8 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250127153848-a84e6c39c206
-## explicit; go 1.22.7
+# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250213085913-418bbbbeed54
+## explicit; go 1.23.1
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
 github.com/opencloud-eu/reva/v2/internal/grpc/interceptors/appctx
@@ -1401,7 +1405,6 @@ github.com/opencloud-eu/reva/v2/pkg/preferences/loader
 github.com/opencloud-eu/reva/v2/pkg/preferences/memory
 github.com/opencloud-eu/reva/v2/pkg/preferences/registry
 github.com/opencloud-eu/reva/v2/pkg/publicshare
-github.com/opencloud-eu/reva/v2/pkg/publicshare/manager/cs3
 github.com/opencloud-eu/reva/v2/pkg/publicshare/manager/json
 github.com/opencloud-eu/reva/v2/pkg/publicshare/manager/json/persistence
 github.com/opencloud-eu/reva/v2/pkg/publicshare/manager/json/persistence/cs3
@@ -1432,7 +1435,6 @@ github.com/opencloud-eu/reva/v2/pkg/share/cache
 github.com/opencloud-eu/reva/v2/pkg/share/cache/warmup/cbox
 github.com/opencloud-eu/reva/v2/pkg/share/cache/warmup/loader
 github.com/opencloud-eu/reva/v2/pkg/share/cache/warmup/registry
-github.com/opencloud-eu/reva/v2/pkg/share/manager/cs3
 github.com/opencloud-eu/reva/v2/pkg/share/manager/json
 github.com/opencloud-eu/reva/v2/pkg/share/manager/jsoncs3
 github.com/opencloud-eu/reva/v2/pkg/share/manager/jsoncs3/providercache
@@ -1544,14 +1546,9 @@ github.com/opencloud-eu/reva/v2/pkg/storage/utils/downloader
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/eosfs
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/filelocks
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/grants
-github.com/opencloud-eu/reva/v2/pkg/storage/utils/indexer
-github.com/opencloud-eu/reva/v2/pkg/storage/utils/indexer/errors
-github.com/opencloud-eu/reva/v2/pkg/storage/utils/indexer/index
-github.com/opencloud-eu/reva/v2/pkg/storage/utils/indexer/option
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/localfs
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/middleware
-github.com/opencloud-eu/reva/v2/pkg/storage/utils/sync
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/templates
 github.com/opencloud-eu/reva/v2/pkg/storage/utils/walker
 github.com/opencloud-eu/reva/v2/pkg/storagespace
@@ -1594,8 +1591,8 @@ github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 ## explicit; go 1.12
 github.com/oxtoacart/bpool
-# github.com/pablodz/inotifywaitgo v0.0.7
-## explicit; go 1.21
+# github.com/pablodz/inotifywaitgo v0.0.9
+## explicit; go 1.23.1
 github.com/pablodz/inotifywaitgo/inotifywaitgo
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
@@ -1610,8 +1607,8 @@ github.com/pierrec/lz4/v4/internal/lz4block
 github.com/pierrec/lz4/v4/internal/lz4errors
 github.com/pierrec/lz4/v4/internal/lz4stream
 github.com/pierrec/lz4/v4/internal/xxh32
-# github.com/pjbgf/sha1cd v0.3.0
-## explicit; go 1.19
+# github.com/pjbgf/sha1cd v0.3.2
+## explicit; go 1.21
 github.com/pjbgf/sha1cd
 github.com/pjbgf/sha1cd/internal
 github.com/pjbgf/sha1cd/ubc
@@ -1760,8 +1757,8 @@ github.com/segmentio/ksuid
 # github.com/sercand/kuberesolver/v5 v5.1.1
 ## explicit; go 1.18
 github.com/sercand/kuberesolver/v5
-# github.com/sergi/go-diff v1.3.1
-## explicit; go 1.12
+# github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3
+## explicit; go 1.13
 github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-password v0.3.1
 ## explicit; go 1.21
@@ -1788,7 +1785,7 @@ github.com/shurcooL/vfsgen
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/skeema/knownhosts v1.2.1
+# github.com/skeema/knownhosts v1.3.0
 ## explicit; go 1.17
 github.com/skeema/knownhosts
 # github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784

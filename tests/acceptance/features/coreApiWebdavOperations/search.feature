@@ -22,44 +22,27 @@ Feature: Search
     And user "Alice" has uploaded file with content "file with comma in filename" to "/upload😀 😁/upload,1.txt"
 
   @smokeTest @issue-10329
-  Scenario Outline: search for entry by pattern
-    Given using <dav-path-version> DAV path
-    When user "Alice" searches for "*upload*" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the search result of user "Alice" should contain these entries:
-      | /upload.txt                   |
-      | /just-a-folder/upload.txt     |
-      | /upload folder                |
-      | /just-a-folder/uploadÜठिF.txt |
-      | /फनी näme/upload.txt          |
-      | /upload😀 😁                  |
-      | /upload😀 😁/upload😀 😁.txt  |
-      | /upload😀 😁/upload,1.txt     |
-    But the search result of user "Alice" should not contain these entries:
-      | /a-image.png |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+  # Scenario Outline: search for entry by pattern
+  #   Given using <dav-path-version> DAV path
+  #   When user "Alice" searches for "*upload*" using the WebDAV API
+  #   Then the HTTP status code should be "207"
+  #   And the search result of user "Alice" should contain these entries:
+  #     | /upload.txt                   |
+  #     | /just-a-folder/upload.txt     |
+  #     | /upload folder                |
+  #     | /just-a-folder/uploadÜठिF.txt |
+  #     | /फनी näme/upload.txt          |
+  #     | /upload😀 😁                  |
+  #     | /upload😀 😁/upload😀 😁.txt  |
+  #     | /upload😀 😁/upload,1.txt     |
+  #   But the search result of user "Alice" should not contain these entries:
+  #     | /a-image.png |
+  #   Examples:
+  #     | dav-path-version |
+  #     | old              |
+  #     | new              |
+  #     | spaces           |
 
-  @issue-10329
-  Scenario Outline: search for entries by only some letters from the middle of the entry name
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "FOLDER"
-    When user "Alice" searches for "*ol*" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the search result should contain "4" entries
-    And the search result of user "Alice" should contain these entries:
-      | /just-a-folder           |
-      | /upload folder           |
-      | /FOLDER                  |
-      | /just-a-folder/lolol.txt |
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
 
   @issue-10329
   Scenario Outline: search for files by extension

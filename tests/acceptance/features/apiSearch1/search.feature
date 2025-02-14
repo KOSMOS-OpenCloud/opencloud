@@ -354,3 +354,114 @@ Feature: Search
       | old              |
       | new              |
       | spaces           |
+
+  @issue-10329
+  Scenario Outline: search for files by extension
+    Given using <dav-path-version> DAV path
+    When user "Alice" searches for "*txt*" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain these entries:
+      | insideTheFolder.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: search with empty field
+    Given using <dav-path-version> DAV path
+    When user "Alice" searches for "" using the WebDAV API
+    Then the HTTP status code should be "400"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-10329
+  Scenario Outline: limit returned search entries to only 1 entry
+    Given using <dav-path-version> DAV path
+    When user "Alice" searches for "*folder*" and limits the results to "1" items using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain any "1" of these entries:
+      | insideTheFolder.txt |
+      | folderMain          |
+      | SubFolder1          |
+      | subFOLDER2          |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-10329
+  Scenario Outline: search for entry with emoji by pattern
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world" to "upload😀 😁.txt"
+    When user "Alice" searches for '"*😀 😁*"' using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain these entries:
+      | upload😀 😁.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783 @issue-10329
+  Scenario Outline: report extra properties in search entries for a file
+    Given using <dav-path-version> DAV path
+    When user "Alice" searches for "*insideTheFo*" using the WebDAV API requesting these properties:
+      | oc:fileid             |
+      | oc:permissions        |
+      | d:getlastmodified     |
+      | d:getetag             |
+      | d:getcontenttype      |
+      | oc:size               |
+      | oc:owner-id           |
+      | oc:owner-display-name |
+    Then the HTTP status code should be "207"
+    And file "insideTheFolder.txt" in the search result of user "Alice" should contain these properties:
+      | name                  | value                                                                                             |
+      | oc:fileid             | \d*                                                                                               |
+      | oc:permissions        | ^(RDNVW\|RMDNVW)$                                                                                 |
+      | d:getlastmodified     | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
+      | d:getetag             | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
+      | d:getcontenttype      | text\/plain                                                                                       |
+      | oc:size               | 15                                                                                                |
+      | oc:owner-id           | %username%                                                                                        |
+      | oc:owner-display-name | %displayname%                                                                                     |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783 @issue-10329
+  Scenario Outline: report extra properties in search entries for a folder
+    Given using <dav-path-version> DAV path
+    When user "Alice" searches for "*folderMain*" using the WebDAV API requesting these properties:
+      | oc:fileid             |
+      | oc:permissions        |
+      | d:getlastmodified     |
+      | d:getetag             |
+      | d:getcontenttype      |
+      | oc:size               |
+      | oc:owner-id           |
+      | oc:owner-display-name |
+    Then the HTTP status code should be "207"
+    And folder "folderMain" in the search result of user "Alice" should contain these properties:
+      | name                  | value                                                                                             |
+      | oc:fileid             | \d*                                                                                               |
+      | oc:permissions        | ^(RDNVCK\|RMDNVCK)$                                                                               |
+      | d:getlastmodified     | ^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$ |
+      | d:getetag             | ^\"[a-f0-9:\.]{1,32}\"$                                                                           |
+      | oc:size               | 0                                                                                                 |
+      | oc:owner-id           | %username%                                                                                        |
+      | oc:owner-display-name | %displayname%                                                                                     |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

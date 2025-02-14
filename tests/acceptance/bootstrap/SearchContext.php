@@ -274,7 +274,7 @@ class SearchContext implements Context {
 	): void {
 		// NOTE: since indexing of newly uploaded files or directories with OpenCloud is decoupled and occurs asynchronously,
 		// a short wait is necessary before searching
-		sleep(2);
+		sleep(5);
 		$response = $this-> searchFiles($user, $pattern, null, $scopeType, $scope, $spaceName);
 		$this->featureContext->setResponse($response);
 	}

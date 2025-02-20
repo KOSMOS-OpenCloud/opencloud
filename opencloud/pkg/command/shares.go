@@ -15,7 +15,9 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
+	oclog "github.com/opencloud-eu/opencloud/pkg/log"
 	mregistry "github.com/opencloud-eu/opencloud/pkg/registry"
+	sharing "github.com/opencloud-eu/opencloud/services/sharing/pkg/config"
 	sharingparser "github.com/opencloud-eu/opencloud/services/sharing/pkg/config/parser"
 )
 
@@ -125,4 +127,88 @@ func cleanup(c *cli.Context, cfg *config.Config) error {
 	mgr.(*jsoncs3.Manager).CleanupStaleShares(serviceUserCtx)
 
 	return nil
+}
+
+func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"json": map[string]interface{}{
+			"file":         cfg.UserSharingDrivers.JSON.File,
+			"gateway_addr": cfg.Reva.Address,
+		},
+		"sql": map[string]interface{}{ // cernbox sql
+			"db_username":                   cfg.UserSharingDrivers.SQL.DBUsername,
+			"db_password":                   cfg.UserSharingDrivers.SQL.DBPassword,
+			"db_host":                       cfg.UserSharingDrivers.SQL.DBHost,
+			"db_port":                       cfg.UserSharingDrivers.SQL.DBPort,
+			"db_name":                       cfg.UserSharingDrivers.SQL.DBName,
+			"password_hash_cost":            cfg.UserSharingDrivers.SQL.PasswordHashCost,
+			"enable_expired_shares_cleanup": cfg.UserSharingDrivers.SQL.EnableExpiredSharesCleanup,
+			"janitor_run_interval":          cfg.UserSharingDrivers.SQL.JanitorRunInterval,
+		},
+		"owncloudsql": map[string]interface{}{
+			"gateway_addr":     cfg.Reva.Address,
+			"storage_mount_id": cfg.UserSharingDrivers.OwnCloudSQL.UserStorageMountID,
+			"db_username":      cfg.UserSharingDrivers.OwnCloudSQL.DBUsername,
+			"db_password":      cfg.UserSharingDrivers.OwnCloudSQL.DBPassword,
+			"db_host":          cfg.UserSharingDrivers.OwnCloudSQL.DBHost,
+			"db_port":          cfg.UserSharingDrivers.OwnCloudSQL.DBPort,
+			"db_name":          cfg.UserSharingDrivers.OwnCloudSQL.DBName,
+		},
+		"cs3": map[string]interface{}{
+			"gateway_addr":        cfg.UserSharingDrivers.CS3.ProviderAddr,
+			"provider_addr":       cfg.UserSharingDrivers.CS3.ProviderAddr,
+			"service_user_id":     cfg.UserSharingDrivers.CS3.SystemUserID,
+			"service_user_idp":    cfg.UserSharingDrivers.CS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.UserSharingDrivers.CS3.SystemUserAPIKey,
+		},
+		"jsoncs3": map[string]interface{}{
+			"gateway_addr":        cfg.Reva.Address,
+			"provider_addr":       cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
+			"service_user_id":     cfg.UserSharingDrivers.JSONCS3.SystemUserID,
+			"service_user_idp":    cfg.UserSharingDrivers.JSONCS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey,
+		},
+	}
+}
+
+func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"json": map[string]interface{}{
+			"file":         cfg.PublicSharingDrivers.JSON.File,
+			"gateway_addr": cfg.Reva.Address,
+		},
+		"jsoncs3": map[string]interface{}{
+			"gateway_addr":        cfg.Reva.Address,
+			"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+			"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
+			"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
+		},
+		"sql": map[string]interface{}{
+			"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,
+			"db_password":                   cfg.PublicSharingDrivers.SQL.DBPassword,
+			"db_host":                       cfg.PublicSharingDrivers.SQL.DBHost,
+			"db_port":                       cfg.PublicSharingDrivers.SQL.DBPort,
+			"db_name":                       cfg.PublicSharingDrivers.SQL.DBName,
+			"password_hash_cost":            cfg.PublicSharingDrivers.SQL.PasswordHashCost,
+			"enable_expired_shares_cleanup": cfg.PublicSharingDrivers.SQL.EnableExpiredSharesCleanup,
+			"janitor_run_interval":          cfg.PublicSharingDrivers.SQL.JanitorRunInterval,
+		},
+		"cs3": map[string]interface{}{
+			"gateway_addr":        cfg.PublicSharingDrivers.CS3.ProviderAddr,
+			"provider_addr":       cfg.PublicSharingDrivers.CS3.ProviderAddr,
+			"service_user_id":     cfg.PublicSharingDrivers.CS3.SystemUserID,
+			"service_user_idp":    cfg.PublicSharingDrivers.CS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
+		},
+	}
+}
+
+func logger() *zerolog.Logger {
+	log := oclog.NewLogger(
+		oclog.Name("migrate"),
+		oclog.Level("info"),
+		oclog.Pretty(true),
+		oclog.Color(true)).Logger
+	return &log
 }

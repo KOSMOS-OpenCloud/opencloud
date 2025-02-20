@@ -213,7 +213,7 @@ func dumpCmd(cfg *config.Config) *cli.Command {
 		Usage: `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
 		Action: func(c *cli.Context) error {
 			lu, backend := getBackend(c)
-			path, err := getPath(c, lu)
+			path, err := getNode(c, lu)
 			if err != nil {
 				return err
 			}
@@ -242,7 +242,7 @@ func getCmd(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			lu, backend := getBackend(c)
-			path, err := getPath(c, lu)
+			path, err := getNode(c, lu)
 			if err != nil {
 				return err
 			}
@@ -278,7 +278,7 @@ func setCmd(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			lu, backend := getBackend(c)
-			path, err := getPath(c, lu)
+			n, err := getNode(c, lu)
 			if err != nil {
 				return err
 			}
@@ -300,7 +300,7 @@ func setCmd(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			err = backend.Set(c.Context, path, c.String("attribute"), []byte(v))
+			err = backend.Set(c.Context, n, c.String("attribute"), []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
@@ -332,27 +332,15 @@ func getBackend(c *cli.Context) (*lookup.Lookup, metadata.Backend) {
 	return lu, backend
 }
 
-func getPath(c *cli.Context, lu *lookup.Lookup) (string, error) {
+func getNode(c *cli.Context, lu *lookup.Lookup) (*node.Node, error) {
 	nodeFlag := c.String("node")
 
-	path := ""
-	if strings.HasPrefix(nodeFlag, "/") {
-		path = nodeFlag
-	} else {
-		nId := c.String("node")
-		id, err := storagespace.ParseID(nId)
-		if err != nil {
-			fmt.Println("Invalid node id.")
-			return "", err
-		}
-		n, err := lu.NodeFromID(context.Background(), &id)
-		if err != nil || !n.Exists {
-			fmt.Println("Can not find node '" + nId + "'")
-			return "", err
-		}
-		path = n.InternalPath()
+	id, err := storagespace.ParseID(nodeFlag)
+	if err != nil {
+		fmt.Println("Invalid node id.")
+		return nil, err
 	}
-	return path, nil
+	return lu.NodeFromID(context.Background(), &id)
 }
 
 func printAttribs(attribs map[string][]byte, onlyAttribute string) {

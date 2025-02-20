@@ -134,7 +134,7 @@ func (dp *DataProvider) getBlobPath(path string) (string, Inconsistency) {
 
 	if bid := m["user.oc.blobid"]; string(bid) != "" {
 		spaceID, _ := getIDsFromPath(filepath.Join(dp.discpath, path))
-		return dp.lbs.Path(&node.Node{BlobID: string(bid), SpaceID: spaceID}), ""
+		return dp.lbs.Path(&node.Node{BaseNode: node.BaseNode{SpaceID: spaceID}, BlobID: string(bid)}), ""
 	}
 
 	return "", ""

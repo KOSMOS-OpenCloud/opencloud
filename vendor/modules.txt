@@ -1189,7 +1189,7 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250220084142-9db89fb25fdf
+# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250220094822-4ffb9dbabef5
 ## explicit; go 1.23.1
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
@@ -1475,8 +1475,8 @@ github.com/opencloud-eu/reva/v2/pkg/storage/favorite/registry
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/cephfs
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed/blobstore
-github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed_s3
-github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed_s3/blobstore
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposeds3
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposeds3/blobstore
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eos
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eosgrpc
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/eosgrpchome

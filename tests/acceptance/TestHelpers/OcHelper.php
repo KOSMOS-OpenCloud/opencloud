@@ -32,7 +32,7 @@ abstract class StorageDriver {
 	public const DECOMPOSED = "DECOMPOSED";
 	public const EOS = "EOS";
 	public const OWNCLOUD = "OWNCLOUD";
-	public const DECOMPOSEDS3 = "DECOMPOSED_S3";
+	public const DECOMPOSEDS3 = "DECOMPOSEDS3";
 	public const POSIX = "POSIX";
 }
 

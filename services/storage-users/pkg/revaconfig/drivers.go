@@ -269,7 +269,7 @@ func S3(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// DecomposedS3 is the config mapping for the Decomposed-S3 storage driver
+// DecomposedS3 is the config mapping for the decomposeds3 storage driver
 func DecomposedS3(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",
@@ -334,7 +334,7 @@ func DecomposedS3(cfg *config.Config) map[string]interface{} {
 	}
 }
 
-// DecomposedS3NoEvents is the config mapping for the Decomposed-S3 storage driver emitting no events
+// DecomposedS3NoEvents is the config mapping for the decomposeds3 storage driver emitting no events
 func DecomposedS3NoEvents(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"metadata_backend": "messagepack",

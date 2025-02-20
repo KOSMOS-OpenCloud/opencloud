@@ -164,7 +164,7 @@ func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 
 		if !dryRun {
 			if blobID != "" {
-				//  TODO: needs spaceID for s3ng
+				//  TODO: needs spaceID for decomposeds3
 				if err := bs.Delete(&node.Node{BlobID: blobID}); err != nil {
 					fmt.Printf("error deleting blob %s: %v\n", blobID, err)
 					continue

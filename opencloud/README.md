@@ -55,7 +55,7 @@ A node that doesn't have any (or malformed) metadata.
 This command provides additional options:
 
 * `-b` / `--blobstore`\
-Allows specifying the blobstore to use. Defaults to `decomposed`. Empty blobs will not be checked. Can also be switched to `decomposed_s3`, but needs addtional envvar configuration (see the `storage-users` service for more details).
+Allows specifying the blobstore to use. Defaults to `decomposed`. Empty blobs will not be checked. Can also be switched to `decomposeds3`, but needs addtional envvar configuration (see the `storage-users` service for more details).
 * `--fail`\
 Exits with non-zero exit code if inconsistencies are found. Useful for automation.
 
@@ -86,7 +86,7 @@ This command provides additional options:
 * `--dry-run` (default: `true`)\
 Do not remove any revisions but print the revisions that would be removed.
 * `-b` / `--blobstore`\
-Allows specifying the blobstore to use. Defaults to `decomposed`. Can be switched to `decomposed_s3` but needs addtional envvar configuration (see the `storage-users` service for more details).
+Allows specifying the blobstore to use. Defaults to `decomposed`. Can be switched to `decomposeds3` but needs addtional envvar configuration (see the `storage-users` service for more details).
 * `-v` / `--verbose`\
 Prints additional information about the revisions that are removed.
 * `--glob-mechanism` (default: `glob`\

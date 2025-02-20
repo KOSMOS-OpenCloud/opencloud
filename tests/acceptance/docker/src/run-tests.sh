@@ -13,8 +13,8 @@ if [ "$TEST_SOURCE" = "core" ]; then
         export OC_REVA_DATA_ROOT=''
         export BEHAT_FILTER_TAGS='~@skipOnOpencloud-decomposed-Storage'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-decomposed-storage.md'
-    elif [ "$STORAGE_DRIVER" = "decomposed_s3" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed_s3-Storage'
+    elif [ "$STORAGE_DRIVER" = "decomposeds3" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposeds3-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing STORAGE selected"
@@ -27,8 +27,8 @@ elif [ "$TEST_SOURCE" = "opencloud" ]; then
     if [ "$STORAGE_DRIVER" = "decomposed" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed-Storage'
         export OC_REVA_DATA_ROOT=''
-    elif [ "$STORAGE_DRIVER" = "decomposed_s3" ]; then
-        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposed_s3-Storage'
+    elif [ "$STORAGE_DRIVER" = "decomposeds3" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposeds3-Storage'
         export OC_REVA_DATA_ROOT=''
     else
         echo "non existing storage selected"

@@ -1189,7 +1189,7 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250218085216-6d8d9c5e692c
+# github.com/opencloud-eu/reva/v2 v2.27.3-0.20250220084142-9db89fb25fdf
 ## explicit; go 1.23.1
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
@@ -1506,7 +1506,6 @@ github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/aspects
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/lookup
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/metadata/prefixes
-github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/migrator
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/mtimesyncedcache
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node
 github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/options

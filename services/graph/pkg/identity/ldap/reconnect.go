@@ -374,3 +374,8 @@ func (c ConnWithReconnect) Syncrepl(ctx context.Context, searchRequest *ldap.Sea
 	// unimplemented
 	return nil
 }
+
+// Extended implements the ldap.Client interface
+func (c ConnWithReconnect) Extended(_ *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}

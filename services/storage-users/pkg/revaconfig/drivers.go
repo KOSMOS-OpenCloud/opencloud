@@ -88,6 +88,7 @@ func Local(cfg *config.Config) map[string]interface{} {
 func Posix(cfg *config.Config, enableFSScan bool) map[string]interface{} {
 	return map[string]interface{}{
 		"root":                       cfg.Drivers.Posix.Root,
+		"metadata_backend":           "hybrid",
 		"personalspacepath_template": cfg.Drivers.Posix.PersonalSpacePathTemplate,
 		"generalspacepath_template":  cfg.Drivers.Posix.GeneralSpacePathTemplate,
 		"permissionssvc":             cfg.Drivers.Posix.PermissionsEndpoint,

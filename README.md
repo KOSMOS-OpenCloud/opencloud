@@ -25,7 +25,7 @@ Generate the assets needed by e.g. the web UI and the builtin IDP
 make generate
 ```
 
-The compile the `opencloud` binary
+Then compile the `opencloud` binary
 
 ``` console
 make -C opencloud build

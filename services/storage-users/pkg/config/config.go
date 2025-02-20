@@ -24,7 +24,7 @@ type Config struct {
 	SkipUserGroupsInToken   bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 	GracefulShutdownTimeout int  `yaml:"graceful_shutdown_timeout" env:"STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT" desc:"The number of seconds to wait for the 'storage-users' service to shutdown cleanly before exiting with an error that gets logged. Note: This setting is only applicable when running the 'storage-users' service as a standalone service. See the text description for more details." introductionVersion:"pre5.0"`
 
-	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'decomposed', Supported values are: 'decomposed', 'decomposed_s3' and 'owncloudsql'. For backwards compatibility reasons it's also possible to use the 'ocis' and 's3ng' driver and configure them using the 'decomposed'/'decomposed_s3' options. The 'decomposed' driver stores all data (blob and meta data) in an POSIX compliant volume. The 'decomposed_s3' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
+	Driver         string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service. Defaults to 'decomposed', Supported values are: 'decomposed', 'decomposeds3' and 'owncloudsql'. For backwards compatibility reasons it's also possible to use the 'ocis' and 's3ng' driver and configure them using the 'decomposed'/'decomposeds3' options. The 'decomposed' driver stores all data (blob and meta data) in an POSIX compliant volume. The 'decomposeds3' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket." introductionVersion:"pre5.0"`
 	Drivers        Drivers `yaml:"drivers"`
 	DataServerURL  string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed." introductionVersion:"pre5.0"`
 	DataGatewayURL string  `yaml:"data_gateway_url" env:"STORAGE_USERS_DATA_GATEWAY_URL" desc:"URL of the data gateway server" introductionVersion:"pre5.0"`
@@ -99,7 +99,7 @@ type CORS struct {
 // Drivers combine all storage driver configurations
 type Drivers struct {
 	Decomposed   DecomposedDriver   `yaml:"decomposed"`
-	DecomposedS3 DecomposedS3Driver `yaml:"decomposed_s3"`
+	DecomposedS3 DecomposedS3Driver `yaml:"decomposeds3"`
 	OwnCloudSQL  OwnCloudSQLDriver  `yaml:"owncloudsql"`
 	Posix        PosixDriver        `yaml:"posix"`
 
@@ -120,7 +120,7 @@ type DecomposedDriver struct {
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_DECOMPOSED_ROOT" desc:"The directory where the filesystem storage will store blobs and metadata. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
 	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_DECOMPOSED_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
-	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSED_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposed_s3'." introductionVersion:"pre5.0"`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSED_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposeds3'." introductionVersion:"pre5.0"`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
 	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_DECOMPOSED_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
@@ -139,14 +139,14 @@ type DecomposedDriver struct {
 	DisableVersioning       bool   `yaml:"disable_versioning" env:"OC_DISABLE_VERSIONING" desc:"Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version." introductionVersion:"7.0.0"`
 }
 
-// DecomposedS3Driver is the storage driver configuration when using 'decomposed_s3' storage driver
+// DecomposedS3Driver is the storage driver configuration when using 'decomposeds3' storage driver
 type DecomposedS3Driver struct {
 	Propagator             string                 `yaml:"propagator" env:"OC_DECOMPOSEDFS_PROPAGATOR;STORAGE_USERS_DECOMPOSEDS3_PROPAGATOR" desc:"The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option." introductionVersion:"pre5.0"`
 	AsyncPropagatorOptions AsyncPropagatorOptions `yaml:"async_propagator_options"`
 	// Root is the absolute path to the location of the data
 	Root                  string `yaml:"root" env:"STORAGE_USERS_DECOMPOSEDS3_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"pre5.0"`
 	UserLayout            string `yaml:"user_layout" env:"STORAGE_USERS_DECOMPOSEDS3_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory." introductionVersion:"pre5.0"`
-	PermissionsEndpoint   string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSEDS3_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposed_s3'." introductionVersion:"pre5.0"`
+	PermissionsEndpoint   string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_DECOMPOSEDS3_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed' and 'decomposeds3'." introductionVersion:"pre5.0"`
 	Region                string `yaml:"region" env:"STORAGE_USERS_DECOMPOSEDS3_REGION" desc:"Region of the S3 bucket." introductionVersion:"pre5.0"`
 	AccessKey             string `yaml:"access_key" env:"STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY" desc:"Access key for the S3 bucket." introductionVersion:"pre5.0"`
 	SecretKey             string `yaml:"secret_key" env:"STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY" desc:"Secret key for the S3 bucket." introductionVersion:"pre5.0"`
@@ -197,7 +197,7 @@ type PosixDriver struct {
 	Root                      string        `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"6.0.0"`
 	PersonalSpacePathTemplate string        `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"6.0.0"`
 	GeneralSpacePathTemplate  string        `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"6.0.0"`
-	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed', 'posix' and 'decomposed_s3'." introductionVersion:"6.0.0"`
+	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed', 'posix' and 'decomposeds3'." introductionVersion:"6.0.0"`
 	AsyncUploads              bool          `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"pre5.0"`
 	ScanDebounceDelay         time.Duration `yaml:"scan_debounce_delay" env:"STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY" desc:"The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected." introductionVersion:"6.0.0"`
 

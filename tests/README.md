@@ -19,7 +19,7 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment, both can be applied to OpenCloud.
 
-As a storage backend, we support the OpenCloud native storage, also called `decomposed`. This stores files directly on disk. Along with that we also provide `decomposed_s3` storage driver.
+As a storage backend, we support the OpenCloud native storage, also called `decomposed`. This stores files directly on disk. Along with that we also provide `decomposeds3` storage driver.
 
 You can invoke two types of test suite runs:
 
@@ -30,7 +30,7 @@ You can invoke two types of test suite runs:
 
 #### Local OpenCloud Tests (prefix `api`)
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features). They can be run with `decomposed` storage and `decomposed_s3` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features). They can be run with `decomposed` storage and `decomposeds3` storage.
 
 For example, command:
 
@@ -43,10 +43,10 @@ runs the same tests as the `localApiTests-apiGraph-decomposed` CI pipeline, whic
 And command:
 
 ```bash
-make -C tests/acceptance/docker localApiTests-apiGraph-decomposed_s3
+make -C tests/acceptance/docker localApiTests-apiGraph-decomposeds3
 ```
 
-runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `decomposed_s3` storage.
+runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `decomposeds3` storage.
 
 Note:
 While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/main/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
@@ -93,7 +93,7 @@ make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 
 Command `make -C tests/acceptance/docker Core-API-Tests-decomposed-storage-3` runs the same tests as the `Core-API-Tests-decomposed-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `decomposed` storage.
 
-And `make -C tests/acceptance/docker Core-API-Tests-decomposed_s3-storage-3` runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `decomposed_s3` storage.
+And `make -C tests/acceptance/docker Core-API-Tests-decomposeds3-storage-3` runs the third (out of ten) test suite groups transferred from core against the OpenCloud server with `decomposeds3` storage.
 
 ### Run Single Feature Test
 
@@ -119,16 +119,16 @@ BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26
 make -C tests/acceptance/docker test-opencloud-feature-decomposed-storage
 ```
 
-Similarly, with `decomposed_s3` storage;
+Similarly, with `decomposeds3` storage;
 
 ```bash
 # run a whole feature
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
-make -C tests/acceptance/docker test-opencloud-feature-decomposed_s3-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposeds3-storage
 
 # run a single scenario
 BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
-make -C tests/acceptance/docker test-opencloud-feature-decomposed_s3-storage
+make -C tests/acceptance/docker test-opencloud-feature-decomposeds3-storage
 ```
 
 In the same way, tests transferred from core can be run as:
@@ -222,7 +222,7 @@ A specific scenario from a feature can be run by adding `:<line-number>` at the 
 >
 > BEHAT_SUITE=apiGraph
 
-`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `decomposed` (default), `owncloudsql` and `decomposed_s3`
+`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `decomposed` (default), `owncloudsql` and `decomposeds3`
 
 > Example:
 >

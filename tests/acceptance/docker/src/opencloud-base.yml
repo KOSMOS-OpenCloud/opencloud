@@ -26,12 +26,12 @@ services:
       PROXY_HTTP_ADDR: "0.0.0.0:9200"
       OC_JWT_SECRET: "some-random-jwt-secret"
 
-      # s3ng specific settings
-      STORAGE_USERS_S3NG_ENDPOINT: http://ceph:8080
-      STORAGE_USERS_S3NG_REGION: default
-      STORAGE_USERS_S3NG_ACCESS_KEY: test
-      STORAGE_USERS_S3NG_SECRET_KEY: test
-      STORAGE_USERS_S3NG_BUCKET: test
+      # decomposeds3 specific settings
+      STORAGE_USERS_DECOMPOSEDS3_ENDPOINT: http://ceph:8080
+      STORAGE_USERS_DECOMPOSEDS3_REGION: default
+      STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY: test
+      STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY: test
+      STORAGE_USERS_DECOMPOSEDS3_BUCKET: test
       # email
       NOTIFICATIONS_SMTP_HOST: email
       NOTIFICATIONS_SMTP_PORT: 2500

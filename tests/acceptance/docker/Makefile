@@ -77,14 +77,14 @@ help:
 	@echo -e "${GREEN}Run full OpenCloud test suites with decomposed storage:${RESET}\n"
 	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-decomposed\t\t${BLUE}run apiAccountsHashDifficulty test suite,  where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
 	@echo
-	@echo -e "${GREEN}Run full OpenCloud test suites with decomposed_s3 storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-decomposed_s3\t\t${BLUE}run apiAccountsHashDifficulty test suite, where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
+	@echo -e "${GREEN}Run full OpenCloud test suites with decomposeds3 storage:${RESET}\n"
+	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-decomposeds3\t\t${BLUE}run apiAccountsHashDifficulty test suite, where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
 	@echo
 	@echo -e "${GREEN}Run full OpenCloud test suites with decomposed storage:${RESET}\n"
 	@echo -e "\tmake Core-API-Tests-decomposed-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
 	@echo
-	@echo -e "${GREEN}Run full OpenCloud test suites with decomposed_s3 storage:${RESET}\n"
-	@echo -e "\tmake Core-API-Tests-decomposed_s3-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
+	@echo -e "${GREEN}Run full OpenCloud test suites with decomposeds3 storage:${RESET}\n"
+	@echo -e "\tmake Core-API-Tests-decomposeds3-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an OpenCloud feature test with decomposed storage:${RESET}\n"
 	@echo -e "\tmake test-opencloud-feature-decomposed-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
@@ -92,8 +92,8 @@ help:
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
 	@echo
-	@echo -e "${GREEN}Run an OpenCloud feature test with decomposed_s3 storage:${RESET}\n"
-	@echo -e "\tmake test-opencloud-feature-decomposed_s3-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "${GREEN}Run an OpenCloud feature test with decomposeds3 storage:${RESET}\n"
+	@echo -e "\tmake test-opencloud-feature-decomposeds3-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
@@ -107,8 +107,8 @@ help:
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
 	@echo
-	@echo -e "${GREEN}Run a core test against OpenCloud with decomposed_s3 storage:${RESET}\n"
-	@echo -e "\tmake test-core-feature-decomposed_s3-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "${GREEN}Run a core test against OpenCloud with decomposeds3 storage:${RESET}\n"
+	@echo -e "\tmake test-core-feature-decomposeds3-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
@@ -133,10 +133,10 @@ test-opencloud-feature-decomposed-storage: ## test a OpenCloud feature with deco
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-opencloud-feature-decomposed_s3-storage
-test-opencloud-feature-decomposed_s3-storage: ## test a OpenCloud feature with decomposed_s3 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
+.PHONY: test-opencloud-feature-decomposeds3-storage
+test-opencloud-feature-decomposeds3-storage: ## test a OpenCloud feature with decomposeds3 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
 	@TEST_SOURCE=opencloud \
-	STORAGE_DRIVER=decomposed_s3 \
+	STORAGE_DRIVER=decomposeds3 \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
@@ -148,10 +148,10 @@ test-core-feature-decomposed-storage: ## test a core feature with decomposed sto
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-core-feature-decomposed_s3-storage
-test-core-feature-decomposed_s3-storage: ## test a core feature with decomposed_s3 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+.PHONY: test-core-feature-decomposeds3-storage
+test-core-feature-decomposeds3-storage: ## test a core feature with decomposeds3 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=core \
-	STORAGE_DRIVER=decomposed_s3 \
+	STORAGE_DRIVER=decomposeds3 \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
@@ -165,12 +165,12 @@ $(localSuiteOpencloud): ## run local api test suite with decomposed storage
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	$(MAKE) --no-print-directory testSuite
 
-localSuiteDecomposedS3 = $(addprefix localApiTests-, $(addsuffix -decomposed_s3,${LOCAL_API_SUITES}))
+localSuiteDecomposedS3 = $(addprefix localApiTests-, $(addsuffix -decomposeds3,${LOCAL_API_SUITES}))
 .PHONY: $(localSuiteDecomposedS3)
 $(localSuiteDecomposedS3): ## run local api test suite with s3 storage
 	@$(eval BEHAT_SUITE=$(shell echo "$@" | cut -d'-' -f2))
 	@TEST_SOURCE=opencloud \
-	STORAGE_DRIVER=decomposed_s3 \
+	STORAGE_DRIVER=decomposeds3 \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	$(MAKE) --no-print-directory testSuite
 
@@ -183,12 +183,12 @@ $(targetsOC):
 	RUN_PART=$(RUN_PART) \
 	$(MAKE) --no-print-directory testSuite
 
-targetsDecomposedS3 = $(addprefix Core-API-Tests-decomposed_s3-storage-,$(PARTS))
+targetsDecomposedS3 = $(addprefix Core-API-Tests-decomposeds3-storage-,$(PARTS))
 .PHONY: $(targetsDecomposedS3)
 $(targets):
 	@$(eval RUN_PART=$(shell echo "$@" | tr -dc '0-9'))
 	@TEST_SOURCE=core \
-	STORAGE_DRIVER=decomposed_s3 \
+	STORAGE_DRIVER=decomposeds3 \
 	RUN_PART=$(RUN_PART) \
 	$(MAKE) --no-print-directory testSuite
 

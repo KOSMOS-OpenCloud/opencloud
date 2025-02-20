@@ -10,13 +10,13 @@ services:
     command:
       [
         "-c",
-        "mkdir -p /data/${S3NG_BUCKET:-opencloud-bucket} && minio server --console-address ':9001' /data",
+        "mkdir -p /data/${DECOMPOSEDS3_BUCKET:-opencloud-bucket} && minio server --console-address ':9001' /data",
       ]
     volumes:
       - minio-data:/data
     environment:
-      MINIO_ACCESS_KEY: ${S3NG_ACCESS_KEY:-opencloud}
-      MINIO_SECRET_KEY: ${S3NG_SECRET_KEY:-opencloud-secret-key}
+      MINIO_ACCESS_KEY: ${DECOMPOSEDS3_ACCESS_KEY:-opencloud}
+      MINIO_SECRET_KEY: ${DECOMPOSEDS3_SECRET_KEY:-opencloud-secret-key}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.entrypoints=https"

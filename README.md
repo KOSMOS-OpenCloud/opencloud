@@ -17,7 +17,15 @@ The OpenCloud server is released under [Apache 2.0](LICENSE). The project is ver
 
 ### Build OpenCloud
 
-To build the backend, follow the following instructions:
+To build the backend, follow these instructions:
+
+Generate the assets needed by e.g. the web UI and the builtin IDP
+
+``` console
+make generate
+```
+
+Then compile the `opencloud` binary
 
 ``` console
 make -C opencloud build

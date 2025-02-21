@@ -15,8 +15,8 @@ services:
     volumes:
       - minio-data:/data
     environment:
-      MINIO_ACCESS_KEY: ${DECOMPOSEDS3_ACCESS_KEY:-opencloud}
-      MINIO_SECRET_KEY: ${DECOMPOSEDS3_SECRET_KEY:-opencloud-secret-key}
+      MINIO_ROOT_USER: ${DECOMPOSEDS3_ACCESS_KEY:-opencloud}
+      MINIO_ROOT_PASSWORD: ${DECOMPOSEDS3_SECRET_KEY:-opencloud-secret-key}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.entrypoints=https"

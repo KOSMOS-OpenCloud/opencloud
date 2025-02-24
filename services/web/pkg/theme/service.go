@@ -144,9 +144,8 @@ func (s Service) LogoUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), KV{
-		"common.logo":                      filepathx.JailJoin("themes", fp),
-		"clients.web.defaults.logo.topbar": filepathx.JailJoin("themes", fp),
-		"clients.web.defaults.logo.login":  filepathx.JailJoin("themes", fp),
+		"common.logo":               filepathx.JailJoin("themes", fp),
+		"clients.web.defaults.logo": filepathx.JailJoin("themes", fp),
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -184,9 +183,8 @@ func (s Service) LogoReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = UpdateKV(s.themeFS, filepathx.JailJoin(_brandingRoot, _themeFileName), KV{
-		"common.logo":                      nil,
-		"clients.web.defaults.logo.topbar": nil,
-		"clients.web.defaults.logo.login":  nil,
+		"common.logo":               nil,
+		"clients.web.defaults.logo": nil,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

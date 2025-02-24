@@ -25,7 +25,7 @@ ERROR=0
 
 SEMVER_REGEX="([0-9]|[1-9][0-9]*)(\.([0-9]|[1-9][0-9]*)){1,2}(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"
 
-QUERY_INTRO=$(git grep -n "env:" -- '*.go' |grep -v -P "introductionVersion:\"($SEMVER_REGEX|(pre5\.0)|(%%NEXT%%))\""|grep -v "_test.go"|grep -v "vendor/")
+QUERY_INTRO=$(git grep -n "env:" -- '*.go' |grep -v -P "introductionVersion:\"($SEMVER_REGEX|(%%NEXT%%))\""|grep -v "_test.go"|grep -v "vendor/")
 RESULTS_INTRO=$(echo "${QUERY_INTRO}"|wc -l)
 if [ "${QUERY_INTRO}" != "" ] && [ "${RESULTS_INTRO}" -gt 0 ]; then
   echo "==============================================================================================="

@@ -38,6 +38,10 @@ dev-docker:
 ########### multiarch-docker ###########
 .PHONY: dev-docker-multiarch
 dev-docker-multiarch:
+	@echo "+-------------------------------------------------------------------------+"
+	@echo "| Are you sure you have run make ci-node-generate in the repository root? |"
+	@echo "+-------------------------------------------------------------------------+"
+	sleep 10
 	docker buildx rm opencloudbuilder || true
 	docker buildx create --platform linux/arm64,linux/amd64 --name opencloudbuilder
 	docker buildx use opencloudbuilder

@@ -1,19 +1,9 @@
-FROM owncloudci/nodejs:18 AS generate
-ARG TARGETARCH
-
-COPY ./ /opencloud/
-
-WORKDIR /opencloud/opencloud
-ARG TARGETARCH
-
-RUN make ci-node-generate
-
 FROM golang:alpine3.20 AS build
 ARG TARGETARCH
 
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
-COPY --from=generate /opencloud /opencloud
+COPY ./ /opencloud/
 
 WORKDIR /opencloud/opencloud
 RUN GOOS=linux GOARCH="${TARGETARCH}" make ci-go-generate build ENABLE_VIPS=true

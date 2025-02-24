@@ -289,7 +289,7 @@ clean-files:
 clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-files ## clean all
 
 .PHONY: start-server
-start-server: ## build and start server
+start-server: $(OC_WRAPPER) ## build and start server
 	@echo "Build and start server..."
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \

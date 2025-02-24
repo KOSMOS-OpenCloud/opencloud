@@ -3,6 +3,7 @@
 # Set required environment variables
 export LOCAL_TEST=true
 export START_EMAIL=true
+export WITH_WRAPPER=true
 
 # LOCAL TEST WITHOUT EXTRA ENVS
 TEST_SERVER_URL="https://opencloud-server:9200"

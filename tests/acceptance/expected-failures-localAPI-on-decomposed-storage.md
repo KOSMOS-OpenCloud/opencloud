@@ -195,11 +195,11 @@
 #### [Skip tests for different languages](https://github.com/opencloud-eu/opencloud/issues/183)
 - [apiAntivirus/antivirus.feature:309](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L309)
 - [apiAntivirus/antivirus.feature:310](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L310)
-- [apiAntivirus/antivirus.feature:311](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L310)
+- [apiAntivirus/antivirus.feature:311](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L311)
 - [apiNotification/deprovisioningNotification.feature:127](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/deprovisioningNotification.feature#L127)
 - [apiNotification/notification.feature:284](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/notification.feature#L284)
 - [apiNotification/notification.feature:285](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/notification.feature#L285)
-- [apiNotification/spaceNotification.feature:435](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/spaceNotification.feature#435)
+- [apiNotification/spaceNotification.feature:435](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiNotification/spaceNotification.feature#L435)
 
 
 #### [Missing properties in REPORT response](https://github.com/owncloud/ocis/issues/9780), [d:getetag property has empty value in REPORT response](https://github.com/owncloud/ocis/issues/9783)

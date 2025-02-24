@@ -65,7 +65,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/open-policy-agent/opa v1.1.0
-	github.com/opencloud-eu/reva/v2 v2.27.3-0.20250220094822-4ffb9dbabef5
+	github.com/opencloud-eu/reva/v2 v2.27.3-0.20250220153133-2081521720f4
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240829135935-80dc00d6f5ea
 	github.com/pkg/errors v0.9.1
@@ -155,7 +155,7 @@ require (
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/ceph/go-ceph v0.30.0 // indirect
+	github.com/ceph/go-ceph v0.32.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
@@ -309,9 +309,9 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/yashtewari/glob-intersection v0.2.0 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.16 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.16 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.16 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.18 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.18 // indirect
+	go.etcd.io/etcd/client/v3 v3.5.18 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0 // indirect

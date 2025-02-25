@@ -6,7 +6,7 @@ services:
         aliases:
           - ${OC_DOMAIN:-cloud.opencloud.test}
   opencloud:
-    image: ${OC_DOCKER_IMAGE:-opencloud-eu/opencloud}:${OC_DOCKER_TAG:-latest}
+    image: ${OC_DOCKER_IMAGE:-opencloudeu/opencloud}:${OC_DOCKER_TAG:-latest}
     # changelog: https://github.com/opencloud-eu/opencloud/tree/main/changelog
     # release notes: https://docs.opencloud.eu/opencloud_release_notes.html
     networks:

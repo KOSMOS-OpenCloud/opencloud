@@ -28,7 +28,7 @@
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: devops@opencloud.eu
           OC_DOCKER_TAG: main
-          OC_DOCKER_IMAGE: opencloud-eu/opencloud-rolling:main
+          OC_DOCKER_IMAGE: opencloudeu/opencloud-rolling:latest
           OC_DOMAIN: cloud.main.opencloud.rocks
           COMPANION_DOMAIN: companion.main.opencloud.rocks
           COMPANION_IMAGE: transloadit/companion:5.5.0

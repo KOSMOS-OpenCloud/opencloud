@@ -33,7 +33,7 @@ docs-generate: config-docs-generate
 .PHONY: dev-docker
 dev-docker:
 	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
-	docker build -f docker/Dockerfile.linux.$(GOARCH) -t opencloud-eu/opencloud:dev .
+	docker build -f docker/Dockerfile.linux.$(GOARCH) -t opencloudeu/opencloud:dev .
 
 ########### multiarch-docker ###########
 .PHONY: dev-docker-multiarch

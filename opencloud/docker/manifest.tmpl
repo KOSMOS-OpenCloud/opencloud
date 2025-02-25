@@ -1,4 +1,4 @@
-image: opencloud-eu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}{{else}}master{{/if}}
+image: opencloudeu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}{{else}}master{{/if}}
 {{#if build.tags}}
 tags:
 {{#each build.tags}}
@@ -6,11 +6,11 @@ tags:
 {{/each}}
 {{/if}}
 manifests:
-  - image: opencloud-eu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
+  - image: opencloudeu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
     platform:
       architecture: amd64
       os: linux
-  - image: opencloud-eu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm64
+  - image: opencloudeu/opencloud-rolling:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm64
     platform:
       architecture: arm64
       variant: v8

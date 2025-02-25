@@ -35,6 +35,19 @@ dev-docker:
 	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
 	docker build -f docker/Dockerfile.linux.$(GOARCH) -t opencloud-eu/opencloud:dev .
 
+########### multiarch-docker ###########
+.PHONY: dev-docker-multiarch
+dev-docker-multiarch:
+	@echo "+-------------------------------------------------------------------------+"
+	@echo "| Are you sure you have run make ci-node-generate in the repository root? |"
+	@echo "+-------------------------------------------------------------------------+"
+	sleep 10
+	docker buildx rm opencloudbuilder || true
+	docker buildx create --platform linux/arm64,linux/amd64 --name opencloudbuilder
+	docker buildx use opencloudbuilder
+	cd .. && docker buildx build --platform linux/arm64,linux/amd64 --output type=docker --file opencloud/docker/Dockerfile.linux.multiarch --tag opencloud-eu/opencloud:dev-multiarch .
+	docker buildx rm opencloudbuilder
+
 ############ debug-docker ############
 .PHONY: debug-docker
 debug-docker:

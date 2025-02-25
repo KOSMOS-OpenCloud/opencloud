@@ -1,4 +1,4 @@
-![OpenCloud logo](opencloud_logo.png)
+![OpenCloud logo](https://raw.githubusercontent.com/opencloud-eu/opencloud/refs/heads/main/opencloud_logo.png)
 
 -[![Matrix](https://img.shields.io/matrix/opencloud%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#opencloud:matrix.org)
 -[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -13,7 +13,7 @@ This the main repository of the OpenCloud server. It contains the golang codebas
 
 ## Getting Involved
 
-The OpenCloud server is released under [Apache 2.0](LICENSE). The project is very happy to receive contributions in all forms. Start hacking now 😃
+The OpenCloud server is released under [Apache 2.0](https://github.com/opencloud-eu/opencloud/blob/main/LICENSE). The project is very happy to receive contributions in all forms. Start hacking now 😃
 
 ### Build OpenCloud
 

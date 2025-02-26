@@ -48,6 +48,13 @@ else
 	SEARCH_EXTRACTOR_TYPE := basic
 endif
 
+# default to decomposedfs
+STORAGE_DRIVER ?= decomposed
+ifeq ($(STORAGE_DRIVER),posix)
+	# posix requires a additional driver config
+	COMPOSE_FILE := $(COMPOSE_FILE):src/posix.yml
+endif
+
 # static
 DIVIDE_INTO_NUM_PARTS := 10
 PARTS = 1 2 3 4 5 6 7 8 9 10
@@ -296,7 +303,7 @@ start-server: $(OC_WRAPPER) ## build and start server
 	OC_IMAGE_TAG=dev \
 	WITH_WRAPPER=$(WITH_WRAPPER) \
 	TEST_SOURCE=opencloud \
-	STORAGE_DRIVER=decomposed \
+	STORAGE_DRIVER=$(STORAGE_DRIVER) \
 	OC_ASYNC_UPLOADS=true \
 	SEARCH_EXTRACTOR_TYPE=tika \
 	OC_ADD_RUN_SERVICES=notifications \

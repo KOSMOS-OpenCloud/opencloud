@@ -33,9 +33,9 @@
 - [apiGraphUserGroup/getUser.feature:628](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L628)
 - [apiGraphUserGroup/getUser.feature:629](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L629)
 - [apiGraphUserGroup/getUser.feature:630](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L630)
-- [apiGraphUserGroup/getUser.feature:644](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L644)
 - [apiGraphUserGroup/getUser.feature:645](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L645)
 - [apiGraphUserGroup/getUser.feature:646](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L646)
+- [apiGraphUserGroup/getUser.feature:647](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiGraphUserGroup/getUser.feature#L647)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 

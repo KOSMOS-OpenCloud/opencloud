@@ -2,7 +2,7 @@
 # mounting 'ocwrapper' binary doesn't work with image 'amd64/alpine:3.17' (busybox based)
 
 ARG OC_IMAGE_TAG
-FROM opencloud-eu/opencloud:${OC_IMAGE_TAG} AS opencloud
+FROM opencloudeu/opencloud:${OC_IMAGE_TAG} AS opencloud
 
 FROM ubuntu:22.04
 COPY --from=opencloud /usr/bin/opencloud /usr/bin/opencloud

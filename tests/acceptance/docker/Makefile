@@ -148,6 +148,13 @@ test-opencloud-feature-decomposeds3-storage: ## test a OpenCloud feature with de
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
+.PHONY: test-opencloud-feature-posix-storage
+test-opencloud-feature-posix-storage: ## test a OpenCloud feature with posix storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
+	@TEST_SOURCE=opencloud \
+	STORAGE_DRIVER=posix \
+	BEHAT_FEATURE=$(BEHAT_FEATURE) \
+	$(MAKE) --no-print-directory testSuite
+
 .PHONY: test-core-feature-decomposed-storage
 test-core-feature-decomposed-storage: ## test a core feature with decomposed storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=core \
@@ -161,6 +168,13 @@ test-core-feature-decomposeds3-storage: ## test a core feature with decomposeds3
 	STORAGE_DRIVER=decomposeds3 \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	START_CEPH=1 \
+	$(MAKE) --no-print-directory testSuite
+
+.PHONY: test-opencloud-feature-posix-storage
+test-core-opencloud-feature-posix-storage: ## test a core feature with posix storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
+	@TEST_SOURCE=core \
+	STORAGE_DRIVER=posix \
+	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
 localSuiteOpencloud = $(addprefix localApiTests-, $(addsuffix -decomposed,${LOCAL_API_SUITES}))
@@ -178,6 +192,15 @@ $(localSuiteDecomposedS3): ## run local api test suite with s3 storage
 	@$(eval BEHAT_SUITE=$(shell echo "$@" | cut -d'-' -f2))
 	@TEST_SOURCE=opencloud \
 	STORAGE_DRIVER=decomposeds3 \
+	BEHAT_SUITE=$(BEHAT_SUITE) \
+	$(MAKE) --no-print-directory testSuite
+
+localSuitePosix = $(addprefix localApiTests-, $(addsuffix -posix,${LOCAL_API_SUITES}))
+.PHONY: $(localSuitePosix)
+$(localSuitePosix): ## run local api test suite with posix storage
+	@$(eval BEHAT_SUITE=$(shell echo "$@" | cut -d'-' -f2))
+	@TEST_SOURCE=opencloud \
+	STORAGE_DRIVER=posix \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	$(MAKE) --no-print-directory testSuite
 

@@ -30,6 +30,9 @@ elif [ "$TEST_SOURCE" = "opencloud" ]; then
     elif [ "$STORAGE_DRIVER" = "decomposeds3" ]; then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-decomposeds3-Storage'
         export OC_REVA_DATA_ROOT=''
+    elif [ "$STORAGE_DRIVER" = "posix" ]; then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOpencloud-posix-Storage'
+        export OC_REVA_DATA_ROOT=''
     else
         echo "non existing storage selected"
         exit 1

@@ -6,10 +6,10 @@ services:
         condition: service_completed_successfully
 
   progressbars-init:
-    image: opencloud-eu/web-extensions:progress-bars-0.3.0
+    image: opencloudeu/web-extensions:progress-bars-1.0.0
     user: root
     volumes:
       - opencloud-apps:/apps
     entrypoint:
       - /bin/sh
-    command: ["-c", "cp -R /var/lib/nginx/html/progress-bars/ /apps"]
+    command: ["-c", "cp -R /usr/share/nginx/html/progress-bars/ /apps"]

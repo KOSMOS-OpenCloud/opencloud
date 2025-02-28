@@ -14,13 +14,13 @@ services:
         condition: service_completed_successfully
 
   importer-init:
-    image: opencloud-eu/web-extensions:importer-0.3.0
+    image: opencloudeu/web-extensions:importer-1.0.0
     user: root
     volumes:
       - opencloud-apps:/apps
     entrypoint:
       - /bin/sh
-    command: [ "-c", "cp -R /var/lib/nginx/html/importer/ /apps" ]
+    command: [ "-c", "cp -R /usr/share/nginx/html/importer/ /apps" ]
 
   companion:
     image: ${COMPANION_IMAGE:-transloadit/companion:5.5.0}

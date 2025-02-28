@@ -1,6 +1,6 @@
 SHELL := bash
 NAME := web
-WEB_ASSETS_VERSION = 552ff3c3f8e9543de653537087161c070698661e
+WEB_ASSETS_VERSION = v1.0.0
 
 include ../../.make/recursion.mk
 
@@ -33,10 +33,7 @@ ci-node-generate: pull-assets
 .PHONY: pull-assets
 pull-assets:
 	git clean -xfd assets
-	test ! -d assets/core/origin && git clone -b main --depth 1 https://github.com/opencloud-eu/web.git assets/core/origin || git checkout main; git pull
-	make -C assets/core/origin release
-	tar xfv assets/core/origin/release/web.tar.gz -C assets/core/
-	rm -rf assets/core/origin
+	curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses

@@ -4,6 +4,7 @@
 export LOCAL_TEST=true
 export START_EMAIL=true
 export WITH_WRAPPER=true
+export STORAGE_DRIVER=${STORAGE_DRIVER:-decomposed}
 
 # LOCAL TEST WITHOUT EXTRA ENVS
 TEST_SERVER_URL="https://opencloud-server:9200"
@@ -117,7 +118,7 @@ for SUITE in "${SUITES[@]}"; do
     LOG_FILE="$LOG_DIR/${SUITE}.log"
 
     # Run suite
-    make test-acceptance-api TEST_SERVER_URL=$TEST_SERVER_URL OC_WRAPPER_URL=$OC_WRAPPER_URL EXPECTED_FAILURES_FILE=$EXPECTED_FAILURES_FILE BEHAT_SUITE=$SUITE > "$LOG_FILE" 2>&1
+    make test-acceptance-api TEST_SERVER_URL=$TEST_SERVER_URL OC_WRAPPER_URL=$OC_WRAPPER_URL EXPECTED_FAILURES_FILE=$EXPECTED_FAILURES_FILE BEHAT_SUITE=$SUITE SEND_SCENARIO_LINE_REFERENCES=true > "$LOG_FILE" 2>&1
     
     # Check if suite was successful
     if [ $? -eq 0 ]; then
@@ -137,7 +138,7 @@ for SUITE in "${CORE_SUITES[@]}"; do
     LOG_FILE="$LOG_DIR/${SUITE}.log"
 
     # Run suite
-    make test-acceptance-api TEST_SERVER_URL=$TEST_SERVER_URL EXPECTED_FAILURES_FILE=$EXPECTED_FAILURES_FILE_FROM_CORE BEHAT_SUITE=$SUITE > "$LOG_FILE" 2>&1
+    make test-acceptance-api TEST_SERVER_URL=$TEST_SERVER_URL EXPECTED_FAILURES_FILE=$EXPECTED_FAILURES_FILE_FROM_CORE BEHAT_SUITE=$SUITE SEND_SCENARIO_LINE_REFERENCES=true > "$LOG_FILE" 2>&1
     
     # Check if suite was successful
     if [ $? -eq 0 ]; then

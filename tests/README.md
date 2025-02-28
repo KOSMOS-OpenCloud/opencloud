@@ -558,3 +558,21 @@ The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`
   "defaultFont": "/path/to/opencloud/tests/config/drone/NotoSans.ttf"
 }
 ```
+
+## Running All API Tests Locally
+
+### Build dev docker
+
+```bash
+make -C opencloud dev-docker 
+```
+
+### Choose STORAGE_DRIVER
+By default, the system uses `decomposed` storage. However, you can override this by setting the `STORAGE_DRIVER` environment variable.
+
+
+### Run a script that starts the openCloud server in the docker and runs the API tests locally (for debugging purposes) 
+
+```bash
+STORAGE_DRIVER=posix ./tests/acceptance/run_api_tests.sh 
+```

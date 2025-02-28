@@ -19,7 +19,7 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment, both can be applied to OpenCloud.
 
-As a storage backend, we support the OpenCloud native storage, also called `decomposed`. This stores files directly on disk. Along with that we also provide `decomposeds3` storage driver.
+As a storage backend, we support the OpenCloud native storage, also called `decomposed`. This stores files directly on disk. Along with that we also provide `decomposeds3`, `posix`  storage drivers.
 
 You can invoke two types of test suite runs:
 
@@ -30,7 +30,7 @@ You can invoke two types of test suite runs:
 
 #### Local OpenCloud Tests (prefix `api`)
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features). They can be run with `decomposed` storage and `decomposeds3` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local OpenCloud specific test suites [here](https://github.com/opencloud-eu/opencloud/tree/main/tests/acceptance/features). They can be run with `decomposed` storage, `decomposeds3` storage and `posix` storage
 
 For example, command:
 
@@ -40,13 +40,21 @@ make -C tests/acceptance/docker localApiTests-apiGraph-decomposed
 
 runs the same tests as the `localApiTests-apiGraph-decomposed` CI pipeline, which runs the OpenCloud test suite "apiGraph" against the OpenCloud server with `decomposed` storage.
 
-And command:
+command:
 
 ```bash
 make -C tests/acceptance/docker localApiTests-apiGraph-decomposeds3
 ```
 
 runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `decomposeds3` storage.
+
+And command:
+
+```bash
+make -C tests/acceptance/docker localApiTests-apiGraph-posix
+```
+
+runs the OpenCloud test suite `apiGraph` against the OpenCloud server with `posix` storage.
 
 Note:
 While running the tests, OpenCloud server is started with [ocwrapper](https://github.com/opencloud-eu/opencloud/blob/main/tests/ocwrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ocwrapper, provide `WITH_WRAPPER=false` when running the tests. For example:

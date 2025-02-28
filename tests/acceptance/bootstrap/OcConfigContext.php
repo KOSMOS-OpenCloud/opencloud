@@ -154,7 +154,12 @@ class OcConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
-		$path = \realpath(\dirname(__FILE__) . "/../../" . $path);
+		if (\getenv('TEST_ROOT_PATH')) {
+			$path = \getenv('TEST_ROOT_PATH') . "/" . $path;
+		} else {
+			$path = \realpath(\dirname(__FILE__) . "/../../" . $path);
+		}
+		
 		$response =  OcConfigHelper::reConfigureOc(
 			[
 				$configVariable => $path

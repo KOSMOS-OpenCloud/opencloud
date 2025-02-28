@@ -500,7 +500,7 @@ Feature: Create a link share for a resource
       """
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
 
-  @skip-local-run
+
   Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
@@ -755,7 +755,7 @@ Feature: Create a link share for a resource
       | upload           |
       | createOnly       |
 
-  @skip-local-run
+
   Scenario Outline: create a link share of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -1155,7 +1155,7 @@ Feature: Create a link share for a resource
       | edit             |
       | internal         |
 
-  @skip-local-run
+
   Scenario Outline: create a link share of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path
@@ -1610,7 +1610,7 @@ Feature: Create a link share for a resource
       | upload           |
       | createOnly       |
 
-  @skip-local-run
+
   Scenario Outline: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using spaces DAV path

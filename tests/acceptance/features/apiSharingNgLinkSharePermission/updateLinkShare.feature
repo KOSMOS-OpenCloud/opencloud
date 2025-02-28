@@ -230,7 +230,7 @@ Feature: Update a link share for a resource
     And the public should be able to download file "textfile1.txt" from the last link share with password "%public%" and the content should be "other data"
     And the public download of file "textfile1.txt" from the last link share with password "$heLlo*1234*" should fail with HTTP status code "401" using shareNg
 
-  @skip-local-run
+
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
     Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"

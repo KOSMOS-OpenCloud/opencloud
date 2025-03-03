@@ -16,6 +16,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
 	ehmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/eventhistory/v0"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
@@ -38,6 +39,44 @@ type Marshaller func(any) ([]byte, error)
 // ExportPersonalDataRequest is the body of the request
 type ExportPersonalDataRequest struct {
 	StorageLocation string `json:"storageLocation"`
+}
+
+func (g Graph) getPersonalSpace(ctx context.Context, u *user.UserId) (*provider.StorageSpace, error) {
+
+	// we cannot assume the space id is the same as the user id, so we have to look up his personal space first
+	lReq := &storageprovider.ListStorageSpacesRequest{
+		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
+			{
+				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_OWNER,
+				Term: &storageprovider.ListStorageSpacesRequest_Filter_Owner{
+					Owner: u,
+				},
+			},
+			{
+				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
+					SpaceType: "personal",
+				},
+			},
+		},
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	res, err := gatewayClient.ListStorageSpaces(ctx, lReq)
+	if err != nil {
+		return nil, err
+	}
+	if res.Status.Code != rpc.Code_CODE_OK {
+		return nil, errorcode.FromCS3Status(res.Status, fmt.Errorf("could not list storage spaces"))
+	}
+	if len(res.GetStorageSpaces()) == 0 {
+		return nil, fmt.Errorf("could not find personal space for user %s", u.GetOpaqueId())
+	}
+
+	return res.GetStorageSpaces()[0], nil
 }
 
 // ExportPersonalData exports all personal data the system holds
@@ -65,8 +104,15 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 		marsh = json.Marshal
 	}
 
+	personalSpace, err := g.getPersonalSpace(ctx, u.GetId())
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not get personal space")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not get personal space, aborting")
+		return
+	}
+
 	ref := &provider.Reference{
-		ResourceId: &provider.ResourceId{SpaceId: u.GetId().GetOpaqueId(), OpaqueId: u.GetId().GetOpaqueId()},
+		ResourceId: personalSpace.GetRoot(),
 		Path:       loc,
 	}
 

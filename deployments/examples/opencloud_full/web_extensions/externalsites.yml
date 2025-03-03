@@ -1,15 +1,18 @@
 ---
 services:
   opencloud:
+    volumes:
+      # external sites needs to have sites configured in the web.yaml
+      - ./config/opencloud/apps.yaml:/etc/opencloud/apps.yaml
     depends_on:
       externalsites-init:
         condition: service_completed_successfully
 
   externalsites-init:
-    image: opencloud-eu/web-extensions:external-sites-0.3.0
+    image: opencloudeu/web-extensions:external-sites-1.0.0
     user: root
     volumes:
       - opencloud-apps:/apps
     entrypoint:
       - /bin/sh
-    command: ["-c", "cp -R /var/lib/nginx/html/external-sites/ /apps"]
+    command: ["-c", "cp -R /usr/share/nginx/html/external-sites/ /apps"]

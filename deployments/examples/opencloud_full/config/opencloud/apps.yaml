@@ -9,10 +9,10 @@ external-sites:
   config:
     sites:
       # For settings see: https://github.com/opencloud-eu/web-extensions/tree/main/packages/web-app-external-sites
-      - name: OpenCloud
-        url: "https://opencloud.eu"
+      - name: Documentation
+        url: "https://docs.opencloud.eu"
         target: embedded
-        color: "#0D856F"
+        color: "#E2BAFF"
         icon: cloud
         priority: 50
       - name: Wikipedia

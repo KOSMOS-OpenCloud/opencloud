@@ -21,7 +21,7 @@ directives:
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.opencloud.test}/'
     # This is needed for the external-sites web extension when embedding sites
-    - 'https://opencloud.dev'
+    - 'https://docs.opencloud.eu'
   img-src:
     - '''self'''
     - 'data:'

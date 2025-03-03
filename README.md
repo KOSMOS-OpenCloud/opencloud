@@ -37,7 +37,7 @@ opencloud/bin/opencloud init && opencloud/bin/opencloud server
 ```
 This creates a server configuration (by default in `$HOME/.opencloud`) and starts the server.
 
-For more setup- and installation options consult the [Development Documentation](https://docs.opencloud.eu/opencloud/).
+For more setup- and installation options consult the [Development Documentation](https://docs.opencloud.eu/).
 
 ### Contribute
 

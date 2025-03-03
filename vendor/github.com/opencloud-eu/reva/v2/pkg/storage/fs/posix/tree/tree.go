@@ -325,6 +325,12 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	if newNode.ID == "" {
 		newNode.ID = oldNode.ID
 	}
+	// invalidate old tree
+	err = t.lookup.IDCache.DeleteByPath(ctx, filepath.Join(oldNode.ParentPath(), oldNode.Name))
+	if err != nil {
+		return err
+	}
+
 	if err := t.lookup.CacheID(ctx, newNode.SpaceID, newNode.ID, filepath.Join(newNode.ParentPath(), newNode.Name)); err != nil {
 		t.log.Error().Err(err).Str("spaceID", newNode.SpaceID).Str("id", newNode.ID).Str("path", filepath.Join(newNode.ParentPath(), newNode.Name)).Msg("could not cache id")
 	}
@@ -408,7 +414,7 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 	g.Go(func() error {
 		defer close(work)
 		for _, name := range names {
-			if isInternal(name) || isLockFile(name) || isTrash(name) {
+			if t.isInternal(name) || isLockFile(name) || isTrash(name) {
 				continue
 			}
 
@@ -649,15 +655,15 @@ func (t *Tree) createDirNode(ctx context.Context, n *node.Node) (err error) {
 var nodeIDRegep = regexp.MustCompile(`.*/nodes/([^.]*).*`)
 
 func (t *Tree) isIgnored(path string) bool {
-	return isLockFile(path) || isTrash(path) || t.isUpload(path) || isInternal(path)
+	return isLockFile(path) || isTrash(path) || t.isUpload(path) || t.isInternal(path)
 }
 
 func (t *Tree) isUpload(path string) bool {
 	return strings.HasPrefix(path, t.options.UploadDirectory)
 }
 
-func isInternal(path string) bool {
-	return strings.Contains(path, lookup.RevisionsDir)
+func (t *Tree) isInternal(path string) bool {
+	return path == t.options.Root || strings.HasPrefix(path, filepath.Join(t.options.Root, "indexes")) || strings.Contains(path, lookup.RevisionsDir)
 }
 
 func isLockFile(path string) bool {

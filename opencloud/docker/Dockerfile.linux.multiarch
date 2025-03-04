@@ -6,8 +6,10 @@ RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools
 
 COPY ./ /opencloud/
 
-WORKDIR /opencloud/opencloud
-RUN GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" make ci-go-generate release-linux-docker-${TARGETARCH} ENABLE_VIPS=true
+WORKDIR /opencloud
+RUN GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" ; \
+    make ci-go-generate ; \
+    make -C opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true
 
 FROM alpine:3.20
 ARG VERSION

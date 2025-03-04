@@ -21,7 +21,7 @@ COPY ./ /opencloud/
 WORKDIR /opencloud/opencloud
 RUN make ci-node-generate
 
-FROM golang:1.23-alpine AS build
+FROM golang:1.24-alpine AS build
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
 COPY --from=generate /opencloud /opencloud

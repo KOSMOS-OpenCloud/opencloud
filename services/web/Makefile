@@ -22,25 +22,23 @@ node-generate-prod: download-assets
 pull-assets:
 	echo "using unreleased assets from branch $(WEB_ASSETS_BRANCH), this should not be used for official releases"
 	git clean -xfd assets
-	@if [ ! -d assets/core/origin ]; then \
+	@if [ ! -d tmp/assets/core/origin ]; then \
 		echo "no web assets found, initializing"; \
-		git clone -b main --depth 1 https://github.com/opencloud-eu/web.git assets/core/origin; \
+		git clone -b main --depth 1 https://github.com/opencloud-eu/web.git tmp/assets/core/origin; \
 	else \
 		echo "web assets found, updating"; \
-		cd assets/core/origin; \
-		if [[ `git status --porcelain` ]]; then echo "There are uncommitted changes in assets/core/origin"; exit 1; fi; \
+		cd tmp/assets/core/origin; \
+		if [[ `git status --porcelain` ]]; then echo "There are uncommitted changes in tmp/assets/core/origin"; exit 1; fi; \
 		git checkout $(WEB_ASSETS_BRANCH); \
         git pull; \
 	fi;
-	make -C assets/core/origin release
-	cd assets/core/origin && git checkout pnpm-lock.yaml # the lock could be updated during the release process, we need to reset the state for later runs
-	tar xfv assets/core/origin/release/web.tar.gz -C assets/core/
+	make -C tmp/assets/core/origin release
+	tar xfv tmp/assets/core/origin/release/web.tar.gz -C assets/core/
 	mkdir -p ../../third-party-licenses/node/web
-	tar xfv assets/core/origin/release/third-party-licenses.tar.gz -C ../../third-party-licenses/node/web/
+	tar xfv tmp/assets/core/origin/release/third-party-licenses.tar.gz -C ../../third-party-licenses/node/web/
 
 .PHONY: download-assets
 download-assets:
-	@if [ -d assets/core/origin ]; then rm -rf assets/core/origin; fi;
 	git clean -xfd assets
 	curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
 

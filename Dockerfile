@@ -19,7 +19,7 @@ FROM owncloudci/nodejs:18 AS generate
 COPY ./ /opencloud/
 
 WORKDIR /opencloud/opencloud
-RUN make ci-node-generate
+RUN make node-generate-prod
 
 FROM golang:1.24-alpine AS build
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
@@ -27,7 +27,7 @@ RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools
 COPY --from=generate /opencloud /opencloud
 
 WORKDIR /opencloud/opencloud
-RUN make ci-go-generate build ENABLE_VIPS=true
+RUN make go-generate-prod build ENABLE_VIPS=true
 
 FROM alpine:3.20
 

@@ -1,40 +1,22 @@
 SHELL := bash
 NAME := idp
 
-include ../../.make/recursion.mk
-
-############ tooling ############
-ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
-endif
-
-############ go tooling ############
+include ../../.make/default.mk
+include ../../.make/deprecate.mk
+include ../../.make/recursion.mk
 include ../../.make/go.mk
-
-############ release ############
 include ../../.make/release.mk
-
-############ docs generate ############
 include ../../.make/docs.mk
 
-.PHONY: docs-generate
-docs-generate: config-docs-generate
-
-############ generate ############
-include ../../.make/generate.mk
-
-.PHONY: ci-go-generate
-ci-go-generate: # CI runs ci-node-generate automatically before this target
-
-.PHONY: ci-node-generate
-ci-node-generate: assets
+.PHONY: node-generate-prod
+node-generate-prod: assets
 
 .PHONY: assets
 assets: pnpm-build \
 		assets/identifier/static \
 		assets/identifier/static/favicon.ico \
 		assets/identifier/static/icon-lilac.svg
-
 
 assets/identifier/static:
 	mkdir -p assets/identifier/static
@@ -57,7 +39,6 @@ pnpm-build: node_modules
 node_modules:
 	pnpm install
 
-############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses: node_modules
 	pnpm licenses:check

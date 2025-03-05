@@ -53,17 +53,18 @@ sync:
 
 .PHONY: clean
 clean:
-	@echo "$(NAME): clean"
-	go clean -i ./...
-	rm -rf $(BIN) $(DIST)
+	@echo "- $(NAME): clean"
+	@go clean -i ./...
+	@rm -rf $(BIN) $(DIST)
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
-	@echo "$(NAME): go-mod-tidy"
+	@echo "- $(NAME): go-mod-tidy"
 	@go mod tidy
 
 .PHONY: fmt
 fmt:
+	@echo "- $(NAME): fmt"
 	gofmt -s -w $(SOURCES)
 
 .PHONY: golangci-lint-fix

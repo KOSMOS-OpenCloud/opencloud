@@ -3,33 +3,20 @@ NAME := web
 WEB_ASSETS_VERSION = v1.0.0
 WEB_ASSETS_BRANCH = main
 
-include ../../.make/recursion.mk
-
-############ tooling ############
-ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
-endif
-
-############ go tooling ############
+include ../../.make/default.mk
+include ../../.make/deprecate.mk
+include ../../.make/recursion.mk
 include ../../.make/go.mk
-
-############ release #########
 include ../../.make/release.mk
-
-############ docs generate ############
 include ../../.make/docs.mk
 
-.PHONY: docs-generate
-docs-generate: config-docs-generate
+.PHONY: node-generate-dev
+node-generate-dev: pull-assets
 
-############ generate ############
-include ../../.make/generate.mk
+.PHONY: node-generate-prod
+node-generate-prod: download-assets
 
-.PHONY: ci-go-generate
-ci-go-generate: # CI runs ci-node-generate automatically before this target
-
-.PHONY: ci-node-generate
-ci-node-generate: download-assets
 
 .PHONY: pull-assets
 pull-assets:
@@ -56,10 +43,6 @@ download-assets:
 	@if [ -d assets/core/origin ]; then rm -rf assets/core/origin; fi;
 	git clean -xfd assets
 	curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
-
-############ licenses ############
-.PHONY: ci-node-check-licenses
-ci-node-check-licenses: # OpenCloud Web does the check on it's own
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:

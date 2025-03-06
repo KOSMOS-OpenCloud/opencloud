@@ -142,15 +142,41 @@ composer.lock: composer.json
 	@rm composer.lock || true
 
 .PHONY: generate
-generate:
+generate: generate-prod # production is always the default
+
+.PHONY: generate-prod
+generate-prod:
 	@for mod in $(OC_MODULES); do \
-        $(MAKE) -C $$mod generate || exit 1; \
+		printf '\n%s:\n---------------------------\n' $$mod; \
+        $(MAKE) -C $$mod generate-prod || exit 1; \
     done
 
-.PHONY: vet
-vet:
+.PHONY: generate-dev
+generate-dev:
 	@for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod vet  || exit 1; \
+		printf '\n%s:\n---------------------------\n' $$mod; \
+        $(MAKE) -C $$mod generate-dev || exit 1; \
+    done
+
+.PHONY: go-generate
+go-generate:
+	@for mod in $(OC_MODULES); do \
+		printf '\n%s:\n---------------------------\n' $$mod; \
+        $(MAKE) -C $$mod go-generate || exit 1; \
+    done
+
+.PHONY: node-generate-prod
+node-generate-prod:
+	@for mod in $(OC_MODULES); do \
+		printf '\n%s:\n---------------------------\n' $$mod; \
+        $(MAKE) -C $$mod node-generate-prod || exit 1; \
+    done
+
+.PHONY: node-generate-dev
+node-generate-dev:
+	@for mod in $(OC_MODULES); do \
+		printf '\n%s:\n---------------------------\n' $$mod; \
+        $(MAKE) -C $$mod node-generate-dev || exit 1; \
     done
 
 .PHONY: clean
@@ -159,34 +185,9 @@ clean:
         $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
 
-.PHONY: docs-generate
-docs-generate:
-	# empty the folders first to only have files that are generated without remnants
-	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" ! -name "_*" \) -delete || exit 1
-
-	@for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
-    done
-
-	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
-	cp docs/services/general-info/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
-
 .PHONY: check-env-var-annotations
 check-env-var-annotations:
 	.make/check-env-var-annotations.sh
-
-.PHONY: ci-go-generate
-ci-go-generate:
-	@for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod ci-go-generate || exit 1; \
-    done
-
-.PHONY: ci-node-generate
-ci-node-generate:
-	@if [ $(MAKE_DEPTH) -le 1 ]; then \
-	for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod ci-node-generate || exit 1; \
-    done; fi;
 
 .PHONY: go-mod-tidy
 go-mod-tidy:

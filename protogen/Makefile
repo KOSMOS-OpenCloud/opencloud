@@ -1,16 +1,11 @@
-include ../.make/recursion.mk
+SHELL := bash
+NAME := protogen
 
-############ tooling ############
-ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
-endif
-
-############ generate ############
+include ../.make/default.mk
+include ../.make/recursion.mk
 include ../.make/generate.mk
 
-.PHONY: ci-node-generate
-ci-node-generate:
-
-.PHONY: ci-go-generate
-ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
+.PHONY: go-generate
+go-generate: $(MOCKERY)
 	$(MOCKERY)

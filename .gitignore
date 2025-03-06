@@ -56,6 +56,7 @@ protogen/buf.sha1.lock
 
 # misc
 /tmp
+/services/*/tmp
 go.work
 go.work.sum
 .env

@@ -1,7 +1,5 @@
 SHELL := bash
 
-include .make/deprecate.mk
-
 # define standard colors
 BLACK        := $(shell tput -Txterm setaf 0)
 RED          := $(shell tput -Txterm setaf 1)
@@ -160,18 +158,11 @@ generate-dev:
         $(MAKE) -C $$mod generate-dev || exit 1; \
     done
 
-.PHONY: go-generate-prod
-go-generate-prod:
+.PHONY: go-generate
+go-generate:
 	@for mod in $(OC_MODULES); do \
 		printf '\n%s:\n---------------------------\n' $$mod; \
-        $(MAKE) -C $$mod go-generate-prod || exit 1; \
-    done
-
-.PHONY: go-generate-dev
-go-generate-dev:
-	@for mod in $(OC_MODULES); do \
-		printf '\n%s:\n---------------------------\n' $$mod; \
-        $(MAKE) -C $$mod go-generate-dev || exit 1; \
+        $(MAKE) -C $$mod go-generate || exit 1; \
     done
 
 .PHONY: node-generate-prod

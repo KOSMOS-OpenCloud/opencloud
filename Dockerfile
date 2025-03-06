@@ -27,7 +27,7 @@ RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools
 COPY --from=generate /opencloud /opencloud
 
 WORKDIR /opencloud/opencloud
-RUN make go-generate-prod build ENABLE_VIPS=true
+RUN make go-generate build ENABLE_VIPS=true
 
 FROM alpine:3.20
 

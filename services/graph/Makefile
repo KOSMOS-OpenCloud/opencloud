@@ -5,14 +5,13 @@ TEMPLATE_FILE = ./pkg/l10n/graph.pot
 
 include ../../.bingo/Variables.mk
 include ../../.make/default.mk
-include ../../.make/deprecate.mk
 include ../../.make/recursion.mk
 include ../../.make/go.mk
 include ../../.make/release.mk
 include ../../.make/docs.mk
 
-.PHONY: go-generate-prod
-go-generate-prod: $(MOCKERY)
+.PHONY: go-generate
+go-generate: $(MOCKERY)
 	$(MOCKERY)
 
 .PHONY: l10n-pull

@@ -8,7 +8,7 @@ COPY ./ /opencloud/
 
 WORKDIR /opencloud
 RUN GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" ; \
-    make go-generate-prod ; \
+    make go-generate ; \
     make -C opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true
 
 FROM alpine:3.20

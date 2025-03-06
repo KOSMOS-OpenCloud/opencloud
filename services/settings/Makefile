@@ -5,7 +5,6 @@ TEMPLATE_FILE = ./pkg/service/v0/l10n/settings.pot
 
 include ../../.bingo/Variables.mk
 include ../../.make/default.mk
-include ../../.make/deprecate.mk
 include ../../.make/recursion.mk
 include ../../.make/go.mk
 include ../../.make/release.mk
@@ -15,8 +14,8 @@ include ../../.make/protobuf.mk
 .PHONY: docs-generate
 docs-generate: grpc-docs-generate
 
-.PHONY: go-generate-prod
-go-generate-prod: $(MOCKERY) protobuf
+.PHONY: go-generate
+go-generate: $(MOCKERY) protobuf
 	$(MOCKERY)
 
 .PHONY: protobuf

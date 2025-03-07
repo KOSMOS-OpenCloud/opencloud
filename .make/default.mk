@@ -5,7 +5,7 @@ node-generate-dev-default: node-generate-prod
 node-generate-prod-default: noop
 
 .PHONY: go-generate-default
-go-generate-default: go-generate
+go-generate-default: noop
 
 .PHONY: generate
 generate: generate-prod # production is always the default

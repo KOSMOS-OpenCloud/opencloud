@@ -35,3 +35,9 @@ dev-docker-multiarch:
 debug-docker:
 	$(MAKE) --no-print-directory debug-linux-docker-$(GOARCH)
 	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t opencloud-eu/opencloud:debug .
+
+.PHONY: node-generate-prod
+node-generate-prod: # opencloud needs assets of all other modules
+	@if [ $(MAKE_DEPTH) -le 1 ]; then \
+	$(MAKE) --no-print-directory -C .. node-generate-prod \
+	; fi;

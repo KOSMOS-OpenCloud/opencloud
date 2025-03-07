@@ -13,4 +13,4 @@ steps:
       git_config_email: ${CI_COMMIT_AUTHOR_EMAIL}
       git_config_name: ${CI_COMMIT_AUTHOR}
       ssh_key:
-        from_secret: ssh_key_docs_pages
+        from_secret: ssh_key

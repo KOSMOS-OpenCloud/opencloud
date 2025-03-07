@@ -238,7 +238,7 @@ test-gherkin-lint-fix:
 
 .PHONY: bingo-update
 bingo-update: $(BINGO)
-	$(BINGO) get -l -v -t 10
+	$(BINGO) get -l -v -t 20
 
 .PHONY: check-licenses
 check-licenses: ci-go-check-licenses ci-node-check-licenses
@@ -319,7 +319,7 @@ l10n-write:
 
 .PHONY: ci-format
 ci-format: $(BUILDIFIER)
-	$(BUILDIFIER) --mode=fix .drone.star
+	$(BUILDIFIER) --mode=fix .woodpecker.star
 
 .PHONY: test-php-style
 test-php-style: vendor-bin/opencloud-codestyle/vendor vendor-bin/php_codesniffer/vendor

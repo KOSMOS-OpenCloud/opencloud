@@ -159,14 +159,14 @@ func parseAgentConfig(ae string) (string, string, error) {
 
 	p := strings.Split(ae, ":")
 	if len(p) != 2 {
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae)
 	}
 
 	switch {
 	case p[0] == "" && p[1] == "": // case ae = ":"
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae)
 	case p[0] == "":
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae)
 	}
 	return p[0], p[1], nil
 }

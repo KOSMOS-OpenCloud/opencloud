@@ -37,7 +37,6 @@ class ShareesContext implements Context {
 	private FeatureContext $featureContext;
 	private OCSContext $ocsContext;
 
-
 	/**
 	 * @When /^user "([^"]*)" gets the sharees using the sharing API with parameters$/
 	 *

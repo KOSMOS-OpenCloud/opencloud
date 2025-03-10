@@ -1654,7 +1654,6 @@ trait Sharing {
 		$this->setResponse($this->getAllShares($user, "?path=$path"));
 	}
 
-
 	/**
 	 * @Then /^the last share_id should be included in the response/
 	 *

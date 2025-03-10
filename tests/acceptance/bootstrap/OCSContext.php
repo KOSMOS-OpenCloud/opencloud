@@ -192,7 +192,7 @@ class OCSContext implements Context {
 			)
 		);
 	}
-	
+
 	/**
 	 * @Then /^the OCS status code should be "([^"]*)"$/
 	 *

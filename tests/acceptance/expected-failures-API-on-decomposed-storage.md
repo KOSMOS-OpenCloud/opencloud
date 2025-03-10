@@ -119,13 +119,6 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavUploadTUS/uploadToShare.feature:375](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L375)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:376](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L376)
 
-#### [Renaming resource to banned name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3099)
-
-- [coreApiWebdavMove2/moveFile.feature:143](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L143)
-- [coreApiWebdavMove1/moveFolder.feature:36](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L36)
-- [coreApiWebdavMove1/moveFolder.feature:50](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L50)
-- [coreApiWebdavMove1/moveFolder.feature:64](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L64)
-
 #### [Trying to delete other user's trashbin item returns 409 for spaces path instead of 404](https://github.com/owncloud/ocis/issues/9791)
 
 - [coreApiTrashbin/trashbinDelete.feature:92](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L92)

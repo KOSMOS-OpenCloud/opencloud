@@ -6,6 +6,7 @@ Feature: get applications
   Background:
     Given user "Alice" has been created with default attributes
 
+
   Scenario Outline: admin user lists all the groups
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" gets all applications using the Graph API

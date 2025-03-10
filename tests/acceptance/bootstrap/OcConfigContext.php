@@ -159,7 +159,7 @@ class OcConfigContext implements Context {
 		} else {
 			$path = \realpath(\dirname(__FILE__) . "/../../" . $path);
 		}
-		
+
 		$response =  OcConfigHelper::reConfigureOc(
 			[
 				$configVariable => $path

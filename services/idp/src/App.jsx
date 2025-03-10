@@ -61,6 +61,7 @@ const App = ({ bgImg }): ReactElement => {
                     <img
                         src={`${process.env.PUBLIC_URL}/static/icon-lilac.svg`}
                         className={'oc-login-bg-icon'}
+                        alt=''
                     />
                 }
             </div>

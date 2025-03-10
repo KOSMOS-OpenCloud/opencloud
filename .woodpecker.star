@@ -427,9 +427,9 @@ def main(ctx):
         buildOcisBinaryForTesting(ctx) + \
         checkStarlark() + \
         build_release_helpers + \
-        testOcisAndUploadResults(ctx) \
-        # testPipelines(ctx)
+        testOcisAndUploadResults(ctx)
 
+    # testPipelines(ctx)
     # build_release_pipelines =  \
     #      dockerReleases(ctx) + \
     #      binaryReleases(ctx)
@@ -498,8 +498,6 @@ def testOcisAndUploadResults(ctx):
     # See https://github.com/owncloud/ocis/issues/9527 for more details. #
     # FIXME: RE-ENABLE THIS ASAP!!!                                      #
     ######################################################################
-
-
 
     #security_scan = scanOcis(ctx)
     #return [security_scan, pipeline, scan_result_upload]
@@ -1411,10 +1409,10 @@ def multiServiceE2ePipeline(ctx):
                 "commands": [
                     "cd %s/tests/e2e" % dirs["web"],
                     "bash run-e2e.sh %s" % e2e_args,
-                    ],
-            }] + logTracingResults() \
-            # uploadTracingResult(ctx) + \
+                ],
+            }] + logTracingResults()
 
+        # uploadTracingResult(ctx) + \
         pipelines.append({
             "name": "e2e-tests-multi-service",
             "steps": steps,
@@ -1533,61 +1531,61 @@ def dockerRelease(ctx, arch, repo, build_type):
         },
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") + [
-             {
-                 "name": "build",
-                 "image": OC_CI_GOLANG,
-                 "environment": CI_HTTP_PROXY_ENV,
-                 "commands": [
-                     "make -C opencloud release-linux-docker-%s ENABLE_VIPS=true" % (arch),
-                     ],
-             },
-             {
-                 "name": "dryrun",
-                 "image": PLUGINS_DOCKER,
-                 "settings": {
-                     "dry_run": True,
-                     "context": "ocis",
-                     "tags": "linux-%s" % (arch),
-                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                     "repo": repo,
-                     "build_args": build_args,
-                 },
-                 "when": {
-                     "ref": {
-                         "include": [
-                             "refs/pull/**",
-                         ],
-                     },
-                 },
-             },
-             {
-                 "name": "docker",
-                 "image": PLUGINS_DOCKER,
-                 "settings": {
-                     "username": {
-                         "from_secret": "docker_username",
-                     },
-                     "password": {
-                         "from_secret": "docker_password",
-                     },
-                     "auto_tag": True,
-                     "context": "ocis",
-                     "auto_tag_suffix": "linux-%s" % (arch),
-                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                     "repo": repo,
-                     "build_args": build_args,
-                 },
-                 "when": [
-                     {
-                         "event": ["push", "manual"],
-                         "branch": "main",
-                     },
-                     {
-                         "event": "tag",
-                     },
-                 ],
-             },
-         ],
+            {
+                "name": "build",
+                "image": OC_CI_GOLANG,
+                "environment": CI_HTTP_PROXY_ENV,
+                "commands": [
+                    "make -C opencloud release-linux-docker-%s ENABLE_VIPS=true" % (arch),
+                ],
+            },
+            {
+                "name": "dryrun",
+                "image": PLUGINS_DOCKER,
+                "settings": {
+                    "dry_run": True,
+                    "context": "ocis",
+                    "tags": "linux-%s" % (arch),
+                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "repo": repo,
+                    "build_args": build_args,
+                },
+                "when": {
+                    "ref": {
+                        "include": [
+                            "refs/pull/**",
+                        ],
+                    },
+                },
+            },
+            {
+                "name": "docker",
+                "image": PLUGINS_DOCKER,
+                "settings": {
+                    "username": {
+                        "from_secret": "docker_username",
+                    },
+                    "password": {
+                        "from_secret": "docker_password",
+                    },
+                    "auto_tag": True,
+                    "context": "ocis",
+                    "auto_tag_suffix": "linux-%s" % (arch),
+                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
+                    "repo": repo,
+                    "build_args": build_args,
+                },
+                "when": [
+                    {
+                        "event": ["push", "manual"],
+                        "branch": "main",
+                    },
+                    {
+                        "event": "tag",
+                    },
+                ],
+            },
+        ],
         "depends_on": depends_on,
         "when": [
             {
@@ -1679,82 +1677,82 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     return {
         "name": "binaries-%s-%s" % (arch, build_type),
         "steps": makeNodeGenerate("") +
-             makeGoGenerate("") + [
-                 {
-                     "name": "build",
-                     "image": OC_CI_GOLANG,
-                     "environment": CI_HTTP_PROXY_ENV,
-                     "commands": [
-                         "make -C opencloud release-%s" % (arch),
-                         ],
-                 },
-                 {
-                     "name": "finish",
-                     "image": OC_CI_GOLANG,
-                     "environment": CI_HTTP_PROXY_ENV,
-                     "commands": [
-                         "make -C opencloud release-finish",
-                         "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
-                     ],
-                     "when": [
-                         {
-                             "event": ["push", "manual"],
-                             "branch": "main",
-                         },
-                         {
-                             "event": "tag",
-                         },
-                     ],
-                 },
-                 {
-                     "name": "upload",
-                     "image": PLUGINS_S3,
-                     "settings": settings,
-                     "when": [
-                         {
-                             "event": ["push", "manual"],
-                             "branch": "main",
-                         },
-                         {
-                             "event": "tag",
-                         },
-                     ],
-                 },
-                 {
-                     "name": "changelog",
-                     "image": OC_CI_GOLANG,
-                     "environment": CI_HTTP_PROXY_ENV,
-                     "commands": [
-                         "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", ""),
-                         ],
-                     "when": [
-                         {
-                             "event": "tag",
-                         },
-                     ],
-                 },
-                 {
-                     "name": "release",
-                     "image": PLUGINS_GITHUB_RELEASE,
-                     "settings": {
-                         "api_key": {
-                             "from_secret": "github_token",
-                         },
-                         "files": [
-                             "ocis/dist/release/*",
-                         ],
-                         "title": ctx.build.ref.replace("refs/tags/v", ""),
-                         "note": "ocis/dist/CHANGELOG.md",
-                         "overwrite": True,
-                         "prerelease": len(ctx.build.ref.split("-")) > 1,
-                     },
-                     "when": [
-                         {
-                             "event": "tag",
-                         },
-                     ],
-                 },
-             ],
+                 makeGoGenerate("") + [
+            {
+                "name": "build",
+                "image": OC_CI_GOLANG,
+                "environment": CI_HTTP_PROXY_ENV,
+                "commands": [
+                    "make -C opencloud release-%s" % (arch),
+                ],
+            },
+            {
+                "name": "finish",
+                "image": OC_CI_GOLANG,
+                "environment": CI_HTTP_PROXY_ENV,
+                "commands": [
+                    "make -C opencloud release-finish",
+                    "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
+                ],
+                "when": [
+                    {
+                        "event": ["push", "manual"],
+                        "branch": "main",
+                    },
+                    {
+                        "event": "tag",
+                    },
+                ],
+            },
+            {
+                "name": "upload",
+                "image": PLUGINS_S3,
+                "settings": settings,
+                "when": [
+                    {
+                        "event": ["push", "manual"],
+                        "branch": "main",
+                    },
+                    {
+                        "event": "tag",
+                    },
+                ],
+            },
+            {
+                "name": "changelog",
+                "image": OC_CI_GOLANG,
+                "environment": CI_HTTP_PROXY_ENV,
+                "commands": [
+                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", ""),
+                ],
+                "when": [
+                    {
+                        "event": "tag",
+                    },
+                ],
+            },
+            {
+                "name": "release",
+                "image": PLUGINS_GITHUB_RELEASE,
+                "settings": {
+                    "api_key": {
+                        "from_secret": "github_token",
+                    },
+                    "files": [
+                        "ocis/dist/release/*",
+                    ],
+                    "title": ctx.build.ref.replace("refs/tags/v", ""),
+                    "note": "ocis/dist/CHANGELOG.md",
+                    "overwrite": True,
+                    "prerelease": len(ctx.build.ref.split("-")) > 1,
+                },
+                "when": [
+                    {
+                        "event": "tag",
+                    },
+                ],
+            },
+        ],
         "depends_on": depends_on,
         "when": [
             {
@@ -2289,7 +2287,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
             "backend_options": {
                 "docker": {
                     "user": user,
-                }
+                },
             },
             "commands": [
                 "%s init --insecure true" % ocis_bin,
@@ -2484,7 +2482,6 @@ def checkStarlark():
                 "commands": [
                     "buildifier --mode=check .woodpecker.star",
                 ],
-                "failure": "ignore",
             },
             {
                 "name": "show-diff",
@@ -3102,10 +3099,10 @@ def k6LoadTests(ctx):
                     "curl -s -o run_k6_tests.sh %s" % script_link,
                     "apk add --no-cache openssh-client sshpass",
                     "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
-                    ],
+                ],
                 "when": [
                     {
-                        "status": ["success","failure"],
+                        "status": ["success", "failure"],
                     },
                 ],
             },
@@ -3117,13 +3114,13 @@ def k6LoadTests(ctx):
                 ],
                 "when": [
                     {
-                        "status": ["success","failure"],
+                        "status": ["success", "failure"],
                     },
                 ],
             },
         ],
         "depends_on": [],
-        "when":[
+        "when": [
             {
                 "event": event_array,
             },

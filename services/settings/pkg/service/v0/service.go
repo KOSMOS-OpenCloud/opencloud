@@ -252,15 +252,15 @@ func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueReques
 	cleanUpResource(ctx, req.GetValue().GetResource())
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError.Error())
 	}
 	r, err := g.manager.WriteValue(req.GetValue())
 	if err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Value = valueWithIdentifier
 	return nil
@@ -290,17 +290,17 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingss
 		return merrors.Forbidden(g.id, "can't get value of another user")
 	}
 	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	v, err := g.manager.ReadValueByUniqueIdentifiers(req.GetAccountUuid(), req.GetSettingId())
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 
 	if v.GetBundleId() != "" {
 		valueWithIdentifier, err := g.getValueWithIdentifier(v)
 		if err != nil {
-			return merrors.NotFound(g.id, err.Error())
+			return merrors.NotFound(g.id, "%s", err)
 		}
 
 		res.Value = valueWithIdentifier
@@ -316,11 +316,11 @@ func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequ
 	}
 
 	if validationError := validateListValues(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	values, err := g.manager.ListValues(req.GetBundleId(), req.GetAccountUuid())
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	result := make([]*settingsmsg.ValueWithIdentifier, 0, len(values))
 	for _, value := range values {
@@ -390,7 +390,7 @@ func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingss
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -417,7 +417,7 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 
 	r, err := g.manager.WriteRoleAssignment(req.GetAccountUuid(), req.GetRoleId())
 	if err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Assignment = r
 	return nil
@@ -430,7 +430,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	}
 
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -442,7 +442,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	al, err := g.manager.ListRoleAssignments(ownAccountUUID)
 	if err != nil {
 		g.logger.Debug().Err(err).Str("id", g.id).Msg("ListRoleAssignments failed")
-		return merrors.InternalServerError(g.id, err.Error())
+		return merrors.InternalServerError(g.id, "%s", err)
 	}
 
 	for _, a := range al {
@@ -453,7 +453,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	}
 
 	if err := g.manager.RemoveRoleAssignment(req.GetId()); err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	return nil
 }
@@ -697,7 +697,7 @@ func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.
 			// translate interval names ('Instant', 'Daily', 'Weekly', 'Never')
 			value := set.GetSingleChoiceValue()
 			for i, v := range value.GetOptions() {
-				value.Options[i].DisplayValue = t.Get(v.GetDisplayValue())
+				value.Options[i].DisplayValue = t.Get("%s", v.GetDisplayValue())
 			}
 			set.Value = &settingsmsg.Setting_SingleChoiceValue{SingleChoiceValue: value}
 			fallthrough
@@ -710,9 +710,9 @@ func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.
 			defaults.SettingUUIDProfileEventSpaceDisabled,
 			defaults.SettingUUIDProfileEventSpaceDeleted:
 			// translate event names ('Share Received', 'Share Removed', ...)
-			set.DisplayName = t.Get(set.GetDisplayName())
+			set.DisplayName = t.Get("%s", set.GetDisplayName())
 			// translate event descriptions ('Notify me when I receive a share', ...)
-			set.Description = t.Get(set.GetDescription())
+			set.Description = t.Get("%s", set.GetDescription())
 			bundle.Settings[i] = set
 		}
 	}

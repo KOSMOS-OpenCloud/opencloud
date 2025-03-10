@@ -65,12 +65,12 @@ func GenTempCertForAddr(addr string) (tls.Certificate, error) {
 // persistCertificate generates a certificate using pk as private key and proceeds to store it into a file named certName.
 func persistCertificate(certName string, l log.Logger, pk interface{}) error {
 	if err := ensureExistsDir(certName); err != nil {
-		return fmt.Errorf("creating certificate destination: " + certName)
+		return fmt.Errorf("creating certificate destination: %s", certName)
 	}
 
 	certificate, err := generateCertificate(pk)
 	if err != nil {
-		return fmt.Errorf("creating certificate: " + filepath.Dir(certName))
+		return fmt.Errorf("creating certificate: %s", filepath.Dir(certName))
 	}
 
 	certOut, err := os.Create(certName)
@@ -108,7 +108,7 @@ func generateCertificate(pk interface{}) ([]byte, error) {
 // persistKey persists the private key used to generate the certificate at the configured location.
 func persistKey(destination string, l log.Logger, pk interface{}) error {
 	if err := ensureExistsDir(destination); err != nil {
-		return fmt.Errorf("creating key destination: " + destination)
+		return fmt.Errorf("creating key destination: %s", destination)
 	}
 
 	keyOut, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)

@@ -376,7 +376,7 @@ func composeMessage(nt NotificationTemplate, locale, defaultLocale, path string,
 
 func loadTemplates(nt NotificationTemplate, locale, defaultLocale, path string) (string, string) {
 	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, path, _translationFS, "l10n/locale").Locale(locale)
-	return t.Get(nt.Subject), t.Get(nt.Message)
+	return t.Get("%s", nt.Subject), t.Get("%s", nt.Message)
 }
 
 func executeTemplate(raw string, vars map[string]interface{}) (string, error) {

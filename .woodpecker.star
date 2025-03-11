@@ -715,7 +715,7 @@ def scanOcis(ctx):
 
 def buildOcisBinaryForTesting(ctx):
     return [{
-        "name": "build_ocis_binary_for_testing",
+        "name": "build_opencloud_binary_for_testing",
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +

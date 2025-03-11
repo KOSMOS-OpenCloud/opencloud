@@ -111,7 +111,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "9.2.1",
     "babel-plugin-named-asset-import": "^0.3.8",
-    "babel-preset-react-app": "^10.0.1",
+    "babel-preset-react-app": "^10.1.0",
     "case-sensitive-paths-webpack-plugin": "2.4.0",
     "cldr": "^7.5.0",
     "css-loader": "5.2.7",

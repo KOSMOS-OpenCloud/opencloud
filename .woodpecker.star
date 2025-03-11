@@ -2843,7 +2843,7 @@ def generateWebPnpmCache(ctx):
                 # zip the pnpm deps before caching
                 "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
                 "cd %s" % dirs["web"],
-                "tar -czvf %s .pnpm-store" % dirs["webPnpmZip"],
+                "tar -czf %s .pnpm-store" % dirs["webPnpmZip"],
             ],
         },
         {

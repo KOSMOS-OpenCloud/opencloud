@@ -64,6 +64,7 @@ dirs = {
     "ocmProviders": "tests/config/drone/providers.json",
     "opencloudBinPath": "opencloud/bin",
     "opencloudBin": "opencloud/bin/opencloud",
+    "opencloudBinArtifact": "opencloud-binary-amd64",
 }
 
 # OCIS URLs
@@ -718,7 +719,7 @@ def buildOcisBinaryForTesting(ctx):
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +
-                 rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]),
+                 rebuildBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]),
         "when": [
             {
                 "event": ["push", "manual"],
@@ -905,7 +906,7 @@ def localApiTestPipeline(ctx):
                     for run_with_remote_php in params["withRemotePhp"]:
                         pipeline = {
                             "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
-                            "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]) +
+                            "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
@@ -972,7 +973,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
         "name": "cs3ApiTests",
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]) +
+        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
                  [
                      {
@@ -1074,7 +1075,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
     return {
         "name": "wopiValidatorTests-%s" % wopiServerType,
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]) +
+        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  fakeOffice() +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
                  ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
@@ -1123,7 +1124,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
 
     return {
         "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]) +
+        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
                      {
@@ -1244,7 +1245,7 @@ def e2eTestPipeline(ctx):
             e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
         steps_before = \
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBin"]) + \
+            restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBin"]) + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
@@ -1393,7 +1394,7 @@ def multiServiceE2ePipeline(ctx):
             e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
         steps = \
-            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBin"]) + \
+            restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBin"]) + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
@@ -2677,7 +2678,7 @@ def litmus(ctx, storage):
 
     result = {
         "name": "litmus",
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", dirs["opencloudBinPath"]) +
+        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  ocisServer(storage) +
                  setupForLitmus() +
                  [

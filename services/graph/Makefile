@@ -3,7 +3,10 @@ NAME := graph
 OUTPUT_DIR = ./pkg/l10n
 TEMPLATE_FILE = ./pkg/l10n/graph.pot
 
+ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
+endif
+
 include ../../.make/default.mk
 include ../../.make/recursion.mk
 include ../../.make/go.mk

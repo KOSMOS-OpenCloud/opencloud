@@ -3,7 +3,10 @@ NAME := settings
 OUTPUT_DIR = ./pkg/service/v0/l10n
 TEMPLATE_FILE = ./pkg/service/v0/l10n/settings.pot
 
+ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
+endif
+
 include ../../.make/default.mk
 include ../../.make/recursion.mk
 include ../../.make/go.mk

@@ -3,7 +3,10 @@ NAME := web
 WEB_ASSETS_VERSION = v1.0.0
 WEB_ASSETS_BRANCH = main
 
+ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
+endif
+
 include ../../.make/default.mk
 include ../../.make/recursion.mk
 include ../../.make/go.mk

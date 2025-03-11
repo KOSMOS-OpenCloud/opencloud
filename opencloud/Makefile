@@ -7,7 +7,9 @@ ifdef ENABLE_VIPS
 	TAGS := ${TAGS},enable_vips
 endif
 
+ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
+endif
 include ../.make/default.mk
 include ../.make/recursion.mk
 include ../.make/go.mk

@@ -433,7 +433,6 @@ def main(ctx):
         testOpencloudAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    # testPipelines(ctx)
     # build_release_pipelines =  \
     #      dockerReleases(ctx) + \
     #      binaryReleases(ctx)

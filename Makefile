@@ -213,20 +213,16 @@ protobuf:
     done
 
 .PHONY: golangci-lint
-golangci-lint:
-	@for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod golangci-lint; \
-    done
+golangci-lint: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: ci-golangci-lint
-ci-golangci-lint: $(GOLANGCI_LINT)
+ci-golangci-lint:
 	$(GOLANGCI_LINT) run --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: golangci-lint-fix
-golangci-lint-fix:
-	@for mod in $(OC_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod golangci-lint-fix; \
-    done
+golangci-lint-fix: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run --fix --modules-download-mode vendor --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test-gherkin-lint
 test-gherkin-lint:
@@ -241,13 +237,13 @@ bingo-update: $(BINGO)
 	$(BINGO) get -l -v -t 20
 
 .PHONY: check-licenses
-check-licenses: ci-go-check-licenses ci-node-check-licenses
+check-licenses: $(GO_LICENSES) ci-go-check-licenses ci-node-check-licenses
 
 .PHONY: save-licenses
-save-licenses: ci-go-save-licenses ci-node-save-licenses
+save-licenses: $(GO_LICENSES) ci-go-save-licenses ci-node-save-licenses
 
 .PHONY: ci-go-check-licenses
-ci-go-check-licenses: $(GO_LICENSES)
+ci-go-check-licenses:
 	$(GO_LICENSES) check ./...
 
 .PHONY: ci-node-check-licenses
@@ -257,7 +253,7 @@ ci-node-check-licenses:
     done
 
 .PHONY: ci-go-save-licenses
-ci-go-save-licenses: $(GO_LICENSES)
+ci-go-save-licenses:
 	@mkdir -p ./third-party-licenses/go/opencloud/third-party-licenses
 	$(GO_LICENSES) csv ./... > ./third-party-licenses/go/opencloud/third-party-licenses.csv
 	$(GO_LICENSES) save ./... --force --save_path="./third-party-licenses/go/opencloud/third-party-licenses"

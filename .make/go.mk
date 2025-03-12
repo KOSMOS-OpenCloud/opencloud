@@ -67,18 +67,6 @@ fmt:
 	@echo "- $(NAME): fmt"
 	gofmt -s -w $(SOURCES)
 
-.PHONY: golangci-lint-fix
-golangci-lint-fix: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run $(LINTERS) --fix
-
-.PHONY: golangci-lint
-golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --path-prefix services/$(NAME)
-
-.PHONY: ci-golangci-lint
-ci-golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --path-prefix services/$(NAME) --timeout 15m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
-
 .PHONY: test
 test:
 	@go test -v -tags '$(TAGS)' -coverprofile coverage.out ./...

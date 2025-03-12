@@ -418,8 +418,14 @@ def main(ctx):
 
     build_release_helpers = \
         changelog() + \
-        docs() + \
-        licenseCheck(ctx)
+        docs()
+
+    build_release_helpers.append(
+        pipelineDependsOn(
+            licenseCheck(ctx),
+            getGoBinForTesting(ctx),
+        ),
+    )
 
     test_pipelines = \
         codestyle(ctx) + \
@@ -1741,20 +1747,9 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     }
 
 def licenseCheck(ctx):
-    # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
-    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    if ctx.build.event == "tag":
-        # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
-        folder = "stable"
-        buildref = ctx.build.ref.replace("refs/tags/v", "")
-        buildref = buildref.lower()
-        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
-            folder = "testing"
-        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
-
-    return [{
+    return {
         "name": "check-licenses",
-        "steps": [
+        "steps": restoreGoBinCache() + [
             {
                 "name": "node-check-licenses",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -1840,7 +1835,7 @@ def licenseCheck(ctx):
             },
         ],
         "workspace": workspace,
-    }]
+    }
 
 def releaseDockerManifest(ctx, repo, build_type):
     spec = "manifest.tmpl"
@@ -2503,10 +2498,8 @@ def genericCachePurge(flush_path):
             {
                 "event": "pull_request",
             },
-            # {
-            #     "status": ["success", "failure"]
-            # },
         ],
+        "runs_on": ["failure"],
     }
 
 def genericBuildArtifactCache(ctx, name, action, path):

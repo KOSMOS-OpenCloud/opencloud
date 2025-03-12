@@ -5,7 +5,6 @@ linters:
   disable:
     - contextcheck # FIXME: causes panic in graph service
     - lll # 760 issues in the codebase
-    - exhaustivestruct
     - exhaustruct
     - exhaustive # 634 issues in the codebase
     - wrapcheck # 398 issues in the codebase
@@ -16,14 +15,12 @@ linters:
     - forbidigo
     - gochecknoglobals
     - nlreturn
-    - nosnakecase  # each 100-200 issues in codebase
     - gci
     - godot
     - funlen
-    - gomnd
     - gofumpt
     - ireturn
-    - goerr113
+    - err113
     - containedctx
     - paralleltest
     - gocritic # each 50-100 issues in codebase
@@ -31,8 +28,6 @@ linters:
     - cyclop
     - noctx
     - testpackage
-    - maligned
-    - golint
     - forcetypeassert
     - nonamedreturns
     - dupl

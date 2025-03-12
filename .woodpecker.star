@@ -151,7 +151,7 @@ config = {
             "suites": [
                 "apiSpacesDavOperation",
             ],
-            "skip": True,
+            "skip": False,
         },
         "search1": {
             "suites": [
@@ -937,9 +937,9 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
+def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
+    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
 
     environment = {
         "TEST_SERVER_URL": OC_URL,
@@ -948,10 +948,10 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "SEND_SCENARIO_LINE_REFERENCES": True,
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
-        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage,
         "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-        "OCIS_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
+        "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
         "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
     }

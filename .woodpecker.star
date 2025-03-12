@@ -56,10 +56,10 @@ dirs = {
     "baseGo": "/go/src/github.com/opencloud-eu/opencloud",
     "gobinTar": "go-bin.tar.gz",
     "gobinTarPath": "/go/src/github.com/opencloud-eu/opencloud/go-bin.tar.gz",
-    "ocisConfig": "tests/config/drone/ocis-config.json",
+    "opencloudConfig": "tests/config/drone/opencloud-config.json",
     "ocis": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis/owncloud/data",
-    "ocisWrapper": "/woodpecker/src/github.com/opencloud-eu/opencloud/tests/ociswrapper",
+    "ocWrapper": "/woodpecker/src/github.com/opencloud-eu/opencloud/tests/ocwrapper",
     "bannedPasswordList": "tests/config/drone/banned-password-list.txt",
     "ocmProviders": "tests/config/drone/providers.json",
     "opencloudBinPath": "opencloud/bin",
@@ -69,8 +69,8 @@ dirs = {
 
 # OpenCloud URLs
 OC_SERVER_NAME = "opencloud-server"
-OCIS_URL = "https://%s:9200" % OC_SERVER_NAME
-OCIS_DOMAIN = "%s:9200" % OC_SERVER_NAME
+OC_URL = "https://%s:9200" % OC_SERVER_NAME
+OC_DOMAIN = "%s:9200" % OC_SERVER_NAME
 FED_OC_SERVER_NAME = "federation-opencloud-server"
 OC_FED_URL = "https://%s:10200" % FED_OC_SERVER_NAME
 OC_FED_DOMAIN = "%s:10200" % FED_OC_SERVER_NAME
@@ -430,7 +430,8 @@ def main(ctx):
         buildOpencloudBinaryForTesting(ctx) + \
         checkStarlark() + \
         build_release_helpers + \
-        testOpencloudAndUploadResults(ctx)
+        testOpencloudAndUploadResults(ctx) + \
+        testPipelines(ctx)
 
     # testPipelines(ctx)
     # build_release_pipelines =  \
@@ -885,7 +886,7 @@ def localApiTestPipeline(ctx):
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": ["ocis"],
+        "storages": ["decomposed"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -909,10 +910,10 @@ def localApiTestPipeline(ctx):
                             "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
+                                     opencloudServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (opencloudServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
@@ -937,12 +938,12 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
+def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
     environment = {
-        "TEST_SERVER_URL": OCIS_URL,
+        "TEST_SERVER_URL": OC_URL,
         "TEST_SERVER_FED_URL": OC_FED_URL,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "SEND_SCENARIO_LINE_REFERENCES": True,
@@ -2162,15 +2163,15 @@ def notify(ctx):
         ],
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = OC_SERVER_NAME
     environment = {
-        "OCIS_URL": OCIS_URL,
-        "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
+        "OC_URL": OC_URL,
+        "OC_CONFIG_DIR": "/root/.opencloud/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
-        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+        "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
         "OCIS_LOG_LEVEL": "error",
         "IDM_CREATE_DEMO_USERS": True,  # needed for litmus and cs3api-validator tests
         "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
@@ -2262,8 +2263,8 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment[item] = extra_server_environment[item]
 
     wrapper_commands = [
-        "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], dirs["opencloudBin"], environment["OCIS_URL"]),
+        "make -C %s build" % dirs["ocWrapper"],
+        "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], dirs["opencloudBin"], environment["OC_URL"]),
     ]
 
     wait_for_ocis = {

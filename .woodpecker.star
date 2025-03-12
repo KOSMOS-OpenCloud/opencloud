@@ -1657,25 +1657,6 @@ def binaryReleases(ctx):
     return pipelines
 
 def binaryRelease(ctx, arch, build_type, target, depends_on = []):
-    settings = {
-        "endpoint": {
-            "from_secret": "upload_s3_endpoint",
-        },
-        "access_key": {
-            "from_secret": "upload_s3_access_key",
-        },
-        "secret_key": {
-            "from_secret": "upload_s3_secret_key",
-        },
-        "bucket": {
-            "from_secret": "upload_s3_bucket",
-        },
-        "path_style": True,
-        "strip_prefix": "ocis/dist/release/",
-        "source": "ocis/dist/release/*",
-        "target": target,
-    }
-
     return {
         "name": "binaries-%s-%s" % (arch, build_type),
         "steps": makeNodeGenerate("") +
@@ -1696,20 +1677,6 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                     "make -C opencloud release-finish",
                     "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
                 ],
-                "when": [
-                    {
-                        "event": ["push", "manual"],
-                        "branch": "main",
-                    },
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-            {
-                "name": "upload",
-                "image": PLUGINS_S3,
-                "settings": settings,
                 "when": [
                     {
                         "event": ["push", "manual"],
@@ -1785,24 +1752,6 @@ def licenseCheck(ctx):
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
 
-    settings = {
-        "endpoint": {
-            "from_secret": "upload_s3_endpoint",
-        },
-        "access_key": {
-            "from_secret": "upload_s3_access_key",
-        },
-        "secret_key": {
-            "from_secret": "upload_s3_secret_key",
-        },
-        "bucket": {
-            "from_secret": "upload_s3_bucket",
-        },
-        "path_style": True,
-        "source": "third-party-licenses.tar.gz",
-        "target": target,
-    }
-
     return [{
         "name": "check-licenses",
         "steps": [
@@ -1841,20 +1790,6 @@ def licenseCheck(ctx):
                 "image": OC_CI_ALPINE,
                 "commands": [
                     "cd third-party-licenses && tar -czf ../third-party-licenses.tar.gz *",
-                ],
-            },
-            {
-                "name": "upload",
-                "image": PLUGINS_S3,
-                "settings": settings,
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                    {
-                        "event": ["push", "manual"],
-                        "branch": "main",
-                    },
                 ],
             },
             {

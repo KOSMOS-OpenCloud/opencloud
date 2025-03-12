@@ -2086,9 +2086,14 @@ def notify(ctx):
         "depends_on": [],
         "when": [
             {
-                "status": status,
+                "event": ["push", "manual"],
+                "branch": ["main", "release-*"],
+            },
+            {
+                "event": "tag",
             },
         ],
+        "runs_on": status,
     }
 
 def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):

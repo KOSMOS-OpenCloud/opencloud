@@ -56,12 +56,12 @@ dirs = {
     "baseGo": "/go/src/github.com/opencloud-eu/opencloud",
     "gobinTar": "go-bin.tar.gz",
     "gobinTarPath": "/go/src/github.com/opencloud-eu/opencloud/go-bin.tar.gz",
-    "opencloudConfig": "tests/config/drone/opencloud-config.json",
+    "opencloudConfig": "tests/config/woodpecker/opencloud-config.json",
     "ocis": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis/owncloud/data",
     "ocWrapper": "/woodpecker/src/github.com/opencloud-eu/opencloud/tests/ocwrapper",
-    "bannedPasswordList": "tests/config/drone/banned-password-list.txt",
-    "ocmProviders": "tests/config/drone/providers.json",
+    "bannedPasswordList": "tests/config/woodpecker/banned-password-list.txt",
+    "ocmProviders": "tests/config/woodpecker/providers.json",
     "opencloudBinPath": "opencloud/bin",
     "opencloudBin": "opencloud/bin/opencloud",
     "opencloudBinArtifact": "opencloud-binary-amd64",
@@ -564,7 +564,7 @@ def checkGoBinCache():
             },
         },
         "commands": [
-            "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s %s" % (dirs["baseGo"], dirs["baseGo"], dirs["gobinTar"]),
+            "bash -x %s/tests/config/woodpecker/check_go_bin_cache.sh %s %s" % (dirs["baseGo"], dirs["baseGo"], dirs["gobinTar"]),
         ],
     }]
 
@@ -1029,7 +1029,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                 "image": "cs3org/wopiserver:v10.4.0",
                 "detach": True,
                 "commands": [
-                    "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
+                    "cp %s/tests/config/woodpecker/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
                     "echo 123 > /etc/wopi/wopisecret",
                     "/app/wopiserver.py",
                 ],
@@ -2225,7 +2225,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
         environment["FRONTEND_OCS_ENABLE_DENIALS"] = True
 
         # fonts map for txt thumbnails (including unicode support)
-        environment["THUMBNAILS_TXT_FONTMAP_FILE"] = "%s/tests/config/drone/fontsMap.json" % (dirs["base"])
+        environment["THUMBNAILS_TXT_FONTMAP_FILE"] = "%s/tests/config/woodpecker/fontsMap.json" % (dirs["base"])
 
     if deploy_type == "cs3api_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  #  make gateway available to cs3api-validator
@@ -2291,7 +2291,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
         "commands": [
             "%s init --insecure true" % dirs["opencloudBin"],
             "cat $OC_CONFIG_DIR/opencloud.yaml",
-            "cp tests/config/drone/app-registry.yaml $OC_CONFIG_DIR/app-registry.yaml",
+            "cp tests/config/woodpecker/app-registry.yaml $OC_CONFIG_DIR/app-registry.yaml",
         ] + (wrapper_commands),
     }
 
@@ -2782,7 +2782,7 @@ def setupForLitmus():
             "TEST_SERVER_URL": OC_URL,
         },
         "commands": [
-            "bash ./tests/config/drone/setup-for-litmus.sh",
+            "bash ./tests/config/woodpecker/setup-for-litmus.sh",
             "cat .env",
         ],
     }]
@@ -2790,7 +2790,7 @@ def setupForLitmus():
 def getDroneEnvAndCheckScript(ctx):
     ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
     path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
-    path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
+    path_to_check_script = "%s/%s/tests/config/woodpecker/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
     return {
         "name": "get-drone-env-and-check-script",
         "image": OC_UBUNTU,
@@ -2975,7 +2975,7 @@ def fakeOffice():
             "detach": True,
             "environment": {},
             "commands": [
-                "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
+                "sh %s/tests/config/woodpecker/serve-hosting-discovery.sh" % (dirs["base"]),
             ],
         },
     ]
@@ -3078,7 +3078,7 @@ def k6LoadTests(ctx):
         return []
 
     ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
-    script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+    script_link = "%s/%s/tests/config/woodpecker/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
 
     event_array = ["cron"]
 
@@ -3189,7 +3189,7 @@ def onlyofficeService():
                 "USE_UNAUTHORIZED_STORAGE": True,  # self signed certificates
             },
             "commands": [
-                "cp %s/tests/config/drone/only-office.json /etc/onlyoffice/documentserver/local.json" % dirs["base"],
+                "cp %s/tests/config/woodpecker/only-office.json /etc/onlyoffice/documentserver/local.json" % dirs["base"],
                 "openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes",
                 "mkdir -p /var/www/onlyoffice/Data/certs",
                 "cp onlyoffice.key /var/www/onlyoffice/Data/certs/",

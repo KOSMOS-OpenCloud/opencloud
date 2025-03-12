@@ -1939,7 +1939,7 @@ def changelog():
                         "push",
                     ],
                     "message": "Automated changelog update [skip ci]",
-                    "branch": "master",
+                    "branch": "main",
                     "author_email": "devops@opencloud.eu",
                     "author_name": "openclouders",
                     "netrc_machine": "github.com",
@@ -2086,12 +2086,6 @@ def notify(ctx):
         "depends_on": [],
         "when": [
             {
-                "event": ["push", "manual"],
-                "branch": ["main", "release-*"],
-                "status": status,
-            },
-            {
-                "event": "tag",
                 "status": status,
             },
         ],

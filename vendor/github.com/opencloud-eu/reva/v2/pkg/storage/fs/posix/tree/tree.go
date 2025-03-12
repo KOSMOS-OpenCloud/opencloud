@@ -26,7 +26,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -62,13 +61,6 @@ func init() {
 	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/pkg/decomposedfs/tree")
 }
 
-// Blobstore defines an interface for storing blobs in a blobstore
-type Blobstore interface {
-	Upload(node *node.Node, source, copyTarget string) error
-	Download(node *node.Node) (io.ReadCloser, error)
-	Delete(node *node.Node) error
-}
-
 type Watcher interface {
 	Watch(path string)
 }
@@ -82,7 +74,7 @@ type scanItem struct {
 // Tree manages a hierarchical tree
 type Tree struct {
 	lookup      *lookup.Lookup
-	blobstore   Blobstore
+	blobstore   node.Blobstore
 	trashbin    *trashbin.Trashbin
 	propagator  propagator.Propagator
 	permissions permissions.Permissions
@@ -103,7 +95,7 @@ type Tree struct {
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, trashbin *trashbin.Trashbin, permissions permissions.Permissions, o *options.Options, es events.Stream, cache store.Store, log *zerolog.Logger) (*Tree, error) {
+func New(lu node.PathLookup, bs node.Blobstore, um usermapper.Mapper, trashbin *trashbin.Trashbin, permissions permissions.Permissions, o *options.Options, es events.Stream, cache store.Store, log *zerolog.Logger) (*Tree, error) {
 	scanQueue := make(chan scanItem)
 	t := &Tree{
 		lookup:      lu.(*lookup.Lookup),
@@ -242,7 +234,10 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 		if err != nil {
 			return err
 		}
-		t.lookup.TimeManager().OverrideMtime(ctx, n, &attributes, nodeMTime)
+		err = t.lookup.TimeManager().OverrideMtime(ctx, n, &attributes, nodeMTime)
+		if err != nil {
+			return err
+		}
 	} else {
 		fi, err := f.Stat()
 		if err != nil {
@@ -572,13 +567,13 @@ func (t *Tree) DeleteBlob(node *node.Node) error {
 }
 
 // BuildSpaceIDIndexEntry returns the entry for the space id index
-func (t *Tree) BuildSpaceIDIndexEntry(spaceID, nodeID string) string {
-	return nodeID
+func (t *Tree) BuildSpaceIDIndexEntry(spaceID string) string {
+	return spaceID
 }
 
 // ResolveSpaceIDIndexEntry returns the node id for the space id index entry
-func (t *Tree) ResolveSpaceIDIndexEntry(spaceid, entry string) (string, string, error) {
-	return spaceid, entry, nil
+func (t *Tree) ResolveSpaceIDIndexEntry(spaceID string) (string, error) {
+	return spaceID, nil
 }
 
 // InitNewNode initializes a new node
@@ -651,8 +646,6 @@ func (t *Tree) createDirNode(ctx context.Context, n *node.Node) (err error) {
 	}
 	return n.SetXattrsWithContext(ctx, attributes, false)
 }
-
-var nodeIDRegep = regexp.MustCompile(`.*/nodes/([^.]*).*`)
 
 func (t *Tree) isIgnored(path string) bool {
 	return isLockFile(path) || isTrash(path) || t.isUpload(path) || t.isInternal(path)

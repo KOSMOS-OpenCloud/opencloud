@@ -130,7 +130,7 @@ type Decomposedfs struct {
 }
 
 // NewDefault returns an instance with default components
-func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, log *zerolog.Logger) (storage.FS, error) {
+func NewDefault(m map[string]interface{}, bs node.Blobstore, es events.Stream, log *zerolog.Logger) (storage.FS, error) {
 	if log == nil {
 		log = &zerolog.Logger{}
 	}
@@ -143,9 +143,9 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, l
 	var lu *lookup.Lookup
 	switch o.MetadataBackend {
 	case "xattrs":
-		lu = lookup.New(metadata.NewXattrsBackend(o.Root, o.FileMetadataCache), o, &timemanager.Manager{})
+		lu = lookup.New(metadata.NewXattrsBackend(o.FileMetadataCache), o, &timemanager.Manager{})
 	case "messagepack":
-		lu = lookup.New(metadata.NewMessagePackBackend(o.Root, o.FileMetadataCache), o, &timemanager.Manager{})
+		lu = lookup.New(metadata.NewMessagePackBackend(o.FileMetadataCache), o, &timemanager.Manager{})
 	default:
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
@@ -1292,7 +1292,23 @@ func (fs *Decomposedfs) RestoreRecycleItem(ctx context.Context, space *provider.
 		return errtypes.NotFound(key)
 	}
 
-	return fs.trashbin.RestoreRecycleItem(ctx, spaceID, key, relativePath, restoreRef)
+	restoredNode, err := fs.trashbin.RestoreRecycleItem(ctx, spaceID, key, relativePath, restoreRef)
+	if err != nil {
+		return err
+	}
+
+	var sizeDiff int64
+	if restoredNode.IsDir(ctx) {
+		treeSize, err := restoredNode.GetTreeSize(ctx)
+		if err != nil {
+			return err
+		}
+		sizeDiff = int64(treeSize)
+	} else {
+		sizeDiff = restoredNode.Blobsize
+	}
+
+	return fs.tp.Propagate(ctx, restoredNode, sizeDiff)
 }
 
 func (fs *Decomposedfs) PurgeRecycleItem(ctx context.Context, space *provider.Reference, key, relativePath string) error {

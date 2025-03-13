@@ -304,9 +304,9 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": True,
+            "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
+            "xsuites": ["search", "app-provider", "app-provider-onlyOffice", "app-store", "keycloak", "oidc", "ocm"],  # suites to skip
         },
         "search": {
             "skip": True,
@@ -1198,7 +1198,11 @@ def e2eTestPipeline(ctx):
     }
 
     extra_server_environment = {
-        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OC_SHOW_USER_EMAIL_IN_RESULTS": True,
+        "FRONTEND_OCS_ENABLE_DENIALS": True,
+        # Needed for enabling all roles
+        "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
     }
 
     e2e_trigger = [
@@ -1255,7 +1259,7 @@ def e2eTestPipeline(ctx):
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "environment": {
-                "BASE_URL_OCIS": OC_DOMAIN,
+                "OC_BASE_URL": OC_DOMAIN,
                 "HEADLESS": True,
                 "RETRY": "1",
                 "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
@@ -1267,7 +1271,8 @@ def e2eTestPipeline(ctx):
         }
 
         # steps_after = uploadTracingResult(ctx) + \
-        steps_after = logTracingResults()
+        # steps_after = logTracingResults()
+        steps_after = []
 
         if params["totalParts"]:
             for index in range(params["totalParts"]):
@@ -2720,15 +2725,15 @@ def setupForLitmus():
         ],
     }]
 
-def getDroneEnvAndCheckScript(ctx):
-    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
-    path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
-    path_to_check_script = "%s/%s/tests/config/woodpecker/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
+def getWoodpeckerEnvAndCheckScript(ctx):
+    opencloud_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
+    path_to_woodpecker_env = "%s/%s/.woodpecker.env" % (opencloud_git_base_url, ctx.build.commit)
+    path_to_check_script = "%s/%s/tests/config/woodpecker/check_web_cache.sh" % (opencloud_git_base_url, ctx.build.commit)
     return {
-        "name": "get-drone-env-and-check-script",
+        "name": "get-woodpecker-env-and-check-script",
         "image": OC_UBUNTU,
         "commands": [
-            "curl -s -o .drone.env %s" % path_to_drone_env,
+            "curl -s -o .woodpecker.env %s" % path_to_woodpecker_env,
             "curl -s -o check_web_cache.sh %s" % path_to_check_script,
         ],
     }
@@ -2755,16 +2760,16 @@ def cloneWeb():
         "name": "clone-web",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
-            ". ./.drone.env",
+            ". ./.woodpecker.env",
             "rm -rf %s" % dirs["web"],
-            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
+            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/opencloud-eu/web.git %s" % dirs["web"],
             "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
         ],
     }
 
 def generateWebPnpmCache(ctx):
     return [
-        getDroneEnvAndCheckScript(ctx),
+        getWoodpeckerEnvAndCheckScript(ctx),
         checkForWebCache("web-pnpm"),
         cloneWeb(),
         {
@@ -2792,7 +2797,7 @@ def generateWebPnpmCache(ctx):
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
-                "source ./.drone.env",
+                "source ./.woodpecker.env",
                 # cache using the minio/mc client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webPnpmZip"],
@@ -2802,7 +2807,7 @@ def generateWebPnpmCache(ctx):
 
 def generateWebCache(ctx):
     return [
-        getDroneEnvAndCheckScript(ctx),
+        getWoodpeckerEnvAndCheckScript(ctx),
         checkForWebCache("web"),
         cloneWeb(),
         {
@@ -2818,7 +2823,7 @@ def generateWebCache(ctx):
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
-                "source ./.drone.env",
+                "source ./.woodpecker.env",
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
@@ -2832,7 +2837,7 @@ def restoreWebCache():
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
-            "source ./.drone.env",
+            "source ./.woodpecker.env",
             "rm -rf %s" % dirs["web"],
             "mkdir -p %s" % dirs["web"],
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
@@ -2852,7 +2857,7 @@ def restoreWebPnpmCache():
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
-            "source ./.drone.env",
+            "source ./.woodpecker.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
             "mc cp -r -a s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz %s" % dirs["zip"],
         ],

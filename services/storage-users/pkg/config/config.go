@@ -194,12 +194,14 @@ type OwnCloudSQLDriver struct {
 // PosixDriver is the storage driver configuration when using 'posix' storage driver
 type PosixDriver struct {
 	// Root is the absolute path to the location of the data
-	Root                      string        `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"1.0.0"`
-	PersonalSpacePathTemplate string        `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"1.0.0"`
-	GeneralSpacePathTemplate  string        `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"1.0.0"`
-	PermissionsEndpoint       string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed', 'posix' and 'decomposeds3'." introductionVersion:"1.0.0"`
-	AsyncUploads              bool          `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"1.0.0"`
-	ScanDebounceDelay         time.Duration `yaml:"scan_debounce_delay" env:"STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY" desc:"The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected." introductionVersion:"1.0.0"`
+	Root                       string        `yaml:"root" env:"STORAGE_USERS_POSIX_ROOT" desc:"The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OC_BASE_DATA_PATH/storage/users." introductionVersion:"1.0.0"`
+	PersonalSpaceAliasTemplate string        `yaml:"personalspacealias_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"1.0.0"`
+	PersonalSpacePathTemplate  string        `yaml:"personalspacepath_template" env:"STORAGE_USERS_POSIX_PERSONAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the personal space roots." introductionVersion:"1.0.0"`
+	GeneralSpaceAliasTemplate  string        `yaml:"generalspacealias_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases." introductionVersion:"1.0.0"`
+	GeneralSpacePathTemplate   string        `yaml:"generalspacepath_template" env:"STORAGE_USERS_POSIX_GENERAL_SPACE_PATH_TEMPLATE" desc:"Template string to construct the paths of the projects space roots." introductionVersion:"1.0.0"`
+	PermissionsEndpoint        string        `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_POSIX_PERMISSIONS_ENDPOINT" desc:"Endpoint of the permissions service. The endpoints can differ for 'decomposed', 'posix' and 'decomposeds3'." introductionVersion:"1.0.0"`
+	AsyncUploads               bool          `yaml:"async_uploads" env:"OC_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads." introductionVersion:"1.0.0"`
+	ScanDebounceDelay          time.Duration `yaml:"scan_debounce_delay" env:"STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY" desc:"The time in milliseconds to wait before scanning the filesystem for changes after a change has been detected." introductionVersion:"1.0.0"`
 
 	UseSpaceGroups bool `yaml:"use_space_groups" env:"STORAGE_USERS_POSIX_USE_SPACE_GROUPS" desc:"Use space groups to manage permissions on spaces." introductionVersion:"1.0.0"`
 

@@ -5,7 +5,7 @@
 # NOTE: need to be updated if new production releases are determined
 # - follow semver
 # - omit 'v' prefix
-PRODUCTION_RELEASE_TAGS = ["5.0", "7"]
+PRODUCTION_RELEASE_TAGS = ["2.0", "3.0"]
 
 # Repository
 
@@ -33,7 +33,7 @@ OC_LITMUS = "owncloudci/litmus:latest"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
 PLUGINS_CODACY = "plugins/codacy:1"
-PLUGINS_DOCKER = "plugins/docker:latest"
+PLUGINS_DOCKER_BUILDX = "woodpeckerci/plugin-docker-buildx:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
 PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
@@ -440,10 +440,9 @@ def main(ctx):
         testOpencloudAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    # build_release_pipelines =  \
-    #      dockerReleases(ctx) + \
-    #      binaryReleases(ctx)
-    build_release_pipelines = binaryReleases(ctx)
+    build_release_pipelines = \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx)
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -1513,14 +1512,13 @@ def dockerReleases(ctx):
         if ctx.build.event == "tag":
             build_type = "rolling" if "rolling" in repo else "production"
 
-        for arch in config["dockerReleases"]["architectures"]:
-            repo_pipelines.append(dockerRelease(ctx, arch, repo, build_type))
+        repo_pipelines.append(dockerRelease(ctx, repo, build_type))
 
-        manifest = releaseDockerManifest(ctx, repo, build_type)
-        manifest["depends_on"] = getPipelineNames(repo_pipelines)
-        repo_pipelines.append(manifest)
+        # manifest = releaseDockerManifest(ctx, repo, build_type)
+        # manifest["depends_on"] = getPipelineNames(repo_pipelines)
+        # repo_pipelines.append(manifest)
 
-        readme = releaseDockerReadme(ctx, repo, build_type)
+        readme = releaseDockerReadme(repo, build_type)
         readme["depends_on"] = getPipelineNames(repo_pipelines)
         repo_pipelines.append(readme)
 
@@ -1528,66 +1526,68 @@ def dockerReleases(ctx):
 
     return pipelines
 
-def dockerRelease(ctx, arch, repo, build_type):
+def dockerRelease(ctx, repo, build_type):
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
-        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "master"),
+        "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "daily"),
     ]
+
     depends_on = getPipelineNames(testOpencloudAndUploadResults(ctx) + testPipelines(ctx))
 
     if ctx.build.event == "tag":
         depends_on = []
 
     return {
-        "name": "docker-%s-%s" % (arch, build_type),
-        "labels": {
-            "platform": "linux/%s" % arch,
-        },
+        "name": "container-build-%s" % build_type,
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") + [
             {
-                "name": "build",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make -C opencloud release-linux-docker-%s ENABLE_VIPS=true" % (arch),
+                "name": "dryrun",
+                "image": PLUGINS_DOCKER_BUILDX,
+                "settings": {
+                    "dry_run": True,
+                    "platforms": "linux/amd64,linux/arm64",
+                    "repo": repo,
+                    "auto_tag": True,
+                    "default_tag": "daily",
+                    "dockerfile": "opencloud/docker/Dockerfile.multiarch",
+                    "build_args": build_args,
+                },
+                "when": [
+                    {
+                        "event": ["pull_request"],
+                    },
                 ],
             },
             {
-                "name": "dryrun",
-                "image": PLUGINS_DOCKER,
+                "name": "build-and-push",
+                "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
-                    "dry_run": True,
-                    "context": "ocis",
-                    "tags": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
                     "repo": repo,
-                    "build_args": build_args,
-                },
-                "when": {
-                    "ref": {
-                        "include": [
-                            "refs/pull/**",
-                        ],
-                    },
-                },
-            },
-            {
-                "name": "docker",
-                "image": PLUGINS_DOCKER,
-                "settings": {
-                    "username": {
-                        "from_secret": "docker_username",
-                    },
-                    "password": {
-                        "from_secret": "docker_password",
-                    },
                     "auto_tag": True,
-                    "context": "ocis",
-                    "auto_tag_suffix": "linux-%s" % (arch),
-                    "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
-                    "repo": repo,
+                    "default_tag": "daily",
+                    "dockerfile": "opencloud/docker/Dockerfile.multiarch",
                     "build_args": build_args,
+                    "logins": [
+                        {
+                            "registry": "https://index.docker.io/v1/",
+                            "username": {
+                                "from_secret": "docker_username",
+                            },
+                            "password": {
+                                "from_secret": "docker_password",
+                            },
+                        },
+                        {
+                            "registry": "https://quay.io",
+                            "username": {
+                                "from_secret": "quay_username",
+                            },
+                            "password": {
+                                "from_secret": "quay_password",
+                            },
+                        },
+                    ],
                 },
                 "when": [
                     {
@@ -1620,57 +1620,16 @@ def dockerRelease(ctx, arch, repo, build_type):
 
 def binaryReleases(ctx):
     pipelines = []
-    targets = []
-    build_type = "daily"
-
-    # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
-    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
     depends_on = getPipelineNames(testOpencloudAndUploadResults(ctx) + testPipelines(ctx))
 
-    if ctx.build.event == "tag":
-        depends_on = []
-
-        buildref = ctx.build.ref.replace("refs/tags/v", "").lower()
-        target_path = "/ocis/%s" % ctx.repo.name.replace("ocis-", "")
-
-        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
-            folder = "testing"
-            target = "%s/%s/%s" % (target_path, folder, buildref)
-            targets.append(target)
-            build_type = "testing"
-        else:
-            # uploads binary to eg. https://download.owncloud.com/ocis/ocis/rolling/1.0.0/
-            folder = "rolling"
-            target = "%s/%s/%s" % (target_path, folder, buildref)
-            targets.append(target)
-
-            for prod_tag in PRODUCTION_RELEASE_TAGS:
-                if buildref.startswith(prod_tag):
-                    # uploads binary to eg. https://download.owncloud.com/ocis/ocis/stable/2.0.0/
-                    folder = "stable"
-                    target = "%s/%s/%s" % (target_path, folder, buildref)
-                    targets.append(target)
-                    break
-
-    else:
-        targets.append(target)
-
-    for target in targets:
-        if "rolling" in target:
-            build_type = "rolling"
-        elif "stable" in target:
-            build_type = "production"
-        elif "testing" in target:
-            build_type = "testing"
-
-        for os in config["binaryReleases"]["os"]:
-            pipelines.append(binaryRelease(ctx, os, build_type, target, depends_on))
+    for os in config["binaryReleases"]["os"]:
+        pipelines.append(binaryRelease(ctx, os, depends_on))
 
     return pipelines
 
-def binaryRelease(ctx, arch, build_type, target, depends_on = []):
+def binaryRelease(ctx, arch, depends_on = []):
     return {
-        "name": "binaries-%s-%s" % (arch, build_type),
+        "name": "binaries-%s" % arch,
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") + [
             {
@@ -1678,7 +1637,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "image": OC_CI_GOLANG,
                 "environment": CI_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C opencloud release-%s" % (arch),
+                    "make -C opencloud release-%s" % arch,
                 ],
             },
             {
@@ -1842,68 +1801,6 @@ def licenseCheck(ctx):
         "workspace": workspace,
     }
 
-def releaseDockerManifest(ctx, repo, build_type):
-    spec = "manifest.tmpl"
-    spec_latest = "manifest-latest.tmpl"
-    if "rolling" not in repo:
-        spec = "manifest.production.tmpl"
-        spec_latest = "manifest.production-latest.tmpl"
-
-    steps = [
-        {
-            "name": "execute",
-            "image": PLUGINS_MANIFEST,
-            "settings": {
-                "username": {
-                    "from_secret": "docker_username",
-                },
-                "password": {
-                    "from_secret": "docker_password",
-                },
-                "spec": "ocis/docker/%s" % spec,
-                "auto_tag": True if ctx.build.event == "tag" else False,
-                "ignore_missing": True,
-            },
-        },
-    ]
-    if len(ctx.build.ref.split("-")) == 1:
-        steps.append(
-            {
-                "name": "execute-latest",
-                "image": PLUGINS_MANIFEST,
-                "settings": {
-                    "username": {
-                        "from_secret": "docker_username",
-                    },
-                    "password": {
-                        "from_secret": "docker_password",
-                    },
-                    "spec": "ocis/docker/%s" % spec_latest,
-                    "auto_tag": True,
-                    "ignore_missing": True,
-                },
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-        )
-
-    return {
-        "name": "manifest-%s" % build_type,
-        "steps": steps,
-        "when": [
-            {
-                "event": ["push", "manual"],
-                "branch": "main",
-            },
-            {
-                "event": "tag",
-            },
-        ],
-    }
-
 def changelog():
     return [{
         "name": "changelog",
@@ -1964,12 +1861,12 @@ def changelog():
         ],
     }]
 
-def releaseDockerReadme(ctx, repo, build_type):
+def releaseDockerReadme(repo, build_type):
     return {
         "name": "readme-%s" % build_type,
         "steps": [
             {
-                "name": "execute",
+                "name": "push-docker",
                 "image": CHKO_DOCKER_PUSHRM,
                 "environment": {
                     "DOCKER_USER": {
@@ -1979,7 +1876,22 @@ def releaseDockerReadme(ctx, repo, build_type):
                         "from_secret": "docker_password",
                     },
                     "PUSHRM_TARGET": repo,
-                    "PUSHRM_SHORT": "Docker images for %s" % (ctx.repo.name),
+                    "PUSHRM_SHORT": "Docker images for %s" % (repo),
+                    "PUSHRM_FILE": "README.md",
+                },
+            },
+            {
+                "name": "push-quay",
+                "image": CHKO_DOCKER_PUSHRM,
+                "environment": {
+                    "DOCKER_USER": {
+                        "from_secret": "quay_username",
+                    },
+                    "DOCKER_PASS": {
+                        "from_secret": "quay_password",
+                    },
+                    "PUSHRM_TARGET": "quay.io/%s" % repo,
+                    "PUSHRM_SHORT": "Docker images for %s" % (repo),
                     "PUSHRM_FILE": "README.md",
                 },
             },
@@ -2506,7 +2418,7 @@ def genericCachePurge(flush_path):
                 "event": "pull_request",
             },
         ],
-        "runs_on": ["failure"],
+        "runs_on": ["success", "failure"],
     }
 
 def genericBuildArtifactCache(ctx, name, action, path):

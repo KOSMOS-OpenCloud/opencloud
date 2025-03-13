@@ -30,7 +30,7 @@ dev-docker-multiarch:
 	docker buildx rm opencloudbuilder || true
 	docker buildx create --platform linux/arm64,linux/amd64 --name opencloudbuilder
 	docker buildx use opencloudbuilder
-	cd .. && docker buildx build --platform linux/arm64,linux/amd64 --output type=docker --file opencloud/docker/Dockerfile.linux.multiarch --tag opencloud-eu/opencloud:dev-multiarch .
+	cd .. && docker buildx build --platform linux/arm64,linux/amd64 --output type=docker --file opencloud/docker/Dockerfile.multiarch --tag opencloud-eu/opencloud:dev-multiarch .
 	docker buildx rm opencloudbuilder
 
 .PHONY: debug-docker

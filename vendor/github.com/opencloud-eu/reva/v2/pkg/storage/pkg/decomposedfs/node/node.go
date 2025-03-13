@@ -86,6 +86,13 @@ const (
 	ProcessingStatus = "processing:"
 )
 
+// Blobstore defines an interface for storing blobs in a blobstore
+type Blobstore interface {
+	Upload(node *Node, source, copyTarget string) error
+	Download(node *Node) (io.ReadCloser, error)
+	Delete(node *Node) error
+}
+
 type TimeManager interface {
 	// OverrideMTime overrides the mtime of the node, either on the node itself or in the given attributes, depending on the implementation
 	OverrideMtime(ctx context.Context, n *Node, attrs *Attributes, mtime time.Time) error
@@ -129,8 +136,8 @@ type Tree interface {
 	ReadBlob(node *Node) (io.ReadCloser, error)
 	DeleteBlob(node *Node) error
 
-	BuildSpaceIDIndexEntry(spaceID, nodeID string) string
-	ResolveSpaceIDIndexEntry(spaceID, entry string) (string, string, error)
+	BuildSpaceIDIndexEntry(spaceID string) string
+	ResolveSpaceIDIndexEntry(spaceID string) (string, error)
 
 	CreateRevision(ctx context.Context, n *Node, version string, f *lockedfile.File) (string, error)
 	ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error)

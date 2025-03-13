@@ -208,8 +208,6 @@
 - [apiLocks/unlockFiles.feature:321](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiLocks/unlockFiles.feature#L321)
 - [apiLocks/unlockFiles.feature:322](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiLocks/unlockFiles.feature#L322)
 - [apiLocks/unlockFiles.feature:323](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiLocks/unlockFiles.feature#L323)
-- [apiActivities/shareActivities.feature:1956](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L1956)
-- [apiActivities/shareActivities.feature:2095](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L2095)
 - [apiAntivirus/antivirus.feature:114](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L114)
 - [apiAntivirus/antivirus.feature:115](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L115)
 - [apiAntivirus/antivirus.feature:116](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L116)

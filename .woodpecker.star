@@ -1673,7 +1673,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
         "name": "binaries-%s-%s" % (arch, build_type),
         "steps": makeNodeGenerate("") +
                  makeGoGenerate("") +
-                 licenseCheck(ctx) + [
+                 [licenseCheck(ctx)] + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,

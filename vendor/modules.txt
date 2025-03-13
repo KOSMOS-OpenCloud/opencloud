@@ -845,7 +845,7 @@ github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/klauspost/cpuid/v2 v2.2.9
 ## explicit; go 1.20
 github.com/klauspost/cpuid/v2
-# github.com/kovidgoyal/imaging v1.6.3
+# github.com/kovidgoyal/imaging v1.6.4
 ## explicit; go 1.21
 github.com/kovidgoyal/imaging
 # github.com/leodido/go-urn v1.4.0

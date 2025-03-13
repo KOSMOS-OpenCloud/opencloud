@@ -2042,7 +2042,7 @@ def makeNodeGenerate(module):
             },
             "commands": [
                 "pnpm config set store-dir ./.pnpm-store",
-                "retry -t 3 '%s node-generate-prod'" % (make),
+                "for i in $(seq 3); do %s node-generate-prod && break || sleep 1; done" % (make),
             ],
         },
     ]
@@ -2057,7 +2057,7 @@ def makeGoGenerate(module):
             "name": "generate go",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 '%s go-generate'" % (make),
+                "for i in $(seq 3); do %s go-generate && break || sleep 1; done" % (make),
             ],
             "environment": CI_HTTP_PROXY_ENV,
         },
@@ -2291,7 +2291,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C opencloud build'",
+                "for i in $(seq 3); do make -C opencloud build && break || sleep 1; done",
             ],
             "environment": CI_HTTP_PROXY_ENV,
         },
@@ -2774,7 +2774,7 @@ def generateWebPnpmCache(ctx):
                 "cd %s" % dirs["web"],
                 'npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"',
                 "pnpm config set store-dir ./.pnpm-store",
-                "retry -t 3 'pnpm install'",
+                "for i in $(seq 3); do pnpm install && break || sleep 1; done",
             ],
         },
         {
@@ -2866,7 +2866,7 @@ def restoreWebPnpmCache():
             "tar -xvf %s" % dirs["webPnpmZip"],
             'npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"',
             "pnpm config set store-dir ./.pnpm-store",
-            "retry -t 3 'pnpm install'",
+            "for i in $(seq 3); do pnpm install && break || sleep 1; done",
         ],
     }]
 

@@ -1672,8 +1672,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     return {
         "name": "binaries-%s-%s" % (arch, build_type),
         "steps": makeNodeGenerate("") +
-                 makeGoGenerate("") +
-                 [licenseCheck(ctx)] + [
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1688,7 +1687,6 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "environment": CI_HTTP_PROXY_ENV,
                 "commands": [
                     "make -C opencloud release-finish",
-                    "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
                 ],
                 "when": [
                     {

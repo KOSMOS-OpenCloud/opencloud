@@ -737,7 +737,7 @@ Feature: check share activity
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
-                                  "const": "Alice Hansen"
+                                  "const": "FOLDER"
                                 }
                               }
                             },
@@ -2357,7 +2357,7 @@ Feature: check share activity
                               "required": ["id","name"],
                               "properties": {
                                 "name": {
-                                  "const": "Alice Hansen"
+                                  "const": "FOLDER"
                                 }
                               }
                             },

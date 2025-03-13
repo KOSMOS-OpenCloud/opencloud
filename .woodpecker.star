@@ -37,6 +37,7 @@ PLUGINS_DOCKER = "plugins/docker:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
 PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
+PLUGINS_GIT_PUSH = "appleboy/drone-git-push"
 PLUGINS_MANIFEST = "plugins/manifest:1"
 PLUGINS_S3 = "plugins/s3:1"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
@@ -1671,7 +1672,8 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     return {
         "name": "binaries-%s-%s" % (arch, build_type),
         "steps": makeNodeGenerate("") +
-                 makeGoGenerate("") + [
+                 makeGoGenerate("") +
+                 licenseCheck(ctx) + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1932,23 +1934,18 @@ def changelog():
             },
             {
                 "name": "publish",
-                "image": PLUGINS_GIT_ACTION,
+                "image": PLUGINS_GIT_PUSH,
                 "settings": {
-                    "actions": [
-                        "commit",
-                        "push",
-                    ],
-                    "message": "Automated changelog update [skip ci]",
                     "branch": "main",
+                    "remote": "ssh://git@github.com/%s.git" % repo_slug,
+                    "commit": True,
+                    "ssh_key": {
+                        "from_secret": "ssh_key",
+                    },
+                    "commit_message": "Automated changelog update [skip ci]",
                     "author_email": "devops@opencloud.eu",
                     "author_name": "openclouders",
-                    "netrc_machine": "github.com",
-                    "netrc_username": {
-                        "from_secret": "github_username",
-                    },
-                    "netrc_password": {
-                        "from_secret": "github_token",
-                    },
+                    "rebase": True,
                 },
                 "when": [
                     {

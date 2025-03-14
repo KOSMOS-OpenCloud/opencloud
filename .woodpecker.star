@@ -188,7 +188,7 @@ config = {
             "skip": True,
         },
         "accountsHashDifficulty": {
-            "skip": True,
+            "skip": False,
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
@@ -218,14 +218,14 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": True,
+            "skip": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "OC_ASYNC_UPLOADS": True,
+                "OC_ADD_RUN_SERVICES": "antivirus",
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
@@ -233,7 +233,7 @@ config = {
             "suites": [
                 "apiSearchContent",
             ],
-            "skip": True,
+            "skip": False,
             "tikaNeeded": True,
         },
         "ocm": {
@@ -276,10 +276,10 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
+                "OC_ADD_RUN_SERVICES": "auth-app",
                 "PROXY_ENABLE_APP_AUTH": True,
             },
         },
@@ -293,8 +293,8 @@ config = {
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "OC_ASYNC_UPLOADS": True,
+                "OC_ADD_RUN_SERVICES": "antivirus",
             },
         },
     },
@@ -950,7 +950,6 @@ def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment =
     environment = {
         "TEST_SERVER_URL": OC_URL,
         "TEST_SERVER_FED_URL": OC_FED_URL,
-        "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "SEND_SCENARIO_LINE_REFERENCES": True,
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
@@ -2861,7 +2860,6 @@ def wopiCollaborationService(name):
 def tikaService():
     return [{
         "name": "tika",
-        "type": "docker",
         "image": APACHE_TIKA,
         "detach": True,
     }, {

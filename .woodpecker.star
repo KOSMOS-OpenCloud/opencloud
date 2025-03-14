@@ -1896,6 +1896,7 @@ def releaseDockerReadme(repo, build_type):
                     "PUSHRM_TARGET": "quay.io/%s" % repo,
                     "PUSHRM_SHORT": "Docker images for %s" % (repo),
                     "PUSHRM_FILE": "README.md",
+                    "PUSHRM_PROVIDER": "quay",
                 },
             },
         ],

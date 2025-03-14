@@ -1532,7 +1532,7 @@ def dockerRelease(ctx, repo, build_type):
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "daily"),
     ]
 
-    depends_on = getPipelineNames(testOpencloudAndUploadResults(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(getGoBinForTesting(ctx))
 
     if ctx.build.event == "tag":
         depends_on = []
@@ -1547,8 +1547,9 @@ def dockerRelease(ctx, repo, build_type):
                 "settings": {
                     "dry_run": True,
                     "platforms": "linux/amd64,linux/arm64",
-                    "repo": repo,
-                    "auto_tag": True,
+                    "repo": "%s,quay.io/%s" % (repo, repo),
+                    "auto_tag": False if build_type == "daily" else True,
+                    "tag": "daily" if build_type == "daily" else "",
                     "default_tag": "daily",
                     "dockerfile": "opencloud/docker/Dockerfile.multiarch",
                     "build_args": build_args,
@@ -1563,8 +1564,10 @@ def dockerRelease(ctx, repo, build_type):
                 "name": "build-and-push",
                 "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
-                    "repo": repo,
-                    "auto_tag": True,
+                    "repo": "%s,quay.io/%s" % (repo, repo),
+                    "platforms": "linux/amd64,linux/arm64",
+                    "auto_tag": False if build_type == "daily" else True,
+                    "tag": "daily" if build_type == "daily" else "",
                     "default_tag": "daily",
                     "dockerfile": "opencloud/docker/Dockerfile.multiarch",
                     "build_args": build_args,
@@ -1887,7 +1890,7 @@ def releaseDockerReadme(repo, build_type):
                     "DOCKER_USER": {
                         "from_secret": "quay_username",
                     },
-                    "DOCKER_PASS": {
+                    "APIKEY__QUAY_IO": {
                         "from_secret": "quay_password",
                     },
                     "PUSHRM_TARGET": "quay.io/%s" % repo,

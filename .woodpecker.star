@@ -1886,16 +1886,13 @@ def releaseDockerReadme(repo, build_type):
                 "name": "push-quay",
                 "image": CHKO_DOCKER_PUSHRM,
                 "environment": {
-                    "DOCKER_USER": {
-                        "from_secret": "quay_username",
-                    },
                     "APIKEY__QUAY_IO": {
                         "from_secret": "quay_password",
                     },
                     "PUSHRM_TARGET": "quay.io/%s" % repo,
-                    "PUSHRM_SHORT": "Docker images for %s" % (repo),
                     "PUSHRM_FILE": "README.md",
                     "PUSHRM_PROVIDER": "quay",
+                    "PUSHRM_DEBUG": True,
                 },
             },
         ],

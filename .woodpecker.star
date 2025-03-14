@@ -300,7 +300,7 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 7,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "e2eTests": {
@@ -891,7 +891,7 @@ def localApiTestPipeline(ctx):
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": ["decomposed"],
+        "storages": ["posix"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -1122,7 +1122,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         ],
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "posix", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
@@ -1408,7 +1408,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            opencloudServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            opencloudServer(storage = "posix", extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",

@@ -945,7 +945,8 @@ def localApiTestPipeline(ctx):
 
 def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
+    # expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
+    expected_failures_file = "%s/expected-failures-localAPI-on-decomposed-storage.md" % (test_dir)
 
     environment = {
         "TEST_SERVER_URL": OC_URL,
@@ -1125,7 +1126,8 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "posix", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
+    # expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
+    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
 
     return {
         "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),

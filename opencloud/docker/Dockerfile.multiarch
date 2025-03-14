@@ -1,14 +1,15 @@
 FROM golang:alpine3.20 AS build
 ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION
+ARG STRING
 
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
-COPY ./ /opencloud/
+COPY ../ /opencloud/
 
 WORKDIR /opencloud
 RUN GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" ; \
-    make go-generate ; \
     make -C opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true
 
 FROM alpine:3.20

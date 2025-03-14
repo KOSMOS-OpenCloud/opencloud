@@ -33,7 +33,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Alice" file "<new-file-name>" should not exist
     Examples:
       | dav-path-version | file-name     | new-file-name  |
@@ -54,7 +54,7 @@ Feature: antivirus
     And the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Alice" file "<new-file-name>" should not exist
     But as "Alice" file "/normalfile.txt" should exist
     And the content of file "/normalfile.txt" for user "Alice" should be:
@@ -107,7 +107,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
       | dav-path-version | file-name     | new-file-name  |
@@ -133,7 +133,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
       | dav-path-version | file-name     | new-file-name  |
@@ -160,7 +160,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
@@ -190,7 +190,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
@@ -212,14 +212,14 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And for user "Alice" folder "uploadFolder" of the space "new-space" should not contain these entries:
       | <new-file-name> |
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And for user "Alice" the space "new-space" should not contain these entries:
       | /<new-file-name> |
     Examples:
@@ -242,7 +242,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
       | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
     And for user "Brian" the space "new-space" should not contain these entries:
       | /<new-file-name> |
     And for user "Alice" the space "new-space" should not contain these entries:
@@ -273,7 +273,7 @@ Feature: antivirus
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                             |
-      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Eicar-Signature |
     And as "Alice" file "/aFileWithVirus.txt" should not exist
     Examples:
       | dav-path-version |
@@ -294,7 +294,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-  @issue-enterprise-5706 @issue-183
+  @issue-enterprise-5706 @issue-183 @issue-369
   Scenario Outline: upload a file with virus and get notification in different languages
     Given user "Alice" has switched the system language to "<language>" using the Graph API
     And using <dav-path-version> DAV path
@@ -305,13 +305,13 @@ Feature: antivirus
       | <message> |
     And as "Alice" file "/aFileWithVirus.txt" should not exist
     Examples:
-      | dav-path-version | language | subject          | message                                                                                                                        |
-      | old              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
-      | new              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
-      | spaces           | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
-      | old              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
-      | new              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
-      | spaces           | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
+      | dav-path-version | language | subject          | message                                                                                                                   |
+      | old              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Eicar-Signature                              |
+      | new              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Eicar-Signature                              |
+      | spaces           | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Eicar-Signature                                     |
+      | old              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Eicar-Signature |
+      | new              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Eicar-Signature |
+      | spaces           | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Eicar-Signature |
 
   @issue-enterprise-5709
   Scenario Outline: try to create a version of file by uploading virus content
@@ -477,7 +477,7 @@ Feature: antivirus
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "text.txt" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                   |
-      | Virus found in text.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | message                                                              |
+      | Virus found in text.txt. Upload not possible. Virus: Eicar-Signature |
     And for user "Brian" the content of the file "/text.txt" of the space "new-space" should be "hello world"
     And for user "Alice" the content of the file "/text.txt" of the space "new-space" should be "hello world"

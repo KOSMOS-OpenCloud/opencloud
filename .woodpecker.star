@@ -2009,6 +2009,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
         "OC_URL": OC_URL,
         "OC_CONFIG_DIR": "/root/.opencloud/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
+        "STORAGE_USERS_ID_CACHE_STORE": "nats-js-kv",
         "PROXY_ENABLE_BASIC_AUTH": True,
         "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
         "OC_LOG_LEVEL": "error",

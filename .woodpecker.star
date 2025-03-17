@@ -240,7 +240,7 @@ config = {
             "suites": [
                 "apiOcm",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -249,8 +249,8 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
-                "OCIS_ENABLE_OCM": True,
+                "OC_ADD_RUN_SERVICES": "ocm,notifications",
+                "OC_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
                 "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,

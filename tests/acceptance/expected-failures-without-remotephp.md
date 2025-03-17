@@ -36,7 +36,7 @@
 - [apiSearch1/search.feature:321](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L321)
 - [apiSearch1/search.feature:324](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L324)
 - [apiSearch1/search.feature:356](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L356)
-- [apiSearch1/search.feature:369](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L369
+- [apiSearch1/search.feature:369](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L369)
 - [apiSearch1/search.feature:396](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L396)
 - [apiSearch1/search.feature:410](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L410)
 - [apiSearch2/mediaTypeSearch.feature:31](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch2/mediaTypeSearch.feature#L31)
@@ -300,7 +300,7 @@
 - [coreApiWebdavOperations/propfind.feature:69](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavOperations/propfind.feature#L69)
 - [coreApiWebdavUpload/uploadFile.feature:376](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUpload/uploadFile.feature#L376)
 - [apiActivities/shareActivities.feature:1956](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L1956)
-  [apiActivities/shareActivities.feature:2095](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L2095)
+- [apiActivities/shareActivities.feature:2095](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L2095)
 
 #### [Cannot create new TUS upload resource using /webdav without remote.php - returns html instead](https://github.com/owncloud/ocis/issues/10346)
 

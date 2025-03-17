@@ -36,6 +36,7 @@
 - [apiSearch1/search.feature:321](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L321)
 - [apiSearch1/search.feature:324](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L324)
 - [apiSearch1/search.feature:356](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L356)
+- [apiSearch1/search.feature:369](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L369
 - [apiSearch1/search.feature:396](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L396)
 - [apiSearch1/search.feature:410](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L410)
 - [apiSearch2/mediaTypeSearch.feature:31](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch2/mediaTypeSearch.feature#L31)
@@ -148,7 +149,7 @@
 - [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:147](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L147)
 - [apiSharingNgLinkSharePermission/createLinkShare.feature:473](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkSharePermission/createLinkShare.feature#L473)
 - [apiSharingNgLinkSharePermission/createLinkShare.feature:1208](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkSharePermission/createLinkShare.feature#L1208)
-- [apiSharingNgLinkSharePermission/updateLinkShare.feature:203](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkSharePermission/updateLinkShare.feature#L203)
+- [apiSharingNgLinkSharePermission/updateLinkShare.feature:204](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkSharePermission/updateLinkShare.feature#L204)
 - [apiSharingNgLinkSharePermission/updateLinkShare.feature:282](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkSharePermission/updateLinkShare.feature#L282)
 - [apiSharingNgLinkShareRoot/updateLinkShare.feature:10](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkShareRoot/updateLinkShare.feature#L10)
 - [apiSharingNgLinkShareRoot/updateLinkShare.feature:42](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSharingNgLinkShareRoot/updateLinkShare.feature#L42)
@@ -187,7 +188,7 @@
 - [apiSpaces/uploadSpaces.feature:95](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpaces/uploadSpaces.feature#L95)
 - [apiSpaces/uploadSpaces.feature:112](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpaces/uploadSpaces.feature#L112)
 - [apiSpaces/uploadSpaces.feature:129](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpaces/uploadSpaces.feature#L129)
-- [apiSpacesShares/shareSpacesViaLink.feature:61](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L61)
+- [apiSpacesShares/shareSpacesViaLink.feature:58](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L58)
 - [apiDepthInfinity/propfind.feature:74](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiDepthInfinity/propfind.feature#L74)
 - [apiDepthInfinity/propfind.feature:124](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiDepthInfinity/propfind.feature#L124)
 - [apiLocks/lockFiles.feature:490](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiLocks/lockFiles.feature#L490)
@@ -304,6 +305,8 @@
 - [coreApiWebdavOperations/propfind.feature:55](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavOperations/propfind.feature#L55)
 - [coreApiWebdavOperations/propfind.feature:69](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavOperations/propfind.feature#L69)
 - [coreApiWebdavUpload/uploadFile.feature:376](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUpload/uploadFile.feature#L376)
+- [apiActivities/shareActivities.feature:1956](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L1956)
+  [apiActivities/shareActivities.feature:2095](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/shareActivities.feature#L2095)
 
 #### [Cannot create new TUS upload resource using /webdav without remote.php - returns html instead](https://github.com/owncloud/ocis/issues/10346)
 

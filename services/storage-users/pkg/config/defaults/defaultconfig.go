@@ -143,7 +143,7 @@ func DefaultConfig() *config.Config {
 				UseSpaceGroups:             false,
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
-				PersonalSpacePathTemplate:  "users/{{.User.Username}}",
+				PersonalSpacePathTemplate:  "users/{{.User.Id.OpaqueId}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				GeneralSpacePathTemplate:   "projects/{{.SpaceId}}",
 				PermissionsEndpoint:        "eu.opencloud.api.settings",

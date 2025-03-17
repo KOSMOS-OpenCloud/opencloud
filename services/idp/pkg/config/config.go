@@ -60,13 +60,14 @@ type Asset struct {
 }
 
 type Client struct {
-	ID              string   `yaml:"id"`
-	Name            string   `yaml:"name"`
-	Trusted         bool     `yaml:"trusted"`
-	Secret          string   `yaml:"secret"`
-	RedirectURIs    []string `yaml:"redirect_uris"`
-	Origins         []string `yaml:"origins"`
-	ApplicationType string   `yaml:"application_type"`
+	ID                     string   `yaml:"id"`
+	Name                   string   `yaml:"name"`
+	Trusted                bool     `yaml:"trusted"`
+	Secret                 string   `yaml:"secret"`
+	RedirectURIs           []string `yaml:"redirect_uris"`
+	PostLogoutRedirectURIs []string `yaml:"post_logout_redirect_uris"`
+	Origins                []string `yaml:"origins"`
+	ApplicationType        string   `yaml:"application_type"`
 }
 
 type Settings struct {

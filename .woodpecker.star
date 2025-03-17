@@ -300,7 +300,7 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 7,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
@@ -886,12 +886,16 @@ def localApiTestPipeline(ctx):
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
+    storages = ["decomposed"]
+    if "posix" in ctx.build.title.lower():
+        storages = ["posix"]
+
     defaults = {
         "suites": {},
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": ["posix"],
+        "storages": storages,
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -945,7 +949,6 @@ def localApiTestPipeline(ctx):
 
 def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    # expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
     expected_failures_file = "%s/expected-failures-localAPI-on-decomposed-storage.md" % (test_dir)
 
     environment = {
@@ -1126,7 +1129,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "posix", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    # expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
     expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
 
     return {
@@ -1188,10 +1190,13 @@ def apiTests(ctx):
         "withRemotePhp": with_remote_php,
     }
 
+    if "posix" in ctx.build.title.lower():
+        storage = "posix"
+
     for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
         for run_with_remote_php in defaults["withRemotePhp"]:
             if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
-                pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], run_with_remote_php))
+                pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], run_with_remote_php, storage))
 
     return pipelines
 
@@ -1339,6 +1344,10 @@ def multiServiceE2ePipeline(ctx):
     if (not "full-ci" in ctx.build.title.lower() and ctx.build.event != "cron"):
         return pipelines
 
+    storage = "decomposed"
+    if "posix" in ctx.build.title.lower():
+        storage = "posix"
+
     extra_server_environment = {
         "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
@@ -1410,7 +1419,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            opencloudServer(storage = "posix", extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",

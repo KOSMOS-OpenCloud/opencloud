@@ -349,7 +349,7 @@ Feature: Create a link share for a resource
 
   @issue-7879 @skip-local-run
   Scenario Outline: try to create a link share of a project-space drive with a password that is listed in the Banned-Password-List using root endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -389,21 +389,21 @@ Feature: Create a link share for a resource
       | banned-password | permissions-role |
       | 123             | view             |
       | password        | view             |
-      | OpenCloud        | view             |
+      | OpenCloud       | view             |
       | 123             | edit             |
       | password        | edit             |
-      | OpenCloud        | edit             |
+      | OpenCloud       | edit             |
       | 123             | upload           |
       | password        | upload           |
-      | OpenCloud        | upload           |
+      | OpenCloud       | upload           |
       | 123             | createOnly       |
       | password        | createOnly       |
-      | OpenCloud        | createOnly       |
+      | OpenCloud       | createOnly       |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a project-space drive without password using root endpoint
     Given the following configs have been set:
-      | config                                       | value |
+      | config                                     | value |
       | OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

@@ -502,7 +502,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     When user "Alice" creates the following resource link share using the Graph API:
       | resource        | text.txt          |
@@ -757,7 +757,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a link share of a folder inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -799,16 +799,16 @@ Feature: Create a link share for a resource
       | banned-password | permissions-role |
       | 123             | view             |
       | password        | view             |
-      | OpenCloud        | view             |
+      | OpenCloud       | view             |
       | 123             | edit             |
       | password        | edit             |
-      | OpenCloud        | edit             |
+      | OpenCloud       | edit             |
       | 123             | upload           |
       | password        | upload           |
-      | OpenCloud        | upload           |
+      | OpenCloud       | upload           |
       | 123             | createOnly       |
       | password        | createOnly       |
-      | OpenCloud        | createOnly       |
+      | OpenCloud       | createOnly       |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a file inside project-space without password using permissions endpoint
@@ -1157,7 +1157,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: create a link share of a file inside project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
@@ -1199,10 +1199,10 @@ Feature: Create a link share for a resource
       | banned-password | permissions-role |
       | 123             | view             |
       | password        | view             |
-      | OpenCloud        | view             |
+      | OpenCloud       | view             |
       | 123             | edit             |
       | password        | edit             |
-      | OpenCloud        | edit             |
+      | OpenCloud       | edit             |
 
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a file inside project-space using permissions endpoint
@@ -1612,7 +1612,7 @@ Feature: Create a link share for a resource
 
 
   Scenario Outline: try to create a link share of a project-space with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API

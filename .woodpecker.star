@@ -105,7 +105,7 @@ config = {
             "suites": [
                 "apiSettings",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -113,7 +113,7 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
+                "OC_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": True,
@@ -126,14 +126,14 @@ config = {
                 "apiGraph",
                 "apiServiceAvailability",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
         },
         "graphUserGroup": {
             "suites": [
                 "apiGraphUserGroup",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
         },
         "spaces": {
@@ -185,7 +185,7 @@ config = {
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
             ],
-            "skip": True,
+            "skip": False,
         },
         "accountsHashDifficulty": {
             "skip": False,
@@ -198,7 +198,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -206,7 +206,7 @@ config = {
                 "EMAIL_PORT": "9000",
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
+                "OC_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": True,

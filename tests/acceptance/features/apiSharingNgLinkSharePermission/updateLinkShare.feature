@@ -232,7 +232,7 @@ Feature: Update a link share for a resource
 
 
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     And user "Alice" has created the following resource link share:
       | resource        | text.txt |
@@ -276,7 +276,7 @@ Feature: Update a link share for a resource
       | banned-password |
       | 123             |
       | password        |
-      | OpenCloud        |
+      | OpenCloud       |
 
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a folder inside project-space using permissions endpoint

@@ -256,7 +256,7 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -272,14 +272,14 @@ Feature: enforce password on public link
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "<message>"
     Examples:
-      | password | http-status-code | ocs-status-code | message                                                                                               |
-      | 123      | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
-      | password | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password  | http-status-code | ocs-status-code | message                                                                                               |
+      | 123       | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password  | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | OpenCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
 
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
-    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/woodpecker/banned-password-list.txt"
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -291,7 +291,7 @@ Feature: enforce password on public link
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "<message>"
     Examples:
-      | password | http-status-code | ocs-status-code | message                                                                                               |
-      | 123      | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
-      | password | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password  | http-status-code | ocs-status-code | message                                                                                               |
+      | 123       | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
+      | password  | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |
       | OpenCloud | 400              | 400             | Unfortunately, your password is commonly used. please pick a harder-to-guess password for your safety |

@@ -60,6 +60,7 @@ dirs = {
     "opencloudConfig": "tests/config/woodpecker/opencloud-config.json",
     "ocis": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis/owncloud/data",
+    "multiServiceOcBaseDataPath": "/woodpecker/src/github.com/opencloud-eu/opencloud/multiServiceData",
     "ocWrapper": "/woodpecker/src/github.com/opencloud-eu/opencloud/tests/ocwrapper",
     "bannedPasswordList": "tests/config/woodpecker/banned-password-list.txt",
     "ocmProviders": "tests/config/woodpecker/providers.json",
@@ -310,14 +311,14 @@ config = {
             "xsuites": ["search", "app-provider", "app-provider-onlyOffice", "app-store", "keycloak", "oidc", "ocm"],  # suites to skip
         },
         "search": {
-            "skip": True,
+            "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": True,
+            "skip": False,
             "suites": [
                 "smoke",
                 "shares",
@@ -343,6 +344,8 @@ config = {
     "litmus": True,
     "codestyle": True,
 }
+
+GRAPH_AVAILABLE_ROLES = "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa"
 
 # workspace for pipeline to cache Go dependencies between steps of a pipeline
 # to be used in combination with stepVolumeGo
@@ -920,7 +923,7 @@ def localApiTestPipeline(ctx):
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (opencloudServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
-                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
+                                     (openCloudHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
                                      logRequests(),
                             "services": (emailService() if params["emailNeeded"] else []) +
@@ -1205,9 +1208,8 @@ def e2eTestPipeline(ctx):
     extra_server_environment = {
         "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
         "OC_SHOW_USER_EMAIL_IN_RESULTS": True,
-        "FRONTEND_OCS_ENABLE_DENIALS": True,
         # Needed for enabling all roles
-        "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
+        "GRAPH_AVAILABLE_ROLES": "%s" % GRAPH_AVAILABLE_ROLES,
     }
 
     e2e_trigger = [
@@ -1315,20 +1317,18 @@ def multiServiceE2ePipeline(ctx):
         "tikaNeeded": False,
     }
 
-    e2e_trigger = {
-        "when": [
-            {
-                "event": ["push", "manual"],
-                "branch": "main",
+    e2e_trigger = [
+        {
+            "event": ["push", "manual"],
+            "branch": "main",
+        },
+        {
+            "event": "pull_request",
+            "path": {
+                "exclude": skipIfUnchanged(ctx, "e2e-tests"),
             },
-            {
-                "event": "pull_request",
-                "path": {
-                    "exclude": skipIfUnchanged(ctx, "e2e-tests"),
-                },
-            },
-        ],
-    }
+        },
+    ]
 
     if ("skip-e2e" in ctx.build.title.lower()):
         return pipelines
@@ -1338,28 +1338,32 @@ def multiServiceE2ePipeline(ctx):
         return pipelines
 
     extra_server_environment = {
-        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
-        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
-        "OCIS_SERVICE_ACCOUNT_ID": "service-account-id",
-        "OCIS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
-        "OCIS_EXCLUDE_RUN_SERVICES": "storage-users",
-        "OCIS_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
+        "OC_SERVICE_ACCOUNT_ID": "service-account-id",
+        "OC_SERVICE_ACCOUNT_SECRET": "service-account-secret",
+        "OC_EXCLUDE_RUN_SERVICES": "storage-users",
+        "OC_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "SETTINGS_GRPC_ADDR": "0.0.0.0:9191",
         "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-id",
+        "OC_SHOW_USER_EMAIL_IN_RESULTS": True,
+        # Needed for enabling all roles
+        "GRAPH_AVAILABLE_ROLES": "%s" % GRAPH_AVAILABLE_ROLES,
     }
 
     storage_users_environment = {
-        "OCIS_CORS_ALLOW_ORIGINS": "%s,https://%s:9201" % (OC_URL, OC_SERVER_NAME),
-        "STORAGE_USERS_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_CORS_ALLOW_ORIGINS": "%s,https://%s:9201" % (OC_URL, OC_SERVER_NAME),
+        "STORAGE_USERS_JWT_SECRET": "some-opencloud-jwt-secret",
         "STORAGE_USERS_MOUNT_ID": "storage-users-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_ID": "service-account-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
         "STORAGE_USERS_GATEWAY_GRPC_ADDR": "%s:9142" % OC_SERVER_NAME,
         "STORAGE_USERS_EVENTS_ENDPOINT": "%s:9233" % OC_SERVER_NAME,
         "STORAGE_USERS_DATA_GATEWAY_URL": "%s/data" % OC_URL,
-        "OCIS_CACHE_STORE": "nats-js-kv",
-        "OCIS_CACHE_STORE_NODES": "%s:9233" % OC_SERVER_NAME,
+        "OC_CACHE_STORE": "nats-js-kv",
+        "OC_CACHE_STORE_NODES": "%s:9233" % OC_SERVER_NAME,
         "MICRO_REGISTRY_ADDRESS": "%s:9233" % OC_SERVER_NAME,
+        "OC_BASE_DATA_PATH": dirs["multiServiceOcBaseDataPath"],
     }
     storage_users1_environment = {
         "STORAGE_USERS_GRPC_ADDR": "storageusers1:9157",
@@ -1379,13 +1383,9 @@ def multiServiceE2ePipeline(ctx):
     for item in storage_users_environment:
         storage_users2_environment[item] = storage_users_environment[item]
 
-    storage_volume = [{
-        "name": "storage",
-        "path": "/root/.ocis",
-    }]
-    storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
-                             startOcisService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
-                             ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
+    storage_users_services = startOpenCloudService("storage-users", "storageusers1", storage_users1_environment) + \
+                             startOpenCloudService("storage-users", "storageusers2", storage_users2_environment) + \
+                             openCloudHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
 
     for _, suite in config["e2eMultiService"].items():
         if "skip" in suite and suite["skip"]:
@@ -1414,7 +1414,7 @@ def multiServiceE2ePipeline(ctx):
                 "name": "e2e-tests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
-                    "BASE_URL_OCIS": OC_DOMAIN,
+                    "OC_BASE_URL": OC_DOMAIN,
                     "HEADLESS": True,
                     "RETRY": "1",
                 },
@@ -1422,14 +1422,15 @@ def multiServiceE2ePipeline(ctx):
                     "cd %s/tests/e2e" % dirs["web"],
                     "bash run-e2e.sh %s" % e2e_args,
                 ],
-            }] + logTracingResults()
+            }]
 
+        # + logTracingResults()
         # uploadTracingResult(ctx) + \
         pipelines.append({
             "name": "e2e-tests-multi-service",
             "steps": steps,
             "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
-            "workspace": e2e_trigger,
+            "when": e2e_trigger,
         })
     return pipelines
 
@@ -2146,15 +2147,14 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
 
     return steps
 
-def startOcisService(service = None, name = None, environment = {}, volumes = []):
+def startOpenCloudService(service = None, name = None, environment = {}):
     """
-    Starts an OCIS service in a detached container.
+    Starts an OpenCloud service in a detached container.
 
     Args:
         service (str): The name of the service to start.
         name (str): The name of the container.
         environment (dict): The environment variables to set in the container.
-        volumes (list): The volumes to mount in the container.
 
     Returns:
         list: A list of pipeline steps to start the service.
@@ -2851,7 +2851,7 @@ def wopiCollaborationService(name):
 
     environment["COLLABORATION_WOPI_SRC"] = "http://%s:9300" % service_name
 
-    return startOcisService("collaboration", service_name, environment)
+    return startOpenCloudService("collaboration", service_name, environment)
 
 def tikaService():
     return [{
@@ -2981,7 +2981,7 @@ def waitForServices(name, services = []):
         ],
     }]
 
-def ocisHealthCheck(name, services = []):
+def openCloudHealthCheck(name, services = []):
     commands = []
     timeout = 300
     curl_command = ["timeout %s bash -c 'while [ $(curl -s %s/%s ", "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'"]

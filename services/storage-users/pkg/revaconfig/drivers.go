@@ -115,6 +115,15 @@ func Posix(cfg *config.Config, enableFSScan bool) map[string]interface{} {
 			"cache_auth_username":       cfg.FilemetadataCache.AuthUsername,
 			"cache_auth_password":       cfg.FilemetadataCache.AuthPassword,
 		},
+		"events": map[string]interface{}{
+			"numconsumers": cfg.Events.NumConsumers,
+		},
+		"tokens": map[string]interface{}{
+			"transfer_shared_secret": cfg.Commons.TransferSecret,
+			"transfer_expires":       cfg.TransferExpires,
+			"download_endpoint":      cfg.DataServerURL,
+			"datagateway_endpoint":   cfg.DataGatewayURL,
+		},
 		"use_space_groups":           cfg.Drivers.Posix.UseSpaceGroups,
 		"enable_fs_revisions":        cfg.Drivers.Posix.EnableFSRevisions,
 		"scan_fs":                    enableFSScan,

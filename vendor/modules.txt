@@ -1191,7 +1191,7 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencloud-eu/reva/v2 v2.28.1-0.20250318095448-45dd4836c008
+# github.com/opencloud-eu/reva/v2 v2.28.1-0.20250318145617-dd5b9b6fb606
 ## explicit; go 1.24.1
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime

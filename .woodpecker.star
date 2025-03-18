@@ -53,7 +53,7 @@ dirs = {
     "web": "/woodpecker/src/github.com/opencloud-eu/opencloud/webTestRunner",
     "zip": "/woodpecker/src/github.com/opencloud-eu/opencloud/zip",
     "webZip": "/woodpecker/src/github.com/opencloud-eu/opencloud/zip/web.tar.gz",
-    "webPnpmZip": "/woodpecker/src/github.com/opencloud-eu/opencloud/zip/pnpm-store.tar.gz",
+    "webPnpmZip": "/woodpecker/src/github.com/opencloud-eu/opencloud/zip/web-pnpm.tar.gz",
     "baseGo": "/go/src/github.com/opencloud-eu/opencloud",
     "gobinTar": "go-bin.tar.gz",
     "gobinTarPath": "/go/src/github.com/opencloud-eu/opencloud/go-bin.tar.gz",
@@ -562,15 +562,8 @@ def getGoBinForTesting(ctx):
 def checkGoBinCache():
     return [{
         "name": "check-go-bin-cache",
-        "image": OC_UBUNTU,
-        "environment": {
-            "CACHE_ENDPOINT": {
-                "from_secret": "cache_s3_server",
-            },
-            "CACHE_BUCKET": {
-                "from_secret": "cache_s3_bucket",
-            },
-        },
+        "image": MINIO_MC,
+        "environment": MINIO_MC_ENV,
         "commands": [
             "bash -x %s/tests/config/woodpecker/check_go_bin_cache.sh %s %s" % (dirs["baseGo"], dirs["baseGo"], dirs["gobinTar"]),
         ],
@@ -582,6 +575,8 @@ def cacheGoBin():
             "name": "bingo-get",
             "image": OC_CI_GOLANG,
             "commands": [
+                ". ./.env",
+                "if $BIN_CACHE_FOUND; then exit 0; fi",
                 "make bingo-update",
             ],
             "environment": CI_HTTP_PROXY_ENV,
@@ -590,6 +585,8 @@ def cacheGoBin():
             "name": "archive-go-bin",
             "image": OC_UBUNTU,
             "commands": [
+                ". ./.env",
+                "if $BIN_CACHE_FOUND; then exit 0; fi",
                 "tar -czvf %s /go/bin" % dirs["gobinTarPath"],
             ],
         },
@@ -598,6 +595,8 @@ def cacheGoBin():
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
+                ". ./.env",
+                "if $BIN_CACHE_FOUND; then exit 0; fi",
                 # .bingo folder will change after 'bingo-get'
                 # so get the stored hash of a .bingo folder
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["baseGo"],
@@ -2640,15 +2639,8 @@ def getWoodpeckerEnvAndCheckScript(ctx):
 def checkForWebCache(name):
     return {
         "name": "check-for-%s-cache" % name,
-        "image": OC_UBUNTU,
-        "environment": {
-            "CACHE_ENDPOINT": {
-                "from_secret": "cache_s3_server",
-            },
-            "CACHE_BUCKET": {
-                "from_secret": "cache_s3_bucket",
-            },
-        },
+        "image": MINIO_MC,
+        "environment": MINIO_MC_ENV,
         "commands": [
             "bash -x check_web_cache.sh %s" % name,
         ],
@@ -2660,6 +2652,7 @@ def cloneWeb():
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
             ". ./.woodpecker.env",
+            "if $WEB_CACHE_FOUND; then exit 0; fi",
             "rm -rf %s" % dirs["web"],
             "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/opencloud-eu/web.git %s" % dirs["web"],
             "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
@@ -2675,6 +2668,8 @@ def generateWebPnpmCache(ctx):
             "name": "install-pnpm",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
+                ". ./.woodpecker.env",
+                "if $WEB_CACHE_FOUND; then exit 0; fi",
                 "cd %s" % dirs["web"],
                 'npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"',
                 "pnpm config set store-dir ./.pnpm-store",
@@ -2685,6 +2680,8 @@ def generateWebPnpmCache(ctx):
             "name": "zip-pnpm",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
+                ". ./.woodpecker.env",
+                "if $WEB_CACHE_FOUND; then exit 0; fi",
                 # zip the pnpm deps before caching
                 "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
                 "cd %s" % dirs["web"],
@@ -2696,7 +2693,8 @@ def generateWebPnpmCache(ctx):
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
-                "source ./.woodpecker.env",
+                ". ./.woodpecker.env",
+                "if $WEB_CACHE_FOUND; then exit 0; fi",
                 # cache using the minio/mc client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webPnpmZip"],
@@ -2713,6 +2711,8 @@ def generateWebCache(ctx):
             "name": "zip-web",
             "image": OC_UBUNTU,
             "commands": [
+                ". ./.woodpecker.env",
+                "if $WEB_CACHE_FOUND; then exit 0; fi",
                 "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
                 "tar -czvf %s webTestRunner" % dirs["webZip"],
             ],
@@ -2722,7 +2722,8 @@ def generateWebCache(ctx):
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
-                "source ./.woodpecker.env",
+                ". ./.woodpecker.env",
+                "if $WEB_CACHE_FOUND; then exit 0; fi",
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a %s s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
@@ -2758,7 +2759,7 @@ def restoreWebPnpmCache():
         "commands": [
             "source ./.woodpecker.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc cp -r -a s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz %s" % dirs["zip"],
+            "mc cp -r -a s3/$CACHE_BUCKET/opencloud/web-test-runner/$WEB_COMMITID/web-pnpm.tar.gz %s" % dirs["zip"],
         ],
     }, {
         # we need to install again because the node_modules are not cached

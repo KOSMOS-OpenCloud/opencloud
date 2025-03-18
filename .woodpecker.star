@@ -80,7 +80,7 @@ OC_FED_DOMAIN = "%s:10200" % FED_OC_SERVER_NAME
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
         "skip": False,
@@ -999,6 +999,8 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          "image": OC_CS3_API_VALIDATOR,
                          "environment": {},
                          "commands": [
+                             "apk --no-cache add curl",
+                             "curl '%s/graph/v1.0/users' -k -X POST  --data-raw '{\"onPremisesSamAccountName\":\"marie\",\"displayName\":\"Marie Curie\",\"mail\":\"marie@opencloud.eu\",\"passwordProfile\":{\"password\":\"radioactivity\"}}' -uadmin:admin" % OC_URL,
                              "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=%s:9142" % OC_SERVER_NAME,
                          ],
                      },

@@ -521,11 +521,15 @@ def testPipelines(ctx):
     if config["litmus"]:
         pipelines += litmus(ctx, "decomposed")
 
+    storage = "decomposed"
+    if "[posix]" in ctx.build.title.lower():
+        storage = "posix"
+
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+        pipelines.append(cs3ApiTests(ctx, storage, "default"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+        pipelines.append(wopiValidatorTests(ctx, storage, "builtin", "default"))
+        pipelines.append(wopiValidatorTests(ctx, storage, "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
@@ -888,12 +892,16 @@ def localApiTestPipeline(ctx):
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
+    storages = ["decomposed"]
+    if "[posix]" in ctx.build.title.lower():
+        storages = ["posix"]
+
     defaults = {
         "suites": {},
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": ["decomposed"],
+        "storages": storages,
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -947,7 +955,7 @@ def localApiTestPipeline(ctx):
 
 def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
+    expected_failures_file = "%s/expected-failures-localAPI-on-decomposed-storage.md" % (test_dir)
 
     environment = {
         "TEST_SERVER_URL": OC_URL,
@@ -1124,10 +1132,14 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         ],
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
+    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
+
+    storage = "decomposed"
+    if "[posix]" in ctx.build.title.lower():
+        storage = "posix"
 
     return {
         "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
@@ -1236,6 +1248,10 @@ def e2eTestPipeline(ctx):
     if (ctx.build.event == "tag"):
         return pipelines
 
+    storage = "decomposed"
+    if "[posix]" in ctx.build.title.lower():
+        storage = "posix"
+
     for name, suite in config["e2eTests"].items():
         if "skip" in suite and suite["skip"]:
             continue
@@ -1259,7 +1275,7 @@ def e2eTestPipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            opencloudServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
@@ -1336,6 +1352,10 @@ def multiServiceE2ePipeline(ctx):
     if (not "full-ci" in ctx.build.title.lower() and ctx.build.event != "cron"):
         return pipelines
 
+    storage = "decomposed"
+    if "[posix]" in ctx.build.title.lower():
+        storage = "posix"
+
     extra_server_environment = {
         "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
         "OC_JWT_SECRET": "some-opencloud-jwt-secret",
@@ -1407,7 +1427,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            opencloudServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",
@@ -2059,6 +2079,9 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
         "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
     }
+
+    if storage == "posix":
+        environment["STORAGE_USERS_ID_CACHE_STORE"] = "nats-js-kv"
 
     if deploy_type == "":
         environment["FRONTEND_OCS_ENABLE_DENIALS"] = True

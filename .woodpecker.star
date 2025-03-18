@@ -35,7 +35,7 @@ ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER_BUILDX = "woodpeckerci/plugin-docker-buildx:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
-PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
+PLUGINS_GITHUB_RELEASE = "woodpeckerci/plugin-release"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_GIT_PUSH = "appleboy/drone-git-push"
 PLUGINS_MANIFEST = "plugins/manifest:1"
@@ -558,6 +558,9 @@ def getGoBinForTesting(ctx):
                 "path": {
                     "exclude": skipIfUnchanged(ctx, "unit-tests"),
                 },
+            },
+            {
+                "event": "tag",
             },
         ],
         "workspace": workspace,
@@ -1656,7 +1659,7 @@ def dockerRelease(ctx, repo, build_type):
 
 def binaryReleases(ctx):
     pipelines = []
-    depends_on = getPipelineNames(testOpencloudAndUploadResults(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(getGoBinForTesting(ctx))
 
     for os in config["binaryReleases"]["os"]:
         pipelines.append(binaryRelease(ctx, os, depends_on))
@@ -1694,19 +1697,6 @@ def binaryRelease(ctx, arch, depends_on = []):
                 ],
             },
             {
-                "name": "changelog",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", ""),
-                ],
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-            {
                 "name": "release",
                 "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
@@ -1714,11 +1704,8 @@ def binaryRelease(ctx, arch, depends_on = []):
                         "from_secret": "github_token",
                     },
                     "files": [
-                        "ocis/dist/release/*",
+                        "opencloud/dist/release/*",
                     ],
-                    "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
-                    "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [
@@ -1788,19 +1775,6 @@ def licenseCheck(ctx):
                 ],
             },
             {
-                "name": "changelog",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
-                ],
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-            {
                 "name": "release",
                 "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
@@ -1810,10 +1784,6 @@ def licenseCheck(ctx):
                     "files": [
                         "third-party-licenses.tar.gz",
                     ],
-                    "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
-                    "overwrite": True,
-                    "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [
                     {

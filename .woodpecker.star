@@ -1565,13 +1565,20 @@ def dockerRelease(ctx, repo, build_type):
                 "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
                     "dry_run": True,
-                    "platforms": "linux/amd64,linux/arm64",
+                    "platforms": "linux/amd64",  # do dry run only on the native platform
                     "repo": "%s,quay.io/%s" % (repo, repo),
                     "auto_tag": False if build_type == "daily" else True,
                     "tag": "daily" if build_type == "daily" else "",
                     "default_tag": "daily",
                     "dockerfile": "opencloud/docker/Dockerfile.multiarch",
                     "build_args": build_args,
+                    "pull_image": False,
+                    "http_proxy": {
+                        "from_secret": "ci_http_proxy",
+                    },
+                    "https_proxy": {
+                        "from_secret": "ci_http_proxy",
+                    },
                 },
                 "when": [
                     {
@@ -1584,12 +1591,19 @@ def dockerRelease(ctx, repo, build_type):
                 "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
                     "repo": "%s,quay.io/%s" % (repo, repo),
-                    "platforms": "linux/amd64,linux/arm64",
+                    "platforms": "linux/amd64,linux/arm64",  # we can add remote builders
                     "auto_tag": False if build_type == "daily" else True,
                     "tag": "daily" if build_type == "daily" else "",
                     "default_tag": "daily",
                     "dockerfile": "opencloud/docker/Dockerfile.multiarch",
                     "build_args": build_args,
+                    "pull_image": False,
+                    "http_proxy": {
+                        "from_secret": "ci_http_proxy",
+                    },
+                    "https_proxy": {
+                        "from_secret": "ci_http_proxy",
+                    },
                     "logins": [
                         {
                             "registry": "https://index.docker.io/v1/",

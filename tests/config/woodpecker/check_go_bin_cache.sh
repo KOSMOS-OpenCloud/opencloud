@@ -15,13 +15,17 @@ BINGO_DIR="$ROOT_PATH/.bingo"
 BINGO_HASH=$(cat "$BINGO_DIR"/* | sha256sum | cut -d ' ' -f 1)
 
 URL="$CACHE_ENDPOINT/$CACHE_BUCKET/opencloud/go-bin/$BINGO_HASH/$2"
-if curl --output /dev/null --silent --head --fail "$URL"; then
+
+mc alias set s3 "$MC_HOST" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+
+if mc ls --json s3/"$CACHE_BUCKET"/opencloud/go-bin/"$BINGO_HASH"/$2 | grep "\"status\":\"success\""; then
     echo "[INFO] Go bin cache with has '$BINGO_HASH' exists."
-    # https://discourse.drone.io/t/how-to-exit-a-pipeline-early-without-failing/3951
-    # exit a Pipeline early without failing
-    exit 78
+    ENV="BIN_CACHE_FOUND=true\n"
 else
     # stored hash of a .bingo folder to '.bingo_hash' file
     echo "$BINGO_HASH" >"$ROOT_PATH/.bingo_hash"
     echo "[INFO] Go bin cache with has '$BINGO_HASH' does not exist."
+    ENV="BIN_CACHE_FOUND=false\n"
 fi
+
+echo -e $ENV >> .env

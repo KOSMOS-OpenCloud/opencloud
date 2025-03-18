@@ -27,7 +27,7 @@ Feature: backup consistency
     Then the command should be successful
     And the command output should contain "💚 No inconsistency found. The backup in '%storage_path%' seems to be valid."
 
-  @issue-9498
+  @issue-9498 @issue-391 @skipOnOpencloud-decomposed-Storage
   Scenario: check backup consistency after uploading file multiple times via TUS
     Given user "Alice" uploads a file "filesForUpload/textfile.txt" to "/today.txt" with mtime "today" via TUS inside of the space "Personal" using the WebDAV API
     And user "Alice" uploads a file "filesForUpload/textfile.txt" to "/today.txt" with mtime "today" via TUS inside of the space "Personal" using the WebDAV API
@@ -41,7 +41,7 @@ Feature: backup consistency
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
 
-  @issue-9498
+  @issue-9498 @issue-428 @skipOnOpencloud-decomposed-Storage
   Scenario: check backup consistency after uploading a file multiple times
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"

@@ -35,7 +35,7 @@ ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER_BUILDX = "woodpeckerci/plugin-docker-buildx:latest"
 PLUGINS_GH_PAGES = "plugins/gh-pages:1"
-PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
+PLUGINS_GITHUB_RELEASE = "woodpeckerci/plugin-release"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_GIT_PUSH = "appleboy/drone-git-push"
 PLUGINS_MANIFEST = "plugins/manifest:1"
@@ -558,6 +558,9 @@ def getGoBinForTesting(ctx):
                 "path": {
                     "exclude": skipIfUnchanged(ctx, "unit-tests"),
                 },
+            },
+            {
+                "event": "tag",
             },
         ],
         "workspace": workspace,
@@ -1656,7 +1659,7 @@ def dockerRelease(ctx, repo, build_type):
 
 def binaryReleases(ctx):
     pipelines = []
-    depends_on = getPipelineNames(testOpencloudAndUploadResults(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames(getGoBinForTesting(ctx))
 
     for os in config["binaryReleases"]["os"]:
         pipelines.append(binaryRelease(ctx, os, depends_on))
@@ -1714,10 +1717,10 @@ def binaryRelease(ctx, arch, depends_on = []):
                         "from_secret": "github_token",
                     },
                     "files": [
-                        "ocis/dist/release/*",
+                        "opencloud/dist/release/*",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
+                    "note": "opencloud/dist/CHANGELOG.md",
                     "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
@@ -1811,7 +1814,7 @@ def licenseCheck(ctx):
                         "third-party-licenses.tar.gz",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "ocis/dist/CHANGELOG.md",
+                    "note": "opencloud/dist/CHANGELOG.md",
                     "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },

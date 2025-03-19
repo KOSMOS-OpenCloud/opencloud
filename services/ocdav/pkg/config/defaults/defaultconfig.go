@@ -92,7 +92,6 @@ func DefaultConfig() *config.Config {
 			ProductVersion: version.GetString(),
 			Product:        "OpenCloud",
 			ProductName:    "OpenCloud",
-			Edition:        "",
 		},
 	}
 }

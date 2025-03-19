@@ -101,12 +101,18 @@ func DefaultConfig() *config.Config {
 				RedirectURIs: []string{
 					"oc://android.opencloud.eu",
 				},
+				PostLogoutRedirectURIs: []string{
+					"oc://android.opencloud.eu",
+				},
 			},
 			{
 				ID:              "OpenCloudIOS",
 				Name:            "OpenCloud iOS App",
 				ApplicationType: "native",
 				RedirectURIs: []string{
+					"oc://ios.opencloud.eu",
+				},
+				PostLogoutRedirectURIs: []string{
 					"oc://ios.opencloud.eu",
 				},
 			},

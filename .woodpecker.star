@@ -521,15 +521,15 @@ def testPipelines(ctx):
     if config["litmus"]:
         pipelines += litmus(ctx, "decomposed")
 
-    storage = "posix"
-    if "[decomposed]" in ctx.build.title.lower():
-        storage = "decomposed"
+    storages = ["posix", "decomposed"]
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, storage, "default"))
+        for storage in storages:
+            pipelines.append(cs3ApiTests(ctx, storage, "default"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, storage, "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, storage, "cs3", "default"))
+        for storage in storages:
+            pipelines.append(wopiValidatorTests(ctx, storage, "builtin", "default"))
+            pipelines.append(wopiValidatorTests(ctx, storage, "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
@@ -895,16 +895,12 @@ def localApiTestPipeline(ctx):
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
-    storages = ["posix"]
-    if "[decomposed]" in ctx.build.title.lower():
-        storages = ["decomposed"]
-
     defaults = {
         "suites": {},
         "skip": False,
         "extraEnvironment": {},
         "extraServerEnvironment": {},
-        "storages": storages,
+        "storages": ["decomposed", "posix"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
@@ -956,9 +952,9 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
+def localApiTests(ctx, name, suites, storage, extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-localAPI-on-decomposed-storage.md" % (test_dir)
+    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage)
 
     environment = {
         "TEST_SERVER_URL": OC_URL,
@@ -1138,58 +1134,60 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, accounts_hash_difficulty = 4):
-    storage = "posix"
-    if "[decomposed]" in ctx.build.title.lower():
-        storage = "decomposed"
-    filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
-    test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
+    storages = ["posix", "decomposed"]
+    steps = []
 
-    return {
-        "name": "Core-API-Tests-%s%s-%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else "", storage),
-        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
-                 opencloudServer(storage, accounts_hash_difficulty, with_wrapper = True) +
-                 [
-                     {
-                         "name": "oC10ApiTests-%s" % part_number,
-                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                         "environment": {
-                             "TEST_SERVER_URL": OC_URL,
-                             "OC_REVA_DATA_ROOT": "%s" % (dirs["opencloudRevaDataRoot"] if storage == "owncloud" else ""),
-                             "SEND_SCENARIO_LINE_REFERENCES": True,
-                             "STORAGE_DRIVER": storage,
-                             "BEHAT_FILTER_TAGS": filterTags,
-                             "DIVIDE_INTO_NUM_PARTS": number_of_parts,
-                             "RUN_PART": part_number,
-                             "ACCEPTANCE_TEST_TYPE": "core-api",
-                             "EXPECTED_FAILURES_FILE": expected_failures_file,
-                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                             "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
-                             "WITH_REMOTE_PHP": with_remote_php,
+    for storage in storages:
+        filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
+        test_dir = "%s/tests/acceptance" % dirs["base"]
+        expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage)
+
+        steps.append({
+            "name": "Core-API-Tests-%s%s-%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else "", storage),
+            "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
+                     opencloudServer(storage, accounts_hash_difficulty, with_wrapper = True) +
+                     [
+                         {
+                             "name": "oC10ApiTests-%s-%s" % (storage, part_number),
+                             "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                             "environment": {
+                                 "TEST_SERVER_URL": OC_URL,
+                                 "OC_REVA_DATA_ROOT": "%s" % (dirs["opencloudRevaDataRoot"] if storage == "owncloud" else ""),
+                                 "SEND_SCENARIO_LINE_REFERENCES": True,
+                                 "STORAGE_DRIVER": storage,
+                                 "BEHAT_FILTER_TAGS": filterTags,
+                                 "DIVIDE_INTO_NUM_PARTS": number_of_parts,
+                                 "RUN_PART": part_number,
+                                 "ACCEPTANCE_TEST_TYPE": "core-api",
+                                 "EXPECTED_FAILURES_FILE": expected_failures_file,
+                                 "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                                 "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
+                                 "WITH_REMOTE_PHP": with_remote_php,
+                             },
+                             "commands": [
+                                 # merge the expected failures
+                                 "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+                                 "make -C %s test-acceptance-api" % (dirs["base"]),
+                             ],
                          },
-                         "commands": [
-                             # merge the expected failures
-                             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
-                             "make -C %s test-acceptance-api" % (dirs["base"]),
-                         ],
-                     },
-                 ] +
-                 logRequests(),
-        "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx)),
-        "when": [
-            {
-                "event": ["push", "manual"],
-                "branch": "main",
-            },
-            {
-                "event": "pull_request",
-                "path": {
-                    "exclude": skipIfUnchanged(ctx, "acceptance-tests"),
+                     ] +
+                     logRequests(),
+            "services": redisForOCStorage(storage),
+            "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx)),
+            "when": [
+                {
+                    "event": ["push", "manual"],
+                    "branch": "main",
                 },
-            },
-        ],
-    }
+                {
+                    "event": "pull_request",
+                    "path": {
+                        "exclude": skipIfUnchanged(ctx, "acceptance-tests"),
+                    },
+                },
+            ],
+        })
+    return steps
 
 def apiTests(ctx):
     pipelines = []
@@ -1252,77 +1250,76 @@ def e2eTestPipeline(ctx):
     if (ctx.build.event == "tag"):
         return pipelines
 
-    storage = "posix"
-    if "[decomposed]" in ctx.build.title.lower():
-        storage = "decomposed"
+    storages = ["posix", "decomposed"]
 
-    for name, suite in config["e2eTests"].items():
-        if "skip" in suite and suite["skip"]:
-            continue
+    for storage in storages:
+        for name, suite in config["e2eTests"].items():
+            if "skip" in suite and suite["skip"]:
+                continue
 
-        params = {}
-        for item in defaults:
-            params[item] = suite[item] if item in suite else defaults[item]
+            params = {}
+            for item in defaults:
+                params[item] = suite[item] if item in suite else defaults[item]
 
-        e2e_args = ""
-        if params["totalParts"] > 0:
-            e2e_args = "--total-parts %d" % params["totalParts"]
-        elif params["suites"]:
-            e2e_args = "--suites %s" % ",".join(params["suites"])
+            e2e_args = ""
+            if params["totalParts"] > 0:
+                e2e_args = "--total-parts %d" % params["totalParts"]
+            elif params["suites"]:
+                e2e_args = "--suites %s" % ",".join(params["suites"])
 
-        # suites to skip
-        if params["xsuites"]:
-            e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
+            # suites to skip
+            if params["xsuites"]:
+                e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
-        steps_before = \
-            restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBin"]) + \
-            restoreWebCache() + \
-            restoreWebPnpmCache() + \
-            (tikaService() if params["tikaNeeded"] else []) + \
-            opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            steps_before = \
+                restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBin"]) + \
+                restoreWebCache() + \
+                restoreWebPnpmCache() + \
+                (tikaService() if params["tikaNeeded"] else []) + \
+                opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
 
-        step_e2e = {
-            "name": "e2e-tests",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "environment": {
-                "OC_BASE_URL": OC_DOMAIN,
-                "HEADLESS": True,
-                "RETRY": "1",
-                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
-                "LOCAL_UPLOAD_DIR": "/uploads",
-            },
-            "commands": [
-                "cd %s/tests/e2e" % dirs["web"],
-            ],
-        }
-
-        # steps_after = uploadTracingResult(ctx) + \
-        # steps_after = logTracingResults()
-        steps_after = []
-
-        if params["totalParts"]:
-            for index in range(params["totalParts"]):
-                run_part = index + 1
-                run_e2e = {}
-                run_e2e.update(step_e2e)
-                run_e2e["commands"] = [
+            step_e2e = {
+                "name": "e2e-tests",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "environment": {
+                    "OC_BASE_URL": OC_DOMAIN,
+                    "HEADLESS": True,
+                    "RETRY": "1",
+                    "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["opencloudConfig"]),
+                    "LOCAL_UPLOAD_DIR": "/uploads",
+                },
+                "commands": [
                     "cd %s/tests/e2e" % dirs["web"],
-                    "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
-                ]
+                ],
+            }
+
+            # steps_after = uploadTracingResult(ctx) + \
+            # steps_after = logTracingResults()
+            steps_after = []
+
+            if params["totalParts"]:
+                for index in range(params["totalParts"]):
+                    run_part = index + 1
+                    run_e2e = {}
+                    run_e2e.update(step_e2e)
+                    run_e2e["commands"] = [
+                        "cd %s/tests/e2e" % dirs["web"],
+                        "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
+                    ]
+                    pipelines.append({
+                        "name": "e2e-tests-%s-%s-%s" % (name, run_part, storage),
+                        "steps": steps_before + [run_e2e] + steps_after,
+                        "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
+                        "when": e2e_trigger,
+                    })
+            else:
+                step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
                 pipelines.append({
-                    "name": "e2e-tests-%s-%s-%s" % (name, run_part, storage),
-                    "steps": steps_before + [run_e2e] + steps_after,
+                    "name": "e2e-tests-%s-%s" % (name, storage),
+                    "steps": steps_before + [step_e2e] + steps_after,
                     "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "when": e2e_trigger,
                 })
-        else:
-            step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
-            pipelines.append({
-                "name": "e2e-tests-%s-%s" % (name, storage),
-                "steps": steps_before + [step_e2e] + steps_after,
-                "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
-                "when": e2e_trigger,
-            })
 
     return pipelines
 
@@ -1431,7 +1428,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            opencloudServer("decomposed", extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",
@@ -2040,7 +2037,7 @@ def notify(ctx):
         "runs_on": status,
     }
 
-def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def opencloudServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = OC_SERVER_NAME
     environment = {
@@ -2559,6 +2556,8 @@ def litmus(ctx, storage):
     if (config["litmus"] == False):
         return pipelines
 
+    storages = ["posix", "decomposed"]
+
     environment = {
         "LITMUS_PASSWORD": "admin",
         "LITMUS_USERNAME": "admin",
@@ -2567,93 +2566,94 @@ def litmus(ctx, storage):
 
     litmusCommand = "/usr/local/bin/litmus-wrapper"
 
-    result = {
-        "name": "litmus",
-        "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
-                 opencloudServer(storage) +
-                 setupForLitmus() +
-                 [
-                     {
-                         "name": "old-endpoint",
-                         "image": OC_LITMUS,
-                         "environment": environment,
-                         "commands": [
-                             "source .env",
-                             'export LITMUS_URL="%s/remote.php/webdav"' % OC_URL,
-                             litmusCommand,
-                         ],
-                     },
-                     {
-                         "name": "new-endpoint",
-                         "image": OC_LITMUS,
-                         "environment": environment,
-                         "commands": [
-                             "source .env",
-                             'export LITMUS_URL="%s/remote.php/dav/files/admin"' % OC_URL,
-                             litmusCommand,
-                         ],
-                     },
-                     {
-                         "name": "new-shared",
-                         "image": OC_LITMUS,
-                         "environment": environment,
-                         "commands": [
-                             "source .env",
-                             'export LITMUS_URL="%s/remote.php/dav/files/admin/Shares/new_folder/"' % OC_URL,
-                             litmusCommand,
-                         ],
-                     },
-                     {
-                         "name": "old-shared",
-                         "image": OC_LITMUS,
-                         "environment": environment,
-                         "commands": [
-                             "source .env",
-                             'export LITMUS_URL="%s/remote.php/webdav/Shares/new_folder/"' % OC_URL,
-                             litmusCommand,
-                         ],
-                     },
-                     #  {
-                     #      "name": "public-share",
-                     #      "image": OC_LITMUS,
-                     #      "environment": {
-                     #          "LITMUS_PASSWORD": "admin",
-                     #          "LITMUS_USERNAME": "admin",
-                     #          "TESTS": "basic copymove http",
-                     #      },
-                     #      "commands": [
-                     #          "source .env",
-                     #          "export LITMUS_URL='%s/remote.php/dav/public-files/'$PUBLIC_TOKEN" % OCIS_URL,
-                     #          litmusCommand,
-                     #      ],
-                     #  },
-                     {
-                         "name": "spaces-endpoint",
-                         "image": OC_LITMUS,
-                         "environment": environment,
-                         "commands": [
-                             "source .env",
-                             "export LITMUS_URL='%s/remote.php/dav/spaces/'$SPACE_ID" % OC_URL,
-                             litmusCommand,
-                         ],
-                     },
-                 ],
-        "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx)),
-        "when": [
-            {
-                "event": ["push", "manual"],
-                "branch": "main",
-            },
-            {
-                "event": "pull_request",
-                "path": {
-                    "exclude": skipIfUnchanged(ctx, "litmus"),
+    for storage in storages:
+        result = {
+            "name": "litmus-%s" % (storage),
+            "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
+                     opencloudServer(storage) +
+                     setupForLitmus() +
+                     [
+                         {
+                             "name": "old-endpoint",
+                             "image": OC_LITMUS,
+                             "environment": environment,
+                             "commands": [
+                                 "source .env",
+                                 'export LITMUS_URL="%s/remote.php/webdav"' % OC_URL,
+                                 litmusCommand,
+                             ],
+                         },
+                         {
+                             "name": "new-endpoint",
+                             "image": OC_LITMUS,
+                             "environment": environment,
+                             "commands": [
+                                 "source .env",
+                                 'export LITMUS_URL="%s/remote.php/dav/files/admin"' % OC_URL,
+                                 litmusCommand,
+                             ],
+                         },
+                         {
+                             "name": "new-shared",
+                             "image": OC_LITMUS,
+                             "environment": environment,
+                             "commands": [
+                                 "source .env",
+                                 'export LITMUS_URL="%s/remote.php/dav/files/admin/Shares/new_folder/"' % OC_URL,
+                                 litmusCommand,
+                             ],
+                         },
+                         {
+                             "name": "old-shared",
+                             "image": OC_LITMUS,
+                             "environment": environment,
+                             "commands": [
+                                 "source .env",
+                                 'export LITMUS_URL="%s/remote.php/webdav/Shares/new_folder/"' % OC_URL,
+                                 litmusCommand,
+                             ],
+                         },
+                         #  {
+                         #      "name": "public-share",
+                         #      "image": OC_LITMUS,
+                         #      "environment": {
+                         #          "LITMUS_PASSWORD": "admin",
+                         #          "LITMUS_USERNAME": "admin",
+                         #          "TESTS": "basic copymove http",
+                         #      },
+                         #      "commands": [
+                         #          "source .env",
+                         #          "export LITMUS_URL='%s/remote.php/dav/public-files/'$PUBLIC_TOKEN" % OCIS_URL,
+                         #          litmusCommand,
+                         #      ],
+                         #  },
+                         {
+                             "name": "spaces-endpoint",
+                             "image": OC_LITMUS,
+                             "environment": environment,
+                             "commands": [
+                                 "source .env",
+                                 "export LITMUS_URL='%s/remote.php/dav/spaces/'$SPACE_ID" % OC_URL,
+                                 litmusCommand,
+                             ],
+                         },
+                     ],
+            "services": redisForOCStorage(storage),
+            "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx)),
+            "when": [
+                {
+                    "event": ["push", "manual"],
+                    "branch": "main",
                 },
-            },
-        ],
-    }
-    pipelines.append(result)
+                {
+                    "event": "pull_request",
+                    "path": {
+                        "exclude": skipIfUnchanged(ctx, "litmus"),
+                    },
+                },
+            ],
+        }
+        pipelines.append(result)
 
     return pipelines
 

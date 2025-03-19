@@ -83,7 +83,7 @@ config = {
         "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
         "skip": True,
@@ -267,7 +267,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": True,
+            "skip": False,
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
@@ -1054,7 +1054,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         ]
     else:
         extra_server_environment = {
-            "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
+            "OC_EXCLUDE_RUN_SERVICES": "app-provider",
         }
 
         wopiServer = wopiCollaborationService("fakeoffice")
@@ -1093,8 +1093,8 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
     return {
         "name": "wopiValidatorTests-%s" % wopiServerType,
+        "services": fakeOffice(),
         "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
-                 fakeOffice() +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
                  opencloudServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
@@ -2112,7 +2112,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
 
     if deploy_type == "wopi_validator":
         environment["GATEWAY_GRPC_ADDR"] = "0.0.0.0:9142"  # make gateway available to wopi server
-        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
+        environment["APP_PROVIDER_EXTERNAL_ADDR"] = "eu.opencloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
@@ -2850,7 +2850,6 @@ def fakeOffice():
         {
             "name": "fakeoffice",
             "image": OC_CI_ALPINE,
-            "detach": True,
             "environment": {},
             "commands": [
                 "sh %s/tests/config/woodpecker/serve-hosting-discovery.sh" % (dirs["base"]),
@@ -2871,7 +2870,7 @@ def wopiCollaborationService(name):
         "COLLABORATION_APP_PROOF_DISABLE": True,
         "COLLABORATION_APP_INSECURE": True,
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": True,
-        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "OC_JWT_SECRET": "some-opencloud-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
     }
 
@@ -3040,9 +3039,7 @@ def collaboraService():
     return [
         {
             "name": "collabora",
-            "type": "docker",
             "image": COLLABORA_CODE,
-            "detach": True,
             "environment": {
                 "DONT_GEN_SSL_CERT": "set",
                 "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=%s" % OC_URL,
@@ -3058,9 +3055,7 @@ def onlyofficeService():
     return [
         {
             "name": "onlyoffice",
-            "type": "docker",
             "image": ONLYOFFICE_DOCUMENT_SERVER,
-            "detach": True,
             "environment": {
                 "WOPI_ENABLED": True,
                 "USE_UNAUTHORIZED_STORAGE": True,  # self signed certificates

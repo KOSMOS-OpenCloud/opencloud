@@ -2142,7 +2142,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocWrapper"],
-        "env",
+        "env | sort",
         "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], dirs["opencloudBin"], environment["OC_URL"]),
     ]
 

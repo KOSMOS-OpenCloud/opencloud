@@ -11,17 +11,9 @@ import (
 	"strings"
 	"time"
 
-	authapp "github.com/opencloud-eu/opencloud/services/auth-app/pkg/command"
-
 	"github.com/cenkalti/backoff"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
-	notifications "github.com/opencloud-eu/opencloud/services/notifications/pkg/command"
-	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
-	"github.com/opencloud-eu/reva/v2/pkg/logger"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/thejerf/suture/v4"
-
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	ogrpc "github.com/opencloud-eu/opencloud/pkg/service/grpc"
@@ -31,6 +23,7 @@ import (
 	appProvider "github.com/opencloud-eu/opencloud/services/app-provider/pkg/command"
 	appRegistry "github.com/opencloud-eu/opencloud/services/app-registry/pkg/command"
 	audit "github.com/opencloud-eu/opencloud/services/audit/pkg/command"
+	authapp "github.com/opencloud-eu/opencloud/services/auth-app/pkg/command"
 	authbasic "github.com/opencloud-eu/opencloud/services/auth-basic/pkg/command"
 	authmachine "github.com/opencloud-eu/opencloud/services/auth-machine/pkg/command"
 	authservice "github.com/opencloud-eu/opencloud/services/auth-service/pkg/command"
@@ -44,6 +37,7 @@ import (
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/command"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/command"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/command"
+	notifications "github.com/opencloud-eu/opencloud/services/notifications/pkg/command"
 	ocdav "github.com/opencloud-eu/opencloud/services/ocdav/pkg/command"
 	ocm "github.com/opencloud-eu/opencloud/services/ocm/pkg/command"
 	ocs "github.com/opencloud-eu/opencloud/services/ocs/pkg/command"
@@ -64,6 +58,10 @@ import (
 	web "github.com/opencloud-eu/opencloud/services/web/pkg/command"
 	webdav "github.com/opencloud-eu/opencloud/services/webdav/pkg/command"
 	webfinger "github.com/opencloud-eu/opencloud/services/webfinger/pkg/command"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/reva/v2/pkg/logger"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/thejerf/suture/v4"
 )
 
 var (
@@ -159,6 +157,11 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.AppRegistry.Context = ctx
 		cfg.AppRegistry.Commons = cfg.Commons
 		return appRegistry.Execute(cfg.AppRegistry)
+	})
+	reg(3, opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
+		cfg.AuthApp.Context = ctx
+		cfg.AuthApp.Commons = cfg.Commons
+		return authapp.Execute(cfg.AuthApp)
 	})
 	reg(3, opts.Config.AuthBasic.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.AuthBasic.Context = ctx
@@ -323,11 +326,6 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Audit.Context = ctx
 		cfg.Audit.Commons = cfg.Commons
 		return audit.Execute(cfg.Audit)
-	})
-	areg(opts.Config.AuthApp.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
-		cfg.AuthApp.Context = ctx
-		cfg.AuthApp.Commons = cfg.Commons
-		return authapp.Execute(cfg.AuthApp)
 	})
 	areg(opts.Config.Policies.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.Policies.Context = ctx

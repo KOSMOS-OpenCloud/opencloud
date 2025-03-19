@@ -100,6 +100,9 @@ func DefaultConfig() *config.Config {
 			Cluster:   "opencloud-cluster",
 			EnableTLS: false,
 		},
+		AuthMiddleware: config.AuthMiddleware{
+			AllowAppAuth: true,
+		},
 	}
 }
 

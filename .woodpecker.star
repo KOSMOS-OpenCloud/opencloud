@@ -288,7 +288,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "extraServerEnvironment": {

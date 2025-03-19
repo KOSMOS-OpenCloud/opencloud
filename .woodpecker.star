@@ -296,6 +296,7 @@ config = {
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "OC_ASYNC_UPLOADS": True,
                 "OC_ADD_RUN_SERVICES": "antivirus",
+                "STORAGE_USERS_DRIVER": "decomposed",
             },
         },
     },

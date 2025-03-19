@@ -521,9 +521,9 @@ def testPipelines(ctx):
     if config["litmus"]:
         pipelines += litmus(ctx, "decomposed")
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines.append(cs3ApiTests(ctx, storage, "default"))
@@ -895,9 +895,9 @@ def localApiTestPipeline(ctx):
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
-    storages = ["decomposed"]
-    if "[posix]" in ctx.build.title.lower():
-        storages = ["posix"]
+    storages = ["posix"]
+    if "[decomposed]" in ctx.build.title.lower():
+        storages = ["decomposed"]
 
     defaults = {
         "suites": {},
@@ -1136,9 +1136,9 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, accounts_hash_difficulty = 4):
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
     filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
@@ -1250,9 +1250,9 @@ def e2eTestPipeline(ctx):
     if (ctx.build.event == "tag"):
         return pipelines
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     for name, suite in config["e2eTests"].items():
         if "skip" in suite and suite["skip"]:
@@ -1354,9 +1354,9 @@ def multiServiceE2ePipeline(ctx):
     if (not "full-ci" in ctx.build.title.lower() and ctx.build.event != "cron"):
         return pipelines
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     extra_server_environment = {
         "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],

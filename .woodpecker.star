@@ -59,7 +59,7 @@ dirs = {
     "gobinTarPath": "/go/src/github.com/opencloud-eu/opencloud/go-bin.tar.gz",
     "opencloudConfig": "tests/config/woodpecker/opencloud-config.json",
     "ocis": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis",
-    "ocisRevaDataRoot": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis/owncloud/data",
+    "opencloudRevaDataRoot": "/woodpecker/src/github.com/opencloud-eu/opencloud/srv/app/tmp/ocis/owncloud/data",
     "multiServiceOcBaseDataPath": "/woodpecker/src/github.com/opencloud-eu/opencloud/multiServiceData",
     "ocWrapper": "/woodpecker/src/github.com/opencloud-eu/opencloud/tests/ocwrapper",
     "bannedPasswordList": "tests/config/woodpecker/banned-password-list.txt",
@@ -301,7 +301,7 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 7,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "e2eTests": {
@@ -1136,13 +1136,12 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, accounts_hash_difficulty = 4):
-    filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
-    test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
-
     storage = "decomposed"
     if "[posix]" in ctx.build.title.lower():
         storage = "posix"
+    filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
+    test_dir = "%s/tests/acceptance" % dirs["base"]
+    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
 
     return {
         "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
@@ -1154,7 +1153,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "TEST_SERVER_URL": OC_URL,
-                             "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+                             "OC_REVA_DATA_ROOT": "%s" % (dirs["opencloudRevaDataRoot"] if storage == "owncloud" else ""),
                              "SEND_SCENARIO_LINE_REFERENCES": True,
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": filterTags,
@@ -1163,7 +1162,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                              "ACCEPTANCE_TEST_TYPE": "core-api",
                              "EXPECTED_FAILURES_FILE": expected_failures_file,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                             "OCIS_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
+                             "OC_WRAPPER_URL": "http://%s:5200" % OC_SERVER_NAME,
                              "WITH_REMOTE_PHP": with_remote_php,
                          },
                          "commands": [

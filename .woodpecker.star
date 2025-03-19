@@ -521,9 +521,9 @@ def testPipelines(ctx):
     if config["litmus"]:
         pipelines += litmus(ctx, "decomposed")
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines.append(cs3ApiTests(ctx, storage, "default"))
@@ -895,9 +895,9 @@ def localApiTestPipeline(ctx):
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
-    storages = ["decomposed"]
-    if "[posix]" in ctx.build.title.lower():
-        storages = ["posix"]
+    storages = ["posix"]
+    if "[decomposed]" in ctx.build.title.lower():
+        storages = ["decomposed"]
 
     defaults = {
         "suites": {},
@@ -924,7 +924,7 @@ def localApiTestPipeline(ctx):
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
                         pipeline = {
-                            "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                            "name": "%s-%s%s-%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else "", storage),
                             "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
@@ -990,7 +990,7 @@ def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment =
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
-        "name": "cs3ApiTests",
+        "name": "cs3ApiTests-%s" % storage,
         "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  opencloudServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
                  [
@@ -1092,7 +1092,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
             })
 
     return {
-        "name": "wopiValidatorTests-%s" % wopiServerType,
+        "name": "wopiValidatorTests-%s-%s" % (wopiServerType, storage),
         "services": fakeOffice(),
         "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
@@ -1136,15 +1136,15 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, accounts_hash_difficulty = 4):
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
     filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
 
     return {
-        "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
+        "name": "Core-API-Tests-%s%s-%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else "", storage),
         "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                  opencloudServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
@@ -1250,9 +1250,9 @@ def e2eTestPipeline(ctx):
     if (ctx.build.event == "tag"):
         return pipelines
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     for name, suite in config["e2eTests"].items():
         if "skip" in suite and suite["skip"]:
@@ -1308,7 +1308,7 @@ def e2eTestPipeline(ctx):
                     "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
                 ]
                 pipelines.append({
-                    "name": "e2e-tests-%s-%s" % (name, run_part),
+                    "name": "e2e-tests-%s-%s-%s" % (name, run_part, storage),
                     "steps": steps_before + [run_e2e] + steps_after,
                     "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "when": e2e_trigger,
@@ -1316,7 +1316,7 @@ def e2eTestPipeline(ctx):
         else:
             step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
             pipelines.append({
-                "name": "e2e-tests-%s" % name,
+                "name": "e2e-tests-%s-%s" % (name, storage),
                 "steps": steps_before + [step_e2e] + steps_after,
                 "depends_on": getPipelineNames(buildOpencloudBinaryForTesting(ctx) + buildWebCache(ctx)),
                 "when": e2e_trigger,
@@ -1354,9 +1354,9 @@ def multiServiceE2ePipeline(ctx):
     if (not "full-ci" in ctx.build.title.lower() and ctx.build.event != "cron"):
         return pipelines
 
-    storage = "decomposed"
-    if "[posix]" in ctx.build.title.lower():
-        storage = "posix"
+    storage = "posix"
+    if "[decomposed]" in ctx.build.title.lower():
+        storage = "decomposed"
 
     extra_server_environment = {
         "OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
@@ -2142,6 +2142,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volume
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocWrapper"],
+        "env | sort",
         "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], dirs["opencloudBin"], environment["OC_URL"]),
     ]
 

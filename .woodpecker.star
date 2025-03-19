@@ -398,7 +398,7 @@ def getPipelineNames(pipelines = []):
     """getPipelineNames returns names of pipelines as a string array
 
     Args:
-      pipelines: array of drone pipelines
+      pipelines: array of woodpecker pipelines
 
     Returns:
       names of the given pipelines as string array
@@ -409,10 +409,10 @@ def getPipelineNames(pipelines = []):
     return names
 
 def main(ctx):
-    """main is the entrypoint for drone
+    """main is the entrypoint for woodpecker
 
     Args:
-      ctx: drone passes a context with information which the pipeline can be adapted to
+      ctx: woodpecker passes a context with information which the pipeline can be adapted to
 
     Returns:
       none
@@ -511,7 +511,7 @@ def testOpencloudAndUploadResults(ctx):
     # FIXME: RE-ENABLE THIS ASAP!!!                                      #
     ######################################################################
 
-    #security_scan = scanOcis(ctx)
+    #security_scan = scanOpencloud(ctx)
     #return [security_scan, pipeline, scan_result_upload]
     return [pipeline]
 
@@ -697,7 +697,7 @@ def testOpencloud(ctx):
         "workspace": workspace,
     }
 
-def scanOcis(ctx):
+def scanOpencloud(ctx):
     steps = restoreGoBinCache() + makeGoGenerate("") + [
         {
             "name": "govulncheck",
@@ -1516,7 +1516,7 @@ def dockerReleases(ctx):
     build_type = "daily"
 
     # dockerhub repo
-    #  - "owncloud/ocis-rolling"
+    #  - "opencloudeu/opencloud-rolling"
     repo = docker_repo_slug + "-rolling"
     docker_repos.append(repo)
 
@@ -2223,7 +2223,7 @@ def redis():
         },
     ]
 
-def redisForOCStorage(storage = "ocis"):
+def redisForOCStorage(storage = "decomposed"):
     if storage == "owncloud":
         return redis()
     else:
@@ -2279,16 +2279,16 @@ def skipIfUnchanged(ctx, type):
 
 def example_deploys(ctx):
     on_merge_deploy = [
-        "ocis_full/master.yml",
-        "ocis_full/onlyoffice-master.yml",
+        "opencloud_full/master.yml",
+        "opencloud_full/onlyoffice-master.yml",
     ]
     nightly_deploy = [
-        "ocis_ldap/rolling.yml",
-        "ocis_keycloak/rolling.yml",
-        "ocis_full/production.yml",
-        "ocis_full/rolling.yml",
-        "ocis_full/onlyoffice-rolling.yml",
-        "ocis_full/s3-rolling.yml",
+        "opencloud_ldap/rolling.yml",
+        "opencloud_keycloak/rolling.yml",
+        "opencloud_full/production.yml",
+        "opencloud_full/rolling.yml",
+        "opencloud_full/onlyoffice-rolling.yml",
+        "opencloud_full/s3-rolling.yml",
     ]
 
     # if on master branch:
@@ -2482,10 +2482,10 @@ def pipelineSanityChecks(ctx, pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
 
     These sanity checks are only executed on when converting starlark to yaml.
-    Error outputs are only visible when the conversion is done with the drone cli.
+    Error outputs are only visible when the conversion is done with the woodpecker cli.
 
     Args:
-      ctx: drone passes a context with information which the pipeline can be adapted to
+      ctx: woodpecker passes a context with information which the pipeline can be adapted to
       pipelines: pipelines to be checked, normally you should run this on the return value of main()
 
     Returns:
@@ -2920,18 +2920,18 @@ def logRequests():
     }]
 
 def k6LoadTests(ctx):
-    ocis_remote_environment = {
-        "SSH_OCIS_REMOTE": {
-            "from_secret": "k6_ssh_ocis_remote",
+    opencloud_remote_environment = {
+        "SSH_OC_REMOTE": {
+            "from_secret": "k6_ssh_opencloud_remote",
         },
-        "SSH_OCIS_USERNAME": {
-            "from_secret": "k6_ssh_ocis_user",
+        "SSH_OC_USERNAME": {
+            "from_secret": "k6_ssh_opencloud_user",
         },
-        "SSH_OCIS_PASSWORD": {
-            "from_secret": "k6_ssh_ocis_pass",
+        "SSH_OC_PASSWORD": {
+            "from_secret": "k6_ssh_opencloud_pass",
         },
         "TEST_SERVER_URL": {
-            "from_secret": "k6_ssh_ocis_server_url",
+            "from_secret": "k6_ssh_opencloud_server_url",
         },
     }
     k6_remote_environment = {
@@ -2946,14 +2946,14 @@ def k6LoadTests(ctx):
         },
     }
     environment = {}
-    environment.update(ocis_remote_environment)
+    environment.update(opencloud_remote_environment)
     environment.update(k6_remote_environment)
 
     if "skip" in config["k6LoadTests"] and config["k6LoadTests"]["skip"]:
         return []
 
-    ocis_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
-    script_link = "%s/%s/tests/config/woodpecker/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
+    opencloud_git_base_url = "https://raw.githubusercontent.com/opencloud-eu/opencloud"
+    script_link = "%s/%s/tests/config/woodpecker/run_k6_tests.sh" % (opencloud_git_base_url, ctx.build.commit)
 
     event_array = ["cron"]
 
@@ -2975,13 +2975,13 @@ def k6LoadTests(ctx):
                 ],
             },
             {
-                "name": "ocis-log",
+                "name": "opencloud-log",
                 "image": OC_CI_ALPINE,
-                "environment": ocis_remote_environment,
+                "environment": opencloud_remote_environment,
                 "commands": [
                     "curl -s -o run_k6_tests.sh %s" % script_link,
                     "apk add --no-cache openssh-client sshpass",
-                    "sh %s/run_k6_tests.sh --ocis-log" % (dirs["base"]),
+                    "sh %s/run_k6_tests.sh --opencloud-log" % (dirs["base"]),
                 ],
                 "when": [
                     {

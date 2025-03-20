@@ -296,6 +296,7 @@ config = {
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "OC_ASYNC_UPLOADS": True,
                 "OC_ADD_RUN_SERVICES": "antivirus",
+                "STORAGE_USERS_DRIVER": "decomposed",
             },
         },
     },
@@ -1143,7 +1144,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
         storage = "decomposed"
     filterTags = "~@skipOnGraph&&~@skipOnOpencloud-%s-Storage" % storage
     test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-decomposed-storage.md" % (test_dir)
+    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage)
 
     return {
         "name": "Core-API-Tests-%s%s-%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else "", storage),

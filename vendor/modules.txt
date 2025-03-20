@@ -942,7 +942,7 @@ github.com/minio/highwayhash
 # github.com/minio/md5-simd v1.1.2
 ## explicit; go 1.14
 github.com/minio/md5-simd
-# github.com/minio/minio-go/v7 v7.0.87
+# github.com/minio/minio-go/v7 v7.0.88
 ## explicit; go 1.22
 github.com/minio/minio-go/v7
 github.com/minio/minio-go/v7/pkg/cors
@@ -1057,7 +1057,7 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/ginkgo/v2 v2.23.0
+# github.com/onsi/ginkgo/v2 v2.23.1
 ## explicit; go 1.23.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -1191,7 +1191,7 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencloud-eu/reva/v2 v2.28.1-0.20250318145617-dd5b9b6fb606
+# github.com/opencloud-eu/reva/v2 v2.28.1-0.20250320105919-be91238e6b11
 ## explicit; go 1.24.1
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
@@ -1295,6 +1295,7 @@ github.com/opencloud-eu/reva/v2/pkg/app/registry/registry
 github.com/opencloud-eu/reva/v2/pkg/app/registry/static
 github.com/opencloud-eu/reva/v2/pkg/appauth
 github.com/opencloud-eu/reva/v2/pkg/appauth/manager/json
+github.com/opencloud-eu/reva/v2/pkg/appauth/manager/jsoncs3
 github.com/opencloud-eu/reva/v2/pkg/appauth/manager/loader
 github.com/opencloud-eu/reva/v2/pkg/appauth/manager/registry
 github.com/opencloud-eu/reva/v2/pkg/appctx
@@ -1763,6 +1764,9 @@ github.com/sercand/kuberesolver/v5
 # github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3
 ## explicit; go 1.13
 github.com/sergi/go-diff/diffmatchpatch
+# github.com/sethvargo/go-diceware v0.5.0
+## explicit; go 1.22
+github.com/sethvargo/go-diceware/diceware
 # github.com/sethvargo/go-password v0.3.1
 ## explicit; go 1.21
 github.com/sethvargo/go-password/password

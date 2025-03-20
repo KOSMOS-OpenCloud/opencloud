@@ -99,7 +99,10 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	label := "Generated via API"
+	label := q.Get("label")
+	if label == "" {
+		label = "Generated via API"
+	}
 
 	// Impersonated request
 	userID, userName := q.Get("userID"), q.Get("userName")
@@ -131,7 +134,7 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		label = "Generated via Impersonation API"
+		label = label + " (Impersonation)"
 	}
 
 	scopes, err := scope.AddOwnerScope(map[string]*authpb.Scope{})

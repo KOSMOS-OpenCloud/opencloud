@@ -1,53 +1,44 @@
 # Auth-App
 
-The auth-app service provides authentication for 3rd party apps.
+The auth-app service provides authentication for 3rd party apps unable to use
+OpenID Connect. The service is enabled by default and started automatically. It
+is possible to disable the service by setting:
 
-## The `auth` Service Family
-
-OpenCloud uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
-  -   `auth-app` handles authentication of external 3rd party apps
-  -   `auth-basic` handles basic authentication
-  -   `auth-bearer` handles oidc authentication
-  -   `auth-machine` handles interservice authentication when a user is impersonated
-  -   `auth-service` handles interservice authentication when using service accounts
-
-## Service Startup
-
-Because this service is not started automatically, a manual start needs to be initiated which can be done in several ways. To configure the service usage, an environment variable for the proxy service needs to be set to allow app authentication.
 ```bash
-OC_ADD_RUN_SERVICES=auth-app  # deployment specific. Add the service to the manual startup list, use with binary deployments. Alternatively you can start the service explicitly via the command line.
-PROXY_ENABLE_APP_AUTH=true      # mandatory, allow app authentication. In case of a distributed environment, this envvar needs to be set in the proxy service.
+OC_EXCLUDE_RUN_SERVICES=auth-app # deployment specific. Removes service from the list of automatically started services, use with single-binary deployments
+PROXY_ENABLE_APP_AUTH=false      # mandatory, disables app authentication. In case of a distributed environment, this envvar needs to be set in the proxy service.
 ```
 
 ## App Tokens
 
-App Tokens are used to authenticate 3rd party access via https like when using curl (apps) to access an API endpoint. These apps need to authenticate themselves as no logged in user authenticates the request. To be able to use an app token, one must first create a token. There are different options of creating a token.
+App Tokens are password specifically generated to be used by 3rd party applications
+for authentication when accessing the OpenCloud API endpoints. To
+be able to use an app token, one must first create a token. There are different
+options of creating a token.
 
-### Via CLI (dev only)
+## Important Security Note
 
-Replace the `user-name` with an existing user. For the `token-expiration`, you can use any time abbreviation from the following list: `h, m, s`. Examples: `72h` or `1h` or `1m` or `1s.` Default is `72h`.
+When using an external IDP for authentication, App Token are NOT invalidated
+when the user is disabled or locked in that external IDP. That means the user
+will still be able to use its existing App Tokens for authentication for as
+long as the App Tokes are valid.
 
-```bash
-opencloud auth-app create --user-name={user-name} --expiration={token-expiration}
-```
-
-Once generated, these tokens can be used to authenticate requests to OpenCloud. They are passed as part of the request as `Basic Auth` header.
+## Managing App Tokens
 
 ### Via API
 
-The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at the `/auth-app/tokens` endpoint.
+Please note: This API is preliminary. In the future we will provide endpoints
+in the `graph` service for allowing the management of App Tokens.
 
-When using curl for the respective command, you need to authenticate with a header. To do so, get from the browsers developer console the currently active bearer token. Consider that this token has a short lifetime. In any example, replace `<your host[:port]>` with the URL:port of your OpenCloud instance, and `{token}`  `{value}` accordingly. Note that the active bearer token authenticates the user the token was issued for.
+The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at the `/auth-app/tokens` endpoint.
 
 * **Create a token**\
   The POST request requires:
   * A `expiry` key/value pair in the form of `expiry=<number><h|m|s>`\
     Example: `expiry=72h`
-  * An active bearer token
   ```bash
   curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}' \
-       --header 'accept: application/json' \
-       --header 'authorization: Bearer {token}'
+       --header 'accept: application/json'
   ```
   Example output:
   ```
@@ -59,14 +50,19 @@ When using curl for the respective command, you need to authenticate with a head
   }
   ```
 
+  Note, that this is the only time the app token will be returned in cleartext. To use the token
+  please copy it from the response.
+
 * **List tokens**\
-  The GET request only requires an active bearer token for authentication:\
-  Note that `--request GET` is technically not required because it is curl default. 
   ```bash
   curl --request GET 'https://<your host:9200>/auth-app/tokens' \
-       --header 'accept: application/json' \
-       --header 'authorization: Bearer {token}'
+       --header 'accept: application/json'
   ```
+
+  Note that the `token` value in the response to the "List Tokens` request is not the actual
+  app token, but a hashed value of the token. So this value cannot be used for authenticating
+  with the token.
+
   Example output:
   ```
   [
@@ -87,20 +83,23 @@ When using curl for the respective command, you need to authenticate with a head
 
 * **Delete a token**\
   The DELETE request requires:
-  * A `token` key/value pair in the form of `token=<token_issued>`\
-    Example: `token=Z3s2K7816M4vuSpd5`
-  * An active bearer token
+  * A `token` key/value pair in the form of `token=<token_issued>`. The value needs to be the hashed value as returned by the `List Tokens` respone.\
+    Example: `token=$2$Z3s2K7816M4vuSpd5`
   ```bash
   curl --request DELETE 'https://<your host:9200>/auth-app/tokens?token={value}' \
-       --header 'accept: application/json' \
-       --header 'authorization: Bearer {token}'
+       --header 'accept: application/json'
   ```
 
 ### Via Impersonation API
 
-When setting the environment variable `AUTH_APP_ENABLE_IMPERSONATION` to `true`, admins will be able to use the `/auth-app/tokens` endpoint to create tokens for other users but using their own bearer token for authentication. This can be important for migration scenarios, but should not be considered for regular tasks on a production system for security reasons.
+When setting the environment variable `AUTH_APP_ENABLE_IMPERSONATION` to
+`true`, admins will be able to use the `/auth-app/tokens` endpoint to create
+tokens for other users. This can be important for migration scenarios, but
+should not be considered for regular tasks on a production system for security
+reasons.
 
-To impersonate, the respective requests from the CLI commands above extend with the following parameters, where you can use one or the other:
+To impersonate, the respective requests from the CLI commands above extend with
+the following parameters, where you can use one or the other:
 
 * The `userID` in the form of: `userID={value}`\
   Example:\
@@ -114,6 +113,27 @@ Example:\
 A final create request would then look like:
 ```bash
 curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}&userName={value}' \
-     --header 'accept: application/json' \
-     --header 'authorization: Bearer {token}'
+     --header 'accept: application/json'
+```
+
+### Via CLI (developer only)
+
+As the CLI is using the internal CS3Apis this needs access to the reva gateway
+service. This is mainly of developer (and admin) usage.
+Replace the `user-name` with an existing user. For the `token-expiration`, you
+can use any time abbreviation from the following list: `h, m, s`. Examples:
+`72h` or `1h` or `1m` or `1s.` Default is `72h`.
+
+```bash
+opencloud auth-app create --user-name={user-name} --expiration={token-expiration}
+```
+
+## Authenticating using App Tokens
+
+To autenticate using an App Token simply use the username for which token was generated
+and the token value as returned by the "Create Token" request.
+
+```bash
+curl -u <username>:<tokenvalue> 'https://<your host>/graph/v1.0/me' \
+     --header 'accept: application/json'
 ```

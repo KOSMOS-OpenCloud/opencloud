@@ -98,13 +98,26 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
+			var err error
 			f, ok := registry.NewFuncs[cfg.Driver]
 			if !ok {
 				fmt.Fprintf(os.Stderr, "Unknown filesystem driver '%s'\n", cfg.Driver)
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil, nil)
+			var fsStream events.Stream
+			if cfg.Driver == "posix" {
+				// We need to init the posix driver with 'scanfs' disabled
+				drivers["posix"] = revaconfig.Posix(cfg, false)
+				// Also posix refuses to start without an events stream
+				fsStream, err = event.NewStream(cfg)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Failed to create event stream for posix driver: %v\n", err)
+					os.Exit(1)
+				}
+			}
+
+			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), fsStream, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err

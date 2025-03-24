@@ -80,7 +80,7 @@ services:
       OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/opencloud/csp.yaml
       KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.opencloud.test}
-      STORAGE_SYSTEM_DRIVER: "decomposed"
+      STORAGE_SYSTEM_DRIVER: "posix"
       STORAGE_USERS_DRIVER: "posix"
       STORAGE_USERS_ID_CACHE_STORE: "nats-js-kv"
     volumes:

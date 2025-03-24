@@ -39,7 +39,7 @@ Feature: backup consistency
     And the administrator has started the server
     When user "Alice" gets the number of versions of file "today.txt"
     Then the HTTP status code should be "207"
-    And the number of versions should be "1"
+    And the number of versions should be "2"
 
   @issue-9498 @issue-428
   Scenario: check backup consistency after uploading a file multiple times

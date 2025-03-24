@@ -35,7 +35,7 @@ require (
 	github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry v1.2.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-tika v0.3.1
@@ -63,7 +63,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.23.2
 	github.com/onsi/gomega v1.36.2
 	github.com/open-policy-agent/opa v1.2.0
-	github.com/opencloud-eu/reva/v2 v2.28.1-0.20250321112659-61a430bfb4c5
+	github.com/opencloud-eu/reva/v2 v2.28.1-0.20250322065107-9c53cb981d3f
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20240829135935-80dc00d6f5ea
 	github.com/pkg/errors v0.9.1

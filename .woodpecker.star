@@ -279,10 +279,6 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "AUTH_APP_STORAGE_DRIVER": "json",
-                "PROXY_ENABLE_APP_AUTH": True,
-            },
         },
         "cliCommands": {
             "suites": [

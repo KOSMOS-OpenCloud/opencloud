@@ -22,7 +22,7 @@ Feature: create auth-app token
         ],
         "properties": {
           "token": {
-            "pattern": "^[a-zA-Z0-9]{16}$"
+            "pattern": "^([a-zA-Z]+ ){5}[a-zA-Z]+$"
           },
           "label": {
             "const": "Generated via API"
@@ -58,7 +58,7 @@ Feature: create auth-app token
               ],
               "properties": {
                 "token": {
-                  "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
+                  "pattern": "^\\$argon2id\\$v=19\\$m=65536,t=1,p=16\\$.+$"
                 },
                 "label": {
                   "const": "Generated via API"
@@ -75,7 +75,7 @@ Feature: create auth-app token
               ],
               "properties": {
                 "token": {
-                  "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
+                  "pattern": "^\\$argon2id\\$v=19\\$m=65536,t=1,p=16\\$.+$"
                 },
                 "label": {
                   "const": "Generated via CLI"
@@ -92,7 +92,7 @@ Feature: create auth-app token
               ],
               "properties": {
                 "token": {
-                  "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
+                  "pattern": "^\\$argon2id\\$v=19\\$m=65536,t=1,p=16\\$.+$"
                 },
                 "label": {
                   "const": "Generated via API (Impersonation)"
@@ -121,7 +121,7 @@ Feature: create auth-app token
         ],
         "properties": {
           "token": {
-            "pattern": "^[a-zA-Z0-9]{16}$"
+            "pattern": "^([a-zA-Z]+ ){5}[a-zA-Z]+$"
           },
           "label": {
             "const": "Generated via API (Impersonation)"

@@ -59,7 +59,7 @@ Feature: upload file
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol on the WebDAV API
     Then as "Alice" the mtime of the file "file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
-    And the version folder of file "file.txt" for user "Alice" should contain "1" element
+    And the version folder of file "file.txt" for user "Alice" should contain "2" element
     Examples:
       | dav-path-version |
       | old              |

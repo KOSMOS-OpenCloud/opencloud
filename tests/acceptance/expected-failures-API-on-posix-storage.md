@@ -153,16 +153,6 @@ _ocdav: api compatibility, return correct status code_
 
 - [coreApiTrashbin/trashbinSharingToShares.feature:277](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L277)
 
-#### [Uploading file with mtime gives 500 error](https://github.com/opencloud-eu/opencloud/issues/391)
-
-- [coreApiWebdavUploadTUS/uploadFileMtime.feature:65](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtime.feature#L65)
-- [coreApiWebdavUploadTUS/uploadFileMtime.feature:66](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtime.feature#L66)
-- [coreApiWebdavUploadTUS/uploadFileMtime.feature:67](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtime.feature#L67)
-- [coreApiVersions/fileVersions.feature:296](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersions.feature#L296)
-- [coreApiVersions/fileVersions.feature:297](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersions.feature#L297)
-- [coreApiVersions/fileVersions.feature:298](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersions.feature#L298)
-- [coreApiVersions/fileVersions.feature:301](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiVersions/fileVersions.feature#L301)
-
 ### Won't fix
 
 Not everything needs to be implemented for opencloud.

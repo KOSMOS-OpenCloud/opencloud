@@ -677,21 +677,34 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	}
 
 	var spaceItems []libregraph.DriveItem
+	var err error
+	doCache := true
 
-	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, SpaceImageSpecialFolderName, imageNode, space, baseURL)
-	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, ReadmeSpecialFolderName, readmeNode, space, baseURL)
+	spaceItems, err = g.fetchSpecialDriveItem(ctx, spaceItems, SpaceImageSpecialFolderName, imageNode, space, baseURL)
+	if err != nil {
+		doCache = false
+		g.logger.Debug().Err(err).Str("ID", imageNode).Msg("Could not get space image")
+	}
+	spaceItems, err = g.fetchSpecialDriveItem(ctx, spaceItems, ReadmeSpecialFolderName, readmeNode, space, baseURL)
+	if err != nil {
+		doCache = false
+		g.logger.Debug().Err(err).Str("ID", imageNode).Msg("Could not get space readme")
+	}
 
 	// cache properties
 	spacePropertiesEntry := specialDriveItemEntry{
 		specialDriveItems: spaceItems,
 		rootMtime:         space.GetMtime(),
 	}
-	g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+
+	if doCache {
+		g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+	}
 
 	return spaceItems
 }
 
-func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) []libregraph.DriveItem {
+func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) ([]libregraph.DriveItem, error) {
 	var ref *storageprovider.Reference
 	if itemNode != "" {
 		rid, _ := storagespace.ParseID(itemNode)
@@ -700,12 +713,15 @@ func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregrap
 		ref = &storageprovider.Reference{
 			ResourceId: &rid,
 		}
-		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+		spaceItem, err := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+		if err != nil {
+			return spaceItems, err
+		}
 		if spaceItem != nil {
 			spaceItems = append(spaceItems, *spaceItem)
 		}
 	}
-	return spaceItems
+	return spaceItems, nil
 }
 
 // generates a space root stat cache key used to detect changes in a space
@@ -730,10 +746,10 @@ type specialDriveItemEntry struct {
 	rootMtime         *types.Timestamp
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.DriveItem, error) {
 	var spaceItem *libregraph.DriveItem
 	if ref.GetResourceId().GetSpaceId() == "" && ref.GetResourceId().GetOpaqueId() == "" {
-		return nil
+		return nil, nil
 	}
 
 	// FIXME we should send a fieldmask 'path' and return it as the Path property to save an additional call to the storage.
@@ -741,16 +757,14 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Ref
 	// and Path should always be relative to the space root OR the resource the current user can access ...
 	spaceItem, err := g.getDriveItem(ctx, ref)
 	if err != nil {
-		g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
-		return nil
+		return nil, err
 	}
 	itemPath := ref.GetPath()
 	if itemPath == "" {
 		// lookup by id
 		itemPath, err = g.getPathForResource(ctx, *ref.GetResourceId())
 		if err != nil {
-			g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
-			return nil
+			return nil, err
 		}
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
@@ -758,5 +772,5 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref *storageprovider.Ref
 	webdavURL.Path = path.Join(webdavURL.Path, space.GetId().GetOpaqueId(), itemPath)
 	spaceItem.WebDavUrl = libregraph.PtrString(webdavURL.String())
 
-	return spaceItem
+	return spaceItem, nil
 }

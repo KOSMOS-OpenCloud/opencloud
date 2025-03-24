@@ -280,7 +280,7 @@ config = {
             "skip": False,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
-                "OC_ADD_RUN_SERVICES": "auth-app",
+                "AUTH_APP_STORAGE_DRIVER": "json",
                 "PROXY_ENABLE_APP_AUTH": True,
             },
         },

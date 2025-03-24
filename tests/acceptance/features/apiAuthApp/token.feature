@@ -95,7 +95,7 @@ Feature: create auth-app token
                   "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
                 },
                 "label": {
-                  "const": "Generated via Impersonation API"
+                  "const": "Generated via API (Impersonation)"
                 }
               }
             }
@@ -124,7 +124,7 @@ Feature: create auth-app token
             "pattern": "^[a-zA-Z0-9]{16}$"
           },
           "label": {
-            "const": "Generated via Impersonation API"
+            "const": "Generated via API (Impersonation)"
           }
         }
       }

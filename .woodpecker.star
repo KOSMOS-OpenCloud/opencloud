@@ -3060,6 +3060,7 @@ def onlyofficeService():
         {
             "name": "onlyoffice",
             "image": ONLYOFFICE_DOCUMENT_SERVER,
+            "detach": True,
             "environment": {
                 "WOPI_ENABLED": True,
                 "USE_UNAUTHORIZED_STORAGE": True,  # self signed certificates
@@ -3070,8 +3071,10 @@ def onlyofficeService():
                 "mkdir -p /var/www/onlyoffice/Data/certs",
                 "cp onlyoffice.key /var/www/onlyoffice/Data/certs/",
                 "cp onlyoffice.crt /var/www/onlyoffice/Data/certs/",
+                "ls -al /var/www/onlyoffice/Data/certs/",
                 "chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key",
                 "/app/ds/run-document-server.sh",
+                "curl -vk https://onlyoffice:443",
             ],
         },
     ]

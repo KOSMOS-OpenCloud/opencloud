@@ -24,6 +24,7 @@ import (
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 	ocsettingssvc "github.com/opencloud-eu/opencloud/services/settings/pkg/service/v0"
 	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -53,7 +54,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exp, err := identity.GetExpandValues(odataReq.Query)
+	exp, err := odata.GetExpandValues(odataReq.Query)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -119,74 +120,85 @@ func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) 
 
 // GetUserDrive implements the Service interface.
 func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get user drive")
+	ctx := r.Context()
+	log := g.logger.SubloggerWithRequestID(ctx).With().Interface("query", r.URL.Query()).Logger()
+	log.Debug().Msg("calling get user drive")
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		log.Error().Err(err).Msg("could not get personal drive: error parsing webdav base url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log = log.With().Str("url", webDavBaseURL.String()).Logger()
 
 	userID, err := url.PathUnescape(chi.URLParam(r, "userID"))
 	if err != nil {
-		logger.Debug().Err(err).Str("userID", chi.URLParam(r, "userID")).Msg("could not get drive: unescaping drive id failed")
+		log.Debug().Err(err).Str("userID", chi.URLParam(r, "userID")).Msg("could not get drive: unescaping drive id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
 
+	log = log.With().Str("userID", userID).Logger()
+
+	_, expandPermissions, err := parseDriveRequest(r)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
 	if userID == "" {
-		u, ok := revactx.ContextGetUser(r.Context())
+		u, ok := revactx.ContextGetUser(ctx)
 		if !ok {
-			logger.Debug().Msg("could not get user: user not in context")
+			log.Debug().Msg("could not get user: user not in context")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
 			return
 		}
 		userID = u.GetId().GetOpaqueId()
 	}
 
-	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
-	ctx := r.Context()
+	log.Debug().Msg("calling list storage spaces with user and personal filter")
 
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter("personal"), listStorageSpacesUserFilter(userID)}
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
 	case err != nil:
-		logger.Error().Err(err).Msg("could not get drive: transport error")
+		log.Error().Err(err).Msg("could not get drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			// the client is doing a lookup for a specific space, therefore we need to return
 			// not found to the caller
-			logger.Debug().Str("userID", userID).Msg("could not get personal drive for user: not found")
+			log.Debug().Msg("could not get personal drive for user: not found")
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		}
-		logger.Debug().
-			Str("userID", userID).
+		log.Debug().
 			Str("grpcmessage", res.GetStatus().GetMessage()).
 			Msg("could not get personal drive for user: grpc error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
 
-	webDavBaseURL, err := g.getWebDavBaseURL()
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions)
 	if err != nil {
-		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get personal drive: error parsing webdav base url")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1)
-	if err != nil {
-		logger.Debug().Err(err).Msg("could not get personal drive: error parsing grpc response")
+		log.Debug().Err(err).Msg("could not get personal drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 	switch num := len(spaces); {
 	case num == 0:
-		logger.Debug().Str("userID", userID).Msg("could not get personal drive: no drive returned from storage")
+		log.Debug().Msg("could not get personal drive: no drive returned from storage")
 		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "no drive returned from storage")
 		return
 	case num == 1:
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, spaces[0])
 	default:
-		logger.Debug().Int("number", num).Msg("could not get personal drive: expected to find a single drive but fetched more")
+		log.Debug().Int("number", num).Msg("could not get personal drive: expected to find a single drive but fetched more")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get personal drive: expected to find a single drive but fetched more")
 		return
 	}
@@ -301,7 +313,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		users = finalUsers
 	}
 
-	exp, err := identity.GetExpandValues(odataReq.Query)
+	exp, err := odata.GetExpandValues(odataReq.Query)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -449,7 +461,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exp, err := identity.GetExpandValues(odataReq.Query)
+	exp, err := odata.GetExpandValues(odataReq.Query)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -466,6 +478,8 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	listDrives := slices.Contains(exp, "drives")
 	listDrive := slices.Contains(exp, "drive")
+	expandDrivePermissions := slices.Contains(exp, "drive.root.permissions")
+	expandDrivesPermissions := slices.Contains(exp, "drives.root.permissions")
 
 	// do we need to list all or only the personal drive
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
@@ -526,7 +540,13 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			user.Drive = &libregraph.Drive{}
 		}
 		for _, sp := range lspr.GetStorageSpaces() {
-			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, APIVersion_1)
+			expandPermissions := false
+			if sp.GetSpaceType() == "personal" && sp.GetOwner().GetId().GetOpaqueId() != user.GetId() {
+				expandPermissions = expandDrivePermissions
+			} else {
+				expandPermissions = expandDrivesPermissions
+			}
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, APIVersion_1, expandPermissions)
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
 				continue
@@ -1023,7 +1043,7 @@ func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDa
 	if err != nil {
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	}
-	term, err := identity.GetSearchValues(odataReq.Query)
+	term, err := odata.GetSearchValues(odataReq.Query)
 	if err != nil {
 		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}

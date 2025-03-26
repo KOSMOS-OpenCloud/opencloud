@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -32,6 +33,7 @@ import (
 	v0 "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 	settingsServiceExt "github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 )
 
@@ -168,31 +170,63 @@ func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func sanitizePath(path string, apiVersion APIVersion) string {
+	switch apiVersion {
+	case APIVersion_1:
+		return strings.TrimPrefix(path, "/graph/v1.0/")
+	case APIVersion_1_Beta_1:
+		return strings.TrimPrefix(path, "/graph/v1beta1.0/")
+	default:
+		return path
+	}
+}
+
+// parseDriveRequest parses the odata request and returns the parsed request and a boolean indicating if the request should expand root driveItems.
+func parseDriveRequest(r *http.Request) (*godata.GoDataRequest, bool, error) {
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizePath(r.URL.Path, APIVersion_1), r.URL.Query())
+	if err != nil {
+		return nil, false, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+	exp, err := odata.GetExpandValues(odataReq.Query)
+	if err != nil {
+		return nil, false, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+	expandPermissions := false
+	if slices.Contains(exp, "root.permissions") {
+		expandPermissions = true
+	}
+	return odataReq, expandPermissions, nil
+}
+
 // getDrives implements the Service interface.
 func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, error) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().
-		Interface("query", r.URL.Query()).
-		Bool("unrestricted", unrestricted).
-		Msg("calling get drives")
-	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
-	// Parse the request with odata parser
-	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
-	if err != nil {
-		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: query error")
-		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
-	}
 	ctx := r.Context()
+	log := g.logger.SubloggerWithRequestID(ctx).With().Interface("query", r.URL.Query()).Bool("unrestricted", unrestricted).Logger()
+	log.Debug().Msg("calling get drives")
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		log.Error().Err(err).Msg("could not get drives: error parsing url")
+		return nil, errorcode.New(errorcode.GeneralException, err.Error())
+	}
+
+	log = log.With().Str("url", webDavBaseURL.String()).Logger()
+
+	odataReq, expandPermissions, err := parseDriveRequest(r)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
+		return nil, err
+	}
 
 	filters, err := generateCs3Filters(odataReq)
 	if err != nil {
-		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: error parsing filters")
+		log.Debug().Err(err).Msg("could not get drives: error parsing filters")
 		return nil, errorcode.New(errorcode.NotSupported, err.Error())
 	}
 	if !unrestricted {
 		user, ok := revactx.ContextGetUser(r.Context())
 		if !ok {
-			logger.Debug().Msg("could not create drive: invalid user")
+			log.Debug().Msg("could not create drive: invalid user")
 			return nil, errorcode.New(errorcode.AccessDenied, "invalid user")
 		}
 		filters = append(filters, &storageprovider.ListStorageSpacesRequest_Filter{
@@ -203,39 +237,32 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 		})
 	}
 
-	logger.Debug().
+	log.Debug().
 		Interface("filters", filters).
-		Bool("unrestricted", unrestricted).
 		Msg("calling list storage spaces on backend")
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters, unrestricted)
 	switch {
 	case err != nil:
-		logger.Error().Err(err).Msg("could not get drives: transport error")
+		log.Error().Err(err).Msg("could not get drives: transport error")
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			// ok, empty return
 			return nil, nil
 		}
-		logger.Debug().Str("message", res.GetStatus().GetMessage()).Msg("could not get drives: grpc error")
+		log.Debug().Str("message", res.GetStatus().GetMessage()).Msg("could not get drives: grpc error")
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	webDavBaseURL, err := g.getWebDavBaseURL()
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion, expandPermissions)
 	if err != nil {
-		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drives: error parsing url")
-		return nil, errorcode.New(errorcode.GeneralException, err.Error())
-	}
-
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion)
-	if err != nil {
-		logger.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
+		log.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 
 	spaces, err = sortSpaces(odataReq, spaces)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not get drives: error sorting the spaces list according to query")
+		log.Debug().Err(err).Msg("could not get drives: error sorting the spaces list according to query")
 		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
 
@@ -245,15 +272,32 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 // GetSingleDrive does a lookup of a single space by spaceId
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := g.logger.SubloggerWithRequestID(ctx)
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
+	log := g.logger.SubloggerWithRequestID(ctx).With().Interface("query", r.URL.Query()).Logger()
+	log.Debug().Msg("calling get drive")
 
 	rid, err := parseIDParam(r, "driveID")
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
 	}
-	log := logger.With().Str("storage", rid.StorageId).Str("space", rid.SpaceId).Str("node", rid.OpaqueId).Logger()
+
+	log = log.With().Str("storage", rid.StorageId).Str("space", rid.SpaceId).Str("node", rid.OpaqueId).Logger()
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		log.Error().Err(err).Msg("could not get drive: error parsing webdav base url")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	log = log.With().Str("url", webDavBaseURL.String()).Logger()
+
+	_, expandPermissions, err := parseDriveRequest(r)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
+		errorcode.RenderError(w, r, err)
+		return
+	}
 
 	log.Debug().Msg("calling list storage spaces with id filter")
 
@@ -281,13 +325,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	webDavBaseURL, err := g.getWebDavBaseURL()
-	if err != nil {
-		log.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get drive: error parsing webdav base url")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -324,14 +362,28 @@ func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
 
 // CreateDrive creates a storage drive (space).
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling create drive")
-
 	ctx := r.Context()
+	log := g.logger.SubloggerWithRequestID(ctx).With().Interface("query", r.URL.Query()).Logger()
+	log.Debug().Msg("calling create drive")
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		log.Error().Err(err).Msg("could not create drive: error parsing webdav base url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log = log.With().Str("url", webDavBaseURL.String()).Logger()
+
+	_, expandPermissions, err := parseDriveRequest(r)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not create drive: error parsing odata request")
+		errorcode.RenderError(w, r, err)
+	}
 
 	us, ok := revactx.ContextGetUser(ctx)
 	if !ok {
-		logger.Debug().Msg("could not create drive: invalid user")
+		log.Debug().Msg("could not create drive: invalid user")
 		errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
 		return
 	}
@@ -339,7 +391,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	// TODO determine if the user tries to create his own personal space and pass that as a boolean
 	canCreateSpace := g.canCreateSpace(ctx, false)
 	if !canCreateSpace {
-		logger.Debug().Bool("cancreatespace", canCreateSpace).Msg("could not create drive: insufficient permissions")
+		log.Debug().Bool("cancreatespace", canCreateSpace).Msg("could not create drive: insufficient permissions")
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
 		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "insufficient permissions to create a space.")
 		return
@@ -347,20 +399,20 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		logger.Error().Err(err).Msg("could not select next gateway client")
+		log.Error().Err(err).Msg("could not select next gateway client")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
 		return
 	}
 
 	drive := libregraph.Drive{}
 	if err := StrictJSONUnmarshal(r.Body, &drive); err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create drive: invalid body schema definition")
+		log.Debug().Err(err).Interface("body", r.Body).Msg("could not create drive: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
 	spaceName := strings.TrimSpace(drive.Name)
 	if err := validateSpaceName(spaceName); err != nil {
-		logger.Debug().Str("name", spaceName).Err(err).Msg("could not create drive: name validation failed")
+		log.Debug().Str("name", spaceName).Err(err).Msg("could not create drive: name validation failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid spacename: %s", err.Error()))
 		return
 	}
@@ -373,7 +425,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	case "", _spaceTypeProject:
 		driveType = _spaceTypeProject
 	default:
-		logger.Debug().Str("type", driveType).Msg("could not create drive: drives of this type cannot be created via this api")
+		log.Debug().Str("type", driveType).Msg("could not create drive: drives of this type cannot be created via this api")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "drives of this type cannot be created via this api")
 		return
 	}
@@ -398,31 +450,24 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := gatewayClient.CreateStorageSpace(ctx, &csr)
 	if err != nil {
-		logger.Error().Err(err).Msg("could not create drive: transport error")
+		log.Error().Err(err).Msg("could not create drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED {
-			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: permission denied")
+			log.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: permission denied")
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "permission denied")
 			return
 		}
 		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_INVALID_ARGUMENT {
-			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: bad request")
+			log.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: bad request")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
 			return
 		}
-		logger.Debug().Interface("grpcmessage", csr).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not create drive: grpc error")
+		log.Debug().Interface("grpcmessage", csr).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not create drive: grpc error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
-		return
-	}
-
-	webDavBaseURL, err := g.getWebDavBaseURL()
-	if err != nil {
-		logger.Error().Str("url", webDavBaseURL.String()).Err(err).Msg("could not create drive: error parsing webdav base url")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -430,7 +475,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	if t := r.URL.Query().Get(TemplateParameter); t != "" && driveType == _spaceTypeProject {
 		loc := l10n.MustGetUserLocale(ctx, us.GetId().GetOpaqueId(), r.Header.Get(HeaderAcceptLanguage), g.valueService)
 		if err := g.applySpaceTemplate(ctx, gatewayClient, space.GetRoot(), t, loc); err != nil {
-			logger.Error().Err(err).Msg("could not apply template to space")
+			log.Error().Err(err).Msg("could not apply template to space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -438,20 +483,20 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		// refetch the drive to get quota information - should we calculate this ourselves to avoid the extra call?
 		space, err = utils.GetSpace(ctx, space.GetId().GetOpaqueId(), gatewayClient)
 		if err != nil {
-			logger.Error().Err(err).Msg("could not refetch space")
+			log.Error().Err(err).Msg("could not refetch space")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, expandPermissions)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
+		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if len(spaces) == 0 {
-		logger.Error().Msg("could not convert space")
+		log.Error().Msg("could not convert space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not convert space")
 		return
 	}
@@ -462,8 +507,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 // UpdateDrive updates the properties of a storage drive (space).
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling update drive")
+	log := g.logger.SubloggerWithRequestID(r.Context()).With().Interface("query", r.URL.Query()).Logger()
+	log.Debug().Msg("calling update drive")
 
 	rid, err := parseIDParam(r, "driveID")
 	if err != nil {
@@ -471,9 +516,26 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log = log.With().Str("storage", rid.StorageId).Str("space", rid.SpaceId).Str("node", rid.OpaqueId).Logger()
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		log.Error().Err(err).Interface("url", webDavBaseURL.String()).Msg("could not update drive: error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log = log.With().Str("url", webDavBaseURL.String()).Logger()
+
+	_, expandPermissions, err := parseDriveRequest(r)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not create drive: error parsing odata request")
+		errorcode.RenderError(w, r, err)
+	}
+
 	drive := libregraph.DriveUpdate{}
 	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
+		log.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: error: %v", err.Error()))
 		return
 	}
@@ -526,7 +588,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if drive.GetName() != "" {
 		spacename := strings.TrimSpace(drive.GetName())
 		if err := validateSpaceName(spacename); err != nil {
-			logger.Info().Err(err).Msg("could not update drive: spacename invalid")
+			log.Info().Err(err).Msg("could not update drive: spacename invalid")
 			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -552,12 +614,12 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 		canSetSpaceQuota, err := g.canSetSpaceQuota(r.Context(), user, dt)
 		if err != nil {
-			logger.Error().Err(err).Msg("could not update drive: failed to check if the user can set space quota")
+			log.Error().Err(err).Msg("could not update drive: failed to check if the user can set space quota")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 		if !canSetSpaceQuota {
-			logger.Debug().
+			log.Debug().
 				Bool("cansetspacequota", canSetSpaceQuota).
 				Msg("could not update drive: user is not allowed to set the space quota")
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "user is not allowed to set the space quota")
@@ -568,10 +630,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Debug().Interface("payload", updateSpaceRequest).Msg("calling update space on backend")
+	log.Debug().Interface("payload", updateSpaceRequest).Msg("calling update space on backend")
 	resp, err := gatewayClient.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
-		logger.Error().Err(err).Msg("could not update drive: transport error")
+		log.Error().Err(err).Msg("could not update drive: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "transport error")
 		return
 	}
@@ -579,38 +641,31 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
-			logger.Debug().Interface("id", rid).Msg("could not update drive: drive not found")
+			log.Debug().Msg("could not update drive: drive not found")
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		case cs3rpc.Code_CODE_PERMISSION_DENIED:
-			logger.Debug().Interface("id", rid).Msg("could not update drive, permission denied")
+			log.Debug().Msg("could not update drive, permission denied")
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		case cs3rpc.Code_CODE_INVALID_ARGUMENT:
-			logger.Debug().Interface("id", rid).Msg("could not update drive, invalid argument")
+			log.Debug().Msg("could not update drive, invalid argument")
 			errorcode.NotAllowed.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
 			return
 		case cs3rpc.Code_CODE_UNIMPLEMENTED:
-			logger.Debug().Interface("id", rid).Msg("could not delete drive: delete not implemented for this type of drive")
+			log.Debug().Msg("could not delete drive: delete not implemented for this type of drive")
 			errorcode.NotAllowed.Render(w, r, http.StatusMethodNotAllowed, "drive cannot be updated")
 			return
 		default:
-			logger.Debug().Interface("id", rid).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not update drive: grpc error")
+			log.Debug().Str("grpc", resp.GetStatus().GetMessage()).Msg("could not update drive: grpc error")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "grpc error")
 			return
 		}
 	}
 
-	webDavBaseURL, err := g.getWebDavBaseURL()
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1, expandPermissions)
 	if err != nil {
-		logger.Error().Err(err).Interface("url", webDavBaseURL.String()).Msg("could not update drive: error parsing url")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1)
-	if err != nil {
-		logger.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
+		log.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -619,7 +674,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion) ([]*libregraph.Drive, error) {
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool) ([]*libregraph.Drive, error) {
 	errg, ctx := errgroup.WithContext(ctx)
 	work := make(chan *storageprovider.StorageSpace, len(storageSpaces))
 	results := make(chan *libregraph.Drive, len(storageSpaces))
@@ -649,7 +704,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 					// skip OCM shares they are no supposed to show up in the drives list
 					continue
 				}
-				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion)
+				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion, expandPermissions)
 				if err != nil {
 					return err
 				}
@@ -733,7 +788,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion) (*libregraph.Drive, error) {
+func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool) (*libregraph.Drive, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	if space.Root == nil {
 		logger.Error().Msg("unable to parse space: space has no root")
@@ -745,18 +800,20 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 	spaceID := storagespace.FormatResourceID(spaceRid)
 
-	permissions := g.cs3SpacePermissionsToLibreGraph(ctx, space, apiVersion)
-
 	drive := &libregraph.Drive{
 		Id:   libregraph.PtrString(spaceID),
 		Name: space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
+		// we currently always expandt the root because it carries the deleted property that indiccates if a space is trashed
 		Root: &libregraph.DriveItem{
-			Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
-			Permissions: permissions,
+			Id: libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
 		},
 	}
+	if expandPermissions {
+		drive.Root.Permissions = g.cs3SpacePermissionsToLibreGraph(ctx, space, apiVersion)
+	}
+
 	if space.SpaceType == _spaceTypeMountpoint {
 		var remoteItem *libregraph.RemoteItem
 		grantID := storageprovider.ResourceId{

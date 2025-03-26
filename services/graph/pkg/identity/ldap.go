@@ -19,6 +19,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 )
 
 const (
@@ -563,7 +564,7 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 		}
 	}
 
-	exp, err := GetExpandValues(oreq.Query)
+	exp, err := odata.GetExpandValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -593,12 +594,12 @@ func (i *LDAP) FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filt
 		return nil, err
 	}
 
-	search, err := GetSearchValues(oreq.Query)
+	search, err := odata.GetSearchValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
 
-	exp, err := GetExpandValues(oreq.Query)
+	exp, err := odata.GetExpandValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}

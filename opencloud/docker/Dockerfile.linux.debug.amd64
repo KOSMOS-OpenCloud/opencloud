@@ -22,6 +22,8 @@ RUN addgroup -g 1000 -S opencloud-group && \
   adduser -S --ingroup opencloud-group --uid 1000 opencloud-user --home /var/lib/opencloud
 
 RUN mkdir -p /var/lib/opencloud && \
+# Pre-create the web directory to avoid permission issues
+ mkdir -p /var/lib/opencloud/web/assets/apps && \
  chown -R opencloud-user:opencloud-group /var/lib/opencloud && \
  chmod -R 751 /var/lib/opencloud && \
  mkdir -p /etc/opencloud && \

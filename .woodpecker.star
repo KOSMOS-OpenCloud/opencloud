@@ -3060,7 +3060,6 @@ def onlyofficeService():
         {
             "name": "onlyoffice",
             "image": ONLYOFFICE_DOCUMENT_SERVER,
-            "detach": True,
             "environment": {
                 "WOPI_ENABLED": True,
                 "USE_UNAUTHORIZED_STORAGE": True,  # self signed certificates

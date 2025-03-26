@@ -1706,7 +1706,6 @@ def binaryRelease(ctx, arch, depends_on = []):
                         "opencloud/dist/release/*",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [
@@ -1786,7 +1785,6 @@ def licenseCheck(ctx):
                         "third-party-licenses.tar.gz",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [

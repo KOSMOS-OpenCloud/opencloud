@@ -580,6 +580,29 @@
   "webAuthnPolicyPasswordlessExtraOrigins": [],
   "users" : [
     {
+      "id" : "f6866087-061d-4bae-8c3b-ea778868502e",
+      "username" : "admin",
+      "firstName" : "Admin",
+      "email" : "admin@example.org",
+      "emailVerified" : false,
+      "createdTimestamp" : 1743071763647,
+      "enabled" : true,
+      "totp" : false,
+      "credentials" : [ {
+        "id" : "e00326ca-886a-48df-9b2f-a3a70beeaafb",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1743071778786,
+        "secretData" : "{\"value\":\"z1GycCaf+820w76aRX+UgEJBBca62BUL03rvtdQ+crw=\",\"salt\":\"w952cvEBBqZ0dPDuseH8tQ==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "opencloudAdmin", "default-roles-opencloud" ],
+      "notBefore" : 0,
+      "groups" : [ "/users" ]
+    },
+    {
       "id": "f05733ad-04fc-4b27-b1d4-8de6a7cd16e8",
       "username": "alan",
       "firstName": "Alan",

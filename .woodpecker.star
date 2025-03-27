@@ -28,7 +28,7 @@ OC_CI_GOLANG = "docker.io/golang:1.24"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.1"
+OC_CS3_API_VALIDATOR = "opencloudeu/cs3api-validator:latest"
 OC_LITMUS = "owncloudci/litmus:latest"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
@@ -44,6 +44,7 @@ PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
+READY_RELEASE_GO = "woodpeckerci/plugin-ready-release-go:latest"
 
 DEFAULT_PHP_VERSION = "8.2"
 DEFAULT_NODEJS_VERSION = "20"
@@ -418,7 +419,7 @@ def main(ctx):
     pipelines = []
 
     build_release_helpers = \
-        changelog() + \
+        readyReleaseGo() + \
         docs()
 
     build_release_helpers.append(
@@ -1695,19 +1696,6 @@ def binaryRelease(ctx, arch, depends_on = []):
                 ],
             },
             {
-                "name": "changelog",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", ""),
-                ],
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-            {
                 "name": "release",
                 "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
@@ -1718,8 +1706,6 @@ def binaryRelease(ctx, arch, depends_on = []):
                         "opencloud/dist/release/*",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "opencloud/dist/CHANGELOG.md",
-                    "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [
@@ -1789,19 +1775,6 @@ def licenseCheck(ctx):
                 ],
             },
             {
-                "name": "changelog",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
-                ],
-                "when": [
-                    {
-                        "event": "tag",
-                    },
-                ],
-            },
-            {
                 "name": "release",
                 "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
@@ -1812,8 +1785,6 @@ def licenseCheck(ctx):
                         "third-party-licenses.tar.gz",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
-                    "note": "opencloud/dist/CHANGELOG.md",
-                    "overwrite": True,
                     "prerelease": len(ctx.build.ref.split("-")) > 1,
                 },
                 "when": [
@@ -1838,62 +1809,26 @@ def licenseCheck(ctx):
         "workspace": workspace,
     }
 
-def changelog():
+def readyReleaseGo():
     return [{
-        "name": "changelog",
+        "name": "ready-release-go",
         "steps": [
             {
-                "name": "generate",
-                "image": OC_CI_GOLANG,
-                "environment": CI_HTTP_PROXY_ENV,
-                "commands": [
-                    "make -C opencloud changelog",
-                ],
-            },
-            {
-                "name": "diff",
-                "image": OC_CI_ALPINE,
-                "commands": [
-                    "git diff",
-                ],
-            },
-            {
-                "name": "output",
-                "image": OC_CI_ALPINE,
-                "commands": [
-                    "cat CHANGELOG.md",
-                ],
-            },
-            {
-                "name": "publish",
-                "image": PLUGINS_GIT_PUSH,
+                "name": "release-helper",
+                "image": READY_RELEASE_GO,
                 "settings": {
-                    "branch": "main",
-                    "remote": "ssh://git@github.com/%s.git" % repo_slug,
-                    "commit": True,
-                    "ssh_key": {
-                        "from_secret": "ssh_key",
+                    "git_email": "devops@opencloud.eu",
+                    "forge_type": "github",
+                    "forge_token": {
+                        "from_secret": "github_token",
                     },
-                    "commit_message": "Automated changelog update [skip ci]",
-                    "author_email": "devops@opencloud.eu",
-                    "author_name": "openclouders",
-                    "rebase": True,
                 },
-                "when": [
-                    {
-                        "event": ["push", "manual"],
-                        "branch": "main",
-                    },
-                ],
             },
         ],
         "when": [
             {
                 "event": ["push", "manual"],
                 "branch": "main",
-            },
-            {
-                "event": "pull_request",
             },
         ],
     }]
@@ -2253,7 +2188,6 @@ def skipIfUnchanged(ctx, type):
     base = [
         ".github/**",
         ".vscode/**",
-        "changelog/**",
         "docs/**",
         "deployments/**",
         "CHANGELOG.md",

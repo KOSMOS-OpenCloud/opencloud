@@ -36,4 +36,4 @@ dev-docker-multiarch:
 .PHONY: debug-docker
 debug-docker:
 	$(MAKE) --no-print-directory debug-linux-docker-$(GOARCH)
-	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t opencloud-eu/opencloud:debug .
+	docker build -f docker/Dockerfile.linux.debug.$(GOARCH) -t opencloudeu/opencloud:debug .

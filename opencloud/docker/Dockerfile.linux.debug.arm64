@@ -1,16 +1,16 @@
-FROM arm64v8/alpine:3.21
+FROM arm64v8/alpine:edge
 
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk add --no-cache attr bash ca-certificates curl inotify-tools libc6-compat mailcap tree vips patch && \
+RUN apk add --no-cache attr bash ca-certificates curl delve inotify-tools libc6-compat mailcap tree vips patch && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
-LABEL maintainer="openCloud GmbH <devops@opencloud.eu>" \
+LABEL maintainer="OpenCloud GmbH <devops@opencloud.eu>" \
   org.opencontainers.image.title="OpenCloud" \
   org.opencontainers.image.vendor="OpenCloud GmbH" \
   org.opencontainers.image.authors="OpenCloud GmbH" \
-  org.opencontainers.image.description="OpenCloud a modern file-sync and share platform" \
+  org.opencontainers.image.description="OpenCloud is a modern file-sync and share platform" \
   org.opencontainers.image.licenses="Apache-2.0" \
   org.opencontainers.image.documentation="https://github.com/opencloud-eu/opencloud" \
   org.opencontainers.image.url="https://hub.docker.com/r/opencloud-eu/opencloud" \

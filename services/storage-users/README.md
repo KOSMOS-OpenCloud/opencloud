@@ -12,7 +12,7 @@ When hard-stopping OpenCloud, for example with the `kill <pid>` command (SIGKILL
 
 *   With the value of the environment variable `STORAGE_USERS_GRACEFUL_SHUTDOWN_TIMEOUT`, the `storage-users` service will delay its shutdown giving it time to finalize writing necessary data. This delay can be necessary if there is a lot of data to be saved and/or if storage access/thruput is slow. In such a case you would receive an error log entry informing you that not all data could be saved in time. To prevent such occurrences, you must increase the default value.
 
-*   If a shutdown error has been logged, the command-line maintenance tool [Inspect and Manipulate Node Metadata](https://doc.opencloud.eu/maintenance/commands/commands.html#inspect-and-manipulate-node-metadata) can help to fix the issue. Please contact support for details.
+*   If a shutdown error has been logged, the command-line maintenance tool to inspect and manipulate node metadata can help to fix the issue. Please contact support for details.
 
 ## CLI Commands
 
@@ -142,8 +142,7 @@ opencloud storage-users uploads sessions --processing=false --has-virus=false --
 
 ### Manage Trash-Bin Items
 
-This command set provides commands to get an overview of trash-bin items, restore items and purge old items of `personal` spaces and `project` spaces (spaces that have been created manually). `trash-bin` commands require a `spaceID` as parameter. See [List all spaces
-](https://doc.opencloud.eu/apis/http/graph/spaces/#list-all-spaces-get-drives) or [Listing Space IDs](https://doc.opencloud.eu/maintenance/space-ids/space-ids.html) for details of how to get them.
+This command set provides commands to get an overview of trash-bin items, restore items and purge old items of `personal` spaces and `project` spaces (spaces that have been created manually). `trash-bin` commands require a `spaceID` as parameter. 
 
 ```bash
 opencloud storage-users trash-bin <command>
@@ -170,10 +169,10 @@ The behaviour of the `purge-expired` command can be configured by using the foll
 Used to obtain space trash-bin information and takes the system admin user as the default which is the `OC_ADMIN_USER_ID` but can be set individually. It should be noted, that the `OC_ADMIN_USER_ID` is only assigned automatically when using the single binary deployment and must be manually assigned in all other deployments. The command only considers spaces to which the assigned user has access and delete permission.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.opencloud.eu/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable. A value of `0` is equivalent to disable and prevents the deletion of `personal space` trash-bin files.
 
 *   `STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE`\
-Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable, for valid values see the duration type described in the [Environment Variable Types](https://doc.opencloud.eu/latest/deployment/services/envvar-types-description.html). A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
+Has a default value of `720h` which equals `30 days`. This means, the command will delete all files older than `30 days`. The value is human-readable. A value of `0` is equivalent to disable and prevents the deletion of `project space` trash-bin files.
 
 #### List and Restore Trash-Bins Items
 

@@ -12,6 +12,9 @@ PRODUCTION_RELEASE_TAGS = ["2.0", "3.0"]
 repo_slug = "opencloud-eu/opencloud"
 docker_repo_slug = "opencloudeu/opencloud"
 
+# Active base branch for this code stream
+branch = "stable-2.0"
+
 # images
 ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
@@ -682,7 +685,7 @@ def testOpencloud(ctx):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -713,7 +716,7 @@ def scanOpencloud(ctx):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -736,7 +739,7 @@ def buildOpencloudBinaryForTesting(ctx):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -871,7 +874,7 @@ def codestyle(ctx):
                 "when": [
                     {
                         "event": ["push", "manual"],
-                        "branch": "main",
+                        "branch": ["main", "stable-*"],
                     },
                     {
                         "event": "pull_request",
@@ -941,7 +944,7 @@ def localApiTestPipeline(ctx):
                             "when": [
                                 {
                                     "event": ["push", "manual"],
-                                    "branch": "main",
+                                    "branch": ["main", "stable-*"],
                                 },
                                 {
                                     "event": "pull_request",
@@ -1007,7 +1010,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1124,7 +1127,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1178,7 +1181,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1228,7 +1231,7 @@ def e2eTestPipeline(ctx):
     e2e_trigger = [
         {
             "event": ["push", "manual"],
-            "branch": "main",
+            "branch": ["main", "stable-*"],
         },
         {
             "event": "pull_request",
@@ -1337,7 +1340,7 @@ def multiServiceE2ePipeline(ctx):
     e2e_trigger = [
         {
             "event": ["push", "manual"],
-            "branch": "main",
+            "branch": ["main", "stable-*"],
         },
         {
             "event": "pull_request",
@@ -1629,10 +1632,6 @@ def dockerRelease(ctx, repo, build_type):
                 },
                 "when": [
                     {
-                        "event": ["push", "manual"],
-                        "branch": "main",
-                    },
-                    {
                         "event": "tag",
                     },
                 ],
@@ -1642,7 +1641,7 @@ def dockerRelease(ctx, repo, build_type):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1687,10 +1686,6 @@ def binaryRelease(ctx, arch, depends_on = []):
                 ],
                 "when": [
                     {
-                        "event": ["push", "manual"],
-                        "branch": "main",
-                    },
-                    {
                         "event": "tag",
                     },
                 ],
@@ -1720,7 +1715,7 @@ def binaryRelease(ctx, arch, depends_on = []):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1799,7 +1794,7 @@ def licenseCheck(ctx):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -1824,13 +1819,14 @@ def readyReleaseGo():
                     "forge_token": {
                         "from_secret": "github_token",
                     },
+                    "release_branch": branch,
                 },
             },
         ],
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
         ],
     }]
@@ -1870,7 +1866,7 @@ def releaseDockerReadme(repo, build_type):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "tag",
@@ -1888,7 +1884,7 @@ def docs():
                     "image": "codeberg.org/xfix/plugin-codeberg-pages-deploy:1",
                     "settings": {
                         "folder": "docs",
-                        "branch": "docs",
+                        "branch": "docs-%s" % branch,
                         "git_config_email": "${CI_COMMIT_AUTHOR_EMAIL}",
                         "git_config_name": "${CI_COMMIT_AUTHOR}",
                         "ssh_key": {
@@ -1900,7 +1896,7 @@ def docs():
             "when": [
                 {
                     "event": "push",
-                    "branch": "main",
+                    "branch": ["main", "stable-*"],
                 },
             ],
         },
@@ -1965,7 +1961,7 @@ def notify(ctx):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": ["main", "release-*"],
+                "branch": ["main", "stable-*", "release-*"],
             },
             {
                 "event": "tag",
@@ -2390,7 +2386,7 @@ def genericCachePurge(flush_path):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",
@@ -2576,7 +2572,7 @@ def litmus(ctx, storage):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": "main",
+                "branch": ["main", "stable-*"],
             },
             {
                 "event": "pull_request",

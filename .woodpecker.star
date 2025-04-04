@@ -1866,10 +1866,7 @@ def releaseDockerReadme(repo, build_type):
         "when": [
             {
                 "event": ["push", "manual"],
-                "branch": ["main", "stable-*"],
-            },
-            {
-                "event": "tag",
+                "branch": "main",
             },
         ],
     }

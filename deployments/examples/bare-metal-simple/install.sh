@@ -71,8 +71,9 @@ chmod 755 ${dlfile}
 
 mkdir data config
 
-export OC_CONFIG_DIR="$(pwd)/config"
-export OC_BASE_DATA_PATH="$(pwd)/data"
+basedir="${OC_BASE_DIR:-$(pwd)}"
+export OC_CONFIG_DIR="$basedir/config"
+export OC_BASE_DATA_PATH="$basedir/data"
 
 # It is bound to localhost for now to deal with non existing routes
 # to certain host names for example in WSL

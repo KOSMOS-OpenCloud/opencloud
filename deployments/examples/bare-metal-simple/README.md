@@ -36,7 +36,7 @@ in the current working directory.
 ## Server Address
 
 Set the environment variable `OC_HOST` to the fully qualified hostname
-or of this server to allow remote accesse. Default: `localhost`.
+of this server to allow remote accesse. Default: `localhost`.
 
 # Example
 

@@ -77,7 +77,7 @@ export OC_BASE_DATA_PATH="$basedir/data"
 
 # It is bound to localhost for now to deal with non existing routes
 # to certain host names for example in WSL
-host="localhost"
+host="${OC_HOST:-localhost}"
 
 ./${dlfile} init --insecure yes --ap admin
 

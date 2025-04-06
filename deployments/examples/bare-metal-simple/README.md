@@ -33,6 +33,11 @@ Set the environment variable `OC_BASE_DIR` to a directory where the
 both configuration and storage data are within a sandbox subdirectory
 in the current working directory.
 
+## Server Address
+
+Set the environment variable `OC_HOST` to the full qualified hostname
+or of this server to allow remote accesse. Default: `localhost`.
+
 # Example
 
 Call

@@ -416,8 +416,6 @@ def main(ctx):
       none
     """
 
-    pipelines = []
-
     build_release_helpers = \
         readyReleaseGo() + \
         docs()
@@ -431,8 +429,8 @@ def main(ctx):
 
     test_pipelines = \
         codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
+        checkGherkinLint() + \
+        checkTestSuitesInExpectedFailures() + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         buildOpencloudBinaryForTesting(ctx) + \
@@ -474,7 +472,7 @@ def main(ctx):
         ),
     )
 
-    pipelineSanityChecks(ctx, pipelines)
+    pipelineSanityChecks(pipelines)
     return pipelines
 
 def cachePipeline(name, steps):
@@ -772,7 +770,7 @@ def vendorbinCodesniffer(phpVersion):
         ],
     }]
 
-def checkTestSuitesInExpectedFailures(ctx):
+def checkTestSuitesInExpectedFailures():
     return [{
         "name": "check-suites-in-expected-failures",
         "steps": [
@@ -791,7 +789,7 @@ def checkTestSuitesInExpectedFailures(ctx):
         ],
     }]
 
-def checkGherkinLint(ctx):
+def checkGherkinLint():
     return [{
         "name": "check-gherkin-standard",
         "steps": [
@@ -932,7 +930,7 @@ def localApiTestPipeline(ctx):
                                      (opencloudServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (openCloudHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
+                                     localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
                                      logRequests(),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
@@ -954,7 +952,7 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
+def localApiTests(name, suites, storage = "decomposed", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-decomposed-storage.md" % (test_dir)
 
@@ -990,7 +988,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     return {
         "name": "cs3ApiTests-%s" % storage,
         "steps": restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
-                 opencloudServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
+                 opencloudServer(storage, accounts_hash_difficulty, deploy_type = "cs3api_validator") +
                  [
                      {
                          "name": "cs3ApiTests",
@@ -1036,7 +1034,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
     ]
 
     validatorTests = []
-    wopiServer = []
     extra_server_environment = {}
 
     if wopiServerType == "cs3":
@@ -1455,7 +1452,7 @@ def multiServiceE2ePipeline(ctx):
         })
     return pipelines
 
-def uploadTracingResult(ctx):
+def uploadTracingResult():
     return [{
         "name": "upload-tracing-result",
         "image": PLUGINS_S3,
@@ -1972,7 +1969,7 @@ def notify(ctx):
         "runs_on": status,
     }
 
-def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = OC_SERVER_NAME
     environment = {
@@ -2206,8 +2203,6 @@ def skipIfUnchanged(ctx, type):
         skip = base + unit + acceptance
     elif type == "cache":
         skip = base
-    else:
-        return []
 
     return skip
 
@@ -2239,11 +2234,11 @@ def example_deploys(ctx):
 
     deploys = []
     for config in configs:
-        deploys.append(deploy(ctx, config, rebuild))
+        deploys.append(deploy(config, rebuild))
 
     return deploys
 
-def deploy(ctx, config, rebuild):
+def deploy(config, rebuild):
     return {
         "name": "deploy_%s" % (config),
         "steps": [
@@ -2412,14 +2407,13 @@ def rebuildBuildArtifactCache(ctx, name, path):
 def purgeBuildArtifactCache(ctx):
     return genericBuildArtifactCache(ctx, "", "purge", [])
 
-def pipelineSanityChecks(ctx, pipelines):
+def pipelineSanityChecks(pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
 
     These sanity checks are only executed on when converting starlark to yaml.
     Error outputs are only visible when the conversion is done with the woodpecker cli.
 
     Args:
-      ctx: woodpecker passes a context with information which the pipeline can be adapted to
       pipelines: pipelines to be checked, normally you should run this on the return value of main()
 
     Returns:

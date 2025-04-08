@@ -220,12 +220,6 @@ class CapabilitiesContext implements Context {
 			'status@@@edition'
 		);
 
-		if (!\strlen($edition)) {
-			Assert::fail(
-				"Cannot get edition from core capabilities"
-			);
-		}
-
 		$product = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',

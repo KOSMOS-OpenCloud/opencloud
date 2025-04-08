@@ -2071,11 +2071,18 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, depend
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
 
-    wrapper_commands = [
-        "make -C %s build" % dirs["ocWrapper"],
+    server_commands = [
         "env | sort",
-        "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], dirs["opencloudBin"], environment["OC_URL"]),
     ]
+    if with_wrapper:
+        server_commands += [
+            "make -C %s build" % dirs["ocWrapper"],
+            "%s/bin/ocwrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocWrapper"], dirs["opencloudBin"], environment["OC_URL"]),
+        ]
+    else:
+        server_commands += [
+            "%s server" % dirs["opencloudBin"],
+        ]
 
     wait_for_opencloud = {
         "name": "wait-for-%s" % container_name,
@@ -2102,7 +2109,7 @@ def opencloudServer(storage = "decomposed", accounts_hash_difficulty = 4, depend
             "%s init --insecure true" % dirs["opencloudBin"],
             "cat $OC_CONFIG_DIR/opencloud.yaml",
             "cp tests/config/woodpecker/app-registry.yaml $OC_CONFIG_DIR/app-registry.yaml",
-        ] + wrapper_commands,
+        ] + server_commands,
     }
 
     steps = [

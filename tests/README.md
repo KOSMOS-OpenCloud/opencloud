@@ -466,7 +466,7 @@ ANTIVIRUS_SCANNER_TYPE="clamav" \
 ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
 POSTPROCESSING_STEPS="virusscan" \
 OC_ASYNC_UPLOADS=true \
-OC_ADD_RUN_SERVICES="antivirus"
+OC_ADD_RUN_SERVICES="antivirus" \
 opencloud/bin/opencloud server
 ```
 
@@ -576,7 +576,7 @@ make -C opencloud dev-docker
 ```
 
 ### Choose STORAGE_DRIVER
-By default, the system uses `decomposed` storage. However, you can override this by setting the `STORAGE_DRIVER` environment variable.
+By default, the system uses `posix` storage. However, you can override this by setting the `STORAGE_DRIVER` environment variable.
 
 
 ### Run a script that starts the openCloud server in the docker and runs the API tests locally (for debugging purposes) 

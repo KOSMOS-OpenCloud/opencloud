@@ -474,7 +474,7 @@ Note:
 The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
 
 For antivirus running localy on Linux OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/var/run/clamav/clamd.ctl"`.
-For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.socket"`.
+For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.sock"`.
 For antivirus running with docker, use `ANTIVIRUS_CLAMAV_SOCKET= "tcp://host.docker.internal:3310"`
 
 #### Run the Acceptance Test

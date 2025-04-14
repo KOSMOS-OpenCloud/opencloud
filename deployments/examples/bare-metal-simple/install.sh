@@ -72,7 +72,7 @@ chmod 755 ${dlfile}
 basedir="${OC_BASE_DIR:-$(pwd)}"
 export OC_CONFIG_DIR="$basedir/config"
 export OC_BASE_DATA_PATH="$basedir/data"
-mkdir "$OC_CONFIG_DIR" "$OC_BASE_DATA_PATH"
+mkdir -p "$OC_CONFIG_DIR" "$OC_BASE_DATA_PATH"
 
 # It is bound to localhost for now to deal with non existing routes
 # to certain host names for example in WSL

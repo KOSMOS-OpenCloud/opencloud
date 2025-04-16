@@ -870,7 +870,7 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.65.1 => github.com/dragonchaser/lico v0.0.0-20250416114507-5a6cbb7004e8
+# github.com/libregraph/lico v0.65.1 => github.com/dragonchaser/lico v0.0.0-20250416122745-696f1eb05e9c
 ## explicit; go 1.18
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
@@ -2434,4 +2434,4 @@ stash.kopano.io/kgol/rndm
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 # go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
-# github.com/libregraph/lico => github.com/dragonchaser/lico v0.0.0-20250416114507-5a6cbb7004e8
+# github.com/libregraph/lico => github.com/dragonchaser/lico v0.0.0-20250416122745-696f1eb05e9c

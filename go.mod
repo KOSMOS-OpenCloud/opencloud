@@ -345,7 +345,7 @@ replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/pl
 
 replace go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
 
-replace github.com/libregraph/lico => github.com/dragonchaser/lico v0.0.0-20250416114507-5a6cbb7004e8
+replace github.com/libregraph/lico => github.com/dragonchaser/lico v0.0.0-20250416122745-696f1eb05e9c
 
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details

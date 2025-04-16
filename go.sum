@@ -279,8 +279,8 @@ github.com/dlclark/regexp2 v1.4.0 h1:F1rxgk7p4uKjwIQxBs9oAXe5CqrXlCduYEJvrF4u93E
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/dnsimple/dnsimple-go v0.63.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
-github.com/dragonchaser/lico v0.0.0-20250416122745-696f1eb05e9c h1:JeR9yGofF08fNQthvr1DekPg0Ug7FGYNkFoJe7dfemg=
-github.com/dragonchaser/lico v0.0.0-20250416122745-696f1eb05e9c/go.mod h1:GLIhLiUD3QUvbdZ+d7tKdkTwaotVQ3qhC8t1biWzFf8=
+github.com/dragonchaser/lico v0.0.0-20250416140806-144ca6e74bce h1:b3gVyNYR1R/WKWEcZd3YkebJt0toJ/s+gyjeqdkHsQs=
+github.com/dragonchaser/lico v0.0.0-20250416140806-144ca6e74bce/go.mod h1:GLIhLiUD3QUvbdZ+d7tKdkTwaotVQ3qhC8t1biWzFf8=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e h1:rcHHSQqzCgvlwP0I/fQ8rQMn/MpHE5gWSLdtpxtP6KQ=

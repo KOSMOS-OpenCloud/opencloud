@@ -67,9 +67,9 @@ const ResponsiveScreen = (props) => {
     >
       <div className={classes.wrapper}>
         <div className={classes.content}>
-          {branding?.signinPageLogoUri ? (
+          {branding?.signinPageLogoURI ? (
             <a
-              href={branding.signinPageLogoUri}
+              href={branding.signinPageLogoURI}
               target="_blank"
               rel="noopener noreferrer"
             >

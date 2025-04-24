@@ -1,0 +1,41 @@
+---
+services:
+  opencloud:
+    environment:
+      # Keycloak IDP specific configuration for auto-provisioning
+      OC_LDAP_SERVER_WRITE_ENABLED: "true"
+      PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      # Use the `sub` claim from keycloak for the user ID
+      # Keycloak uses the keycloak user ID as the `sub` claim
+      PROXY_USER_OIDC_CLAIM: "sub"
+      # Use the `sub` claim as identifier during autoprovisioning
+      # That mitigates problems when a user is renamed in keycloak
+      PROXY_AUTOPROVISION_CLAIM_USERNAME: "sub"
+      PROXY_USER_CS3_CLAIM: "username"
+      # This triggers the creation of the opencloudUUID during the provisioning of users and groups
+      GRAPH_LDAP_SERVER_UUID: "false"
+      # This is the default value, we need to set it here because we overwrite the values
+      OC_LDAP_USER_SCHEMA_ID: "opencloudUUID"
+      # This is the default value, we need to set it here because we overwrite the values
+      OC_LDAP_GROUP_SCHEMA_ID: "opencloudUUID"
+      # This is the default value, we need to set it here because we overwrite the values
+      OC_LDAP_DISABLE_USER_MECHANISM: "attribute"
+      # These values should only be set in keycloak, because opencloud updates them from the claims
+      FRONTEND_READONLY_USER_ATTRIBUTES: "user.onPremisesSamAccountName,user.displayName,user.mail,user.passwordProfile,user.memberOf"
+  ldap-server:
+    volumes:
+      # Use an empty named volume to overwrite the inherited values
+      - empty-dir:/ldifs
+      # Only use the base ldif file to create the base structure
+      - ./config/ldap/ldif/10_base.ldif:/ldifs/10_base.ldif
+      # Use the custom schema from opencloud because we are in full control of the ldap server
+      - ../shared/config/ldap/schemas/10_opencloud_schema.ldif:/schemas/10_opencloud_schema.ldif
+      - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
+      - ldap-certs:/opt/bitnami/openldap/share
+      - ldap-data:/bitnami/openldap
+  keycloak:
+    volumes:
+      - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
+      - "./config/keycloak/opencloud-realm-autoprovisioning.dist.json:/opt/keycloak/data/import-dist/opencloud-realm.json"
+volumes:
+  empty-dir:

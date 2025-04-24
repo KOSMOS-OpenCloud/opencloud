@@ -18,3 +18,7 @@ uid: ldapadmin
 dn: ou=groups,dc=opencloud,dc=eu
 objectClass: organizationalUnit
 ou: groups
+
+dn: ou=custom,ou=groups,dc=opencloud,dc=eu
+objectClass: organizationalUnit
+ou: custom

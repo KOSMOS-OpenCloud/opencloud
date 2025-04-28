@@ -1,5 +1,63 @@
 # Changelog
 
+## [2.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.2.0) - 2025-04-28
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @JammingBen, @ScharfViktor, @Svanvith, @TheOneRing, @aduffeck, @amrita-shrestha, @butonic, @dragonchaser, @dragotin, @fschade, @individual-it, @jnweiger, @micbar, @michaelstingl, @rhafer
+
+### ✨ Features
+
+- add new property IdentifierDefaultLogoTargetURI [[#684](https://github.com/opencloud-eu/opencloud/pull/684)]
+- feat: add dev docs for web [[#623](https://github.com/opencloud-eu/opencloud/pull/623)]
+- feat: improve the info about storage path in deployment example [[#617](https://github.com/opencloud-eu/opencloud/pull/617)]
+
+### 📈 Enhancement
+
+- [full-ci] chore(web): bump web to v2.3.0 [[#738](https://github.com/opencloud-eu/opencloud/pull/738)]
+- bare-metal-deploy. getting latest version [[#699](https://github.com/opencloud-eu/opencloud/pull/699)]
+- Automatically find the latest released version of opencloud [[#687](https://github.com/opencloud-eu/opencloud/pull/687)]
+- Expose more config vars for the posix fs watchers [[#669](https://github.com/opencloud-eu/opencloud/pull/669)]
+- Add env var to make the inotify stats frequency configurable [[#552](https://github.com/opencloud-eu/opencloud/pull/552)]
+- feat(web): remove old and unused color tokens [[#665](https://github.com/opencloud-eu/opencloud/pull/665)]
+- Feat: install.sh now honors OC_BASE_DIR and OC_HOST [[#574](https://github.com/opencloud-eu/opencloud/pull/574)]
+- revert: completely remove "edition" from capabilities [[#601](https://github.com/opencloud-eu/opencloud/pull/601)]
+
+### 📚 Documentation
+
+- Update descirption of COLLABORA_SSL_ENABLE [[#724](https://github.com/opencloud-eu/opencloud/pull/724)]
+- Fix broken links in opencloud_full README.md [[#643](https://github.com/opencloud-eu/opencloud/pull/643)]
+- chore: move dev docs to opencloud-eu/docs repo [[#635](https://github.com/opencloud-eu/opencloud/pull/635)]
+
+### 🐛 Bug Fixes
+
+- Makefile: fix protobuf dependencies [[#714](https://github.com/opencloud-eu/opencloud/pull/714)]
+- Some smaller Makefile adjustments [[#709](https://github.com/opencloud-eu/opencloud/pull/709)]
+- fix(decomposeds3): enable async-uploads by default [[#686](https://github.com/opencloud-eu/opencloud/pull/686)]
+- fix deployment: do not create demo accounts when using keycloak [[#671](https://github.com/opencloud-eu/opencloud/pull/671)]
+- fix: web dev docs broken links [[#633](https://github.com/opencloud-eu/opencloud/pull/633)]
+- fix inbucket setup [[#619](https://github.com/opencloud-eu/opencloud/pull/619)]
+
+### ✅ Tests
+
+- update test docs [[#652](https://github.com/opencloud-eu/opencloud/pull/652)]
+
+### 📦️ Dependencies
+
+- chore:reva bump v.2.32 [[#737](https://github.com/opencloud-eu/opencloud/pull/737)]
+- build(deps): bump golang.org/x/image from 0.25.0 to 0.26.0 [[#726](https://github.com/opencloud-eu/opencloud/pull/726)]
+- build(deps): bump golang.org/x/net from 0.38.0 to 0.39.0 [[#725](https://github.com/opencloud-eu/opencloud/pull/725)]
+- build(deps): bump github.com/nats-io/nats.go from 1.41.0 to 1.41.2 [[#722](https://github.com/opencloud-eu/opencloud/pull/722)]
+- build(deps): bump google.golang.org/grpc from 1.71.1 to 1.72.0 [[#721](https://github.com/opencloud-eu/opencloud/pull/721)]
+- build(deps): bump golang.org/x/oauth2 from 0.28.0 to 0.29.0 [[#602](https://github.com/opencloud-eu/opencloud/pull/602)]
+- build(deps): bump @testing-library/jest-dom from 6.4.8 to 6.6.3 in /services/idp [[#666](https://github.com/opencloud-eu/opencloud/pull/666)]
+- build(deps): bump golang.org/x/text from 0.23.0 to 0.24.0 [[#641](https://github.com/opencloud-eu/opencloud/pull/641)]
+- build(deps-dev): bump webpack from 5.96.1 to 5.99.6 in /services/idp [[#707](https://github.com/opencloud-eu/opencloud/pull/707)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.11.0 to 2.11.1 [[#679](https://github.com/opencloud-eu/opencloud/pull/679)]
+- build(deps): bump github.com/onsi/ginkgo/v2 from 2.23.3 to 2.23.4 [[#637](https://github.com/opencloud-eu/opencloud/pull/637)]
+- build(deps): bump github.com/coreos/go-oidc/v3 from 3.13.0 to 3.14.1 [[#603](https://github.com/opencloud-eu/opencloud/pull/603)]
+- build(deps-dev): bump typescript from 5.7.3 to 5.8.3 in /services/idp [[#604](https://github.com/opencloud-eu/opencloud/pull/604)]
+
 ## [2.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.1.0) - 2025-04-07
 
 ### ❤️ Thanks to all contributors! ❤️

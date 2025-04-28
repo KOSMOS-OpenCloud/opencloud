@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.1) - 2025-04-28
+
+### ❤️ Thanks to all contributors! ❤️
+
+@JammingBen, @ScharfViktor, @fschade, @micbar
+
+### 🐛 Bug Fixes
+
+- fix(decomposeds3): enable async-uploads by default (#686) [[#694](https://github.com/opencloud-eu/opencloud/pull/694)]
+- fix(antivirus | backport): introduce a default max scan size for the full example deployment [[#620](https://github.com/opencloud-eu/opencloud/pull/620)]
+- [full-ci] chore(web): bump web to v2.1.1 [[#638](https://github.com/opencloud-eu/opencloud/pull/638)]
+
+### 📦️ Dependencies
+
+- chore: prepare release, bump version [[#731](https://github.com/opencloud-eu/opencloud/pull/731)]
+- Port #567 [[#689](https://github.com/opencloud-eu/opencloud/pull/689)]
+- chore: bump reva to v2.29.2 [[#681](https://github.com/opencloud-eu/opencloud/pull/681)]
+- build(deps): bump github.com/nats-io/nats-server/v2 [[#683](https://github.com/opencloud-eu/opencloud/pull/683)]
+
 ## [2.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.0) - 2025-03-26
 
 ### ❤️ Thanks to all contributors! ❤️

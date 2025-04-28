@@ -433,7 +433,7 @@ github.com/ggwhite/go-masker
 ## explicit; go 1.15
 github.com/go-acme/lego/v4/acme
 github.com/go-acme/lego/v4/challenge
-# github.com/go-asn1-ber/asn1-ber v1.5.7
+# github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
 # github.com/go-chi/chi/v5 v5.2.1
@@ -523,8 +523,8 @@ github.com/go-jose/go-jose/v4/json
 ## explicit; go 1.17
 github.com/go-kit/log
 github.com/go-kit/log/level
-# github.com/go-ldap/ldap/v3 v3.4.10
-## explicit; go 1.14
+# github.com/go-ldap/ldap/v3 v3.4.11
+## explicit; go 1.23.0
 github.com/go-ldap/ldap/v3
 # github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 ## explicit; go 1.14
@@ -814,8 +814,8 @@ github.com/jinzhu/now
 # github.com/jmespath/go-jmespath v0.4.0
 ## explicit; go 1.14
 github.com/jmespath/go-jmespath
-# github.com/jonboulle/clockwork v0.2.2
-## explicit; go 1.13
+# github.com/jonboulle/clockwork v0.5.0
+## explicit; go 1.21
 github.com/jonboulle/clockwork
 # github.com/json-iterator/go v1.1.12
 ## explicit; go 1.12
@@ -870,8 +870,8 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.65.1 => github.com/dragonchaser/lico v0.0.0-20250416141658-4d60b0ff2e7d
-## explicit; go 1.18
+# github.com/libregraph/lico v0.65.2-0.20250428103211-356e98f98457
+## explicit; go 1.23.0
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
 github.com/libregraph/lico/bootstrap/backends/guest
@@ -1702,8 +1702,8 @@ github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
 github.com/rs/zerolog/pkgerrors
-# github.com/russellhaering/goxmldsig v1.4.0
-## explicit; go 1.15
+# github.com/russellhaering/goxmldsig v1.5.0
+## explicit; go 1.21.0
 github.com/russellhaering/goxmldsig
 github.com/russellhaering/goxmldsig/etreeutils
 github.com/russellhaering/goxmldsig/types
@@ -2434,4 +2434,3 @@ stash.kopano.io/kgol/rndm
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 # go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
-# github.com/libregraph/lico => github.com/dragonchaser/lico v0.0.0-20250416141658-4d60b0ff2e7d

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/router"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/userroles"
 
@@ -209,7 +210,13 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	req.Header.Set(revactx.TokenHeader, token)
+	ri := router.ContextRoutingInfo(ctx)
+	if ri.RemoteUserHeader() != "" {
+		req.Header.Set(ri.RemoteUserHeader(), user.GetId().GetOpaqueId())
+	}
+	if !ri.SkipXAccessToken() {
+		req.Header.Set(revactx.TokenHeader, token)
+	}
 
 	m.next.ServeHTTP(w, req)
 }

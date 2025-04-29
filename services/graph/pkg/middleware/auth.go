@@ -42,7 +42,7 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			t := r.Header.Get("x-access-token")
+			t := r.Header.Get(revactx.TokenHeader)
 			if t == "" {
 				errorcode.InvalidAuthenticationToken.Render(w, r, http.StatusUnauthorized, "Access token is empty.")
 				/* msgraph error for GET https://graph.microsoft.com/v1.0/me

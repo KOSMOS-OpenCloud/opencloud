@@ -209,6 +209,8 @@ func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
 		if rt.rewriters[pol][rtype][r.Method] != nil {
 			// use specific method
 			method = r.Method
+		} else {
+			method = ""
 		}
 
 		for _, ri := range rt.rewriters[pol][rtype][method] {

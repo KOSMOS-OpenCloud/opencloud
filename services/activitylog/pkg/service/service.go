@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,6 +18,7 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	ehsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/eventhistory/v0"
@@ -45,6 +47,8 @@ type ActivitylogService struct {
 	evHistory  ehsvc.EventHistoryService
 	valService settingssvc.ValueService
 	lock       sync.RWMutex
+	tp         trace.TracerProvider
+	tracer     trace.Tracer
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -80,6 +84,8 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		valService:       o.ValueClient,
 		lock:             sync.RWMutex{},
 		registeredEvents: make(map[string]events.Unmarshaller),
+		tp:               o.TraceProvider,
+		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/activitylog/pkg/service"),
 	}
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
@@ -156,8 +162,11 @@ func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID st
 	if err != nil {
 		return fmt.Errorf("cant get service user context: %w", err)
 	}
+	var span trace.Span
+	ctx, span = a.tracer.Start(ctx, "AddActivity")
+	defer span.End()
 
-	return a.addActivity(initRef, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+	return a.addActivity(ctx, initRef, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
 }
@@ -185,7 +194,11 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 		Path:       filepath.Dir(reference.GetPath()),
 	}
 
-	return a.addActivity(ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+	var span trace.Span
+	ctx, span = a.tracer.Start(ctx, "AddActivity")
+	defer span.End()
+
+	return a.addActivity(ctx, ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
 }
@@ -273,7 +286,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 }
 
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
-func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
+func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
 		info  *provider.ResourceInfo
 		err   error
@@ -281,14 +294,18 @@ func (a *ActivitylogService) addActivity(initRef *provider.Reference, eventID st
 		ref   = initRef
 	)
 	for {
+		_, span := a.tracer.Start(ctx, "getResource")
 		info, err = getResource(ref)
+		span.End()
 		if err != nil {
 			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
+		_, span = a.tracer.Start(ctx, "storeActivity")
 		if err := a.storeActivity(storagespace.FormatResourceID(info.GetId()), eventID, depth, timestamp); err != nil {
 			return fmt.Errorf("could not store activity: %w", err)
 		}
+		span.End()
 
 		if info != nil && utils.IsSpaceRoot(info) {
 			return nil

@@ -49,8 +49,74 @@ type ActivitylogService struct {
 	lock       sync.RWMutex
 	tp         trace.TracerProvider
 	tracer     trace.Tracer
+	debouncer  *Debouncer
 
 	registeredEvents map[string]events.Unmarshaller
+}
+
+type Debouncer struct {
+	after      time.Duration
+	f          func(id string, ra []RawActivity) error
+	pending    sync.Map
+	inProgress sync.Map
+
+	mutex sync.Mutex
+}
+
+type queueItem struct {
+	activities []RawActivity
+	timer      *time.Timer
+}
+
+// NewDebouncer returns a new Debouncer instance
+func NewDebouncer(d time.Duration, f func(id string, ra []RawActivity) error) *Debouncer {
+	return &Debouncer{
+		after:      d,
+		f:          f,
+		pending:    sync.Map{},
+		inProgress: sync.Map{},
+	}
+}
+
+// Debounce restarts the debounce timer for the given space
+func (d *Debouncer) Debounce(id string, ra RawActivity) {
+	if d.after == 0 {
+		d.f(id, []RawActivity{ra})
+		return
+	}
+
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	activities := []RawActivity{ra}
+	if i, ok := d.pending.Load(id); ok {
+		item, ok := i.(*queueItem)
+		if ok {
+			activities = append(item.activities, ra)
+		}
+		item.timer.Stop()
+	}
+
+	d.pending.Store(id, &queueItem{
+		activities: activities,
+		timer: time.AfterFunc(d.after, func() {
+			if _, ok := d.inProgress.Load(id); ok {
+				// Reschedule this run for when the previous run has finished
+				d.mutex.Lock()
+				if i, ok := d.pending.Load(id); ok {
+					i.(*queueItem).timer.Reset(d.after)
+				}
+
+				d.mutex.Unlock()
+				return
+			}
+
+			d.pending.Delete(id)
+			d.inProgress.Store(id, true)
+			defer d.inProgress.Delete(id)
+			d.f(id, activities)
+		}),
+	})
 }
 
 // New creates a new ActivitylogService
@@ -87,6 +153,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		tp:               o.TraceProvider,
 		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/activitylog/pkg/service"),
 	}
+	s.debouncer = NewDebouncer(10*time.Second, s.storeActivity)
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 
@@ -184,7 +251,13 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	}
 
 	// store activity on trashed item
-	if err := a.storeActivity(storagespace.FormatResourceID(resourceID), eventID, 0, timestamp); err != nil {
+	if err := a.storeActivity(storagespace.FormatResourceID(resourceID), []RawActivity{
+		{
+			EventID:   eventID,
+			Depth:     0,
+			Timestamp: timestamp,
+		},
+	}); err != nil {
 		return fmt.Errorf("could not store activity: %w", err)
 	}
 
@@ -213,7 +286,13 @@ func (a *ActivitylogService) AddSpaceActivity(spaceID *provider.StorageSpaceId, 
 		return fmt.Errorf("could not parse space id: %w", err)
 	}
 	rid.OpaqueId = rid.GetSpaceId()
-	return a.storeActivity(storagespace.FormatResourceID(&rid), eventID, 0, timestamp)
+	return a.storeActivity(storagespace.FormatResourceID(&rid), []RawActivity{
+		{
+			EventID:   eventID,
+			Depth:     0,
+			Timestamp: timestamp,
+		},
+	})
 
 }
 
@@ -301,10 +380,12 @@ func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.
 			return fmt.Errorf("could not get resource info: %w", err)
 		}
 
-		_, span = a.tracer.Start(ctx, "storeActivity")
-		if err := a.storeActivity(storagespace.FormatResourceID(info.GetId()), eventID, depth, timestamp); err != nil {
-			return fmt.Errorf("could not store activity: %w", err)
-		}
+		_, span = a.tracer.Start(ctx, "queueStoreActivity")
+		a.debouncer.Debounce(storagespace.FormatResourceID(info.GetId()), RawActivity{
+			EventID:   eventID,
+			Depth:     depth,
+			Timestamp: timestamp,
+		})
 		span.End()
 
 		if info != nil && utils.IsSpaceRoot(info) {
@@ -316,7 +397,7 @@ func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.
 	}
 }
 
-func (a *ActivitylogService) storeActivity(resourceID string, eventID string, depth int, timestamp time.Time) error {
+func (a *ActivitylogService) storeActivity(resourceID string, activities []RawActivity) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
@@ -325,22 +406,19 @@ func (a *ActivitylogService) storeActivity(resourceID string, eventID string, de
 		return err
 	}
 
-	var activities []RawActivity
+	var existingActivities []RawActivity
 	if len(records) > 0 {
-		if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+		if err := json.Unmarshal(records[0].Value, &existingActivities); err != nil {
 			return err
 		}
 	}
 
-	if l := len(activities); l >= _maxActivities {
-		activities = activities[l-_maxActivities+1:]
+	if l := len(existingActivities) + len(activities); l >= _maxActivities {
+		start := min(len(existingActivities), l-_maxActivities+1)
+		existingActivities = existingActivities[start:]
 	}
 
-	activities = append(activities, RawActivity{
-		EventID:   eventID,
-		Depth:     depth,
-		Timestamp: timestamp,
-	})
+	activities = append(existingActivities, activities...)
 
 	b, err := json.Marshal(activities)
 	if err != nil {

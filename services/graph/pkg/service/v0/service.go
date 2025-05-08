@@ -312,6 +312,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 							r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
 						})
 					}
+					r.Get("/photo", svc.GetPhoto)
+					r.Put("/photo", svc.UpdatePhoto)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {

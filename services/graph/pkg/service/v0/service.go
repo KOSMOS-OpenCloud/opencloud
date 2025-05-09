@@ -295,6 +295,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Post("/changePassword", svc.ChangeOwnPassword)
 				r.Get("/photo", svc.GetMePhoto)
 				r.Put("/photo", svc.UpdateMePhoto)
+				r.Patch("/photo", svc.UpdateMePhoto)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)

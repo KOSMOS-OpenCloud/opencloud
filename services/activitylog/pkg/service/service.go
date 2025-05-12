@@ -13,6 +13,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
@@ -38,18 +39,19 @@ type RawActivity struct {
 
 // ActivitylogService logs events per resource
 type ActivitylogService struct {
-	cfg        *config.Config
-	log        log.Logger
-	events     <-chan events.Event
-	store      microstore.Store
-	gws        pool.Selectable[gateway.GatewayAPIClient]
-	mux        *chi.Mux
-	evHistory  ehsvc.EventHistoryService
-	valService settingssvc.ValueService
-	lock       sync.RWMutex
-	tp         trace.TracerProvider
-	tracer     trace.Tracer
-	debouncer  *Debouncer
+	cfg           *config.Config
+	log           log.Logger
+	events        <-chan events.Event
+	store         microstore.Store
+	gws           pool.Selectable[gateway.GatewayAPIClient]
+	mux           *chi.Mux
+	evHistory     ehsvc.EventHistoryService
+	valService    settingssvc.ValueService
+	lock          sync.RWMutex
+	tp            trace.TracerProvider
+	tracer        trace.Tracer
+	debouncer     *Debouncer
+	parentIdCache *ttlcache.Cache
 
 	registeredEvents map[string]events.Unmarshaller
 }
@@ -139,6 +141,12 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		return nil, err
 	}
 
+	cache := ttlcache.NewCache()
+	err = cache.SetTTL(10 * time.Second)
+	if err != nil {
+		return nil, err
+	}
+
 	s := &ActivitylogService{
 		log:              o.Logger,
 		cfg:              o.Config,
@@ -152,6 +160,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		registeredEvents: make(map[string]events.Unmarshaller),
 		tp:               o.TraceProvider,
 		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/activitylog/pkg/service"),
+		parentIdCache:    cache,
 	}
 	s.debouncer = NewDebouncer(10*time.Second, s.storeActivity)
 
@@ -189,6 +198,11 @@ func (a *ActivitylogService) Run() {
 		case events.ItemPurged:
 			err = a.RemoveResource(ev.ID)
 		case events.ItemMoved:
+			// remove the cached parent id for this resource
+			if err := a.parentIdCache.Remove(storagespace.FormatResourceID(ev.Ref.GetResourceId())); err != nil {
+				a.log.Error().Interface("event", ev).Err(err).Msg("could not delete parent id cache")
+			}
+
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
 			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
@@ -368,32 +382,56 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
 		info  *provider.ResourceInfo
-		err   error
 		depth int
 		ref   = initRef
 	)
 	for {
-		_, span := a.tracer.Start(ctx, "getResource")
-		info, err = getResource(ref)
-		span.End()
-		if err != nil {
-			return fmt.Errorf("could not get resource info: %w", err)
+		id := ref.GetResourceId()
+		if ref.Path != "" {
+			// Path based reference, we need to resolve the resource id
+			info, err := getResource(ref)
+			if err != nil {
+				return fmt.Errorf("could not get resource info: %w", err)
+			}
+			id = info.GetId()
+		}
+		if id == nil {
+			return fmt.Errorf("resource id is required")
 		}
 
-		_, span = a.tracer.Start(ctx, "queueStoreActivity")
-		a.debouncer.Debounce(storagespace.FormatResourceID(info.GetId()), RawActivity{
+		key := storagespace.FormatResourceID(id)
+		_, span := a.tracer.Start(ctx, "queueStoreActivity")
+		a.debouncer.Debounce(key, RawActivity{
 			EventID:   eventID,
 			Depth:     depth,
 			Timestamp: timestamp,
 		})
 		span.End()
 
-		if info != nil && utils.IsSpaceRoot(info) {
+		if id.OpaqueId == id.SpaceId {
+			// we are at the root of the space, no need to go further
 			return nil
 		}
 
+		// check if parent id is cached
+		// parent id is cached in the format <storageid>$<spaceid>!<resourceid>
+		// if it is not cached, get the resource info and cache it
+		var parentId *provider.ResourceId
+		if v, err := a.parentIdCache.Get(key); err != nil {
+			_, span = a.tracer.Start(ctx, "getResource")
+			info, err = getResource(ref)
+			span.End()
+			if err != nil {
+				return fmt.Errorf("could not get resource info: %w", err)
+			}
+			parentId = info.GetParentId()
+			a.parentIdCache.Set(key, parentId)
+		} else {
+			parentId = v.(*provider.ResourceId)
+		}
+
 		depth++
-		ref = &provider.Reference{ResourceId: info.GetParentId()}
+		ref = &provider.Reference{ResourceId: parentId}
 	}
 }
 

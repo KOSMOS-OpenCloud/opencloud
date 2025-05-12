@@ -18,6 +18,7 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
+	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 
@@ -371,8 +372,10 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 	}
 
 	var activities []RawActivity
-	if err := json.Unmarshal(records[0].Value, &activities); err != nil {
-		return nil, fmt.Errorf("could not unmarshal activities: %w", err)
+	if err := msgpack.Unmarshal(records[0].Value, &activities); err != nil {
+		if err := json.Unmarshal(records[0].Value, &activities); err != nil {
+			return nil, fmt.Errorf("could not unmarshal activities: %w", err)
+		}
 	}
 
 	return activities, nil
@@ -439,17 +442,25 @@ func (a *ActivitylogService) storeActivity(resourceID string, activities []RawAc
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
+	ctx, span := a.tracer.Start(context.Background(), "storeActivity")
+	defer span.End()
+	_, subspan := a.tracer.Start(ctx, "store.Read")
 	records, err := a.store.Read(resourceID)
 	if err != nil && err != microstore.ErrNotFound {
 		return err
 	}
+	subspan.End()
 
+	_, subspan = a.tracer.Start(ctx, "Unmarshal")
 	var existingActivities []RawActivity
 	if len(records) > 0 {
-		if err := json.Unmarshal(records[0].Value, &existingActivities); err != nil {
-			return err
+		if err := msgpack.Unmarshal(records[0].Value, &existingActivities); err != nil {
+			if err := json.Unmarshal(records[0].Value, &existingActivities); err != nil {
+				return err
+			}
 		}
 	}
+	subspan.End()
 
 	if l := len(existingActivities) + len(activities); l >= _maxActivities {
 		start := min(len(existingActivities), l-_maxActivities+1)
@@ -458,10 +469,12 @@ func (a *ActivitylogService) storeActivity(resourceID string, activities []RawAc
 
 	activities = append(existingActivities, activities...)
 
-	b, err := json.Marshal(activities)
+	_, subspan = a.tracer.Start(ctx, "Unmarshal")
+	b, err := msgpack.Marshal(activities)
 	if err != nil {
 		return err
 	}
+	subspan.End()
 
 	return a.store.Write(&microstore.Record{
 		Key:   resourceID,

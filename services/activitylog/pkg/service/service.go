@@ -183,9 +183,9 @@ func (a *ActivitylogService) Run() {
 		var err error
 		switch ev := e.Event.(type) {
 		case events.UploadReady:
-			err = a.AddActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ev.FileRef, ev.ParentID, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.FileTouched:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ev.Ref, ev.ParentID, e.ID, utils.TSToTime(ev.Timestamp))
 		// Disabled https://github.com/owncloud/ocis/issues/10293
 		//case events.FileDownloaded:
 		// we are only interested in public link downloads - so no need to store others.
@@ -193,9 +193,9 @@ func (a *ActivitylogService) Run() {
 		//	err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		//}
 		case events.ContainerCreated:
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ev.Ref, ev.ParentID, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
-			err = a.AddActivityTrashed(ev.ID, ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivityTrashed(ev.ID, ev.Ref, nil, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemPurged:
 			err = a.RemoveResource(ev.ID)
 		case events.ItemMoved:
@@ -204,23 +204,23 @@ func (a *ActivitylogService) Run() {
 				a.log.Error().Interface("event", ev).Err(err).Msg("could not delete parent id cache")
 			}
 
-			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(ev.Ref, nil, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+			err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, utils.TSToTime(ev.CTime))
 		case events.ShareUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
-				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+				err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, utils.TSToTime(ev.MTime))
 			}
 		case events.ShareRemoved:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, ev.Timestamp)
+			err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, ev.Timestamp)
 		case events.LinkCreated:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.CTime))
+			err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, utils.TSToTime(ev.CTime))
 		case events.LinkUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() != ev.ItemID.GetSpaceId() {
-				err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.MTime))
+				err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, utils.TSToTime(ev.MTime))
 			}
 		case events.LinkRemoved:
-			err = a.AddActivity(toRef(ev.ItemID), e.ID, utils.TSToTime(ev.Timestamp))
+			err = a.AddActivity(toRef(ev.ItemID), nil, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.SpaceShared:
 			err = a.AddSpaceActivity(ev.ID, e.ID, ev.Timestamp)
 		case events.SpaceUnshared:
@@ -234,7 +234,7 @@ func (a *ActivitylogService) Run() {
 }
 
 // AddActivity adds the activity to the given resource and all its parents
-func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID string, timestamp time.Time) error {
+func (a *ActivitylogService) AddActivity(initRef *provider.Reference, parentId *provider.ResourceId, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
 		return fmt.Errorf("cant get gateway client: %w", err)
@@ -248,13 +248,13 @@ func (a *ActivitylogService) AddActivity(initRef *provider.Reference, eventID st
 	ctx, span = a.tracer.Start(ctx, "AddActivity")
 	defer span.End()
 
-	return a.addActivity(ctx, initRef, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+	return a.addActivity(ctx, initRef, parentId, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
 }
 
 // AddActivityTrashed adds the activity to given trashed resource and all its former parents
-func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId, reference *provider.Reference, eventID string, timestamp time.Time) error {
+func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId, reference *provider.Reference, parentId *provider.ResourceId, eventID string, timestamp time.Time) error {
 	gwc, err := a.gws.Next()
 	if err != nil {
 		return fmt.Errorf("cant get gateway client: %w", err)
@@ -286,7 +286,7 @@ func (a *ActivitylogService) AddActivityTrashed(resourceID *provider.ResourceId,
 	ctx, span = a.tracer.Start(ctx, "AddActivity")
 	defer span.End()
 
-	return a.addActivity(ctx, ref, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+	return a.addActivity(ctx, ref, parentId, eventID, timestamp, func(ref *provider.Reference) (*provider.ResourceInfo, error) {
 		return utils.GetResource(ctx, ref, gwc)
 	})
 }
@@ -382,7 +382,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 }
 
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
-func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
+func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, parentId *provider.ResourceId, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
 		info  *provider.ResourceInfo
 		depth int
@@ -419,22 +419,26 @@ func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.
 		// check if parent id is cached
 		// parent id is cached in the format <storageid>$<spaceid>!<resourceid>
 		// if it is not cached, get the resource info and cache it
-		var parentId *provider.ResourceId
-		if v, err := a.parentIdCache.Get(key); err != nil {
-			_, span = a.tracer.Start(ctx, "getResource")
-			info, err = getResource(ref)
-			span.End()
-			if err != nil {
-				return fmt.Errorf("could not get resource info: %w", err)
+		if parentId == nil {
+			if v, err := a.parentIdCache.Get(key); err != nil {
+				_, span = a.tracer.Start(ctx, "getResource")
+				info, err = getResource(ref)
+				span.End()
+				if err != nil || info.GetParentId() == nil || info.GetParentId().GetOpaqueId() == "" {
+					return fmt.Errorf("could not get parent id: %w", err)
+				}
+				parentId = info.GetParentId()
+				a.parentIdCache.Set(key, parentId)
+			} else {
+				parentId = v.(*provider.ResourceId)
 			}
-			parentId = info.GetParentId()
-			a.parentIdCache.Set(key, parentId)
 		} else {
-			parentId = v.(*provider.ResourceId)
+			a.log.Debug().Msg("parent id is cached")
 		}
 
 		depth++
 		ref = &provider.Reference{ResourceId: parentId}
+		parentId = nil // reset parent id so it's not reused in the next iteration
 	}
 }
 

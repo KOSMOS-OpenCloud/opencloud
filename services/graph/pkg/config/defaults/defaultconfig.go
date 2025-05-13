@@ -125,6 +125,17 @@ func DefaultConfig() *config.Config {
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
+		SystemStorageClient: config.SystemStorageClient{
+			GatewayAddress: "eu.opencloud.api.storage-system",
+			StorageAddress: "eu.opencloud.api.storage-system",
+			SystemUserIDP:  "internal",
+			Cache: &config.Cache{
+				Store:    "memory",
+				Nodes:    []string{"127.0.0.1:9233"},
+				Database: "settings-cache",
+				TTL:      time.Minute * 10,
+			},
+		},
 	}
 }
 

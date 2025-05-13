@@ -1,14 +1,19 @@
 package svc
 
 import (
-	"net/http"
-	"net/url"
-
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/opencloud-eu/opencloud/pkg/systemstorageclient"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"net/http"
+	"net/url"
+)
+
+var (
+	namespace  = "profilephoto"
+	identifier = "profilephoto"
 )
 
 // GetMePhoto implements the Service interface
@@ -42,10 +47,15 @@ func (g Graph) GetPhoto(w http.ResponseWriter, r *http.Request) {
 func (g Graph) getPhoto(w http.ResponseWriter, r *http.Request, u *userpb.UserId) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("GetPhoto called")
+	g.getSystemStorageClient()
+	photo, err := g.sdsc.SimpleDownload(r.Context(), u.GetOpaqueId(), identifier)
+	if err != nil {
+		render.Status(r, http.StatusNotFound)
+		render.JSON(w, r, nil)
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, photo)
 
-	// TODO: use proper default return
-	render.Status(r, http.StatusNotFound)
-	render.JSON(w, r, nil)
 }
 
 // UpdateMePhoto implements the Service interface
@@ -79,8 +89,22 @@ func (g Graph) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 func (g Graph) updatePhoto(w http.ResponseWriter, r *http.Request, u *userpb.UserId) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("UpdatePhoto called")
-
+	g.getSystemStorageClient()
+	g.sdsc.SimpleUpload(r.Context(), u.GetOpaqueId(), identifier, []byte("test"))
 	// TODO: use proper default return
 	render.Status(r, http.StatusForbidden)
 	render.JSON(w, r, nil)
+}
+
+func (g Graph) getSystemStorageClient() systemstorageclient.SystemDataStorageClient {
+	g.sdsc = systemstorageclient.NewSystemStorageClient(
+		namespace,
+		g.logger,
+		g.config.SystemStorageClient.GatewayAddress,
+		g.config.SystemStorageClient.StorageAddress,
+		g.config.SystemStorageClient.SystemUserID,
+		g.config.SystemStorageClient.SystemUserIDP,
+		g.config.SystemStorageClient.SystemUserAPIKey,
+	)
+	return g.sdsc
 }

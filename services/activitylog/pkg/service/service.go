@@ -143,7 +143,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 	}
 
 	cache := ttlcache.NewCache()
-	err = cache.SetTTL(10 * time.Second)
+	err = cache.SetTTL(30 * time.Second)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/activitylog/pkg/service"),
 		parentIdCache:    cache,
 	}
-	s.debouncer = NewDebouncer(10*time.Second, s.storeActivity)
+	s.debouncer = NewDebouncer(o.WriteBufferDuration, s.storeActivity)
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 

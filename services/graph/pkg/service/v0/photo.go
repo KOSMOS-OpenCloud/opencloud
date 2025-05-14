@@ -7,6 +7,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/systemstorageclient"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -89,14 +90,30 @@ func (g Graph) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 func (g Graph) updatePhoto(w http.ResponseWriter, r *http.Request, u *userpb.UserId) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("UpdatePhoto called")
+	content, err := io.ReadAll(r.Body)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not read body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not read body")
+		return
+	}
+	if len(content) == 0 {
+		logger.Debug().Msg("could not read body: empty body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "empty body")
+		return
+	}
 	g.getSystemStorageClient()
-	g.sdsc.SimpleUpload(r.Context(), u.GetOpaqueId(), identifier, []byte("test"))
-	// TODO: use proper default return
-	render.Status(r, http.StatusForbidden)
+	err = g.sdsc.SimpleUpload(r.Context(), u.GetOpaqueId(), identifier, content)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not upload photo")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not upload photo")
+		return
+	}
+	render.Status(r, http.StatusOK)
 	render.JSON(w, r, nil)
 }
 
 func (g Graph) getSystemStorageClient() systemstorageclient.SystemDataStorageClient {
+	// TODO: this needs a check if the client is already initialized and if not, initialize it
 	g.sdsc = systemstorageclient.NewSystemStorageClient(
 		namespace,
 		g.logger,

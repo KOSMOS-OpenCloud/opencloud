@@ -2,6 +2,7 @@ package systemstorageclient
 
 import (
 	"context"
+	"fmt"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 
 	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
@@ -17,8 +18,8 @@ func (s SystemDataStorageClient) SimpleDownload(ctx context.Context, userID, ide
 }
 
 func (s SystemDataStorageClient) SimpleUpload(ctx context.Context, userID, identifier string, content []byte) error {
-	//TODO implement me
-	panic("implement me")
+	fmt.Println(content)
+	return nil
 }
 
 func (s SystemDataStorageClient) Delete(ctx context.Context, userID, identifier string) error {

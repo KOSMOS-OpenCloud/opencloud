@@ -9,7 +9,7 @@ import (
 )
 
 type SystemDataStorageClient struct {
-	mds *metadata.Storage
+	mds metadata.Storage
 }
 
 func (s SystemDataStorageClient) SimpleDownload(ctx context.Context, userID, identifier string) ([]byte, error) {
@@ -18,7 +18,7 @@ func (s SystemDataStorageClient) SimpleDownload(ctx context.Context, userID, ide
 }
 
 func (s SystemDataStorageClient) SimpleUpload(ctx context.Context, userID, identifier string, content []byte) error {
-	fmt.Println(content)
+	s.mds.SimpleUpload(ctx, fmt.Sprintf("%s/%s", userID, identifier), content)
 	return nil
 }
 
@@ -43,15 +43,20 @@ func (s SystemDataStorageClient) Init(ctx context.Context, userID, identifier st
 }
 
 // NewProfileStorageClient creates a new ProfileStorageClient
-func NewSystemStorageClient(nameSpace string,
+func NewSystemStorageClient(scope, nameSpace string,
 	logger *log.Logger,
 	gatewayAddress, storageAddress, systemUserID, systemUserIDP, systemUserAPIKey string) SystemDataStorageClient {
+
+	// scope: the scope the data should be persistet in (e.g. user)
+	// namespace: the namespace the data should be persistet in (e.g. profilephoto)
+	// results in the following path: /<scope>/*/<namespace>/*
+
 	sdsci := SystemDataStorageClient{}
 	logger.Debug().Msg("NewSystemStorageClient called")
 	sdsc, err := metadata.NewCS3Storage(gatewayAddress, storageAddress, systemUserID, systemUserIDP, systemUserAPIKey)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("could not create profile storage client")
 	}
-	sdsci.mds = &sdsc
+	sdsci.mds = sdsc
 	return sdsci
 }

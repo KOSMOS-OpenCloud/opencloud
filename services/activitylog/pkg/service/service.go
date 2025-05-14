@@ -92,17 +92,19 @@ func (d *Debouncer) Debounce(id string, ra RawActivity) {
 	defer d.mutex.Unlock()
 
 	activities := []RawActivity{ra}
+	item := &queueItem{
+		activities: activities,
+	}
 	if i, ok := d.pending.Load(id); ok {
-		item, ok := i.(*queueItem)
+		// if the item is already in the queue, append the new activities
+		item, ok = i.(*queueItem)
 		if ok {
-			activities = append(item.activities, ra)
+			item.activities = append(item.activities, ra)
 		}
-		item.timer.Stop()
 	}
 
-	d.pending.Store(id, &queueItem{
-		activities: activities,
-		timer: time.AfterFunc(d.after, func() {
+	if item.timer == nil {
+		item.timer = time.AfterFunc(d.after, func() {
 			if _, ok := d.inProgress.Load(id); ok {
 				// Reschedule this run for when the previous run has finished
 				d.mutex.Lock()
@@ -117,9 +119,11 @@ func (d *Debouncer) Debounce(id string, ra RawActivity) {
 			d.pending.Delete(id)
 			d.inProgress.Store(id, true)
 			defer d.inProgress.Delete(id)
-			d.f(id, activities)
-		}),
-	})
+			d.f(id, item.activities)
+		})
+	}
+
+	d.pending.Store(id, item)
 }
 
 // New creates a new ActivitylogService

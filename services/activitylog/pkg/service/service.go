@@ -377,6 +377,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 
 	var activities []RawActivity
 	if err := msgpack.Unmarshal(records[0].Value, &activities); err != nil {
+		a.log.Debug().Err(err).Str("resourceID", resourceID).Msg("could not unmarshal messagepack, trying json")
 		if err := json.Unmarshal(records[0].Value, &activities); err != nil {
 			return nil, fmt.Errorf("could not unmarshal activities: %w", err)
 		}
@@ -463,6 +464,7 @@ func (a *ActivitylogService) storeActivity(resourceID string, activities []RawAc
 	var existingActivities []RawActivity
 	if len(records) > 0 {
 		if err := msgpack.Unmarshal(records[0].Value, &existingActivities); err != nil {
+			a.log.Debug().Err(err).Str("resourceID", resourceID).Msg("could not unmarshal messagepack, trying json")
 			if err := json.Unmarshal(records[0].Value, &existingActivities); err != nil {
 				return err
 			}

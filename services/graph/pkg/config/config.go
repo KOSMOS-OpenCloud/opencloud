@@ -158,11 +158,11 @@ type ServiceAccount struct {
 
 // SystemStorageClient configures the metadata store to use
 type SystemStorageClient struct {
-	GatewayAddress string `yaml:"gateway_addr" env:"SETTINGS_STORAGE_GATEWAY_GRPC_ADDR;STORAGE_GATEWAY_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
-	StorageAddress string `yaml:"storage_addr" env:"SETTINGS_STORAGE_GRPC_ADDR;STORAGE_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
+	GatewayAddress string `yaml:"gateway_addr" env:"GRAPH_STORAGE_GATEWAY_GRPC_ADDR;STORAGE_GATEWAY_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
+	StorageAddress string `yaml:"storage_addr" env:"GRAPH_STORAGE_GRPC_ADDR;STORAGE_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
 
-	SystemUserID     string `yaml:"system_user_id" env:"OC_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID" desc:"ID of the OpenCloud STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"1.0.0"`
-	SystemUserIDP    string `yaml:"system_user_idp" env:"OC_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP" desc:"IDP of the OpenCloud STORAGE-SYSTEM system user." introductionVersion:"1.0.0"`
+	SystemUserID     string `yaml:"system_user_id" env:"OC_SYSTEM_USER_ID;GRAPH_SYSTEM_USER_ID" desc:"ID of the OpenCloud STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"1.0.0"`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OC_SYSTEM_USER_IDP;GRAPH_SYSTEM_USER_IDP" desc:"IDP of the OpenCloud STORAGE-SYSTEM system user." introductionVersion:"1.0.0"`
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OC_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user." introductionVersion:"1.0.0"`
 	Cache            *Cache `yaml:"cache"`
 }

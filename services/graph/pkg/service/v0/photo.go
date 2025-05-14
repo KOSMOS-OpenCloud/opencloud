@@ -91,7 +91,7 @@ func (g Graph) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 func (g Graph) updatePhoto(w http.ResponseWriter, r *http.Request, u *userpb.UserId) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Debug().Msg("UpdatePhoto called")
-	g.getSystemStorageClient()
+	client := g.getSystemStorageClient()
 	content, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not read body")
@@ -103,7 +103,7 @@ func (g Graph) updatePhoto(w http.ResponseWriter, r *http.Request, u *userpb.Use
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "empty body")
 		return
 	}
-	err = g.sdsc.SimpleUpload(r.Context(), u.GetOpaqueId(), identifier, content)
+	err = client.SimpleUpload(r.Context(), u.GetOpaqueId(), identifier, content)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not upload photo")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not upload photo")
@@ -115,7 +115,7 @@ func (g Graph) updatePhoto(w http.ResponseWriter, r *http.Request, u *userpb.Use
 
 func (g Graph) getSystemStorageClient() systemstorageclient.SystemDataStorageClient {
 	// TODO: this needs a check if the client is already initialized and if not, initialize it
-	g.sdsc = systemstorageclient.NewSystemStorageClient(
+	g.sdsc = *systemstorageclient.NewSystemStorageClient(
 		scope,
 		namespace,
 		g.logger,

@@ -202,6 +202,15 @@ func EnsureDefaults(cfg *config.Config) {
 			cfg.UnifiedRoles.AvailableRoles = append(cfg.UnifiedRoles.AvailableRoles, definition.GetId())
 		}
 	}
+
+	if cfg.SystemStorageClient.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.SystemStorageClient.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.SystemStorageClient.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.SystemStorageClient.SystemUserID = cfg.Commons.SystemUserID
+	}
+
 }
 
 // Sanitize sanitized the configuration

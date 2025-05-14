@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"errors"
-	"github.com/opencloud-eu/opencloud/pkg/systemstorageclient"
 	"net/http"
 	"net/url"
 	"path"
@@ -68,7 +67,6 @@ type Graph struct {
 	keycloakClient           keycloak.Client
 	historyClient            ehsvc.EventHistoryService
 	traceProvider            trace.TracerProvider
-	sdsc                     systemstorageclient.SystemDataStorageClient
 }
 
 // ServeHTTP implements the Service interface.

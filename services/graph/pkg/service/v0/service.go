@@ -19,6 +19,7 @@ import (
 
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
@@ -225,6 +226,27 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
+	storage, err := metadata.NewCS3Storage(
+		options.Config.Metadata.GatewayAddress,
+		options.Config.Metadata.StorageAddress,
+		options.Config.Metadata.SystemUserID,
+		options.Config.Metadata.SystemUserIDP,
+		options.Config.Metadata.SystemUserAPIKey,
+	)
+	if err != nil {
+		return svc, err
+	}
+
+	usersUserProfilePhotoService, err := NewUsersUserProfilePhotoService(storage)
+	if err != nil {
+		return svc, err
+	}
+
+	usersUserProfilePhotoApi, err := NewUsersUserProfilePhotoApi(usersUserProfilePhotoService, options.Logger)
+	if err != nil {
+		return svc, err
+	}
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 
@@ -293,9 +315,12 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 				r.Get("/drives", svc.GetDrives(APIVersion_1))
 				r.Post("/changePassword", svc.ChangeOwnPassword)
-				r.Get("/photo", svc.GetMePhoto)
-				r.Put("/photo", svc.UpdateMePhoto)
-				r.Patch("/photo", svc.UpdateMePhoto)
+				r.Route("/photo", func(r chi.Router) {
+					r.Get("/", usersUserProfilePhotoApi.GetProfilePhoto)
+					r.Put("/", usersUserProfilePhotoApi.UpsertProfilePhoto)
+					r.Patch("/", usersUserProfilePhotoApi.UpsertProfilePhoto)
+					r.Delete("/", usersUserProfilePhotoApi.DeleteProfilePhoto)
+				})
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)
@@ -313,8 +338,6 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 							r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
 						})
 					}
-					r.Get("/photo", svc.GetPhoto)
-					r.Put("/photo", svc.UpdatePhoto)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {

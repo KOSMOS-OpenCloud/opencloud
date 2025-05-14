@@ -38,7 +38,7 @@ type Config struct {
 
 	Context context.Context `yaml:"-"`
 
-	SystemStorageClient SystemStorageClient `yaml:"system_storage_client"`
+	Metadata Metadata `yaml:"metadata_config"`
 }
 
 type Spaces struct {
@@ -156,13 +156,12 @@ type ServiceAccount struct {
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OC_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"1.0.0"`
 }
 
-// SystemStorageClient configures the metadata store to use
-type SystemStorageClient struct {
-	GatewayAddress string `yaml:"gateway_addr" env:"GRAPH_STORAGE_GATEWAY_GRPC_ADDR;STORAGE_GATEWAY_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
-	StorageAddress string `yaml:"storage_addr" env:"GRAPH_STORAGE_GRPC_ADDR;STORAGE_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"1.0.0"`
+// Metadata configures the metadata store to use
+type Metadata struct {
+	GatewayAddress string `yaml:"gateway_addr" env:"GRAPH_STORAGE_GATEWAY_GRPC_ADDR;STORAGE_GATEWAY_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"%%NEXT%%"`
+	StorageAddress string `yaml:"storage_addr" env:"GRAPH_STORAGE_GRPC_ADDR;STORAGE_GRPC_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service." introductionVersion:"%%NEXT%%"`
 
-	SystemUserID     string `yaml:"system_user_id" env:"OC_SYSTEM_USER_ID;GRAPH_SYSTEM_USER_ID" desc:"ID of the OpenCloud STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"1.0.0"`
-	SystemUserIDP    string `yaml:"system_user_idp" env:"OC_SYSTEM_USER_IDP;GRAPH_SYSTEM_USER_IDP" desc:"IDP of the OpenCloud STORAGE-SYSTEM system user." introductionVersion:"1.0.0"`
-	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OC_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user." introductionVersion:"1.0.0"`
-	Cache            *Cache `yaml:"cache"`
+	SystemUserID     string `yaml:"system_user_id" env:"OC_SYSTEM_USER_ID;GRAPH_SYSTEM_USER_ID" desc:"ID of the OpenCloud STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"%%NEXT%%"`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OC_SYSTEM_USER_IDP;GRAPH_SYSTEM_USER_IDP" desc:"IDP of the OpenCloud STORAGE-SYSTEM system user." introductionVersion:"%%NEXT%%"`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OC_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user." introductionVersion:"%%NEXT%%"`
 }

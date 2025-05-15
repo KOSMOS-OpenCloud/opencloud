@@ -204,9 +204,7 @@ func (a *ActivitylogService) Run() {
 			err = a.RemoveResource(ev.ID)
 		case events.ItemMoved:
 			// remove the cached parent id for this resource
-			if err := a.parentIdCache.Remove(storagespace.FormatResourceID(ev.Ref.GetResourceId())); err != nil {
-				a.log.Error().Interface("event", ev).Err(err).Msg("could not delete parent id cache")
-			}
+			a.removeCachedParentID(ev.Ref)
 
 			err = a.AddActivity(ev.Ref, nil, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ShareCreated:
@@ -501,5 +499,32 @@ func toRef(r *provider.ResourceId) *provider.Reference {
 func toSpace(r *provider.Reference) *provider.StorageSpaceId {
 	return &provider.StorageSpaceId{
 		OpaqueId: storagespace.FormatStorageID(r.GetResourceId().GetStorageId(), r.GetResourceId().GetSpaceId()),
+	}
+}
+
+func (a *ActivitylogService) removeCachedParentID(ref *provider.Reference) {
+	purgeId := ref.GetResourceId()
+	if ref.GetPath() != "" {
+		gwc, err := a.gws.Next()
+		if err != nil {
+			a.log.Error().Err(err).Msg("could not get gateway client")
+			return
+		}
+
+		ctx, err := utils.GetServiceUserContext(a.cfg.ServiceAccount.ServiceAccountID, gwc, a.cfg.ServiceAccount.ServiceAccountSecret)
+		if err != nil {
+			a.log.Error().Err(err).Msg("could not get service user context")
+			return
+		}
+
+		info, err := utils.GetResource(ctx, ref, gwc)
+		if err != nil {
+			a.log.Error().Err(err).Msg("could not get resource info")
+			return
+		}
+		purgeId = info.GetId()
+	}
+	if err := a.parentIdCache.Remove(storagespace.FormatResourceID(purgeId)); err != nil {
+		a.log.Error().Interface("event", ref).Err(err).Msg("could not delete parent id cache")
 	}
 }

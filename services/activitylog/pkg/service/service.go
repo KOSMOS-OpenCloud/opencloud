@@ -387,6 +387,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 // note: getResource is abstracted to allow unit testing, in general this will just be utils.GetResource
 func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, parentId *provider.ResourceId, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
+		err   error
 		info  *provider.ResourceInfo
 		depth int
 		ref   = initRef
@@ -395,7 +396,7 @@ func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.
 		id := ref.GetResourceId()
 		if ref.Path != "" {
 			// Path based reference, we need to resolve the resource id
-			info, err := getResource(ref)
+			info, err = getResource(ref)
 			if err != nil {
 				return fmt.Errorf("could not get resource info: %w", err)
 			}
@@ -424,11 +425,13 @@ func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.
 		// if it is not cached, get the resource info and cache it
 		if parentId == nil {
 			if v, err := a.parentIdCache.Get(key); err != nil {
-				_, span = a.tracer.Start(ctx, "getResource")
-				info, err = getResource(ref)
-				span.End()
-				if err != nil || info.GetParentId() == nil || info.GetParentId().GetOpaqueId() == "" {
-					return fmt.Errorf("could not get parent id: %w", err)
+				if info == nil {
+					_, span = a.tracer.Start(ctx, "getResource")
+					info, err = getResource(ref)
+					span.End()
+					if err != nil || info.GetParentId() == nil || info.GetParentId().GetOpaqueId() == "" {
+						return fmt.Errorf("could not get parent id: %w", err)
+					}
 				}
 				parentId = info.GetParentId()
 				a.parentIdCache.Set(key, parentId)

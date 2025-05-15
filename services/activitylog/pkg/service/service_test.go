@@ -82,7 +82,7 @@ var _ = Describe("ActivitylogService", func() {
 						}
 
 						for k, v := range tc.Activities {
-							err := alog.addActivity(context.Background(), reference(v), k, time.Time{}, getResource)
+							err := alog.addActivity(context.Background(), reference(v), nil, k, time.Time{}, getResource)
 							Expect(err).NotTo(HaveOccurred())
 						}
 					})
@@ -121,9 +121,9 @@ var _ = Describe("ActivitylogService", func() {
 				return tree[ref.GetResourceId().GetOpaqueId()], nil
 			}
 
-			err := alog.addActivity(context.Background(), reference("base"), "activity1", time.Time{}, getResource)
+			err := alog.addActivity(context.Background(), reference("base"), nil, "activity1", time.Time{}, getResource)
 			Expect(err).NotTo(HaveOccurred())
-			err = alog.addActivity(context.Background(), reference("base"), "activity2", time.Time{}, getResource)
+			err = alog.addActivity(context.Background(), reference("base"), nil, "activity2", time.Time{}, getResource)
 			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(func(g Gomega) {

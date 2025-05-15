@@ -388,11 +388,11 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 func (a *ActivitylogService) addActivity(ctx context.Context, initRef *provider.Reference, parentId *provider.ResourceId, eventID string, timestamp time.Time, getResource func(*provider.Reference) (*provider.ResourceInfo, error)) error {
 	var (
 		err   error
-		info  *provider.ResourceInfo
 		depth int
 		ref   = initRef
 	)
 	for {
+		var info *provider.ResourceInfo
 		id := ref.GetResourceId()
 		if ref.Path != "" {
 			// Path based reference, we need to resolve the resource id

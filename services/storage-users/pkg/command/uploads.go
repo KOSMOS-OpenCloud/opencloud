@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/urfave/cli/v2"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -145,16 +146,15 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				table *tw.Table
+				table *tablewriter.Table
 				raw   []Session
 			)
 
 			if !c.Bool("json") {
 				fmt.Println(buildInfo(filter))
 
-				table = tw.NewWriter(os.Stdout)
-				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result"})
-				table.SetAutoFormatHeaders(false)
+				table = tablewriter.NewTable(os.Stdout, tablewriter.WithHeaderAutoFormat(tw.Off))
+				table.Header([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result"})
 			}
 
 			for _, u := range uploads {

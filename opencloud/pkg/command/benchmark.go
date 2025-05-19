@@ -14,7 +14,8 @@ import (
 	"strings"
 	"time"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/version"
@@ -403,11 +404,24 @@ func benchmark(iterations int, path string) error {
 	fmt.Printf("Iterations: %d\n", iterations)
 	fmt.Println("")
 
-	table := tw.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Test", "Iterations", "dur/it", "total"})
-	table.SetAutoFormatHeaders(false)
-	table.SetColumnAlignment([]int{tw.ALIGN_LEFT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT})
-	table.SetAutoMergeCellsByColumnIndex([]int{2, 3})
+	cfg := tablewriter.Config{
+		Header: tw.CellConfig{
+			Formatting: tw.CellFormatting{
+				AutoFormat: tw.Off,
+			},
+		},
+		Row: tw.CellConfig{
+			ColumnAligns: []tw.Align{
+				tw.AlignLeft,
+				tw.AlignRight,
+				tw.AlignRight,
+				tw.AlignRight,
+			},
+		},
+	}
+
+	table := tablewriter.NewTable(os.Stdout, tablewriter.WithConfig(cfg))
+	table.Header([]string{"Test", "Iterations", "dur/it", "total"})
 	for _, t := range []string{"lockedfile open(wo,c,t) close", "stat", "fopen(wo,t) write close", "fopen(ro) close", "fopen(ro) read close", "xattr-set", "xattr-get"} {
 		start := time.Now()
 		err := tests[t]()

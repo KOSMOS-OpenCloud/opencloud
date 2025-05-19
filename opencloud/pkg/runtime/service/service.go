@@ -480,8 +480,8 @@ func (s *Service) generateRunSet(cfg *occfg.Config) {
 // List running processes for the Service Controller.
 func (s *Service) List(_ struct{}, reply *string) error {
 	tableString := &strings.Builder{}
-	table := tablewriter.NewWriter(tableString)
-	table.SetHeader([]string{"Service"})
+	table := tablewriter.NewTable(tableString)
+	table.Header([]string{"Service"})
 
 	names := []string{}
 	for t := range s.serviceToken {

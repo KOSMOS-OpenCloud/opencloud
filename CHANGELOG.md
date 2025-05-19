@@ -1,5 +1,63 @@
 # Changelog
 
+## [2.3.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.3.0) - 2025-05-19
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @ScharfViktor, @aduffeck, @butonic, @micbar, @rhafer
+
+### ✨ Features
+
+- deployment: Adapt opencloud_full to include radicale [[#773](https://github.com/opencloud-eu/opencloud/pull/773)]
+- proxy(router): Allow to set some outgoing headers [[#756](https://github.com/opencloud-eu/opencloud/pull/756)]
+- feat: set idp logo defaul url [[#746](https://github.com/opencloud-eu/opencloud/pull/746)]
+
+### 📈 Enhancement
+
+- Reduce load caused by the activitylog service [[#842](https://github.com/opencloud-eu/opencloud/pull/842)]
+
+### ✅ Tests
+
+- PosixTest. Check that version, share and link still exist [[#837](https://github.com/opencloud-eu/opencloud/pull/837)]
+- [test-only] test for #452 [[#826](https://github.com/opencloud-eu/opencloud/pull/826)]
+- collaboration posix tests [[#780](https://github.com/opencloud-eu/opencloud/pull/780)]
+- collaborative posix test [[#672](https://github.com/opencloud-eu/opencloud/pull/672)]
+
+### 🐛 Bug Fixes
+
+- nats: Don't enable debug and trace logging by default [[#825](https://github.com/opencloud-eu/opencloud/pull/825)]
+- fix: show special roles at the end of the list [[#806](https://github.com/opencloud-eu/opencloud/pull/806)]
+- fix: idp login logo url exceeds logo [[#742](https://github.com/opencloud-eu/opencloud/pull/742)]
+
+### 📦️ Dependencies
+
+- [full-ci] chore(web): bump web to v2.3.0 [[#885](https://github.com/opencloud-eu/opencloud/pull/885)]
+- chore:reva bump v.2.33 [[#884](https://github.com/opencloud-eu/opencloud/pull/884)]
+- build(deps): bump google.golang.org/grpc from 1.72.0 to 1.72.1 [[#862](https://github.com/opencloud-eu/opencloud/pull/862)]
+- build(deps): bump golang.org/x/net from 0.39.0 to 0.40.0 [[#855](https://github.com/opencloud-eu/opencloud/pull/855)]
+- build(deps-dev): bump dotenv-expand from 10.0.0 to 12.0.2 in /services/idp [[#831](https://github.com/opencloud-eu/opencloud/pull/831)]
+- build(deps): bump github.com/libregraph/lico from 0.65.2-0.20250428103211-356e98f98457 to 0.66.0 [[#839](https://github.com/opencloud-eu/opencloud/pull/839)]
+- build(deps): bump i18next from 23.16.8 to 25.1.2 in /services/idp [[#832](https://github.com/opencloud-eu/opencloud/pull/832)]
+- build(deps): bump dario.cat/mergo from 1.0.1 to 1.0.2 [[#829](https://github.com/opencloud-eu/opencloud/pull/829)]
+- build(deps): bump golang.org/x/image from 0.26.0 to 0.27.0 [[#817](https://github.com/opencloud-eu/opencloud/pull/817)]
+- build(deps): bump github.com/CiscoM31/godata from 1.0.10 to 1.0.11 [[#815](https://github.com/opencloud-eu/opencloud/pull/815)]
+- build(deps): bump github.com/KimMachineGun/automemlimit from 0.7.1 to 0.7.2 [[#803](https://github.com/opencloud-eu/opencloud/pull/803)]
+- build(deps): bump golang.org/x/crypto from 0.37.0 to 0.38.0 [[#802](https://github.com/opencloud-eu/opencloud/pull/802)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.3.0 to 1.4.2 [[#784](https://github.com/opencloud-eu/opencloud/pull/784)]
+- build(deps): bump golang.org/x/sync from 0.13.0 to 0.14.0 [[#785](https://github.com/opencloud-eu/opencloud/pull/785)]
+- build(deps-dev): bump eslint-plugin-import from 2.30.0 to 2.31.0 in /services/idp [[#777](https://github.com/opencloud-eu/opencloud/pull/777)]
+- build(deps): bump github.com/nats-io/nats.go from 1.41.2 to 1.42.0 [[#776](https://github.com/opencloud-eu/opencloud/pull/776)]
+- build(deps): bump golang.org/x/oauth2 from 0.29.0 to 0.30.0 [[#775](https://github.com/opencloud-eu/opencloud/pull/775)]
+- build(deps): bump i18next-http-backend from 2.5.2 to 3.0.2 in /services/idp [[#774](https://github.com/opencloud-eu/opencloud/pull/774)]
+- build(deps): bump github.com/beevik/etree from 1.5.0 to 1.5.1 [[#759](https://github.com/opencloud-eu/opencloud/pull/759)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.11.2 to 2.11.3 [[#762](https://github.com/opencloud-eu/opencloud/pull/762)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.11.1 to 2.11.2 [[#754](https://github.com/opencloud-eu/opencloud/pull/754)]
+- build(deps): bump github.com/gookit/config/v2 from 2.2.5 to 2.2.6 [[#753](https://github.com/opencloud-eu/opencloud/pull/753)]
+- build(deps-dev): bump css-loader from 5.2.7 to 7.1.2 in /services/idp [[#740](https://github.com/opencloud-eu/opencloud/pull/740)]
+- build(deps): bump react-i18next from 15.1.1 to 15.5.1 in /services/idp [[#741](https://github.com/opencloud-eu/opencloud/pull/741)]
+- build(deps): bump github.com/blevesearch/bleve/v2 from 2.4.4 to 2.5.0 [[#743](https://github.com/opencloud-eu/opencloud/pull/743)]
+- build(deps): bump github.com/gabriel-vasile/mimetype from 1.4.8 to 1.4.9 [[#744](https://github.com/opencloud-eu/opencloud/pull/744)]
+
 ## [2.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.2.0) - 2025-04-28
 
 ### ❤️ Thanks to all contributors! ❤️

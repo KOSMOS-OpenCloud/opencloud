@@ -16,6 +16,7 @@ packages:
             HTTPClient:
             Permissions:
             RoleService:
+            UsersUserProfilePhotoProvider:
     github.com/opencloud-eu/reva/v2/pkg/events:
         config:
             dir: "mocks"

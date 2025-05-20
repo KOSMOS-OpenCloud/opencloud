@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -21,7 +20,7 @@ type (
 		GetPhoto(ctx context.Context, id string) ([]byte, error)
 
 		// UpdatePhoto retrieves the requested photo
-		UpdatePhoto(ctx context.Context, id string, rc io.Reader) error
+		UpdatePhoto(ctx context.Context, id string, r io.Reader) error
 
 		// DeletePhoto deletes the requested photo
 		DeletePhoto(ctx context.Context, id string) error
@@ -34,9 +33,6 @@ var (
 
 	// ErrNoBytes is returned when no bytes are found
 	ErrNoBytes = errors.New("no bytes")
-
-	// ErrNoUser is returned when no user is found
-	ErrNoUser = errors.New("no user found")
 )
 
 // UsersUserProfilePhotoService is the implementation of the UsersUserProfilePhotoProvider interface
@@ -71,8 +67,8 @@ func (s UsersUserProfilePhotoService) DeletePhoto(ctx context.Context, id string
 }
 
 // UpdatePhoto updates the requested photo
-func (s UsersUserProfilePhotoService) UpdatePhoto(ctx context.Context, id string, rc io.Reader) error {
-	photo, err := io.ReadAll(rc)
+func (s UsersUserProfilePhotoService) UpdatePhoto(ctx context.Context, id string, r io.Reader) error {
+	photo, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}
@@ -98,66 +94,61 @@ func NewUsersUserProfilePhotoApi(usersUserProfilePhotoService UsersUserProfilePh
 	}, nil
 }
 
-// GetProfilePhoto provides the requested photo
-func (api UsersUserProfilePhotoApi) GetProfilePhoto(w http.ResponseWriter, r *http.Request) {
-	id, ok := api.getUserID(w, r)
-	if !ok {
-		return
-	}
+// GetProfilePhoto creates a handler which renders the corresponding photo
+func (api UsersUserProfilePhotoApi) GetProfilePhoto(h HTTPDataHandler[string]) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		v, ok := h(w, r)
+		if !ok {
+			return
+		}
 
-	photo, err := api.usersUserProfilePhotoService.GetPhoto(r.Context(), id)
-	if err != nil {
-		api.logger.Debug().Err(err)
-		errorcode.GeneralException.Render(w, r, http.StatusNotFound, "failed to get photo")
-		return
-	}
+		photo, err := api.usersUserProfilePhotoService.GetPhoto(r.Context(), v)
+		if err != nil {
+			api.logger.Debug().Err(err)
+			errorcode.GeneralException.Render(w, r, http.StatusNotFound, "failed to get photo")
+			return
+		}
 
-	render.Status(r, http.StatusOK)
-	_, _ = w.Write(photo)
+		render.Status(r, http.StatusOK)
+		_, _ = w.Write(photo)
+	}
 }
 
-// UpsertProfilePhoto updates or inserts (initial create) the requested photo
-func (api UsersUserProfilePhotoApi) UpsertProfilePhoto(w http.ResponseWriter, r *http.Request) {
-	id, ok := api.getUserID(w, r)
-	if !ok {
-		return
-	}
+// UpsertProfilePhoto creates a handler which updates or creates the corresponding photo
+func (api UsersUserProfilePhotoApi) UpsertProfilePhoto(h HTTPDataHandler[string]) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		v, ok := h(w, r)
+		if !ok {
+			return
+		}
 
-	if err := api.usersUserProfilePhotoService.UpdatePhoto(r.Context(), id, r.Body); err != nil {
-		api.logger.Debug().Err(err)
-		errorcode.GeneralException.Render(w, r, http.StatusNotFound, "failed to update photo")
-		return
-	}
-	defer func() {
-		_ = r.Body.Close()
-	}()
+		if err := api.usersUserProfilePhotoService.UpdatePhoto(r.Context(), v, r.Body); err != nil {
+			api.logger.Debug().Err(err)
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "failed to update photo")
+			return
+		}
+		defer func() {
+			_ = r.Body.Close()
+		}()
 
-	render.Status(r, http.StatusOK)
+		render.Status(r, http.StatusOK)
+	}
 }
 
-// DeleteProfilePhoto deletes the requested photo
-func (api UsersUserProfilePhotoApi) DeleteProfilePhoto(w http.ResponseWriter, r *http.Request) {
-	id, ok := api.getUserID(w, r)
-	if !ok {
-		return
+// DeleteProfilePhoto creates a handler which deletes the corresponding photo
+func (api UsersUserProfilePhotoApi) DeleteProfilePhoto(h HTTPDataHandler[string]) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		v, ok := h(w, r)
+		if !ok {
+			return
+		}
+
+		if err := api.usersUserProfilePhotoService.DeletePhoto(r.Context(), v); err != nil {
+			api.logger.Debug().Err(err)
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "failed to delete photo")
+			return
+		}
+
+		render.Status(r, http.StatusOK)
 	}
-
-	if err := api.usersUserProfilePhotoService.DeletePhoto(r.Context(), id); err != nil {
-		api.logger.Debug().Err(err)
-		errorcode.GeneralException.Render(w, r, http.StatusNotFound, "failed to delete photo")
-		return
-	}
-
-	render.Status(r, http.StatusOK)
-}
-
-func (api UsersUserProfilePhotoApi) getUserID(w http.ResponseWriter, r *http.Request) (string, bool) {
-	u, ok := revactx.ContextGetUser(r.Context())
-	if !ok {
-		api.logger.Debug().Msg(ErrNoUser.Error())
-		errorcode.GeneralException.Render(w, r, http.StatusMethodNotAllowed, ErrNoUser.Error())
-		return "", false
-	}
-
-	return u.GetId().GetOpaqueId(), true
 }

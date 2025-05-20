@@ -14,7 +14,8 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mohae/deepcopy"
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	zlog "github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
@@ -469,11 +470,10 @@ func itemType(it provider.ResourceType) string {
 	return itemType
 }
 
-func itemsTable(total int) *tw.Table {
-	table := tw.NewWriter(os.Stdout)
-	table.SetHeader([]string{"itemID", "path", "type", "delete at"})
-	table.SetAutoFormatHeaders(false)
-	table.SetFooter([]string{"", "", "", "total count: " + strconv.Itoa(total)})
+func itemsTable(total int) *tablewriter.Table {
+	table := tablewriter.NewTable(os.Stdout, tablewriter.WithHeaderAutoFormat(tw.Off))
+	table.Header([]string{"itemID", "path", "type", "delete at"})
+	table.Footer([]string{"", "", "", "total count: " + strconv.Itoa(total)})
 	return table
 }
 

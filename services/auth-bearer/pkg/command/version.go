@@ -7,7 +7,8 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/version"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
 	"github.com/urfave/cli/v2"
 )
@@ -35,9 +36,8 @@ func Version(cfg *config.Config) *cli.Command {
 				return nil
 			}
 
-			table := tw.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Version", "Address", "Id"})
-			table.SetAutoFormatHeaders(false)
+			table := tablewriter.NewTable(os.Stdout, tablewriter.WithHeaderAutoFormat(tw.Off))
+			table.Header([]string{"Version", "Address", "Id"})
 			for _, s := range services {
 				for _, n := range s.Nodes {
 					table.Append([]string{s.Version, n.Address, n.Id})

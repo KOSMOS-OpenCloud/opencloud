@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/renderer"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/urfave/cli/v2"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -54,12 +56,17 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 		Name:  "list",
 		Usage: "list available unified roles",
 		Action: func(c *cli.Context) error {
-			tbl := tablewriter.NewWriter(os.Stdout)
-			tbl.SetRowLine(true)
-			tbl.SetAutoMergeCellsByColumnIndex([]int{0}) // rowspan should only affect the first column
+			r := tw.Rendition{
+				Settings: tw.Settings{
+					Separators: tw.Separators{
+						BetweenRows: tw.On,
+					},
+				},
+			}
+			tbl := tablewriter.NewTable(os.Stdout, tablewriter.WithRenderer(renderer.NewBlueprint(r)))
 
 			headers := []string{"Name", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
-			tbl.SetHeader(headers)
+			tbl.Header(headers)
 
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				const enabled = "enabled"

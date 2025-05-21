@@ -557,8 +557,9 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	if !g.config.API.ShowUserEmailInResults {
+	
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
+	if !ctxHasFullPerms && !g.config.API.ShowUserEmailInResults {
 		user.Mail = nil
 	}
 

@@ -581,6 +581,7 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				valueService.On("GetValueByUniqueIdentifiers", mock.Anything, mock.Anything, mock.Anything).
 					Return(&settings.GetValueResponse{
@@ -621,6 +622,7 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 					Status:     status.NewOK(ctx),
@@ -680,6 +682,7 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 					Status:     status.NewOK(ctx),
@@ -732,6 +735,7 @@ var _ = Describe("Users", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
 
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
 				identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 
 				assignments := []*settingsmsg.UserRoleAssignment{

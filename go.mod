@@ -64,7 +64,7 @@ require (
 	github.com/onsi/gomega v1.37.0
 	github.com/open-policy-agent/opa v1.4.2
 	github.com/opencloud-eu/libre-graph-api-go v1.0.6
-	github.com/opencloud-eu/reva/v2 v2.33.0
+	github.com/opencloud-eu/reva/v2 v2.33.1-0.20250520152851-d33c49bb52b9
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
@@ -128,7 +128,7 @@ require (
 	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/aws/aws-sdk-go v1.55.6 // indirect
+	github.com/aws/aws-sdk-go v1.55.7 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect

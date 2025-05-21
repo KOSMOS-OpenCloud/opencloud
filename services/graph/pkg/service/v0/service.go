@@ -17,11 +17,6 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
-	"github.com/opencloud-eu/reva/v2/pkg/events"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/opencloud-eu/reva/v2/pkg/store"
-	"github.com/opencloud-eu/reva/v2/pkg/utils"
-
 	ocldap "github.com/opencloud-eu/opencloud/pkg/ldap"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
@@ -29,9 +24,13 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
-	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/ldap"
 	graphm "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
+	"github.com/opencloud-eu/reva/v2/pkg/utils/ldap"
 )
 
 const (
@@ -461,7 +460,7 @@ func setIdentityBackends(options Options, svc *Graph) error {
 				tlsConf.RootCAs = certs
 			}
 
-			conn := ldap.NewLDAPWithReconnect(&options.Logger,
+			conn := ldap.NewLDAPWithReconnect(
 				ldap.Config{
 					URI:          options.Config.Identity.LDAP.URI,
 					BindDN:       options.Config.Identity.LDAP.BindDN,
@@ -469,6 +468,7 @@ func setIdentityBackends(options Options, svc *Graph) error {
 					TLSConfig:    tlsConf,
 				},
 			)
+			conn.SetLogger(&options.Logger.Logger)
 			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
 			if err != nil {
 				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")

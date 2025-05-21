@@ -17,11 +17,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
@@ -95,8 +95,13 @@ var _ = Describe("Users", func() {
 
 	When("OCM is disabled", func() {
 		BeforeEach(func() {
-			svc, _ = service.NewService(
+			mds := mocks.NewStorage(GinkgoT())
+			mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+			var err error
+			svc, err = service.NewService(
 				service.Config(cfg),
+				service.MetadataStorage(mds),
 				service.WithGatewaySelector(gatewaySelector),
 				service.EventsPublisher(&eventsPublisher),
 				service.WithIdentityBackend(identityBackend),
@@ -104,6 +109,7 @@ var _ = Describe("Users", func() {
 				service.WithValueService(valueService),
 				service.PermissionService(permissionService),
 			)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		Describe("GetMe", func() {
@@ -901,13 +907,18 @@ var _ = Describe("Users", func() {
 
 						localCfg.API.UsernameMatch = usernameMatch
 
-						localSvc, _ := service.NewService(
+						mds := mocks.NewStorage(GinkgoT())
+						mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+						localSvc, err := service.NewService(
 							service.Config(localCfg),
+							service.MetadataStorage(mds),
 							service.WithGatewaySelector(gatewaySelector),
 							service.EventsPublisher(&eventsPublisher),
 							service.WithIdentityBackend(identityBackend),
 							service.WithRoleService(roleService),
 						)
+						Expect(err).ToNot(HaveOccurred())
 
 						return localSvc
 					}
@@ -1121,8 +1132,14 @@ var _ = Describe("Users", func() {
 	When("OCM is enabled", func() {
 		BeforeEach(func() {
 			cfg.IncludeOCMSharees = true
-			svc, _ = service.NewService(
+
+			mds := mocks.NewStorage(GinkgoT())
+			mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+			var err error
+			svc, err = service.NewService(
 				service.Config(cfg),
+				service.MetadataStorage(mds),
 				service.WithGatewaySelector(gatewaySelector),
 				service.EventsPublisher(&eventsPublisher),
 				service.WithIdentityBackend(identityBackend),
@@ -1130,6 +1147,7 @@ var _ = Describe("Users", func() {
 				service.WithValueService(valueService),
 				service.PermissionService(permissionService),
 			)
+			Expect(err).ToNot(HaveOccurred())
 		})
 		Describe("GetUsers", func() {
 			It("does not list the federated users without a filter", func() {

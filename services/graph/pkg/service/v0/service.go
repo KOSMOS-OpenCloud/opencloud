@@ -19,7 +19,6 @@ import (
 
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
@@ -144,17 +143,6 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		identity.IdentityCacheWithGroupsTTL(time.Duration(options.Config.Spaces.GroupsCacheTTL)),
 	)
 
-	storage, err := metadata.NewCS3Storage(
-		options.Config.Metadata.GatewayAddress,
-		options.Config.Metadata.StorageAddress,
-		options.Config.Metadata.SystemUserID,
-		options.Config.Metadata.SystemUserIDP,
-		options.Config.Metadata.SystemUserAPIKey,
-	)
-	if err != nil {
-		return Graph{}, err
-	}
-
 	baseGraphService := BaseGraphService{
 		logger:          &options.Logger,
 		identityCache:   identityCache,
@@ -183,7 +171,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return Graph{}, err
 	}
 
-	usersUserProfilePhotoService, err := NewUsersUserProfilePhotoService(storage)
+	usersUserProfilePhotoService, err := NewUsersUserProfilePhotoService(options.Storage)
 	if err != nil {
 		return Graph{}, err
 	}

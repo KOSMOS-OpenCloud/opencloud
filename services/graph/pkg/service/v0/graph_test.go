@@ -17,13 +17,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/opencloud-eu/reva/v2/pkg/conversions"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
@@ -80,12 +80,19 @@ var _ = Describe("Graph", func() {
 
 		eventsPublisher = mocks.Publisher{}
 		permissionService = mocks.Permissions{}
-		svc, _ = service.NewService(
+
+		mds := mocks.NewStorage(GinkgoT())
+		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+		var err error
+		svc, err = service.NewService(
 			service.Config(cfg),
+			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.PermissionService(&permissionService),
 		)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe("NewService", func() {

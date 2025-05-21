@@ -13,6 +13,14 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
+
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
@@ -21,13 +29,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
-	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc"
 )
 
 var _ = Describe("Users changing their own password", func() {
@@ -74,17 +75,25 @@ var _ = Describe("Users changing their own password", func() {
 			GroupIDAttribute:         "openCloudUUID",
 			GroupSearchScope:         "sub",
 		}
-		loggger := log.NewLogger()
-		identityBackend, err = identity.NewLDAPBackend(ldapClient, ldapConfig, &loggger)
+		logger := log.NewLogger()
+		identityBackend, err = identity.NewLDAPBackend(ldapClient, ldapConfig, &logger)
 		Expect(err).To(BeNil())
 
 		eventsPublisher = mocks.Publisher{}
-		svc, _ = service.NewService(
+
+		mds := mocks.NewStorage(GinkgoT())
+		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+		var err error
+		svc, err = service.NewService(
 			service.Config(cfg),
+			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.WithIdentityBackend(identityBackend),
 			service.EventsPublisher(&eventsPublisher),
 		)
+		Expect(err).ToNot(HaveOccurred())
+
 		user = &userv1beta1.User{
 			Id: &userv1beta1.UserId{
 				OpaqueId: "user",

@@ -128,9 +128,9 @@ func (_c *UsersUserProfilePhotoProvider_GetPhoto_Call) RunAndReturn(run func(con
 	return _c
 }
 
-// UpdatePhoto provides a mock function with given fields: ctx, id, rc
-func (_m *UsersUserProfilePhotoProvider) UpdatePhoto(ctx context.Context, id string, rc io.Reader) error {
-	ret := _m.Called(ctx, id, rc)
+// UpdatePhoto provides a mock function with given fields: ctx, id, r
+func (_m *UsersUserProfilePhotoProvider) UpdatePhoto(ctx context.Context, id string, r io.Reader) error {
+	ret := _m.Called(ctx, id, r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdatePhoto")
@@ -138,7 +138,7 @@ func (_m *UsersUserProfilePhotoProvider) UpdatePhoto(ctx context.Context, id str
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, io.Reader) error); ok {
-		r0 = rf(ctx, id, rc)
+		r0 = rf(ctx, id, r)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -154,12 +154,12 @@ type UsersUserProfilePhotoProvider_UpdatePhoto_Call struct {
 // UpdatePhoto is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id string
-//   - rc io.Reader
-func (_e *UsersUserProfilePhotoProvider_Expecter) UpdatePhoto(ctx interface{}, id interface{}, rc interface{}) *UsersUserProfilePhotoProvider_UpdatePhoto_Call {
-	return &UsersUserProfilePhotoProvider_UpdatePhoto_Call{Call: _e.mock.On("UpdatePhoto", ctx, id, rc)}
+//   - r io.Reader
+func (_e *UsersUserProfilePhotoProvider_Expecter) UpdatePhoto(ctx interface{}, id interface{}, r interface{}) *UsersUserProfilePhotoProvider_UpdatePhoto_Call {
+	return &UsersUserProfilePhotoProvider_UpdatePhoto_Call{Call: _e.mock.On("UpdatePhoto", ctx, id, r)}
 }
 
-func (_c *UsersUserProfilePhotoProvider_UpdatePhoto_Call) Run(run func(ctx context.Context, id string, rc io.Reader)) *UsersUserProfilePhotoProvider_UpdatePhoto_Call {
+func (_c *UsersUserProfilePhotoProvider_UpdatePhoto_Call) Run(run func(ctx context.Context, id string, r io.Reader)) *UsersUserProfilePhotoProvider_UpdatePhoto_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(io.Reader))
 	})

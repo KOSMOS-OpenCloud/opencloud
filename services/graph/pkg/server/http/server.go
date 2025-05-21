@@ -8,6 +8,7 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/events"
@@ -128,9 +129,21 @@ func Server(opts ...Option) (http.Service, error) {
 
 	hClient := ehsvc.NewEventHistoryService("eu.opencloud.api.eventhistory", grpcClient)
 
+	storage, err := metadata.NewCS3Storage(
+		options.Config.Metadata.GatewayAddress,
+		options.Config.Metadata.StorageAddress,
+		options.Config.Metadata.SystemUserID,
+		options.Config.Metadata.SystemUserIDP,
+		options.Config.Metadata.SystemUserAPIKey,
+	)
+	if err != nil {
+		return http.Service{}, fmt.Errorf("could not initialize metadata storage: %w", err)
+	}
+
 	var handle svc.Service
 	handle, err = svc.NewService(
 		svc.Context(options.Context),
+		svc.MetadataStorage(storage),
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(middlewares...),

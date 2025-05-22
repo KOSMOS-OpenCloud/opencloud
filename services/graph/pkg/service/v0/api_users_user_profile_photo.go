@@ -3,8 +3,10 @@ package svc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/render"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
@@ -33,6 +35,12 @@ var (
 
 	// ErrNoBytes is returned when no bytes are found
 	ErrNoBytes = errors.New("no bytes")
+
+	// ErrInvalidContentType is returned when the content type is invalid
+	ErrInvalidContentType = errors.New("invalid content type")
+
+	// ErrMissingArgument is returned when a required argument is missing
+	ErrMissingArgument = errors.New("required argument is missing")
 )
 
 // UsersUserProfilePhotoService is the implementation of the UsersUserProfilePhotoProvider interface
@@ -53,12 +61,7 @@ func NewUsersUserProfilePhotoService(storage metadata.Storage) (UsersUserProfile
 
 // GetPhoto retrieves the requested photo
 func (s UsersUserProfilePhotoService) GetPhoto(ctx context.Context, id string) ([]byte, error) {
-	photo, err := s.storage.SimpleDownload(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return photo, nil
+	return s.storage.SimpleDownload(ctx, id)
 }
 
 // DeletePhoto deletes the requested photo
@@ -68,6 +71,10 @@ func (s UsersUserProfilePhotoService) DeletePhoto(ctx context.Context, id string
 
 // UpdatePhoto updates the requested photo
 func (s UsersUserProfilePhotoService) UpdatePhoto(ctx context.Context, id string, r io.Reader) error {
+	if id == "" {
+		return fmt.Errorf("%w: %s", ErrMissingArgument, "id")
+	}
+
 	photo, err := io.ReadAll(r)
 	if err != nil {
 		return err
@@ -75,6 +82,11 @@ func (s UsersUserProfilePhotoService) UpdatePhoto(ctx context.Context, id string
 
 	if len(photo) == 0 {
 		return ErrNoBytes
+	}
+
+	contentType := http.DetectContentType(photo)
+	if !strings.HasPrefix(contentType, "image/") {
+		return fmt.Errorf("%w: %s", ErrInvalidContentType, contentType)
 	}
 
 	return s.storage.SimpleUpload(ctx, id, photo)

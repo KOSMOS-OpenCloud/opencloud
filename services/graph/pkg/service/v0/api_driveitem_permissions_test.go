@@ -20,8 +20,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -555,7 +555,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
 			statResponse.Info.Id = listSpacesResponse.StorageSpaces[0].Root
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
-			permissions, err := driveItemPermissionsService.ListSpaceRootPermissions(context.Background(), driveId)
+			permissions, err := driveItemPermissionsService.ListSpaceRootPermissions(context.Background(), driveId, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 		})

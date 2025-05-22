@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"strings"
 
+	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -40,8 +42,9 @@ import (
 )
 
 const (
-	invalidIdMsg       = "invalid driveID or itemID"
-	parseDriveIDErrMsg = "could not parse driveID"
+	invalidIdMsg              = "invalid driveID or itemID"
+	parseDriveIDErrMsg        = "could not parse driveID"
+	federatedRolesODataFilter = "@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition, '@Subject.UserType==\"Federated\"'))"
 )
 
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
@@ -49,7 +52,7 @@ type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
-	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
 	UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
@@ -438,7 +441,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 }
 
 // ListSpaceRootPermissions handles ListPermissions request on project spaces
-func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectRoles bool) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -456,7 +459,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.ListPermissions(ctx, rootResourceID, false, false) // federated roles are not supported for spaces
+	return s.ListPermissions(ctx, rootResourceID, false, selectRoles) // federated roles are not supported for spaces
 }
 
 // DeletePermission deletes a permission from a drive item
@@ -701,14 +704,26 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		return
 	}
 
-	var listFederatedRoles bool
-	if GetFilterParam(r) == "@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition, '@Subject.UserType==\"Federated\"'))" {
-		listFederatedRoles = true
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	var selectRoles bool
-	if GetSelectParam(r) == "@libre.graph.permissions.roles.allowedValues" {
-		selectRoles = true
+	var listFederatedRoles bool
+	if odataReq.Query.Filter != nil {
+		if odataReq.Query.Filter.RawValue == federatedRolesODataFilter {
+			listFederatedRoles = true
+		}
+	}
+
+	selectRoles, err := api.listPermissionsQuerySelectValues(odataReq.Query)
+	if err != nil {
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	ctx := r.Context()
@@ -746,8 +761,23 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 		return
 	}
 
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	selectRoles, err := api.listPermissionsQuerySelectValues(odataReq.Query)
+	if err != nil {
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	ctx := r.Context()
-	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID)
+	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID, selectRoles)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
@@ -902,4 +932,22 @@ func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWrit
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &updatedPermission)
+}
+
+func (api DriveItemPermissionsApi) listPermissionsQuerySelectValues(odataQuery *godata.GoDataQuery) (bool, error) {
+	if odataQuery.Select != nil {
+		for _, item := range odataQuery.Select.SelectItems {
+			if len(item.Segments) != 1 {
+				api.logger.Debug().Msg("Error parsing ListPermissionRequest: unsupported select item")
+				return false, errorcode.New(errorcode.InvalidRequest, "unsupported select item")
+			}
+			// for now we only support the select for the roles
+			if item.Segments[0].Value != "@libre.graph.permissions.roles.allowedValues" {
+				api.logger.Debug().Msg("Error parsing ListPermissionRequest: unsupported select item")
+				return false, errorcode.New(errorcode.InvalidRequest, "unsupported select item")
+			}
+			return true, nil
+		}
+	}
+	return false, nil
 }

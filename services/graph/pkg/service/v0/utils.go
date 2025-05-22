@@ -13,9 +13,9 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -71,16 +71,6 @@ func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (*storageprovid
 	}
 
 	return &driveID, &itemID, nil
-}
-
-// GetFilterParam returns the $filter query parameter from the request. If you need to parse the filter use godata.ParseRequest
-func GetFilterParam(r *http.Request) string {
-	return r.URL.Query().Get("$filter")
-}
-
-// GetSelectParam returns the $select query parameter from the request. If you need to parse the select filter use godata.ParseRequest
-func GetSelectParam(r *http.Request) string {
-	return r.URL.Query().Get("$select")
 }
 
 // GetGatewayClient returns a gateway client from the gatewaySelector.

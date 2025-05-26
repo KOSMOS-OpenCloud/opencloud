@@ -31,6 +31,7 @@ type Options struct {
 	HistoryClient       ehsvc.EventHistoryService
 	ValueClient         settingssvc.ValueService
 	WriteBufferDuration time.Duration
+	MaxActivities       int
 }
 
 // Logger configures a logger for the activitylog service
@@ -107,5 +108,12 @@ func ValueClient(vs settingssvc.ValueService) Option {
 func WriteBufferDuration(d time.Duration) Option {
 	return func(o *Options) {
 		o.WriteBufferDuration = d
+	}
+}
+
+// MaxActivities sets the maximum number of activities to store
+func MaxActivities(max int) Option {
+	return func(o *Options) {
+		o.MaxActivities = max
 	}
 }

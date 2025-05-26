@@ -66,7 +66,7 @@ var _ = SynchronizedAfterSuite(func() {
 var _ = Describe("ActivitylogService", func() {
 	var (
 		alog                *ActivitylogService
-		getResource         func(ref *provider.Reference) (*provider.ResourceInfo, error)
+		getResource         func(_ context.Context, ref *provider.Reference) (*provider.ResourceInfo, error)
 		writebufferduration = 100 * time.Millisecond
 	)
 
@@ -84,9 +84,9 @@ var _ = Describe("ActivitylogService", func() {
 					Nodes:    []string{server.Addr().String()},
 					Database: "activitylog-test-" + uuid.New().String(),
 				},
+				MaxActivities:       4,
+				WriteBufferDuration: writebufferduration,
 			}),
-			MaxActivities(4),
-			WriteBufferDuration(writebufferduration),
 			Stream(stream),
 			TraceProvider(noop.NewTracerProvider()),
 			Mux(chi.NewMux()),
@@ -148,7 +148,7 @@ var _ = Describe("ActivitylogService", func() {
 				tc := tc // capture range variable
 				Context(tc.Name, func() {
 					JustBeforeEach(func() {
-						getResource = func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+						getResource = func(_ context.Context, ref *provider.Reference) (*provider.ResourceInfo, error) {
 							return tc.Tree[ref.GetResourceId().GetOpaqueId()], nil
 						}
 
@@ -179,9 +179,13 @@ var _ = Describe("ActivitylogService", func() {
 			}
 		)
 
+		BeforeEach(func() {
+			writebufferduration = 100 * time.Millisecond
+		})
+
 		Describe("addActivity", func() {
 			var (
-				getResource = func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+				getResource = func(_ context.Context, ref *provider.Reference) (*provider.ResourceInfo, error) {
 					return tree[ref.GetResourceId().GetOpaqueId()], nil
 				}
 			)
@@ -234,7 +238,7 @@ var _ = Describe("ActivitylogService", func() {
 
 		Describe("Activities", func() {
 			It("combines multiple batches", func() {
-				getResource = func(ref *provider.Reference) (*provider.ResourceInfo, error) {
+				getResource = func(_ context.Context, ref *provider.Reference) (*provider.ResourceInfo, error) {
 					return tree[ref.GetResourceId().GetOpaqueId()], nil
 				}
 

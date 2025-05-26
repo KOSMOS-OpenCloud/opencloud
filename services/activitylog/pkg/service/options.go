@@ -103,17 +103,3 @@ func ValueClient(vs settingssvc.ValueService) Option {
 		o.ValueClient = vs
 	}
 }
-
-// WriteBufferDuration sets the write buffer duration
-func WriteBufferDuration(d time.Duration) Option {
-	return func(o *Options) {
-		o.WriteBufferDuration = d
-	}
-}
-
-// MaxActivities sets the maximum number of activities to store
-func MaxActivities(max int) Option {
-	return func(o *Options) {
-		o.MaxActivities = max
-	}
-}

@@ -206,10 +206,10 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		tp:               o.TraceProvider,
 		tracer:           o.TraceProvider.Tracer("github.com/opencloud-eu/opencloud/services/activitylog/pkg/service"),
 		parentIdCache:    cache,
-		maxActivities:    o.MaxActivities,
+		maxActivities:    o.Config.MaxActivities,
 		natskv:           kv,
 	}
-	s.debouncer = NewDebouncer(o.WriteBufferDuration, s.storeActivity)
+	s.debouncer = NewDebouncer(o.Config.WriteBufferDuration, s.storeActivity)
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 

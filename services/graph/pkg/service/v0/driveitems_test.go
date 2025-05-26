@@ -85,12 +85,18 @@ var _ = Describe("Driveitems", func() {
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
-		svc, _ = service.NewService(
+		mds := mocks.NewStorage(GinkgoT())
+		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+		var err error
+		svc, err = service.NewService(
 			service.Config(cfg),
+			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 		)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe("GetRootDriveChildren", func() {

@@ -142,14 +142,46 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		identity.IdentityCacheWithGroupsTTL(time.Duration(options.Config.Spaces.GroupsCacheTTL)),
 	)
 
+	baseGraphService := BaseGraphService{
+		logger:          &options.Logger,
+		identityCache:   identityCache,
+		gatewaySelector: options.GatewaySelector,
+		config:          options.Config,
+		availableRoles:  unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(options.Config.UnifiedRoles.AvailableRoles...)),
+	}
+
+	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector)
+	if err != nil {
+		return Graph{}, err
+	}
+
+	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, baseGraphService, options.Logger)
+	if err != nil {
+		return Graph{}, err
+	}
+
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config)
+	if err != nil {
+		return Graph{}, err
+	}
+
+	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger, options.Config)
+	if err != nil {
+		return Graph{}, err
+	}
+
+	usersUserProfilePhotoService, err := NewUsersUserProfilePhotoService(options.Storage)
+	if err != nil {
+		return Graph{}, err
+	}
+
+	usersUserProfilePhotoApi, err := NewUsersUserProfilePhotoApi(usersUserProfilePhotoService, options.Logger)
+	if err != nil {
+		return Graph{}, err
+	}
+
 	svc := Graph{
-		BaseGraphService: BaseGraphService{
-			logger:          &options.Logger,
-			identityCache:   identityCache,
-			gatewaySelector: options.GatewaySelector,
-			config:          options.Config,
-			availableRoles:  unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(options.Config.UnifiedRoles.AvailableRoles...)),
-		},
+		BaseGraphService:         baseGraphService,
 		mux:                      m,
 		specialDriveItemsCache:   spacePropertiesCache,
 		eventsPublisher:          options.EventsPublisher,
@@ -202,26 +234,6 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		requireAdmin = graphm.RequireAdmin(roleManager, options.Logger)
 	} else {
 		requireAdmin = options.RequireAdminMiddleware
-	}
-
-	drivesDriveItemService, err := NewDrivesDriveItemService(options.Logger, options.GatewaySelector)
-	if err != nil {
-		return svc, err
-	}
-
-	drivesDriveItemApi, err := NewDrivesDriveItemApi(drivesDriveItemService, svc.BaseGraphService, options.Logger)
-	if err != nil {
-		return svc, err
-	}
-
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config)
-	if err != nil {
-		return svc, err
-	}
-
-	driveItemPermissionsApi, err := NewDriveItemPermissionsApi(driveItemPermissionsService, options.Logger, options.Config)
-	if err != nil {
-		return svc, err
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -292,6 +304,12 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 				r.Get("/drives", svc.GetDrives(APIVersion_1))
 				r.Post("/changePassword", svc.ChangeOwnPassword)
+				r.Route("/photo/$value", func(r chi.Router) {
+					r.Get("/", usersUserProfilePhotoApi.GetProfilePhoto(GetUserIDFromCTX))
+					r.Put("/", usersUserProfilePhotoApi.UpsertProfilePhoto(GetUserIDFromCTX))
+					r.Patch("/", usersUserProfilePhotoApi.UpsertProfilePhoto(GetUserIDFromCTX))
+					r.Delete("/", usersUserProfilePhotoApi.DeleteProfilePhoto(GetUserIDFromCTX))
+				})
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)
@@ -300,6 +318,9 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 					r.Get("/", svc.GetUser)
 					r.Get("/drive", svc.GetUserDrive)
 					r.Post("/exportPersonalData", svc.ExportPersonalData)
+					r.Route("/photo/$value", func(r chi.Router) {
+						r.Get("/", usersUserProfilePhotoApi.GetProfilePhoto(GetSlugValue("userID")))
+					})
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
 					if svc.roleService != nil {

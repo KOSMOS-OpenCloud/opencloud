@@ -5,6 +5,11 @@ import (
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/opencloud-eu/opencloud/pkg/keycloak"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/roles"
@@ -13,9 +18,6 @@ import (
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
-	"github.com/opencloud-eu/reva/v2/pkg/events"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -41,6 +43,7 @@ type Options struct {
 	KeycloakClient           keycloak.Client
 	EventHistoryClient       ehsvc.EventHistoryService
 	TraceProvider            trace.TracerProvider
+	Storage                  metadata.Storage
 }
 
 // newOptions initializes the available default options.
@@ -177,5 +180,12 @@ func EventHistoryClient(val ehsvc.EventHistoryService) Option {
 func TraceProvider(val trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TraceProvider = val
+	}
+}
+
+// MetadataStorage provides a function to set the MetadataStorage option.
+func MetadataStorage(ms metadata.Storage) Option {
+	return func(o *Options) {
+		o.Storage = ms
 	}
 }

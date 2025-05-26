@@ -125,6 +125,11 @@ func DefaultConfig() *config.Config {
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},
+		Metadata: config.Metadata{
+			GatewayAddress: "eu.opencloud.api.storage-system",
+			StorageAddress: "eu.opencloud.api.storage-system",
+			SystemUserIDP:  "internal",
+		},
 	}
 }
 
@@ -191,6 +196,15 @@ func EnsureDefaults(cfg *config.Config) {
 			cfg.UnifiedRoles.AvailableRoles = append(cfg.UnifiedRoles.AvailableRoles, definition.GetId())
 		}
 	}
+
+	if cfg.Metadata.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.Metadata.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.Metadata.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.Metadata.SystemUserID = cfg.Commons.SystemUserID
+	}
+
 }
 
 // Sanitize sanitized the configuration

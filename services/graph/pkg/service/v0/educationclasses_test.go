@@ -14,6 +14,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
+
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
@@ -21,12 +28,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
-	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc"
 )
 
 var _ = Describe("EducationClass", func() {
@@ -78,13 +79,19 @@ var _ = Describe("EducationClass", func() {
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
-		svc, _ = service.NewService(
+		mds := mocks.NewStorage(GinkgoT())
+		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+		var err error
+		svc, err = service.NewService(
 			service.Config(cfg),
+			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithIdentityEducationBackend(identityEducationBackend),
 		)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe("GetEducationClasses", func() {
@@ -326,13 +333,19 @@ var _ = Describe("EducationClass", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				cfg.API.GroupMembersPatchLimit = 21
-				svc, _ = service.NewService(
+
+				mds := mocks.NewStorage(GinkgoT())
+				mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+				svc, err = service.NewService(
 					service.Config(cfg),
+					service.MetadataStorage(mds),
 					service.WithGatewaySelector(gatewaySelector),
 					service.EventsPublisher(&eventsPublisher),
 					service.WithIdentityBackend(identityBackend),
 					service.WithIdentityEducationBackend(identityEducationBackend),
 				)
+				Expect(err).ToNot(HaveOccurred())
 
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/classes", bytes.NewBuffer(updatedClassJson))
 				rctx := chi.NewRouteContext()

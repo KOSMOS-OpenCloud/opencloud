@@ -16,11 +16,17 @@ packages:
             HTTPClient:
             Permissions:
             RoleService:
+            UsersUserProfilePhotoProvider:
     github.com/opencloud-eu/reva/v2/pkg/events:
         config:
             dir: "mocks"
         interfaces:
             Publisher:
+    github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata:
+        config:
+            dir: "mocks"
+        interfaces:
+            Storage:
     github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool:
         config:
             dir: "mocks"

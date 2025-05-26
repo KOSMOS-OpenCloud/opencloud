@@ -11,6 +11,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
+
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	settings "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
@@ -19,11 +25,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	identitymocks "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/mocks"
 	service "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	cs3mocks "github.com/opencloud-eu/reva/v2/tests/cs3mocks/mocks"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc"
 )
 
 type applicationList struct {
@@ -70,13 +71,19 @@ var _ = Describe("Applications", func() {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 		cfg.Application.ID = "some-application-ID"
 
-		svc, _ = service.NewService(
+		mds := mocks.NewStorage(GinkgoT())
+		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
+
+		var err error
+		svc, err = service.NewService(
 			service.Config(cfg),
+			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),
 		)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Describe("ListApplications", func() {

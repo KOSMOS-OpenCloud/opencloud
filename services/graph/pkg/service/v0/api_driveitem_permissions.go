@@ -31,6 +31,7 @@ import (
 
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	l10n_pkg "github.com/opencloud-eu/opencloud/services/graph/pkg/l10n"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 
 	"github.com/opencloud-eu/opencloud/pkg/conversions"
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -51,8 +52,8 @@ const (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
-	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
 	UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
@@ -344,7 +345,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 }
 
 // ListPermissions lists the permissions of a driveItem
-func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -367,11 +368,11 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 
 	collectionOfPermissions = libregraph.CollectionOfPermissionsWithAllowedValues{}
 
-	if _, ok := selectedAttrs["@libre.graph.permissions.actions.allowedValues"]; ok || len(selectedAttrs) == 0 {
+	if len(selectedAttrs) == 0 || slices.Contains(selectedAttrs, "@libre.graph.permissions.actions.allowedValues") {
 		collectionOfPermissions.LibreGraphPermissionsActionsAllowedValues = allowedActions
 	}
 
-	if _, ok := selectedAttrs["@libre.graph.permissions.roles.allowedValues"]; ok || len(selectedAttrs) == 0 {
+	if len(selectedAttrs) == 0 || slices.Contains(selectedAttrs, "@libre.graph.permissions.roles.allowedValues") {
 		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues = conversions.ToValueSlice(
 			unifiedrole.GetRolesByPermissions(
 				unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...)),
@@ -444,7 +445,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 }
 
 // ListSpaceRootPermissions handles ListPermissions request on project spaces
-func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -722,7 +723,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		}
 	}
 
-	selectRoles, err := api.listPermissionsQuerySelectValues(odataReq.Query)
+	selectAttrs, err := odata.GetSelectValues(odataReq.Query)
 	if err != nil {
 		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -731,7 +732,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectRoles)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectAttrs)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -772,7 +773,7 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 		return
 	}
 
-	selected, err := api.listPermissionsQuerySelectValues(odataReq.Query)
+	selected, err := odata.GetSelectValues(odataReq.Query)
 	if err != nil {
 		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -935,20 +936,4 @@ func (api DriveItemPermissionsApi) UpdateSpaceRootPermission(w http.ResponseWrit
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &updatedPermission)
-}
-
-func (api DriveItemPermissionsApi) listPermissionsQuerySelectValues(odataQuery *godata.GoDataQuery) (map[string]struct{}, error) {
-	selectedAttrs := map[string]struct{}{}
-	if odataQuery.Select != nil {
-		for _, item := range odataQuery.Select.SelectItems {
-			// for now we only support a limitted set of $select attributes
-			if item.Segments[0].Value == "@libre.graph.permissions.roles.allowedValues" || item.Segments[0].Value == "@libre.graph.permissions.actions.allowedValues" {
-				selectedAttrs[item.Segments[0].Value] = struct{}{}
-			} else {
-				api.logger.Debug().Msg("Error parsing ListPermissionRequest: unsupported select item")
-				return selectedAttrs, errorcode.New(errorcode.InvalidRequest, "unsupported select item")
-			}
-		}
-	}
-	return selectedAttrs, nil
 }

@@ -193,6 +193,12 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		return nil, err
 	}
 
+	// run migrations
+	err = runMigrations(context.Background(), kv)
+	if err != nil {
+		return nil, err
+	}
+
 	s := &ActivitylogService{
 		log:              o.Logger,
 		cfg:              o.Config,
@@ -510,7 +516,7 @@ func (a *ActivitylogService) storeActivity(resourceID string, activities []RawAc
 	subspan.End()
 
 	_, subspan = a.tracer.Start(ctx, "storeActivity.natskv.Put")
-	key := a.natsKey(resourceID, len(activities))
+	key := natsKey(resourceID, len(activities))
 	_, err = a.natskv.Put(key, b)
 	if err != nil {
 		return err
@@ -521,13 +527,6 @@ func (a *ActivitylogService) storeActivity(resourceID string, activities []RawAc
 	a.enforceMaxActivities(ctx, resourceID)
 	subspan.End()
 	return nil
-}
-
-func (a *ActivitylogService) natsKey(resourceID string, activitiesCount int) string {
-	return fmt.Sprintf("%s.%d.%d",
-		base32.StdEncoding.EncodeToString([]byte(resourceID)),
-		activitiesCount,
-		time.Now().UnixNano())
 }
 
 func (a *ActivitylogService) enforceMaxActivities(ctx context.Context, resourceID string) {
@@ -650,4 +649,11 @@ func (a *ActivitylogService) removeCachedParentID(ref *provider.Reference) {
 	if err := a.parentIdCache.Remove(storagespace.FormatResourceID(purgeId)); err != nil {
 		a.log.Error().Interface("event", ref).Err(err).Msg("could not delete parent id cache")
 	}
+}
+
+func natsKey(resourceID string, activitiesCount int) string {
+	return fmt.Sprintf("%s.%d.%d",
+		base32.StdEncoding.EncodeToString([]byte(resourceID)),
+		activitiesCount,
+		time.Now().UnixNano())
 }

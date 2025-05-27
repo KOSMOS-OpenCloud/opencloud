@@ -19,10 +19,7 @@ import (
 )
 
 func TestNewUsersUserProfilePhotoService(t *testing.T) {
-	storage := mocks.NewStorage(t)
-	storage.EXPECT().Init(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, id string) error { return nil })
-
-	service, err := svc.NewUsersUserProfilePhotoService(storage)
+	service, err := svc.NewUsersUserProfilePhotoService(mocks.NewStorage(t))
 	assert.NoError(t, err)
 
 	t.Run("UpdatePhoto", func(t *testing.T) {

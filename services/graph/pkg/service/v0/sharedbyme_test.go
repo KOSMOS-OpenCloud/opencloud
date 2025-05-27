@@ -246,12 +246,8 @@ var _ = Describe("sharedbyme", func() {
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
-		mds := mocks.NewStorage(GinkgoT())
-		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 		svc, err = service.NewService(
 			service.Config(cfg),
-			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),

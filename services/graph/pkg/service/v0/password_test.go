@@ -81,13 +81,9 @@ var _ = Describe("Users changing their own password", func() {
 
 		eventsPublisher = mocks.Publisher{}
 
-		mds := mocks.NewStorage(GinkgoT())
-		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 		var err error
 		svc, err = service.NewService(
 			service.Config(cfg),
-			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.WithIdentityBackend(identityBackend),
 			service.EventsPublisher(&eventsPublisher),

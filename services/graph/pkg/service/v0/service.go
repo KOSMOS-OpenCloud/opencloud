@@ -17,6 +17,12 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
+	"github.com/opencloud-eu/reva/v2/pkg/utils/ldap"
+
 	ocldap "github.com/opencloud-eu/opencloud/pkg/ldap"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
@@ -26,11 +32,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	graphm "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
-	"github.com/opencloud-eu/reva/v2/pkg/events"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/opencloud-eu/reva/v2/pkg/store"
-	"github.com/opencloud-eu/reva/v2/pkg/utils"
-	"github.com/opencloud-eu/reva/v2/pkg/utils/ldap"
 )
 
 const (
@@ -170,12 +171,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return Graph{}, err
 	}
 
-	usersUserProfilePhotoService, err := NewUsersUserProfilePhotoService(options.Storage)
-	if err != nil {
-		return Graph{}, err
-	}
-
-	usersUserProfilePhotoApi, err := NewUsersUserProfilePhotoApi(usersUserProfilePhotoService, options.Logger)
+	usersUserProfilePhotoApi, err := NewUsersUserProfilePhotoApi(options.UserProfilePhotoService, options.Logger)
 	if err != nil {
 		return Graph{}, err
 	}

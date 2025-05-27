@@ -71,13 +71,9 @@ var _ = Describe("Applications", func() {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 		cfg.Application.ID = "some-application-ID"
 
-		mds := mocks.NewStorage(GinkgoT())
-		mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 		var err error
 		svc, err = service.NewService(
 			service.Config(cfg),
-			service.MetadataStorage(mds),
 			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),

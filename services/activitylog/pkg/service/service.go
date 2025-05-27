@@ -193,12 +193,6 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		return nil, err
 	}
 
-	// run migrations
-	err = runMigrations(context.Background(), kv)
-	if err != nil {
-		return nil, err
-	}
-
 	s := &ActivitylogService{
 		log:              o.Logger,
 		cfg:              o.Config,
@@ -216,6 +210,12 @@ func New(opts ...Option) (*ActivitylogService, error) {
 		natskv:           kv,
 	}
 	s.debouncer = NewDebouncer(o.Config.WriteBufferDuration, s.storeActivity)
+
+	// run migrations
+	err = s.runMigrations(context.Background(), kv)
+	if err != nil {
+		return nil, err
+	}
 
 	s.mux.Get("/graph/v1beta1/extensions/org.libregraph/activities", s.HandleGetItemActivities)
 

@@ -175,7 +175,7 @@ func sanitizePath(path string, apiVersion APIVersion) string {
 	case APIVersion_1:
 		return strings.TrimPrefix(path, "/graph/v1.0/")
 	case APIVersion_1_Beta_1:
-		return strings.TrimPrefix(path, "/graph/v1beta1.0/")
+		return strings.TrimPrefix(path, "/graph/v1beta1/")
 	default:
 		return path
 	}

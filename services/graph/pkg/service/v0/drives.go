@@ -191,10 +191,7 @@ func parseDriveRequest(r *http.Request) (*godata.GoDataRequest, bool, error) {
 	if err != nil {
 		return nil, false, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
-	expandPermissions := false
-	if slices.Contains(exp, "root.permissions") {
-		expandPermissions = true
-	}
+	expandPermissions := slices.Contains(exp, "root.permissions")
 	return odataReq, expandPermissions, nil
 }
 
@@ -375,12 +372,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With().Str("url", webDavBaseURL.String()).Logger()
 
-	_, expandPermissions, err := parseDriveRequest(r)
-	if err != nil {
-		log.Debug().Err(err).Msg("could not create drive: error parsing odata request")
-		errorcode.RenderError(w, r, err)
-	}
-
 	us, ok := revactx.ContextGetUser(ctx)
 	if !ok {
 		log.Debug().Msg("could not create drive: invalid user")
@@ -489,7 +480,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, expandPermissions)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, false)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -526,12 +517,6 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log = log.With().Str("url", webDavBaseURL.String()).Logger()
-
-	_, expandPermissions, err := parseDriveRequest(r)
-	if err != nil {
-		log.Debug().Err(err).Msg("could not create drive: error parsing odata request")
-		errorcode.RenderError(w, r, err)
-	}
 
 	drive := libregraph.DriveUpdate{}
 	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
@@ -663,7 +648,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1, expandPermissions)
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1, false)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())

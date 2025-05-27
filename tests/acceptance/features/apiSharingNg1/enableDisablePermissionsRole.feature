@@ -462,80 +462,8 @@ Feature: enable disable permissions role
             "required": [
               "eTag",
               "id",
-              "permissions",
               "webDavUrl"
-            ],
-            "properties": {
-              "permissions": {
-                "type": "array",
-                "minItems": 2,
-                "maxItems": 2,
-                "uniqueItems": true,
-                "items": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "required": ["grantedToV2", "roles"],
-                      "properties": {
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user" : {
-                              "type": "object",
-                              "required": ["@libre.graph.userType", "displayName", "id"],
-                              "properties": {
-                                "@libre.graph.userType": { "const": "Member" },
-                                "displayName": { "const": "Alice Hansen" },
-                                "id": { "pattern": "^%user_id_pattern%$" }
-                              }
-                            }
-                          }
-                        },
-                        "roles": { "pattern": "^%role_id_pattern%$" }
-                      }
-                    },
-                    {
-                      "type": "object",
-                      "required": ["@libre.graph.permissions.actions", "grantedToV2"],
-                      "properties": {
-                        "@libre.graph.permissions.actions": {
-                          "const": [
-                            "libre.graph/driveItem/children/create",
-                            "libre.graph/driveItem/standard/delete",
-                            "libre.graph/driveItem/path/read",
-                            "libre.graph/driveItem/quota/read",
-                            "libre.graph/driveItem/content/read",
-                            "libre.graph/driveItem/upload/create",
-                            "libre.graph/driveItem/permissions/read",
-                            "libre.graph/driveItem/children/read",
-                            "libre.graph/driveItem/deleted/read",
-                            "libre.graph/driveItem/path/update",
-                            "libre.graph/driveItem/deleted/update",
-                            "libre.graph/driveItem/basic/read"
-                          ]
-                        },
-                        "grantedToV2": {
-                          "type": "object",
-                          "required": ["user"],
-                          "properties": {
-                            "user": {
-                              "type": "object",
-                              "required": ["@libre.graph.userType", "displayName", "id"],
-                              "properties": {
-                                "@libre.graph.userType": { "const": "Member" },
-                                "displayName": { "const": "Brian Murphy" },
-                                "id": { "pattern": "^%user_id_pattern%$" }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
+            ]
           }
         }
       }

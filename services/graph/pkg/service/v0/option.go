@@ -7,7 +7,6 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/metadata"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/opencloud-eu/opencloud/pkg/keycloak"
@@ -34,6 +33,7 @@ type Options struct {
 	IdentityBackend          identity.Backend
 	IdentityEducationBackend identity.EducationBackend
 	RoleService              RoleService
+	UserProfilePhotoService  UsersUserProfilePhotoProvider
 	PermissionService        Permissions
 	ValueService             settingssvc.ValueService
 	RoleManager              *roles.Manager
@@ -43,7 +43,6 @@ type Options struct {
 	KeycloakClient           keycloak.Client
 	EventHistoryClient       ehsvc.EventHistoryService
 	TraceProvider            trace.TracerProvider
-	Storage                  metadata.Storage
 }
 
 // newOptions initializes the available default options.
@@ -183,9 +182,9 @@ func TraceProvider(val trace.TracerProvider) Option {
 	}
 }
 
-// MetadataStorage provides a function to set the MetadataStorage option.
-func MetadataStorage(ms metadata.Storage) Option {
+// UserProfilePhotoService provides a function to set the UserProfilePhotoService option.
+func UserProfilePhotoService(p UsersUserProfilePhotoProvider) Option {
 	return func(o *Options) {
-		o.Storage = ms
+		o.UserProfilePhotoService = p
 	}
 }

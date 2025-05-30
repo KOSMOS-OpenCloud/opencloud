@@ -95,13 +95,9 @@ var _ = Describe("Users", func() {
 
 	When("OCM is disabled", func() {
 		BeforeEach(func() {
-			mds := mocks.NewStorage(GinkgoT())
-			mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 			var err error
 			svc, err = service.NewService(
 				service.Config(cfg),
-				service.MetadataStorage(mds),
 				service.WithGatewaySelector(gatewaySelector),
 				service.EventsPublisher(&eventsPublisher),
 				service.WithIdentityBackend(identityBackend),
@@ -911,12 +907,8 @@ var _ = Describe("Users", func() {
 
 						localCfg.API.UsernameMatch = usernameMatch
 
-						mds := mocks.NewStorage(GinkgoT())
-						mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 						localSvc, err := service.NewService(
 							service.Config(localCfg),
-							service.MetadataStorage(mds),
 							service.WithGatewaySelector(gatewaySelector),
 							service.EventsPublisher(&eventsPublisher),
 							service.WithIdentityBackend(identityBackend),
@@ -1137,13 +1129,9 @@ var _ = Describe("Users", func() {
 		BeforeEach(func() {
 			cfg.IncludeOCMSharees = true
 
-			mds := mocks.NewStorage(GinkgoT())
-			mds.EXPECT().Init(mock.Anything, mock.Anything).Return(nil)
-
 			var err error
 			svc, err = service.NewService(
 				service.Config(cfg),
-				service.MetadataStorage(mds),
 				service.WithGatewaySelector(gatewaySelector),
 				service.EventsPublisher(&eventsPublisher),
 				service.WithIdentityBackend(identityBackend),

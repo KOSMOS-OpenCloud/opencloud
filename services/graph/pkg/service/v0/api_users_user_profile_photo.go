@@ -30,9 +30,6 @@ type (
 )
 
 var (
-	// profilePhotoSpaceID is the space ID for the profile photo
-	profilePhotoSpaceID = "f2bdd61a-da7c-49fc-8203-0558109d1b4f"
-
 	// ErrNoBytes is returned when no bytes are found
 	ErrNoBytes = errors.New("no bytes")
 
@@ -50,10 +47,6 @@ type UsersUserProfilePhotoService struct {
 
 // NewUsersUserProfilePhotoService creates a new UsersUserProfilePhotoService
 func NewUsersUserProfilePhotoService(storage metadata.Storage) (UsersUserProfilePhotoService, error) {
-	if err := storage.Init(context.Background(), profilePhotoSpaceID); err != nil {
-		return UsersUserProfilePhotoService{}, err
-	}
-
 	return UsersUserProfilePhotoService{
 		storage: storage,
 	}, nil

@@ -64,7 +64,7 @@ require (
 	github.com/onsi/gomega v1.37.0
 	github.com/open-policy-agent/opa v1.5.0
 	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250603072916-fa601fb14450
-	github.com/opencloud-eu/reva/v2 v2.33.1-0.20250520152851-d33c49bb52b9
+	github.com/opencloud-eu/reva/v2 v2.33.1-0.20250603070030-797b412f62db
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
@@ -156,7 +156,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
-	github.com/coreos/go-semver v0.3.0 // indirect
+	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cornelk/hashmap v1.0.8 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
@@ -246,7 +246,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.27 // indirect
+	github.com/mattn/go-sqlite3 v1.14.28 // indirect
 	github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b // indirect
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 // indirect
 	github.com/miekg/dns v1.1.57 // indirect
@@ -254,7 +254,7 @@ require (
 	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.89 // indirect
+	github.com/minio/minio-go/v7 v7.0.92 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -272,6 +272,7 @@ require (
 	github.com/pablodz/inotifywaitgo v0.0.9 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
+	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -303,6 +304,7 @@ require (
 	github.com/tchap/go-patricia/v2 v2.3.2 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tinylib/msgp v1.3.0 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.26 // indirect
@@ -314,18 +316,17 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/yashtewari/glob-intersection v0.2.0 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.20 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.20 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.20 // indirect
+	go.etcd.io/etcd/api/v3 v3.6.0 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.6.0 // indirect
+	go.etcd.io/etcd/client/v3 v3.6.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.36.0 // indirect
 	go.opentelemetry.io/otel/metric v1.36.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.6.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.23.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/time v0.11.0 // indirect

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -14,16 +15,17 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/tags"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
+
 	searchmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/search/v0"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/constants"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/net"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/prop"
 	"github.com/opencloud-eu/opencloud/services/webdav/pkg/propfind"
-	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
-	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
-	"github.com/opencloud-eu/reva/v2/pkg/tags"
-	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
 const (
@@ -91,7 +93,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 
 func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
-	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches)
+	responsesXML, err := multistatusResponse(r.Context(), g.config.OpenCloudPublicURL, rsp.Matches)
 	if err != nil {
 		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -109,10 +111,10 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 }
 
 // multistatusResponse converts a list of matches into a multistatus response string
-func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byte, error) {
+func multistatusResponse(ctx context.Context, publicURL string, matches []*searchmsg.Match) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(matches))
 	for i := range matches {
-		res, err := matchToPropResponse(ctx, matches[i])
+		res, err := matchToPropResponse(ctx, publicURL, matches[i])
 		if err != nil {
 			return nil, err
 		}
@@ -128,14 +130,14 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byt
 	return msg, nil
 }
 
-func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind.ResponseXML, error) {
-	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
+func matchToPropResponse(ctx context.Context, publicURL string, match *searchmsg.Match) (*propfind.ResponseXML, error) {
+	// unfortunately, search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
 		ref string
 		err error
 	)
 
-	// to copy PROPFIND behaviour we need to deliver different ids
+	// to copy PROPFIND behaviour, we need to deliver different ids
 	// for shares it needs to be sharestorageproviderid!shareid
 	// for other spaces it needs to be storageproviderid$spaceid
 	switch match.Entity.Ref.ResourceId.StorageId {
@@ -215,6 +217,15 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	}
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))
+
+	if privateURL, err := url.Parse(publicURL); err == nil && match.Entity.Id != nil {
+		privateURL.Path = path.Join(privateURL.Path, "f", storagespace.FormatResourceID(&provider.ResourceId{
+			StorageId: match.Entity.Id.StorageId,
+			SpaceId:   match.Entity.Id.SpaceId,
+			OpaqueId:  match.Entity.Id.OpaqueId,
+		}))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:privatelink", privateURL.String()))
+	}
 
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)

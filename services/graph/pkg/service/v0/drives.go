@@ -20,10 +20,10 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/render"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 	"golang.org/x/sync/errgroup"
@@ -796,7 +796,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		},
 	}
 	if expandPermissions {
-		drive.Root.Permissions = g.cs3SpacePermissionsToLibreGraph(ctx, space, apiVersion)
+		drive.Root.Permissions, _ = g.cs3SpacePermissionsToLibreGraph(ctx, space, false, apiVersion)
 	}
 
 	if space.SpaceType == _spaceTypeMountpoint {

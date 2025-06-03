@@ -39,7 +39,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "webdav",
 		},
-		OpenCloudPublicURL: "https://127.0.0.1:9200",
+		OpenCloudPublicURL: "https://localhost:9200",
 		WebdavNamespace:    "/users/{{.Id.OpaqueId}}",
 		RevaGateway:        shared.DefaultRevaConfig().Address,
 	}

@@ -867,8 +867,8 @@ github.com/open-policy-agent/opa v1.5.0 h1:npsQMUZvafCLYHofoNrZ0cSWbvoDpasvWtrHX
 github.com/open-policy-agent/opa v1.5.0/go.mod h1:bYbS7u+uhTI+cxHQIpzvr5hxX0hV7urWtY+38ZtjMgk=
 github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a h1:Sakl76blJAaM6NxylVkgSzktjo2dS504iDotEFJsh3M=
 github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a/go.mod h1:pjcozWijkNPbEtX5SIQaxEW/h8VAVZYTLx+70bmB3LY=
-github.com/opencloud-eu/libre-graph-api-go v1.0.6 h1:bUQq0tfaLboZZmPuI6C1rr/wFIVOIM9IsE1WqI5QsDA=
-github.com/opencloud-eu/libre-graph-api-go v1.0.6/go.mod h1:pzatilMEHZFT3qV7C/X3MqOa3NlRQuYhlRhZTL+hN6Q=
+github.com/opencloud-eu/libre-graph-api-go v1.0.7 h1:xP8xlRc6z+gROmQYWohIXn1GtaORQKh8PN7grF3Z790=
+github.com/opencloud-eu/libre-graph-api-go v1.0.7/go.mod h1:pzatilMEHZFT3qV7C/X3MqOa3NlRQuYhlRhZTL+hN6Q=
 github.com/opencloud-eu/reva/v2 v2.33.1-0.20250520152851-d33c49bb52b9 h1:7y8gTqVQSXLyAqeUFesbI58OkgGcS5fmfq2f3e95XOI=
 github.com/opencloud-eu/reva/v2 v2.33.1-0.20250520152851-d33c49bb52b9/go.mod h1:8S3B+GPFdGMcNL/pkSHI4K2/E0ICvR7qxllE7Ooydm8=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=

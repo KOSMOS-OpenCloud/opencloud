@@ -19,6 +19,7 @@ var (
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z.mpk
 	// 9113a718-8285-4b32-9042-f930f1a58ac2.REV.2024-05-22T07:32:53.89969726Z.mlock
 	_versionRegex = regexp.MustCompile(`\.REV\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+Z*`)
+	_spaceIDRegex = regexp.MustCompile(`/spaces/(.+)/nodes/`)
 )
 
 // DelBlobstore is the interface for a blobstore that can delete blobs.
@@ -145,7 +146,10 @@ func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 			continue
 		}
 
-		var blobID string
+		var (
+			spaceID, blobID string
+		)
+
 		e := filepath.Ext(d)
 		switch e {
 		case ".mpk":
@@ -154,6 +158,12 @@ func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 				fmt.Printf("error getting blobID from %s: %v\n", d, err)
 				continue
 			}
+			matches := _spaceIDRegex.FindStringSubmatch(d)
+			if len(matches) != 2 {
+				fmt.Printf("error extracting spaceID from %s\n", d)
+				continue
+			}
+			spaceID = strings.ReplaceAll(matches[1], "/", "")
 
 			countBlobs++
 		case ".mlock":
@@ -165,7 +175,7 @@ func PurgeRevisions(nodes <-chan string, bs DelBlobstore, dryRun, verbose bool) 
 		if !dryRun {
 			if blobID != "" {
 				//  TODO: needs spaceID for decomposeds3
-				if err := bs.Delete(&node.Node{BlobID: blobID}); err != nil {
+				if err := bs.Delete(&node.Node{BaseNode: node.BaseNode{SpaceID: spaceID}, BlobID: blobID}); err != nil {
 					fmt.Printf("error deleting blob %s: %v\n", blobID, err)
 					continue
 				}

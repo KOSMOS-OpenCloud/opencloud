@@ -34,10 +34,10 @@ func collectExpandPaths(item *godata.ExpandItem, prefix string) ([]string, error
 
 	// Build the current path
 	currentPath := prefix
-	if len(item.Path) > 0 {
-		if len(item.Path) > 1 {
-			return nil, godata.NotImplementedError("multiple segments in $expand not supported")
-		}
+	if len(item.Path) > 1 {
+	   return nil, godata.NotImplementedError("multiple segments in $expand not supported")
+	}
+	if len(item.Path) == 1 {
 		if currentPath == "" {
 			currentPath = item.Path[0].Value
 		} else {

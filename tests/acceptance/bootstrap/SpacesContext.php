@@ -1046,7 +1046,7 @@ class SpacesContext implements Context {
 		string $grantedUser,
 		string $role
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllAvailableSpacesOfUser($user, '$expand=root($expand=permissions)');
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -4618,7 +4618,7 @@ class SpacesContext implements Context {
 		string $role,
 		?string $expirationDate = null
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllAvailableSpacesOfUser($user, '$expand=root($expand=permissions)');
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",

@@ -15,6 +15,7 @@ import (
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 )
 
 type groupAttributeMap struct {
@@ -59,17 +60,17 @@ func (i *LDAP) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*li
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroups")
 
-	search, err := GetSearchValues(oreq.Query)
+	search, err := odata.GetSearchValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
 
 	var expandMembers bool
-	exp, err := GetExpandValues(oreq.Query)
+	exp, err := odata.GetExpandValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
-	sel, err := GetSelectValues(oreq.Query)
+	sel, err := odata.GetSelectValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +147,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroupMembers")
 
-	exp, err := GetExpandValues(req.Query)
+	exp, err := odata.GetExpandValues(req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +157,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.
 		return nil, err
 	}
 
-	searchTerm, err := GetSearchValues(req.Query)
+	searchTerm, err := odata.GetSearchValues(req.Query)
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 )
@@ -81,7 +82,7 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	search, err := GetSearchValues(oreq.Query)
+	search, err := odata.GetSearchValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (i *CS3) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	search, err := GetSearchValues(oreq.Query)
+	search, err := odata.GetSearchValues(oreq.Query)
 	if err != nil {
 		return nil, err
 	}

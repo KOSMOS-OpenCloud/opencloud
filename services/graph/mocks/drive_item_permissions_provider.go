@@ -295,7 +295,7 @@ func (_c *DriveItemPermissionsProvider_Invite_Call) RunAndReturn(run func(contex
 }
 
 // ListPermissions provides a mock function with given fields: ctx, itemID, listFederatedRoles, selectedAttrs
-func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	ret := _m.Called(ctx, itemID, listFederatedRoles, selectedAttrs)
 
 	if len(ret) == 0 {
@@ -304,16 +304,16 @@ func (_m *DriveItemPermissionsProvider) ListPermissions(ctx context.Context, ite
 
 	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
 		return rf(ctx, itemID, listFederatedRoles, selectedAttrs)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, map[string]struct{}) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, bool, []string) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
 		r0 = rf(ctx, itemID, listFederatedRoles, selectedAttrs)
 	} else {
 		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, bool, map[string]struct{}) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, bool, []string) error); ok {
 		r1 = rf(ctx, itemID, listFederatedRoles, selectedAttrs)
 	} else {
 		r1 = ret.Error(1)
@@ -331,14 +331,14 @@ type DriveItemPermissionsProvider_ListPermissions_Call struct {
 //   - ctx context.Context
 //   - itemID *providerv1beta1.ResourceId
 //   - listFederatedRoles bool
-//   - selectedAttrs map[string]struct{}
+//   - selectedAttrs []string
 func (_e *DriveItemPermissionsProvider_Expecter) ListPermissions(ctx interface{}, itemID interface{}, listFederatedRoles interface{}, selectedAttrs interface{}) *DriveItemPermissionsProvider_ListPermissions_Call {
 	return &DriveItemPermissionsProvider_ListPermissions_Call{Call: _e.mock.On("ListPermissions", ctx, itemID, listFederatedRoles, selectedAttrs)}
 }
 
-func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectedAttrs map[string]struct{})) *DriveItemPermissionsProvider_ListPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Run(run func(ctx context.Context, itemID *providerv1beta1.ResourceId, listFederatedRoles bool, selectedAttrs []string)) *DriveItemPermissionsProvider_ListPermissions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(bool), args[3].(map[string]struct{}))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(bool), args[3].([]string))
 	})
 	return _c
 }
@@ -348,13 +348,13 @@ func (_c *DriveItemPermissionsProvider_ListPermissions_Call) Return(_a0 libregra
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, bool, map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, bool, []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListPermissions_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListSpaceRootPermissions provides a mock function with given fields: ctx, driveID, selectedAttrs
-func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Context, driveID *providerv1beta1.ResourceId, selectedAttrs map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Context, driveID *providerv1beta1.ResourceId, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	ret := _m.Called(ctx, driveID, selectedAttrs)
 
 	if len(ret) == 0 {
@@ -363,16 +363,16 @@ func (_m *DriveItemPermissionsProvider) ListSpaceRootPermissions(ctx context.Con
 
 	var r0 libregraph.CollectionOfPermissionsWithAllowedValues
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)); ok {
 		return rf(ctx, driveID, selectedAttrs)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, map[string]struct{}) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, []string) libregraph.CollectionOfPermissionsWithAllowedValues); ok {
 		r0 = rf(ctx, driveID, selectedAttrs)
 	} else {
 		r0 = ret.Get(0).(libregraph.CollectionOfPermissionsWithAllowedValues)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, map[string]struct{}) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, []string) error); ok {
 		r1 = rf(ctx, driveID, selectedAttrs)
 	} else {
 		r1 = ret.Error(1)
@@ -389,14 +389,14 @@ type DriveItemPermissionsProvider_ListSpaceRootPermissions_Call struct {
 // ListSpaceRootPermissions is a helper method to define mock.On call
 //   - ctx context.Context
 //   - driveID *providerv1beta1.ResourceId
-//   - selectedAttrs map[string]struct{}
+//   - selectedAttrs []string
 func (_e *DriveItemPermissionsProvider_Expecter) ListSpaceRootPermissions(ctx interface{}, driveID interface{}, selectedAttrs interface{}) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	return &DriveItemPermissionsProvider_ListSpaceRootPermissions_Call{Call: _e.mock.On("ListSpaceRootPermissions", ctx, driveID, selectedAttrs)}
 }
 
-func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, selectedAttrs map[string]struct{})) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Run(run func(ctx context.Context, driveID *providerv1beta1.ResourceId, selectedAttrs []string)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].(map[string]struct{}))
+		run(args[0].(context.Context), args[1].(*providerv1beta1.ResourceId), args[2].([]string))
 	})
 	return _c
 }
@@ -406,7 +406,7 @@ func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) Return(_a0
 	return _c
 }
 
-func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, map[string]struct{}) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
+func (_c *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call) RunAndReturn(run func(context.Context, *providerv1beta1.ResourceId, []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)) *DriveItemPermissionsProvider_ListSpaceRootPermissions_Call {
 	_c.Call.Return(run)
 	return _c
 }

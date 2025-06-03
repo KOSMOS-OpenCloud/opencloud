@@ -489,8 +489,42 @@ var _ = Describe("Graph", func() {
 				Expect(libreError.Error.Message).To(Equal("internal quota error"))
 				Expect(libreError.Error.Code).To(Equal(errorcode.GeneralException.String()))
 			})
+			It("omit permissions by default", func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Opaque: utils.AppendJSONToOpaque(nil, "grants", map[string]provider.ResourcePermissions{
+								"1": *conversions.NewManagerRole().CS3ResourcePermissions(),
+							}),
+							Root: &provider.ResourceId{},
+						},
+					},
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+				gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userprovider.GetUserResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				jsonData := gjson.Get(rr.Body.String(), "value")
+
+				Expect(jsonData.Get("#").Num).To(Equal(float64(1)))
+				Expect(jsonData.Get("0.root.permissions").Exists()).To(BeFalse())
+			})
 		})
-		DescribeTable("GetDrivesV1Beta1 and GetAllDrivesV1Beta1",
+		DescribeTable("GetDrivesV1Beta1 and GetAllDrivesV1Beta1 expands root permissions",
 			func(check func(gjson.Result), resourcePermissions provider.ResourcePermissions) {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
 					Permission: &v0.Permission{
@@ -518,7 +552,7 @@ var _ = Describe("Graph", func() {
 					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 				}, nil)
 
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1beta1.0/me/drives?$expand=root($expand=permissions)", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrivesV1Beta1(rr, r)

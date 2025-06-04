@@ -52,8 +52,8 @@ const (
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
-	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
-	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
+	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error
 	DeleteSpaceRootPermission(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string) error
 	UpdatePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string, newPermission libregraph.Permission) (libregraph.Permission, error)
@@ -78,6 +78,13 @@ const (
 	Space
 	OCM
 )
+
+type ListPermissionsQueryOptions struct {
+	count                bool
+	noValues             bool
+	filterFederatedRoles bool
+	selectedAttrs        []string
+}
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
 func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
@@ -345,7 +352,7 @@ func (s DriveItemPermissionsService) SpaceRootInvite(ctx context.Context, driveI
 }
 
 // ListPermissions lists the permissions of a driveItem
-func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, listFederatedRoles bool, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -368,17 +375,17 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 
 	collectionOfPermissions = libregraph.CollectionOfPermissionsWithAllowedValues{}
 
-	if len(selectedAttrs) == 0 || slices.Contains(selectedAttrs, "@libre.graph.permissions.actions.allowedValues") {
+	if len(queryOptions.selectedAttrs) == 0 || slices.Contains(queryOptions.selectedAttrs, "@libre.graph.permissions.actions.allowedValues") {
 		collectionOfPermissions.LibreGraphPermissionsActionsAllowedValues = allowedActions
 	}
 
-	if len(selectedAttrs) == 0 || slices.Contains(selectedAttrs, "@libre.graph.permissions.roles.allowedValues") {
+	if len(queryOptions.selectedAttrs) == 0 || slices.Contains(queryOptions.selectedAttrs, "@libre.graph.permissions.roles.allowedValues") {
 		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues = conversions.ToValueSlice(
 			unifiedrole.GetRolesByPermissions(
 				unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(s.config.UnifiedRoles.AvailableRoles...)),
 				allowedActions,
 				condition,
-				listFederatedRoles,
+				queryOptions.filterFederatedRoles,
 				false,
 			),
 		)
@@ -390,7 +397,7 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		collectionOfPermissions.LibreGraphPermissionsRolesAllowedValues[i] = definition
 	}
 
-	if len(selectedAttrs) > 0 {
+	if len(queryOptions.selectedAttrs) > 0 {
 		// no need to fetch shares, we are only interested allowedActions and/or allowedRoles
 		return collectionOfPermissions, nil
 	}
@@ -403,8 +410,11 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	}
 	driveItems[storagespace.FormatResourceID(statResponse.GetInfo().GetId())] = *item
 
+	var permissionsCount int
+
 	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
-		permissions, err := s.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId())
+		var permissions []libregraph.Permission
+		permissions, permissionsCount, err = s.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId(), queryOptions.noValues)
 		if err != nil {
 			return collectionOfPermissions, err
 		}
@@ -438,14 +448,21 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	}
 
 	for _, driveItem := range driveItems {
-		collectionOfPermissions.Value = append(collectionOfPermissions.Value, driveItem.Permissions...)
+		permissionsCount += len(driveItem.Permissions)
+		if !queryOptions.noValues {
+			collectionOfPermissions.Value = append(collectionOfPermissions.Value, driveItem.Permissions...)
+		}
+	}
+
+	if queryOptions.count {
+		collectionOfPermissions.SetOdataCount(int32(permissionsCount))
 	}
 
 	return collectionOfPermissions, nil
 }
 
 // ListSpaceRootPermissions handles ListPermissions request on project spaces
-func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, selectedAttrs []string) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
+func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error) {
 	collectionOfPermissions := libregraph.CollectionOfPermissionsWithAllowedValues{}
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -463,7 +480,7 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	}
 
 	rootResourceID := space.GetRoot()
-	return s.ListPermissions(ctx, rootResourceID, false, selectedAttrs) // federated roles are not supported for spaces
+	return s.ListPermissions(ctx, rootResourceID, queryOptions) // federated roles are not supported for spaces
 }
 
 // DeletePermission deletes a permission from a drive item
@@ -716,23 +733,17 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		return
 	}
 
-	var listFederatedRoles bool
-	if odataReq.Query.Filter != nil {
-		if odataReq.Query.Filter.RawValue == federatedRolesODataFilter {
-			listFederatedRoles = true
-		}
-	}
-
-	selectAttrs, err := odata.GetSelectValues(odataReq.Query)
+	var queryOptions ListPermissionsQueryOptions
+	queryOptions, err = api.getListPermissionsQueryOptions(odataReq)
 	if err != nil {
-		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest query options")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectAttrs)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, queryOptions)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -773,15 +784,16 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 		return
 	}
 
-	selected, err := odata.GetSelectValues(odataReq.Query)
+	var queryOptions ListPermissionsQueryOptions
+	queryOptions, err = api.getListPermissionsQueryOptions(odataReq)
 	if err != nil {
-		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest: query error")
+		api.logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("Error parsing ListPermissionRequest query options")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	ctx := r.Context()
-	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID, selected)
+	permissions, err := api.driveItemPermissionsService.ListSpaceRootPermissions(ctx, &driveID, queryOptions)
 
 	if err != nil {
 		errorcode.RenderError(w, r, err)
@@ -804,6 +816,40 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, permissions)
+}
+
+func (api DriveItemPermissionsApi) getListPermissionsQueryOptions(odataReq *godata.GoDataRequest) (ListPermissionsQueryOptions, error) {
+	var listFederatedRoles bool
+	if odataReq.Query.Filter != nil {
+		if odataReq.Query.Filter.RawValue == federatedRolesODataFilter {
+			listFederatedRoles = true
+		}
+	}
+
+	selectAttrs, err := odata.GetSelectValues(odataReq.Query)
+	if err != nil {
+		return ListPermissionsQueryOptions{}, err
+	}
+
+	queryOptions := ListPermissionsQueryOptions{
+		filterFederatedRoles: listFederatedRoles,
+		selectedAttrs:        selectAttrs,
+	}
+	if odataReq.Query.Count != nil {
+		queryOptions.count = bool(*odataReq.Query.Count)
+	}
+	if odataReq.Query.Top != nil {
+		top := int(*odataReq.Query.Top)
+		switch {
+		case top != 0:
+			return ListPermissionsQueryOptions{}, err
+		case top == 0 && !queryOptions.count:
+			return ListPermissionsQueryOptions{}, err
+		default:
+			queryOptions.noValues = true
+		}
+	}
+	return queryOptions, nil
 }
 
 // DeletePermission handles DeletePermission requests

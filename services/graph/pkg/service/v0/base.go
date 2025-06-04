@@ -49,19 +49,20 @@ type BaseGraphService struct {
 	availableRoles  []*libregraph.UnifiedRoleDefinition
 }
 
-func (g BaseGraphService) getSpaceRootPermissions(ctx context.Context, spaceID *storageprovider.StorageSpaceId) ([]libregraph.Permission, error) {
+func (g BaseGraphService) getSpaceRootPermissions(ctx context.Context, spaceID *storageprovider.StorageSpaceId, countOnly bool) ([]libregraph.Permission, int, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 
 	if err != nil {
 		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
-		return nil, err
+		return nil, 0, err
 	}
 	space, err := utils.GetSpace(ctx, spaceID.GetOpaqueId(), gatewayClient)
 	if err != nil {
-		return nil, errorcode.FromUtilsStatusCodeError(err)
+		return nil, 0, errorcode.FromUtilsStatusCodeError(err)
 	}
 
-	return g.cs3SpacePermissionsToLibreGraph(ctx, space, APIVersion_1_Beta_1), nil
+	perm, count := g.cs3SpacePermissionsToLibreGraph(ctx, space, countOnly, APIVersion_1_Beta_1)
+	return perm, count, nil
 }
 
 func (g BaseGraphService) getDriveItem(ctx context.Context, ref *storageprovider.Reference) (*libregraph.DriveItem, error) {
@@ -99,9 +100,9 @@ func (g BaseGraphService) CS3ReceivedOCMSharesToDriveItems(ctx context.Context, 
 	return cs3ReceivedOCMSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, receivedShares, g.availableRoles)
 }
 
-func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, apiVersion APIVersion) []libregraph.Permission {
+func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace, countOnly bool, apiVersion APIVersion) ([]libregraph.Permission, int) {
 	if space.Opaque == nil {
-		return nil
+		return nil, 0
 	}
 	logger := g.logger.SubloggerWithRequestID(ctx)
 
@@ -118,7 +119,12 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 		}
 	}
 	if len(permissionsMap) == 0 {
-		return nil
+		return nil, 0
+	}
+
+	if countOnly {
+		// If we only need the count, we can return early
+		return nil, len(permissionsMap)
 	}
 
 	var permissionsExpirations map[string]*types.Timestamp
@@ -219,7 +225,7 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 
 		permissions = append(permissions, p)
 	}
-	return permissions
+	return permissions, len(permissions)
 }
 
 func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *link.PublicShare) (*libregraph.Permission, error) {
@@ -1068,7 +1074,7 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 			return nil, nil, err
 		}
 
-		perms, err := g.getSpaceRootPermissions(ctx, resourceInfo.GetSpace().GetId())
+		perms, _, err := g.getSpaceRootPermissions(ctx, resourceInfo.GetSpace().GetId(), false)
 		if err != nil {
 			return nil, nil, err
 		}

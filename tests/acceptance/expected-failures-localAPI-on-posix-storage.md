@@ -205,27 +205,5 @@
 - [apiSearch1/search.feature:466](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L466)
 - [apiSearch1/search.feature:467](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L467)
 
-#### [No notification triggered for .zip virus file](https://github.com/opencloud-eu/opencloud/issues/382)
-- [apiAntivirus/antivirus.feature:41](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L41)
-- [apiAntivirus/antivirus.feature:43](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L43)
-- [apiAntivirus/antivirus.feature:45](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L45)
-- [apiAntivirus/antivirus.feature:69](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L69)
-- [apiAntivirus/antivirus.feature:71](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L71)
-- [apiAntivirus/antivirus.feature:73](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L73)
-- [apiAntivirus/antivirus.feature:115](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L115)
-- [apiAntivirus/antivirus.feature:117](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L117)
-- [apiAntivirus/antivirus.feature:119](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L119)
-- [apiAntivirus/antivirus.feature:141](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L141)
-- [apiAntivirus/antivirus.feature:143](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L143)
-- [apiAntivirus/antivirus.feature:145](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L145)
-- [apiAntivirus/antivirus.feature:169](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L169)
-- [apiAntivirus/antivirus.feature:171](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L171)
-- [apiAntivirus/antivirus.feature:173](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L173)
-- [apiAntivirus/antivirus.feature:199](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L199)
-- [apiAntivirus/antivirus.feature:201](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L201)
-- [apiAntivirus/antivirus.feature:203](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L203)
-- [apiAntivirus/antivirus.feature:228](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L228)
-- [apiAntivirus/antivirus.feature:253](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiAntivirus/antivirus.feature#L253)
-
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

@@ -32,17 +32,17 @@ Feature: antivirus
     # antivirus service can scan files during post-processing. on demand scanning is currently not available
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Alice" file "<new-file-name>" should not exist
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.zip |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus and a file without virus
@@ -53,8 +53,8 @@ Feature: antivirus
     And user "Alice" uploads file "filesForUpload/textfile.txt" to "/normalfile.txt" using the WebDAV API
     And the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Alice" file "<new-file-name>" should not exist
     But as "Alice" file "/normalfile.txt" should exist
     And the content of file "/normalfile.txt" for user "Alice" should be:
@@ -64,13 +64,13 @@ Feature: antivirus
       Cheers.
       """
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.zip |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus in chunks
@@ -92,7 +92,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-  @issue-10331
+  @issue-10331 @env-config
   Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
     And the config "OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
@@ -106,17 +106,17 @@ Feature: antivirus
     When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder using the public WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.zip |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
   @issue-10331
   Scenario Outline: public uploads a file with the virus to a password-protected public share
@@ -132,17 +132,17 @@ Feature: antivirus
     When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.zip |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus to a user share
@@ -159,18 +159,18 @@ Feature: antivirus
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.zip |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus to a group share
@@ -189,18 +189,18 @@ Feature: antivirus
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<file-name>" to "/Shares/uploadFolder/<new-file-name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:
-      | dav-path-version | file-name     | new-file-name  |
-      | old              | eicar.com     | virusFile1.txt |
-      | old              | eicar_com.zip | virusFile2.zip |
-      | new              | eicar.com     | virusFile1.txt |
-      | new              | eicar_com.zip | virusFile2.zip |
-      | spaces           | eicar.com     | virusFile1.txt |
-      | spaces           | eicar_com.zip | virusFile2.txt |
+      | dav-path-version | file-name     | new-file-name  | message                                                                         |
+      | old              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | old              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | new              | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | new              | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+      | spaces           | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | spaces           | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus to a project space
@@ -211,21 +211,21 @@ Feature: antivirus
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/uploadFolder/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And for user "Alice" folder "uploadFolder" of the space "new-space" should not contain these entries:
       | <new-file-name> |
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification for resource "<new-file-name>" with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And for user "Alice" the space "new-space" should not contain these entries:
       | /<new-file-name> |
     Examples:
-      | file-name     | new-file-name  |
-      | eicar.com     | virusFile1.txt |
-      | eicar_com.zip | virusFile2.zip |
+      | file-name     | new-file-name  | message                                                                         |
+      | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
 
   Scenario Outline: upload a file with virus to a shared project space
@@ -241,16 +241,16 @@ Feature: antivirus
     When user "Brian" uploads a file "/filesForUpload/filesWithVirus/<file-name>" to "/<new-file-name>" in space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                          |
-      | Virus found in <new-file-name>. Upload not possible. Virus: Eicar-Signature |
+      | message   |
+      | <message> |
     And for user "Brian" the space "new-space" should not contain these entries:
       | /<new-file-name> |
     And for user "Alice" the space "new-space" should not contain these entries:
       | /<new-file-name> |
     Examples:
-      | file-name     | new-file-name  |
-      | eicar.com     | virusFile1.txt |
-      | eicar_com.zip | virusFile2.zip |
+      | file-name     | new-file-name  | message                                                                         |
+      | eicar.com     | virusFile1.txt | Virus found in virusFile1.txt. Upload not possible. Virus: Eicar-Signature      |
+      | eicar_com.zip | virusFile2.zip | Virus found in virusFile2.zip. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
 
   @env-config  @issue-6494
   Scenario Outline: upload a file with virus by setting antivirus infected file handling config to continue

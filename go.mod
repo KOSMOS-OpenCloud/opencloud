@@ -11,7 +11,7 @@ require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/beevik/etree v1.5.1
-	github.com/blevesearch/bleve/v2 v2.5.1
+	github.com/blevesearch/bleve/v2 v2.5.2
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
@@ -148,7 +148,7 @@ require (
 	github.com/blevesearch/zapx/v13 v13.4.2 // indirect
 	github.com/blevesearch/zapx/v14 v14.4.2 // indirect
 	github.com/blevesearch/zapx/v15 v15.4.2 // indirect
-	github.com/blevesearch/zapx/v16 v16.2.3 // indirect
+	github.com/blevesearch/zapx/v16 v16.2.4 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect

@@ -543,6 +543,7 @@ func (a *ActivitylogService) enforceMaxActivities(ctx context.Context, resourceI
 		a.log.Error().Err(err).Str("resourceID", resourceID).Msg("could not watch")
 		return
 	}
+	defer watcher.Stop()
 
 	var keys []string
 	for update := range watcher.Updates() {

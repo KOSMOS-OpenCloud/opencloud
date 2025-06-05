@@ -53,6 +53,7 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		WriteBufferDuration: 10 * time.Second,
+		MaxActivities:       6000,
 	}
 }
 

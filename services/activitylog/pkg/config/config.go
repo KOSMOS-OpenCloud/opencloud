@@ -34,6 +34,7 @@ type Config struct {
 	Context context.Context `yaml:"-"`
 
 	WriteBufferDuration time.Duration `yaml:"write_buffer_duration" env:"ACTIVITYLOG_WRITE_BUFFER_DURATION" desc:"The duration to wait before flushing the write buffer. This is used to reduce the number of writes to the store." introductionVersion:"%%NEXT%%"`
+	MaxActivities       int           `yaml:"max_activities" env:"ACTIVITYLOG_MAX_ACTIVITIES" desc:"The maximum number of activities to keep in the store per resource. If the number of activities exceeds this value, the oldest activities will be removed." introductionVersion:"%%NEXT%%"`
 }
 
 // Events combines the configuration options for the event bus.

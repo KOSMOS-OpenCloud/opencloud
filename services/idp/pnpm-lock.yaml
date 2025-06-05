@@ -214,8 +214,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(postcss@8.4.39)(webpack@5.99.6)
       postcss-normalize:
-        specifier: 13.0.0
-        version: 13.0.0(browserslist@4.23.2)(postcss@8.4.39)
+        specifier: 13.0.1
+        version: 13.0.1(browserslist@4.23.2)(postcss@8.4.39)
       postcss-preset-env:
         specifier: 10.1.3
         version: 10.1.3(postcss@8.4.39)
@@ -986,6 +986,10 @@ packages:
 
   '@babel/runtime@7.27.4':
     resolution: {integrity: sha512-t3yaEOuGu9NlIZ+hIeGbBjFtZT7j2cb2tg0fuaJKeGotchRjjLfrBA9Kwf8quhpP1EUuxModQg04q/mBwyg8uA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.27.6':
+    resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.26.9':
@@ -4734,12 +4738,12 @@ packages:
     peerDependencies:
       postcss: ^8.4
 
-  postcss-browser-comments@4.0.0:
-    resolution: {integrity: sha512-X9X9/WN3KIvY9+hNERUqX9gncsgBA25XaeR+jshHz2j8+sYyHktHw1JdKuMjeLpGktXidqDhA7b/qm1mrBDmgg==}
-    engines: {node: '>=8'}
+  postcss-browser-comments@6.0.1:
+    resolution: {integrity: sha512-VE5mVLOW+L31a+Eyi7i5j7PmzOydObKLA9VwGBpTZy2OYB3XY1E7/xHxv4tURtEI/qb5h2TyyGHPhZ31sXOEXg==}
+    engines: {node: '>=18'}
     peerDependencies:
-      browserslist: '>=4'
-      postcss: '>=8'
+      browserslist: ^4.23.1
+      postcss: ^8.4
 
   postcss-calc@10.0.0:
     resolution: {integrity: sha512-OmjhudoNTP0QleZCwl1i6NeBwN+5MZbY5ersLZz69mjJiDVv/p57RjRuKDkHeDWr4T+S97wQfsqRTNoDHB2e3g==}
@@ -5010,8 +5014,8 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
 
-  postcss-normalize@13.0.0:
-    resolution: {integrity: sha512-EdlY4gQiS8DluldxUsgsgzMA1+4mRd4FQ7x8yGT934X3IBTJ0ZW3OG6xNneaHTv2BNzwnQ5mrnmrA/7yxVvnYw==}
+  postcss-normalize@13.0.1:
+    resolution: {integrity: sha512-oGfXG7IQ44FUIMFco2N2Uz71UotM+tZ9trEmT1bHIUR5gAplyG3RnHqpMDEcCx1r+1bwBJTrI5uhiQr4YOpqhQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       browserslist: '>= 4'
@@ -7280,6 +7284,8 @@ snapshots:
 
   '@babel/runtime@7.27.4': {}
 
+  '@babel/runtime@7.27.6': {}
+
   '@babel/template@7.26.9':
     dependencies:
       '@babel/code-frame': 7.26.2
@@ -8061,7 +8067,7 @@ snapshots:
   '@testing-library/dom@10.3.2':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/runtime': 7.27.4
+      '@babel/runtime': 7.27.6
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -11831,7 +11837,7 @@ snapshots:
       postcss: 8.4.39
       postcss-selector-parser: 7.1.0
 
-  postcss-browser-comments@4.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-browser-comments@6.0.1(browserslist@4.23.2)(postcss@8.4.39):
     dependencies:
       browserslist: 4.23.2
       postcss: 8.4.39
@@ -12100,12 +12106,12 @@ snapshots:
       postcss: 8.4.39
       postcss-value-parser: 4.2.0
 
-  postcss-normalize@13.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-normalize@13.0.1(browserslist@4.23.2)(postcss@8.4.39):
     dependencies:
       '@csstools/normalize.css': 12.1.1
       browserslist: 4.23.2
       postcss: 8.4.39
-      postcss-browser-comments: 4.0.0(browserslist@4.23.2)(postcss@8.4.39)
+      postcss-browser-comments: 6.0.1(browserslist@4.23.2)(postcss@8.4.39)
       sanitize.css: 13.0.0
 
   postcss-opacity-percentage@3.0.0(postcss@8.4.39):

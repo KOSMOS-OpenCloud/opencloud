@@ -79,6 +79,7 @@ func (a *ActivitylogService) migrateToV1(_ context.Context, kv nats.KeyValue) er
 		if err := json.Unmarshal(valBytes, &val); err != nil {
 			a.log.Error().Err(err).Str("key", key).Msg("migrateToV1: Value for key ss not a keyValueEnvelope. Skipping.")
 			skippedCount++
+			continue
 		}
 
 		// Unmarshal value into a list of strings

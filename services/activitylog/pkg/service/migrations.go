@@ -37,8 +37,8 @@ func (a *ActivitylogService) runMigrations(ctx context.Context, kv nats.KeyValue
 
 // migrateToV1 performs the data migration to version 1.
 // It iterates over all keys, expecting their values to be JSON arrays of strings.
-// For each such key, it creates a new key in the format "originalKey:count:timestamp"
-// and stores the original list of strings (re-marshalled to JSON) as its value.
+// For each such key, it creates a new key in the format "originalKey.count.timestamp"
+// and stores the original list of strings (re-marshalled to messagepack) as its value.
 // Finally, it sets the activitylog.version key to "1".
 func (a *ActivitylogService) migrateToV1(_ context.Context, kv nats.KeyValue) error {
 	lister, err := kv.ListKeys()
@@ -101,7 +101,7 @@ func (a *ActivitylogService) migrateToV1(_ context.Context, kv nats.KeyValue) er
 			continue
 		}
 
-		// Write the value (the list of strings, marshalled as JSON) under the new key
+		// Write the value (the list of strings, marshalled as messagepack) under the new key
 		if _, err := kv.Put(newKey, newValue); err != nil {
 			a.log.Error().Err(err).Str("newKey", newKey).Str("key", key).Msg("migrateToV1: Failed to put new key. Skipping.")
 			skippedCount++

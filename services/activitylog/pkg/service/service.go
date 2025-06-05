@@ -416,6 +416,7 @@ func (a *ActivitylogService) activities(rid *provider.ResourceId) ([]RawActivity
 	if err != nil {
 		return nil, err
 	}
+	defer watcher.Stop()
 
 	var activities []RawActivity
 	for update := range watcher.Updates() {

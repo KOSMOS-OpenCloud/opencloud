@@ -62,7 +62,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
-	github.com/open-policy-agent/opa v1.5.0
+	github.com/open-policy-agent/opa v1.5.1
 	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250603072916-fa601fb14450
 	github.com/opencloud-eu/reva/v2 v2.33.1-0.20250603070030-797b412f62db
 	github.com/orcaman/concurrent-map v1.0.0

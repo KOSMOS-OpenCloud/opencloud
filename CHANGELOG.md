@@ -1,5 +1,90 @@
 # Changelog
 
+## [3.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.0.0) - 2025-06-10
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @ScharfViktor, @VuiMuich, @aduffeck, @butonic, @fschade, @kulmann, @micbar, @prashant-gurung899, @rhafer
+
+### 💥 Breaking changes
+
+- do not automatically expand drive root permissions [[#495](https://github.com/opencloud-eu/opencloud/pull/495)]
+
+### ✨ Features
+
+- Enhancement: Introduced support for PrivateLink in WebDAV search responses [[#983](https://github.com/opencloud-eu/opencloud/pull/983)]
+- Add profile photo [[#864](https://github.com/opencloud-eu/opencloud/pull/864)]
+- feat: hide close button in collabora [[#828](https://github.com/opencloud-eu/opencloud/pull/828)]
+
+### 📈 Enhancement
+
+- graph: Add $filter to only list (and/or count) member permissions [[#996](https://github.com/opencloud-eu/opencloud/pull/996)]
+- [full-ci] chore: bump web to v3.0.0 [[#1026](https://github.com/opencloud-eu/opencloud/pull/1026)]
+- [full-ci] chore: bump web to v3.0.0-alpha.1 [[#972](https://github.com/opencloud-eu/opencloud/pull/972)]
+- feat: add shareType to sharees field on activities api [[#954](https://github.com/opencloud-eu/opencloud/pull/954)]
+- graph: Add more $select options to ListPermissions endpoint [[#916](https://github.com/opencloud-eu/opencloud/pull/916)]
+- feat: add webp format [[#869](https://github.com/opencloud-eu/opencloud/pull/869)]
+
+### ✅ Tests
+
+- apiTest. count permission in the list permissions endpoint [[#1010](https://github.com/opencloud-eu/opencloud/pull/1010)]
+- apiTest. select option for root/permissions endpoint [[#942](https://github.com/opencloud-eu/opencloud/pull/942)]
+- [full-ci] ApiTest. checking private link in report response [[#993](https://github.com/opencloud-eu/opencloud/pull/993)]
+- [full-ci] Change `eicar_com.zip` virus file and update tests [[#992](https://github.com/opencloud-eu/opencloud/pull/992)]
+
+### 🐛 Bug Fixes
+
+- Fix broken urls in README.md of deployment example [[#1023](https://github.com/opencloud-eu/opencloud/pull/1023)]
+- Make activitylog service scalable [[#941](https://github.com/opencloud-eu/opencloud/pull/941)]
+- Fix purging revisions from decomposeds3 blobstores [[#958](https://github.com/opencloud-eu/opencloud/pull/958)]
+- fix(graph-metadata): lazy cs3 metadata storage initialization [[#946](https://github.com/opencloud-eu/opencloud/pull/946)]
+- always get the user email for admin user [[#898](https://github.com/opencloud-eu/opencloud/pull/898)]
+
+### 📚 Documentation
+
+- Updated boxes in readme [[#970](https://github.com/opencloud-eu/opencloud/pull/970)]
+
+### 📦️ Dependencies
+
+- [decomposed] bump-version-v3.0.0 [[#1030](https://github.com/opencloud-eu/opencloud/pull/1030)]
+- [full-ci] chore:reva bump v.2.33.1 [[#1027](https://github.com/opencloud-eu/opencloud/pull/1027)]
+- build(deps): bump i18next from 25.1.2 to 25.2.1 in /services/idp [[#1024](https://github.com/opencloud-eu/opencloud/pull/1024)]
+- build(deps): bump golang.org/x/image from 0.27.0 to 0.28.0 [[#1012](https://github.com/opencloud-eu/opencloud/pull/1012)]
+- build(deps): bump @types/node from 22.15.29 to 22.15.30 in /services/idp [[#1008](https://github.com/opencloud-eu/opencloud/pull/1008)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.5.0 to 1.5.1 [[#1000](https://github.com/opencloud-eu/opencloud/pull/1000)]
+- build(deps): bump golang.org/x/sync from 0.14.0 to 0.15.0 [[#1006](https://github.com/opencloud-eu/opencloud/pull/1006)]
+- build(deps-dev): bump eslint-plugin-react from 7.37.2 to 7.37.5 in /services/idp [[#1004](https://github.com/opencloud-eu/opencloud/pull/1004)]
+- build(deps-dev): bump postcss-normalize from 13.0.0 to 13.0.1 in /services/idp [[#1003](https://github.com/opencloud-eu/opencloud/pull/1003)]
+- build(deps): bump @testing-library/react from 11.2.7 to 12.1.5 in /services/idp [[#994](https://github.com/opencloud-eu/opencloud/pull/994)]
+- build(deps): bump github.com/blevesearch/bleve/v2 from 2.5.1 to 2.5.2 [[#999](https://github.com/opencloud-eu/opencloud/pull/999)]
+- build(deps): bump @fontsource/roboto from 5.1.0 to 5.2.5 in /services/idp [[#995](https://github.com/opencloud-eu/opencloud/pull/995)]
+- build(deps): bump google.golang.org/grpc from 1.72.1 to 1.72.2 [[#991](https://github.com/opencloud-eu/opencloud/pull/991)]
+- build(deps): bump github.com/nats-io/nats.go from 1.42.0 to 1.43.0 [[#990](https://github.com/opencloud-eu/opencloud/pull/990)]
+- build(deps): bump @types/jest from 29.5.12 to 29.5.14 in /services/idp [[#987](https://github.com/opencloud-eu/opencloud/pull/987)]
+- build(deps): bump github.com/leonelquinteros/gotext from 1.7.1 to 1.7.2 [[#981](https://github.com/opencloud-eu/opencloud/pull/981)]
+- build(deps): bump @types/node from 22.15.19 to 22.15.29 in /services/idp [[#980](https://github.com/opencloud-eu/opencloud/pull/980)]
+- build(deps): bump github.com/opencloud-eu/libre-graph-api-go from 1.0.6 to 1.0.7 [[#982](https://github.com/opencloud-eu/opencloud/pull/982)]
+- build(deps-dev): bump sass-loader from 16.0.4 to 16.0.5 in /services/idp [[#979](https://github.com/opencloud-eu/opencloud/pull/979)]
+- build(deps): bump web-vitals from 4.2.4 to 5.0.2 in /services/idp [[#978](https://github.com/opencloud-eu/opencloud/pull/978)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.4.2 to 1.5.0 [[#977](https://github.com/opencloud-eu/opencloud/pull/977)]
+- build(deps-dev): bump cldr from 7.5.0 to 7.9.0 in /services/idp [[#975](https://github.com/opencloud-eu/opencloud/pull/975)]
+- build(deps): bump github.com/olekukonko/tablewriter from 1.0.6 to 1.0.7 [[#974](https://github.com/opencloud-eu/opencloud/pull/974)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc from 0.60.0 to 0.61.0 [[#915](https://github.com/opencloud-eu/opencloud/pull/915)]
+- build(deps): bump go.opentelemetry.io/contrib/zpages from 0.60.0 to 0.61.0 [[#938](https://github.com/opencloud-eu/opencloud/pull/938)]
+- build(deps): bump @testing-library/user-event from 14.5.2 to 14.6.1 in /services/idp [[#939](https://github.com/opencloud-eu/opencloud/pull/939)]
+- build(deps): bump i18next-browser-languagedetector from 7.2.1 to 8.1.0 in /services/idp [[#937](https://github.com/opencloud-eu/opencloud/pull/937)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp from 0.60.0 to 0.61.0 [[#923](https://github.com/opencloud-eu/opencloud/pull/923)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.11.3 to 2.11.4 [[#914](https://github.com/opencloud-eu/opencloud/pull/914)]
+- build(deps): bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc from 1.35.0 to 1.36.0 [[#907](https://github.com/opencloud-eu/opencloud/pull/907)]
+- build(deps): bump go.opentelemetry.io/otel/trace from 1.35.0 to 1.36.0 [[#906](https://github.com/opencloud-eu/opencloud/pull/906)]
+- build(deps): bump github.com/blevesearch/bleve/v2 from 2.5.0 to 2.5.1 [[#900](https://github.com/opencloud-eu/opencloud/pull/900)]
+- build(deps): bump axios from 1.7.7 to 1.8.2 in /services/idp [[#902](https://github.com/opencloud-eu/opencloud/pull/902)]
+- build(deps): bump github.com/opencloud-eu/libre-graph-api-go from 1.0.5 to 1.0.6 [[#899](https://github.com/opencloud-eu/opencloud/pull/899)]
+- build(deps): bump @types/node from 20.14.11 to 22.15.19 in /services/idp [[#886](https://github.com/opencloud-eu/opencloud/pull/886)]
+- build(deps-dev): bump i18next-conv from 14.1.0 to 15.1.1 in /services/idp [[#887](https://github.com/opencloud-eu/opencloud/pull/887)]
+- build(deps): bump golang.org/x/net from 0.39.0 to 0.40.0 [[#889](https://github.com/opencloud-eu/opencloud/pull/889)]
+- build(deps): bump github.com/olekukonko/tablewriter from 0.0.5 to 1.0.6 [[#888](https://github.com/opencloud-eu/opencloud/pull/888)]
+
 ## [2.3.0](https://github.com/opencloud-eu/opencloud/releases/tag/v2.3.0) - 2025-05-19
 
 ### ❤️ Thanks to all contributors! ❤️

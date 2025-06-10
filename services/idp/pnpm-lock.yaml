@@ -69,8 +69,8 @@ importers:
         specifier: https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz
         version: https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz(@gluejs/glue@0.3.0)(@material-ui/core@4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@material-ui/icons@4.11.3(@material-ui/core@4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(notistack@0.8.9(@material-ui/core@4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(oidc-client@1.11.5)(react-dom@17.0.2(react@17.0.2))(react-intl@2.9.0(prop-types@15.8.1)(react@17.0.2))(react@17.0.2)
       query-string:
-        specifier: ^9.1.1
-        version: 9.1.1
+        specifier: ^9.2.0
+        version: 9.2.0
       react:
         specifier: ^17.0.2
         version: 17.0.2
@@ -5040,8 +5040,8 @@ packages:
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
-  query-string@9.1.1:
-    resolution: {integrity: sha512-MWkCOVIcJP9QSKU52Ngow6bsAWAPlPK2MludXvcrS2bGZSl+T1qX9MZvRIkqUIkGLJquMJHWfsT6eRqUpp4aWg==}
+  query-string@9.2.0:
+    resolution: {integrity: sha512-YIRhrHujoQxhexwRLxfy3VSjOXmvZRd2nyw1PwL1UUqZ/ys1dEZd1+NSgXkne2l/4X/7OXkigEAuhTX0g/ivJQ==}
     engines: {node: '>=18'}
 
   queue-microtask@1.2.3:
@@ -11927,7 +11927,7 @@ snapshots:
 
   pure-rand@6.1.0: {}
 
-  query-string@9.1.1:
+  query-string@9.2.0:
     dependencies:
       decode-uri-component: 0.4.1
       filter-obj: 5.1.0

@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
+
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
-	registry "github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config/parser"
@@ -19,8 +23,6 @@ import (
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/http"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -68,9 +70,15 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if err := helpers.RegisterAppProvider(ctx, cfg, logger, gatewaySelector, appUrls); err != nil {
-				return err
-			}
+			ticker := time.NewTicker(cfg.CS3Api.APPRegistrationInterval)
+			defer ticker.Stop()
+			go func() {
+				for ; true; <-ticker.C {
+					if err := helpers.RegisterAppProvider(ctx, cfg, logger, gatewaySelector, appUrls); err != nil {
+						logger.Warn().Err(err).Msg("Failed to register app provider")
+					}
+				}
+			}()
 
 			st := store.Create(
 				store.Store(cfg.Store.Store),

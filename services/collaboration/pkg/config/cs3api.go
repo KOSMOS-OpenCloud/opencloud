@@ -1,12 +1,17 @@
 package config
 
-import "github.com/opencloud-eu/opencloud/pkg/shared"
+import (
+	"time"
+
+	"github.com/opencloud-eu/opencloud/pkg/shared"
+)
 
 // CS3Api defines the available configuration in order to access to the CS3 gateway.
 type CS3Api struct {
-	Gateway       Gateway               `yaml:"gateway"`
-	DataGateway   DataGateway           `yaml:"datagateway"`
-	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	Gateway                 Gateway               `yaml:"gateway"`
+	DataGateway             DataGateway           `yaml:"datagateway"`
+	GRPCClientTLS           *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
+	APPRegistrationInterval time.Duration         `yaml:"app_registration_interval" env:"COLLABORATION_CS3API_APP_REGISTRATION_INTERVAL" desc:"The interval at which the app provider registers itself." introductionVersion:"%%NEXT%%"`
 }
 
 // Gateway defines the available configuration for the CS3 API gateway

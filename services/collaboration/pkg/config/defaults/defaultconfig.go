@@ -65,6 +65,7 @@ func DefaultConfig() *config.Config {
 			DataGateway: config.DataGateway{
 				Insecure: false,
 			},
+			APPRegistrationInterval: 30 * time.Second,
 		},
 	}
 }

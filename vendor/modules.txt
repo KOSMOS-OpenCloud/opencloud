@@ -1849,6 +1849,9 @@ github.com/tchap/go-patricia/v2/patricia
 ## explicit
 github.com/test-go/testify/mock
 github.com/test-go/testify/require
+# github.com/theckman/yacspin v0.13.12
+## explicit; go 1.17
+github.com/theckman/yacspin
 # github.com/thejerf/suture/v4 v4.0.6
 ## explicit; go 1.9
 github.com/thejerf/suture/v4

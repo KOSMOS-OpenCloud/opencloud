@@ -36,7 +36,7 @@ type EntryInfo struct {
 	ParentID string
 }
 
-// PosixfsCommand is the entrypoint for the groups command.
+// PosixfsCommand is the entrypoint for the posixfs command.
 func PosixfsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "posixfs",

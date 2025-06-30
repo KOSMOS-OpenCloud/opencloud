@@ -1,5 +1,60 @@
 # Changelog
 
+## [3.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.1.0) - 2025-06-30
+
+### ❤️ Thanks to all contributors! ❤️
+
+@06kellyjac, @AlexAndBear, @Leander-Wendt, @ScharfViktor, @aduffeck, @fschade, @individual-it, @kulmann, @rhafer
+
+### ✨ Features
+
+- feat: adjust space template image to match brand color [[#1098](https://github.com/opencloud-eu/opencloud/pull/1098)]
+
+### ✅ Tests
+
+- enable user-settings e2e tests [[#1140](https://github.com/opencloud-eu/opencloud/pull/1140)]
+
+### 🐛 Bug Fixes
+
+- Only remove obsolete IDs from the index [[#1127](https://github.com/opencloud-eu/opencloud/pull/1127)]
+- fix: collabora use metrics instead of imperial metric system [[#1086](https://github.com/opencloud-eu/opencloud/pull/1086)]
+
+### 📚 Documentation
+
+- [full-ci] chore: bump web to v3.1.0 [[#1129](https://github.com/opencloud-eu/opencloud/pull/1129)]
+- Update the href of CONTRIBUTING to the dev docs [[#1077](https://github.com/opencloud-eu/opencloud/pull/1077)]
+- fix(docs): WEB_ASSET_PATH was still mentioned in the web readme [[#943](https://github.com/opencloud-eu/opencloud/pull/943)]
+- Fix link in CONTRIBUTING.md [[#1048](https://github.com/opencloud-eu/opencloud/pull/1048)]
+
+### 📈 Enhancement
+
+- feat: re-enable Save As and Export in collabora [[#1119](https://github.com/opencloud-eu/opencloud/pull/1119)]
+- Add a "posixfs consistency" command [[#1091](https://github.com/opencloud-eu/opencloud/pull/1091)]
+- feat: add accessibility url to theme.json files [[#1108](https://github.com/opencloud-eu/opencloud/pull/1108)]
+- cleanup: Avoid fetching group membership when not needed [[#1036](https://github.com/opencloud-eu/opencloud/pull/1036)]
+
+### 📦️ Dependencies
+
+- [decomposed] bump-version-v3.1.0 [[#1142](https://github.com/opencloud-eu/opencloud/pull/1142)]
+- build(deps): bump go.etcd.io/bbolt from 1.4.1 to 1.4.2 [[#1131](https://github.com/opencloud-eu/opencloud/pull/1131)]
+- [full-ci] chore:reva bump v.2.34 [[#1139](https://github.com/opencloud-eu/opencloud/pull/1139)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc from 0.61.0 to 0.62.0 [[#1122](https://github.com/opencloud-eu/opencloud/pull/1122)]
+- build(deps): bump go.opentelemetry.io/contrib/zpages from 0.61.0 to 0.62.0 [[#1123](https://github.com/opencloud-eu/opencloud/pull/1123)]
+- build(deps): bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc from 1.36.0 to 1.37.0 [[#1111](https://github.com/opencloud-eu/opencloud/pull/1111)]
+- build(deps): bump go.opentelemetry.io/otel from 1.36.0 to 1.37.0 [[#1112](https://github.com/opencloud-eu/opencloud/pull/1112)]
+- build(deps): bump github.com/go-chi/chi/v5 from 5.2.1 to 5.2.2 [[#1075](https://github.com/opencloud-eu/opencloud/pull/1075)]
+- build(deps): bump github.com/grpc-ecosystem/grpc-gateway/v2 from 2.26.3 to 2.27.0 [[#1072](https://github.com/opencloud-eu/opencloud/pull/1072)]
+- build(deps): bump github.com/jellydator/ttlcache/v3 from 3.3.0 to 3.4.0 [[#1071](https://github.com/opencloud-eu/opencloud/pull/1071)]
+- build(deps): bump github.com/urfave/cli/v2 from 2.27.6 to 2.27.7 [[#1061](https://github.com/opencloud-eu/opencloud/pull/1061)]
+- build(deps): bump github.com/KimMachineGun/automemlimit from 0.7.2 to 0.7.3 [[#1062](https://github.com/opencloud-eu/opencloud/pull/1062)]
+- Bump reva to pull in the latest fixes [[#1063](https://github.com/opencloud-eu/opencloud/pull/1063)]
+- build(deps): bump go.etcd.io/bbolt from 1.4.0 to 1.4.1 [[#1045](https://github.com/opencloud-eu/opencloud/pull/1045)]
+- build(deps): bump google.golang.org/grpc from 1.72.2 to 1.73.0 [[#1034](https://github.com/opencloud-eu/opencloud/pull/1034)]
+- build(deps): bump golang.org/x/net from 0.40.0 to 0.41.0 [[#1033](https://github.com/opencloud-eu/opencloud/pull/1033)]
+- build(deps-dev): bump jest from 29.7.0 to 30.0.0 in /services/idp [[#1040](https://github.com/opencloud-eu/opencloud/pull/1040)]
+- build(deps-dev): bump css-minimizer-webpack-plugin from 7.0.0 to 7.0.2 in /services/idp [[#1038](https://github.com/opencloud-eu/opencloud/pull/1038)]
+- build(deps): bump query-string from 9.1.1 to 9.2.0 in /services/idp [[#1031](https://github.com/opencloud-eu/opencloud/pull/1031)]
+
 ## [3.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.0.0) - 2025-06-10
 
 ### ❤️ Thanks to all contributors! ❤️

@@ -69,6 +69,10 @@ if [[ $(uname -s) == "Darwin" && $(uname -m) == "arm64" ]]; then
     dlarch="arm64"
 fi
 
+if [[ $(uname -s) == "Linux" && $(uname -m) == "aarch64" ]]; then
+    dlarch="arm64"
+fi
+
 # ...results in the download file
 dlfile="opencloud-${dlversion}-${os}-${dlarch}"
 

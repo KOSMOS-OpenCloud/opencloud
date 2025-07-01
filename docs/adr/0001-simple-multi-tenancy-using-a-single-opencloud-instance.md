@@ -24,13 +24,13 @@ To further limit the scope there are a couple of constraints:
 
 - Tenants are rather small (sometimes just a single user, often less than 10)
 - There is just a single IDP with a single "realm".
-- The user-management is external to OpenCloud. There is no tenant-specific adminstrator
-  that can add/delete users.
+- The user-management is external to OpenCloud
 - The membership of a user to a tenant is represented by a tenant id
   that is provided via a claim in the users' Access Token/UserInfo or by a per User
   Attribute in the LDAP directory.
 - There is no need to support per tenant groups
 - There is no need to isolate the storage of the tenants from each other
+- Role Assignment happens at first login via OIDC claims
 
 ## Decision Drivers
 
@@ -39,7 +39,6 @@ To further limit the scope there are a couple of constraints:
 * Implementation effort: The solution should be easy to implement and maintain.
 * Security: The solution should prevent users from seeing or accessing anything
   from other tenants.
-
 
 ## Considered Options
 
@@ -53,7 +52,7 @@ is extended by a new property "tenantId".
 * Everywhere the UserID is used the tenant id is also available.
   * This might allow implementing more sophisticated checks e.g. on permission
     grants and to a certain extend during share creation.
-  * the tenant id is immediately available e.g. in Events/Auditlog without an addtional
+  * the tenant id is immediately available e.g. in Events/Auditlog without an additional
     user lookup
 
 #### Cons:
@@ -63,7 +62,7 @@ is extended by a new property "tenantId".
   opaque identifier without carrying and specific semantics other than being
   globally unique.
 * on the GraphAPI the ID of a User is just a opaque string without any additional
-  meaning. (Currently it is just using the `OpqueId` property of the CS3 UserId,
+  meaning. (Currently it is just using the `OpaqueId` property of the CS3 UserId,
   without considering the `idp` property.)
 
 ### Option 2: Tenant ID is stored as the `idp` value of the CS3 UserId
@@ -134,31 +133,19 @@ switch to only allow users to search for users that are part of the same group.
 
 ## Decision Outcome
 
+### Chosen option: Option 1 - Tenant ID as a new property of the CS3 UserId
+
 As part of the OIDC Connect Authentication OpenCloud will receive a tenant id via the
-Access Token or Userinfo endpoint. When no shared LDAP server is available
-OpenCloud will store the tenant id as part of the autoprovionsing process.
-Either as via a per-tenant subtree (e.g. 'ou=tenantid,dc=example,dc=com') or as
-an addtional user attribute. When a shared LDAP server is available the tenant
-id must be available there either as a separate attribute of the user or as
-part of the DN (i.e. separate per tenant subtrees).
+Access Token or Userinfo endpoint. For the initial implementation it is assume that OpenCloud
+has read access to a shared LDAP server, that contains all users of all tenants. Users in
+LDAP will have a the tenant id as an dedicated attribute.
 
-More details TBD. Depending on which option we choose from the above list.
+### Implementation Steps
 
-~~The CS3 API needs to be extended to support the tenant id. This will require adding a new
-(optional if possible) field to the User Object (or the UserId inside the User Object). When requesting
-users reva needs to assure that only user objects of the same tenant as the requesting user are
-returned.~~
-
-When creating a share there is a check in place that verifies that the sharer
-and all sharees are part of the same tenant.
-
-
-### Positive Consequences:
-
-* All opencloud service are shared by all tenants, no per-tenant service required
-* little changes to the internal APIs
-
-### Negative consequences:
-
-* no clear data separation
+* Extend the CS3 UserId with a new property "tenantId"
+* Adapt the `users` service` to only return users that are part of the same tenant
+* To cleanup technical debt and reduce code duplication the `cs3` users backend in the
+  graph service is being improved so that is can fully replace the `LDAP` users backend for
+  read operations.
+* The reva `share-provider` service only allow shares between users of the same tenant
 

@@ -1114,7 +1114,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/open-policy-agent/opa v1.5.1
+# github.com/open-policy-agent/opa v1.6.0
 ## explicit; go 1.23.8
 github.com/open-policy-agent/opa/ast
 github.com/open-policy-agent/opa/ast/json
@@ -1889,7 +1889,7 @@ github.com/unrolled/secure/cspbuilder
 # github.com/urfave/cli/v2 v2.27.7
 ## explicit; go 1.18
 github.com/urfave/cli/v2
-# github.com/vektah/gqlparser/v2 v2.5.26
+# github.com/vektah/gqlparser/v2 v2.5.28
 ## explicit; go 1.22
 github.com/vektah/gqlparser/v2/ast
 github.com/vektah/gqlparser/v2/gqlerror

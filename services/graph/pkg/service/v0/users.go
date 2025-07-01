@@ -20,6 +20,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
@@ -31,7 +32,6 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/status"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 )
 
 // GetMe implements the Service interface.
@@ -183,7 +183,7 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions, nil)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get personal drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -546,7 +546,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			} else {
 				expandPermissions = expandDrivesPermissions
 			}
-			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, APIVersion_1, expandPermissions)
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, APIVersion_1, expandPermissions, nil)
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
 				continue
@@ -577,7 +577,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	
+
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
 	if !ctxHasFullPerms && !g.config.API.ShowUserEmailInResults {
 		user.Mail = nil

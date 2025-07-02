@@ -332,7 +332,7 @@ github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
 github.com/crewjam/saml/xmlenc
-# github.com/cs3org/go-cs3apis v0.0.0-20250218144737-544dd3919658
+# github.com/cs3org/go-cs3apis v0.0.0-20250218144737-544dd3919658 => github.com/dragonchaser/go-cs3apis v0.0.0-20250702131306-ab0c559c937c
 ## explicit; go 1.21
 github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1
@@ -2478,3 +2478,4 @@ stash.kopano.io/kgol/rndm
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a
+# github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20250702131306-ab0c559c937c

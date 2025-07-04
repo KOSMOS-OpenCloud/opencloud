@@ -806,7 +806,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	if _, ok := fieldMask["hasTrashedItems"]; ok {
-		drive.HasTrashedItems = &space.HasTrashedItems
+		drive.LibreGraphHasTrashedItems = &space.HasTrashedItems
 	}
 
 	if space.SpaceType == _spaceTypeMountpoint {

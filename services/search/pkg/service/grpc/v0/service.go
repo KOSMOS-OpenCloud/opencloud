@@ -13,7 +13,6 @@ import (
 	"github.com/jellydator/ttlcache/v2"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/errtypes"
-	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/token"
 	"github.com/opencloud-eu/reva/v2/pkg/token/manager/jwt"
@@ -79,23 +78,10 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig{
-		Endpoint:             cfg.Events.Endpoint,
-		Cluster:              cfg.Events.Cluster,
-		EnableTLS:            cfg.Events.EnableTLS,
-		TLSInsecure:          cfg.Events.TLSInsecure,
-		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
-		AuthUsername:         cfg.Events.AuthUsername,
-		AuthPassword:         cfg.Events.AuthPassword,
-	})
-	if err != nil {
-		return nil, teardown, err
-	}
-
 	ss := search.NewService(selector, eng, extractor, logger, cfg)
 
 	// setup event handling
-	if err := search.HandleEvents(ss, bus, logger, cfg); err != nil {
+	if err := search.HandleEvents(ss, cfg, logger); err != nil {
 		return nil, teardown, err
 	}
 

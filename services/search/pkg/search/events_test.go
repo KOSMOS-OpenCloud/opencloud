@@ -25,11 +25,11 @@ var _ = DescribeTable("events",
 
 		bus, _ := mEvents.NewStream()
 
-		search.HandleEvents(s, bus, log.NewLogger(), &config.Config{
+		search.HandleEvents(s, &config.Config{
 			Events: config.Events{
 				AsyncUploads: asyncUploads,
 			},
-		})
+		}, log.NewLogger())
 
 		for _, mck := range mcks {
 			s.On(mck, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {

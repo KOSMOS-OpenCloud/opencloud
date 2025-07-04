@@ -251,7 +251,7 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion, expandPermissions)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion, expandPermissions, getFieldMask(odataReq))
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
@@ -289,7 +289,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With().Str("url", webDavBaseURL.String()).Logger()
 
-	_, expandPermissions, err := parseDriveRequest(r)
+	odataReq, expandPermissions, err := parseDriveRequest(r)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
 		errorcode.RenderError(w, r, err)
@@ -322,7 +322,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1, expandPermissions, getFieldMask(odataReq))
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -480,7 +480,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, false)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, false, nil)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -648,7 +648,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1, false)
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1, false, nil)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -659,7 +659,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool) ([]*libregraph.Drive, error) {
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool, fieldMask map[string]struct{}) ([]*libregraph.Drive, error) {
 	errg, ctx := errgroup.WithContext(ctx)
 	work := make(chan *storageprovider.StorageSpace, len(storageSpaces))
 	results := make(chan *libregraph.Drive, len(storageSpaces))
@@ -689,7 +689,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 					// skip OCM shares they are no supposed to show up in the drives list
 					continue
 				}
-				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion, expandPermissions)
+				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion, expandPermissions, fieldMask)
 				if err != nil {
 					return err
 				}
@@ -773,7 +773,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool) (*libregraph.Drive, error) {
+func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool, fieldMask map[string]struct{}) (*libregraph.Drive, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	if space.Root == nil {
 		logger.Error().Msg("unable to parse space: space has no root")
@@ -790,13 +790,17 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		Name: space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
-		// we currently always expandt the root because it carries the deleted property that indiccates if a space is trashed
+		// we currently always expand the root because it carries the deleted property that indicates if a space is trashed
 		Root: &libregraph.DriveItem{
 			Id: libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
 		},
 	}
 	if expandPermissions {
 		drive.Root.Permissions, _ = g.cs3SpacePermissionsToLibreGraph(ctx, space, false, apiVersion)
+	}
+
+	if _, ok := fieldMask["hasTrashedItems"]; ok {
+		drive.LibreGraphHasTrashedItems = &space.HasTrashedItems
 	}
 
 	if space.SpaceType == _spaceTypeMountpoint {
@@ -1174,4 +1178,16 @@ func validateSpaceName(name string) error {
 	}
 
 	return nil
+}
+
+func getFieldMask(odataReq *godata.GoDataRequest) map[string]struct{} {
+	fieldMask := map[string]struct{}{}
+	if odataReq != nil && odataReq.Query.Select != nil && len(odataReq.Query.Select.SelectItems) > 0 {
+		for _, item := range odataReq.Query.Select.SelectItems {
+			for _, token := range item.Segments {
+				fieldMask[token.Value] = struct{}{}
+			}
+		}
+	}
+	return fieldMask
 }

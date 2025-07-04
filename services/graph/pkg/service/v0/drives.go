@@ -480,13 +480,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	odataReq, _, err := parseDriveRequest(r)
-	if err != nil {
-		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
-		return
-	}
-
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, false, getFieldMask(odataReq))
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1, false, nil)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())

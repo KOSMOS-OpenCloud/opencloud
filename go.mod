@@ -63,8 +63,8 @@ require (
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
 	github.com/open-policy-agent/opa v1.6.0
-	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250603072916-fa601fb14450
-	github.com/opencloud-eu/reva/v2 v2.34.0
+	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250703062332-6dc201fd7bf1
+	github.com/opencloud-eu/reva/v2 v2.34.1-0.20250704134423-74abc5f04717
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
@@ -355,7 +355,3 @@ replace go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.202411151126
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a
-
-replace github.com/cs3org/go-cs3apis => github.com/dragonchaser/go-cs3apis v0.0.0-20250702131306-ab0c559c937c
-
-replace github.com/opencloud-eu/reva/v2 => github.com/dragonchaser/reva/v2 v2.0.0-20250702132606-9a9316045a1a

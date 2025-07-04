@@ -281,8 +281,6 @@ github.com/dlclark/regexp2 v1.4.0 h1:F1rxgk7p4uKjwIQxBs9oAXe5CqrXlCduYEJvrF4u93E
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/dnsimple/dnsimple-go v0.63.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
-github.com/dragonchaser/reva/v2 v2.0.0-20250704073728-ba915c60abf9 h1:v5HDeqlYHRTeu6eI/C91ddKQfuGFbolAPu3hGHHI9ag=
-github.com/dragonchaser/reva/v2 v2.0.0-20250704073728-ba915c60abf9/go.mod h1:hSIUWU8JUaX+y0cVjbh6VaW6Mh0uJ/azFPx5cSVhQfc=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e h1:rcHHSQqzCgvlwP0I/fQ8rQMn/MpHE5gWSLdtpxtP6KQ=
@@ -870,6 +868,8 @@ github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-202505121527
 github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a/go.mod h1:pjcozWijkNPbEtX5SIQaxEW/h8VAVZYTLx+70bmB3LY=
 github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250703062332-6dc201fd7bf1 h1:DNJ5mJdEKguSXSTeSBRG5yBZO8FnmWibAc6MlXbRxfc=
 github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20250703062332-6dc201fd7bf1/go.mod h1:pzatilMEHZFT3qV7C/X3MqOa3NlRQuYhlRhZTL+hN6Q=
+github.com/opencloud-eu/reva/v2 v2.34.1-0.20250704134423-74abc5f04717 h1:khqL0AenfN0vt6oXgvbqH4UIuJk+2+oxWSJKcal4GYQ=
+github.com/opencloud-eu/reva/v2 v2.34.1-0.20250704134423-74abc5f04717/go.mod h1:hSIUWU8JUaX+y0cVjbh6VaW6Mh0uJ/azFPx5cSVhQfc=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/opentracing/opentracing-go v1.2.0 h1:uEJPy/1a5RIPAJ0Ov+OIO8OxWu77jEv+1B0VhjKrZUs=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=

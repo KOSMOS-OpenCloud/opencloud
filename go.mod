@@ -14,7 +14,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.5.2
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.14.1
-	github.com/cs3org/go-cs3apis v0.0.0-20250218144737-544dd3919658
+	github.com/cs3org/go-cs3apis v0.0.0-20250703154118-810365dec814
 	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e

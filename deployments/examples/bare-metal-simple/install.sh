@@ -58,14 +58,15 @@ mkdir ${sandbox} && cd ${sandbox}
 # The operating system
 os="linux"
 
-if [[ $OSTYPE == 'darwin'* ]]; then
+if [[ "$OSTYPE" == 'darwin'* ]]; then
   os="darwin"
 fi
 
 # The platform
 dlarch="amd64"
 
-if [[ $(uname -s) == "Darwin" && $(uname -m) == "arm64" ]]; then
+if [[ ( "$(uname -s)" == "Darwin" && "$(uname -m)" == "arm64" ) ||
+      ( "$(uname -s)" == "Linux"  && "$(uname -m)" == "aarch64" ) ]]; then
     dlarch="arm64"
 fi
 

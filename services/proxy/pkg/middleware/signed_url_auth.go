@@ -254,7 +254,6 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 		return nil, false
 	}
 
-	// TODO: set user in context
 	m.Logger.Debug().
 		Str("authenticator", "signed_url").
 		Str("path", r.URL.Path).

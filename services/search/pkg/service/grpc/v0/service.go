@@ -98,7 +98,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
-	if err := search.HandleEvents(ss, stream, cfg, logger); err != nil {
+	if err := search.HandleEvents(ss, stream, cfg, options.Metrics, logger); err != nil {
 		return nil, teardown, err
 	}
 

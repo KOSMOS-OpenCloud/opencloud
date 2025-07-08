@@ -79,7 +79,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	ss := search.NewService(selector, eng, extractor, logger, cfg)
+	ss := search.NewService(selector, eng, extractor, options.Metrics, logger, cfg)
 
 	// setup event handling
 

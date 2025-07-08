@@ -127,7 +127,7 @@ func monitorMetrics(stream raw.Stream, name string, m *metrics.Metrics, logger l
 			m.EventsOutstandingAcks.Set(float64(info.NumAckPending))
 			m.EventsUnprocessed.Set(float64(info.NumPending))
 			m.EventsRedelivered.Set(float64(info.NumRedelivered))
-			logger.Debug().Msg("updated event metrics")
+			logger.Trace().Msg("updated search event metrics")
 		}
 	}()
 }

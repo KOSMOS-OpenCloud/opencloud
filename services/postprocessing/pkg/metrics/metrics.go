@@ -22,6 +22,7 @@ type Metrics struct {
 	EventsRedelivered     prometheus.Gauge
 	InProgress            prometheus.Gauge
 	Finished              *prometheus.CounterVec
+	Duration              *prometheus.HistogramVec
 }
 
 // New initializes the available metrics.
@@ -62,6 +63,13 @@ func New() *Metrics {
 			Subsystem: Subsystem,
 			Name:      "finished",
 			Help:      "Number of finished postprocessing events",
+		}, []string{"status"}),
+		Duration: promauto.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: Namespace,
+			Subsystem: Subsystem,
+			Name:      "duration_seconds",
+			Help:      "Duration of postprocessing operations in seconds",
+			Buckets:   []float64{0.1, 0.5, 1, 2.5, 5, 10, 30, 60, 120, 300, 600, 1200},
 		}, []string{"status"}),
 	}
 

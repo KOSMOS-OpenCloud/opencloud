@@ -157,6 +157,7 @@ func (pps *PostprocessingService) processEvent(e raw.Event) error {
 			Steps:             pps.steps,
 			InitiatorID:       e.InitiatorID,
 			ImpersonatingUser: ev.ImpersonatingUser,
+			StartTime:         time.Now(),
 		}
 		pps.metrics.InProgress.Inc()
 		next = pp.Init(ev)
@@ -210,19 +211,26 @@ func (pps *PostprocessingService) processEvent(e raw.Event) error {
 		})
 	case events.UploadReady:
 		pps.metrics.InProgress.Dec()
+		// the upload failed - let's keep it around for a while - but mark it as finished
+		pp, err = pps.getPP(pps.store, ev.UploadID)
+		if err != nil {
+			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
+			return fmt.Errorf("%w: cannot get upload", ErrEvent)
+		}
+
 		if ev.Failed {
 			pps.metrics.Finished.WithLabelValues("failed", string(pp.Status.Outcome)).Inc()
-			// the upload failed - let's keep it around for a while - but mark it as finished
-			pp, err = pps.getPP(pps.store, ev.UploadID)
-			if err != nil {
-				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
-				return fmt.Errorf("%w: cannot get upload", ErrEvent)
+			if !pp.StartTime.IsZero() {
+				pps.metrics.Duration.WithLabelValues("failed").Observe(time.Since(pp.StartTime).Seconds())
 			}
 			pp.Finished = true
 			return storePP(pps.store, pp)
 		}
 
 		pps.metrics.Finished.WithLabelValues("succeeded").Inc()
+		if !pp.StartTime.IsZero() {
+			pps.metrics.Duration.WithLabelValues("succeeded").Observe(time.Since(pp.StartTime).Seconds())
+		}
 		// the storage provider thinks the upload is done - so no need to keep it any more
 		if err := pps.store.Delete(ev.UploadID); err != nil {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot delete upload")

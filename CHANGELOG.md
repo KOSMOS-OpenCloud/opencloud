@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.4](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.4) - 2025-07-11
+
+### ❤️ Thanks to all contributors! ❤️
+
+@micbar
+
+### 🐛 Bug Fixes
+
+- [Backport] fix: build_args is now an object [[#1213](https://github.com/opencloud-eu/opencloud/pull/1213)]
+
 ## [2.0.3](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.3) - 2025-07-10
 
 ### ❤️ Thanks to all contributors! ❤️

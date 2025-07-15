@@ -41,6 +41,8 @@ func HandleEvents(s Searcher, cfg *config.Config, logger log.Logger) error {
 		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
 		AuthUsername:         cfg.Events.AuthUsername,
 		AuthPassword:         cfg.Events.AuthPassword,
+		MaxAckPending:        cfg.Events.MaxAckPending,
+		AckWait:              cfg.Events.AckWait,
 	})
 	if err != nil {
 		return err

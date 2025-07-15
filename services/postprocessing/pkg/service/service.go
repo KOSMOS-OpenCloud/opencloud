@@ -43,7 +43,16 @@ var (
 
 // NewPostprocessingService returns a new instance of a postprocessing service
 func NewPostprocessingService(ctx context.Context, logger log.Logger, sto store.Store, tp trace.TracerProvider, cfg *config.Config) (*PostprocessingService, error) {
-	pub, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Postprocessing.Events))
+	pub, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig{
+		Endpoint:             cfg.Postprocessing.Events.Endpoint,
+		Cluster:              cfg.Postprocessing.Events.Cluster,
+		EnableTLS:            cfg.Postprocessing.Events.EnableTLS,
+		TLSInsecure:          cfg.Postprocessing.Events.TLSInsecure,
+		TLSRootCACertificate: cfg.Postprocessing.Events.TLSRootCACertificate,
+		AuthUsername:         cfg.Postprocessing.Events.AuthUsername,
+		AuthPassword:         cfg.Postprocessing.Events.AuthPassword,
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +64,8 @@ func NewPostprocessingService(ctx context.Context, logger log.Logger, sto store.
 		TLSRootCACertificate: cfg.Postprocessing.Events.TLSRootCACertificate,
 		AuthUsername:         cfg.Postprocessing.Events.AuthUsername,
 		AuthPassword:         cfg.Postprocessing.Events.AuthPassword,
+		MaxAckPending:        cfg.Postprocessing.Events.MaxAckPending,
+		AckWait:              cfg.Postprocessing.Events.AckWait,
 	})
 
 	evs, err := raw.Consume("postprocessing-pull",

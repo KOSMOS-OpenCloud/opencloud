@@ -1,7 +1,6 @@
 package search
 
 import (
-	"context"
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -14,7 +13,7 @@ import (
 
 // HandleEvents listens to the needed events,
 // it handles the whole resource indexing livecycle.
-func HandleEvents(s Searcher, cfg *config.Config, logger log.Logger) error {
+func HandleEvents(s Searcher, stream raw.Stream, cfg *config.Config, logger log.Logger) error {
 	evts := []events.Unmarshaller{
 		events.ItemTrashed{},
 		events.ItemRestored{},
@@ -33,21 +32,10 @@ func HandleEvents(s Searcher, cfg *config.Config, logger log.Logger) error {
 		evts = append(evts, events.FileUploaded{})
 	}
 
-	stream, err := raw.FromConfig(context.Background(), cfg.Service.Name, raw.Config{
-		Endpoint:             cfg.Events.Endpoint,
-		Cluster:              cfg.Events.Cluster,
-		EnableTLS:            cfg.Events.EnableTLS,
-		TLSInsecure:          cfg.Events.TLSInsecure,
-		TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
-		AuthUsername:         cfg.Events.AuthUsername,
-		AuthPassword:         cfg.Events.AuthPassword,
-		MaxAckPending:        cfg.Events.MaxAckPending,
-		AckWait:              cfg.Events.AckWait,
-	})
+	ch, err := stream.Consume("search-pull", evts...)
 	if err != nil {
 		return err
 	}
-	ch, err := stream.Consume("search-pull", evts...)
 
 	if cfg.Events.NumConsumers == 0 {
 		cfg.Events.NumConsumers = 1

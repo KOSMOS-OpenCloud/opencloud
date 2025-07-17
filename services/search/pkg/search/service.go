@@ -92,6 +92,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	startTime := time.Now()
 	success := false
 	defer func() {
+		if s.metrics == nil {
+			return
+		}
+
 		status := "success"
 		if !success {
 			status = "error"
@@ -444,6 +448,9 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	startTime := time.Now()
 	success := false
 	defer func() {
+		if s.metrics == nil {
+			return
+		}
 		status := "success"
 		if !success {
 			status = "error"

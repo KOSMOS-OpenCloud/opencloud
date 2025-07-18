@@ -219,7 +219,7 @@ func (pps *PostprocessingService) processEvent(e raw.Event) error {
 		}
 
 		if ev.Failed {
-			pps.metrics.Finished.WithLabelValues("failed", string(pp.Status.Outcome)).Inc()
+			pps.metrics.Finished.WithLabelValues("failed").Inc()
 			if !pp.StartTime.IsZero() {
 				pps.metrics.Duration.WithLabelValues("failed").Observe(time.Since(pp.StartTime).Seconds())
 			}

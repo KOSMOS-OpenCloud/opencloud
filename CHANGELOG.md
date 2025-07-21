@@ -1,5 +1,51 @@
 # Changelog
 
+## [3.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.2.0) - 2025-07-21
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @JammingBen, @ScharfViktor, @Svanvith, @aduffeck, @butonic, @dragonchaser, @fschade, @individual-it, @jnweiger, @micbar, @rhafer
+
+### ✨ Features
+
+- Metrics [[#1242](https://github.com/opencloud-eu/opencloud/pull/1242)]
+- Add `HasTrashedItems` property to /me/drives endpoint [[#1163](https://github.com/opencloud-eu/opencloud/pull/1163)]
+
+### 📈 Enhancement
+
+- [full-ci] chore: bump web to v3.2.0 [[#1253](https://github.com/opencloud-eu/opencloud/pull/1253)]
+- proxy(sign_url_auth): Allow to verify server signed URLs [[#1191](https://github.com/opencloud-eu/opencloud/pull/1191)]
+- Switch to the raw nats consumer instead of the go-micro events [[#1171](https://github.com/opencloud-eu/opencloud/pull/1171)]
+- change: adjust default values for the S3 Uploads [[#1224](https://github.com/opencloud-eu/opencloud/pull/1224)]
+- feat(web): add dark mode and adjust light theme colors [[#1188](https://github.com/opencloud-eu/opencloud/pull/1188)]
+- change: set better decomposedS3 defaults for multipart upload [[#1200](https://github.com/opencloud-eu/opencloud/pull/1200)]
+- add missing full username mapper to the full example [[#1181](https://github.com/opencloud-eu/opencloud/pull/1181)]
+
+### 🐛 Bug Fixes
+
+- fix ready checks [[#1222](https://github.com/opencloud-eu/opencloud/pull/1222)]
+- Update config.go [[#1183](https://github.com/opencloud-eu/opencloud/pull/1183)]
+- Fix wrong build version [[#1210](https://github.com/opencloud-eu/opencloud/pull/1210)]
+- Update Makefile [[#1187](https://github.com/opencloud-eu/opencloud/pull/1187)]
+- fix(collaboration): re register app providers in a configurable interval [[#1035](https://github.com/opencloud-eu/opencloud/pull/1035)]
+- Fix lico idp doesn't load opencloud font anymore [[#1153](https://github.com/opencloud-eu/opencloud/pull/1153)]
+
+### 📦️ Dependencies
+
+- [full-ci] Reva bump 2.35.0 [[#1255](https://github.com/opencloud-eu/opencloud/pull/1255)]
+- build(deps): bump golang.org/x/net from 0.41.0 to 0.42.0 [[#1232](https://github.com/opencloud-eu/opencloud/pull/1232)]
+- build(deps): bump github.com/KimMachineGun/automemlimit from 0.7.3 to 0.7.4 [[#1226](https://github.com/opencloud-eu/opencloud/pull/1226)]
+- build(deps): bump golang.org/x/text from 0.26.0 to 0.27.0 [[#1227](https://github.com/opencloud-eu/opencloud/pull/1227)]
+- build(deps): bump golang.org/x/sync from 0.15.0 to 0.16.0 [[#1209](https://github.com/opencloud-eu/opencloud/pull/1209)]
+- build(deps): bump golang.org/x/term from 0.32.0 to 0.33.0 [[#1208](https://github.com/opencloud-eu/opencloud/pull/1208)]
+- build(deps): bump github.com/olekukonko/tablewriter from 1.0.7 to 1.0.8 [[#1174](https://github.com/opencloud-eu/opencloud/pull/1174)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.11.5 to 2.11.6 [[#1164](https://github.com/opencloud-eu/opencloud/pull/1164)]
+- build(deps): bump github.com/go-playground/validator/v10 from 10.26.0 to 10.27.0 [[#1165](https://github.com/opencloud-eu/opencloud/pull/1165)]
+- build(deps): bump github.com/pkg/xattr from 0.4.11 to 0.4.12 [[#1156](https://github.com/opencloud-eu/opencloud/pull/1156)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp from 0.61.0 to 0.62.0 [[#1155](https://github.com/opencloud-eu/opencloud/pull/1155)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.5.1 to 1.6.0 [[#1148](https://github.com/opencloud-eu/opencloud/pull/1148)]
+- build(deps): bump github.com/oklog/run from 1.1.0 to 1.2.0 [[#1150](https://github.com/opencloud-eu/opencloud/pull/1150)]
+
 ## [3.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.1.0) - 2025-06-30
 
 ### ❤️ Thanks to all contributors! ❤️

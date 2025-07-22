@@ -2,50 +2,25 @@ package svc
 
 import (
 	"fmt"
-	"github.com/CiscoM31/godata"
+	"net/http"
+	"strings"
+
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/go-chi/render"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
-	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail"
-	"github.com/opencloud-eu/reva/v2/pkg/signedurl"
-	"net/http"
-	"slices"
-	"time"
 
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
 type driveItemsByResourceID map[string]libregraph.DriveItem
 
-// parseShareByMeRequest parses the odata request and returns the parsed request and a boolean indicating if the request should expand thumbnails.
-func parseShareByMeRequest(r *http.Request) (*godata.GoDataRequest, bool, error) {
-	odataReq, err := godata.ParseRequest(r.Context(), sanitizePath(r.URL.Path, APIVersion_1), r.URL.Query())
-	if err != nil {
-		return nil, false, errorcode.New(errorcode.InvalidRequest, err.Error())
-	}
-	exp, err := odata.GetExpandValues(odataReq.Query)
-	if err != nil {
-		return nil, false, errorcode.New(errorcode.InvalidRequest, err.Error())
-	}
-	expandThumbnails := slices.Contains(exp, "thumbnails")
-	return odataReq, expandThumbnails, nil
-}
-
 // GetSharedByMe implements the Service interface (/me/drives/sharedByMe endpoint)
 func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 	g.logger.Debug().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	_, expandThumbnails, err := parseShareByMeRequest(r)
-	if err != nil {
-		errorcode.RenderError(w, r, err)
-		return
-	}
-	fmt.Println("expandThumbnails:", expandThumbnails)
-
-	driveItems := make(driveItemsByResourceID)
-	driveItems, err = g.listUserShares(ctx, nil, driveItems)
+	driveItems, err := g.listUserShares(ctx, nil, make(driveItemsByResourceID))
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -65,6 +40,8 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	expand := r.URL.Query().Get("$expand")
+	expandThumbnails := strings.Contains(expand, "thumbnails")
 	if expandThumbnails {
 		for k, item := range driveItems {
 			mt := item.GetFile().MimeType
@@ -72,32 +49,26 @@ func (g Graph) GetSharedByMe(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-			signer, err := signedurl.NewJWTSignedURL(signedurl.WithSecret("abcde"))
-			if err != nil {
-				panic("failed to create signer")
-			}
-
 			_, match := thumbnail.SupportedMimeTypes[*mt]
 			if match {
-				signedURL, err := signer.Sign("https://localhost:9200/", item.GetId(), 30*time.Minute)
-				if err != nil {
-					g.logger.Error().Err(err).Msg("Failed to get thumbnail URL")
-					continue
-				}
-				t := libregraph.NewThumbnail()
-				t.SetUrl(signedURL)
+				baseUrl := fmt.Sprintf("%s/dav/spaces/%s?scalingup=0&preview=1&processor=thumbnail",
+					g.config.Commons.OpenCloudURL,
+					item.GetId())
+				smallUrl := baseUrl + "&x=36&y=36"
+				mediumUrl := baseUrl + "&x=48&y=48"
+				largeUrl := baseUrl + "&x=96&y=96"
+
 				item.SetThumbnails([]libregraph.ThumbnailSet{
 					{
-						Small:  t,
-						Medium: t,
-						Large:  t,
+						Small:  &libregraph.Thumbnail{Url: &smallUrl},
+						Medium: &libregraph.Thumbnail{Url: &mediumUrl},
+						Large:  &libregraph.Thumbnail{Url: &largeUrl},
 					},
 				})
 
 				driveItems[k] = item // assign modified item back to the map
 			}
 		}
-
 	}
 
 	res := make([]libregraph.DriveItem, 0, len(driveItems))

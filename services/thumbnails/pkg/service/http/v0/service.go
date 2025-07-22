@@ -3,9 +3,7 @@ package svc
 import (
 	"context"
 	"fmt"
-	"github.com/opencloud-eu/reva/v2/pkg/signedurl"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -67,7 +65,6 @@ func NewService(opts ...Option) Service {
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(svc.TransferTokenValidator)
-		r.Use(svc.SignedUrlValidator)
 		r.Get("/data", svc.GetThumbnail)
 	})
 
@@ -115,37 +112,6 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 			Str("key", key).
 			Msg("could not write the thumbnail response")
 	}
-}
-
-func (s Thumbnails) SignedUrlValidator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		u, err := url.Parse(r.URL.String())
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		signer, err := signedurl.NewJWTSignedURL(signedurl.WithSecret("abcde"))
-		if err != nil {
-			panic("failed to create signer")
-		}
-
-		sig := u.Query().Get("oc-jwt-sig")
-		if sig == "" {
-			next.ServeHTTP(w, r)
-		}
-
-		_, err = signer.Verify(u.String())
-		if err == nil {
-			// the signature is valid
-			next.ServeHTTP(w, r)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-		}
-
-		// TODO: make sure that one of the validator validated
-		// TODO: log errors
-	})
 }
 
 // TransferTokenValidator validates a transfer token

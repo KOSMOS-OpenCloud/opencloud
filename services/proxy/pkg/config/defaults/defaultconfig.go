@@ -185,7 +185,7 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Type:     config.QueryRoute,
-					Endpoint: "(/remote.php)?/?preview=1",
+					Endpoint: "/remote.php/?preview=1",
 					Service:  "eu.opencloud.web.webdav",
 				},
 				// TODO the actual REPORT goes to /dav/files/{username}, which is user specific ... how would this work in a spaces world?

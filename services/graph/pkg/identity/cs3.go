@@ -10,12 +10,12 @@ import (
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/odata"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 )
 
 var (
@@ -167,7 +167,7 @@ func (i *CS3) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 
 // CreateGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
-	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+	return nil, errNotImplemented
 }
 
 // GetGroup implements the Backend Interface.
@@ -202,25 +202,25 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Value
 
 // DeleteGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) DeleteGroup(ctx context.Context, id string) error {
-	return errorcode.New(errorcode.NotSupported, "not implemented")
+	return errNotImplemented
 }
 
 // UpdateGroupName implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) UpdateGroupName(ctx context.Context, groupID string, groupName string) error {
-	return errorcode.New(errorcode.NotSupported, "not implemented")
+	return errNotImplemented
 }
 
 // GetGroupMembers implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) GetGroupMembers(ctx context.Context, groupID string, _ *godata.GoDataRequest) ([]*libregraph.User, error) {
-	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+	return nil, errNotImplemented
 }
 
 // AddMembersToGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error {
-	return errorcode.New(errorcode.NotSupported, "not implemented")
+	return errNotImplemented
 }
 
 // RemoveMemberFromGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
-	return errorcode.New(errorcode.NotSupported, "not implemented")
+	return errNotImplemented
 }

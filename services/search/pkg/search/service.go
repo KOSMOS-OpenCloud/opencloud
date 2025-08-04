@@ -41,6 +41,7 @@ const (
 	_spaceTypeProject    = "project"
 	_spaceTypeGrant      = "grant"
 	_slowQueryDuration   = 500 * time.Millisecond
+	_batchSize           = 500
 )
 
 // Searcher is the interface to the SearchService
@@ -459,6 +460,12 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	}()
 
 	w := walker.NewWalker(s.gatewaySelector)
+	s.engine.StartBatch(_batchSize)
+	defer func() {
+		if err := s.engine.EndBatch(); err != nil {
+			s.logger.Error().Err(err).Msg("failed to end batch")
+		}
+	}()
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			s.logger.Error().Err(err).Msg("error walking the tree")

@@ -41,7 +41,6 @@ const (
 	_spaceTypeProject    = "project"
 	_spaceTypeGrant      = "grant"
 	_slowQueryDuration   = 500 * time.Millisecond
-	_batchSize           = 500
 )
 
 // Searcher is the interface to the SearchService
@@ -65,6 +64,8 @@ type Service struct {
 
 	serviceAccountID     string
 	serviceAccountSecret string
+
+	batchSize int
 }
 
 var errSkipSpace error
@@ -80,6 +81,8 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 
 		serviceAccountID:     cfg.ServiceAccount.ServiceAccountID,
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
+
+		batchSize: cfg.BatchSize,
 	}
 
 	return s
@@ -460,7 +463,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	}()
 
 	w := walker.NewWalker(s.gatewaySelector)
-	s.engine.StartBatch(_batchSize)
+	s.engine.StartBatch(s.batchSize)
 	defer func() {
 		if err := s.engine.EndBatch(); err != nil {
 			s.logger.Error().Err(err).Msg("failed to end batch")

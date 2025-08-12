@@ -1,5 +1,39 @@
 # Changelog
 
+## [3.3.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.3.0) - 2025-08-12
+
+### ❤️ Thanks to all contributors! ❤️
+
+@ScharfViktor, @aduffeck, @michaelstingl
+
+### ✨ Features
+
+- Tenant [[#1274](https://github.com/opencloud-eu/opencloud/pull/1274)]
+
+### 📈 Enhancement
+
+- chore: bump web to v3.3.0 [[#1329](https://github.com/opencloud-eu/opencloud/pull/1329)]
+
+### ✅ Tests
+
+- multiTenancyTests [[#1313](https://github.com/opencloud-eu/opencloud/pull/1313)]
+
+### 📚 Documentation
+
+- Fix posix driver documentation in STORAGE_USERS_DRIVER description [[#1305](https://github.com/opencloud-eu/opencloud/pull/1305)]
+
+### 🐛 Bug Fixes
+
+- Improve indexing performance using batches [[#1306](https://github.com/opencloud-eu/opencloud/pull/1306)]
+- Do not run the timout func if the work func has run [[#1302](https://github.com/opencloud-eu/opencloud/pull/1302)]
+- Make sure to register prometheus collectors only once [[#1295](https://github.com/opencloud-eu/opencloud/pull/1295)]
+
+### 📦️ Dependencies
+
+- [decomposed] bump-version-v3.3.0 [[#1332](https://github.com/opencloud-eu/opencloud/pull/1332)]
+- [full-ci] Reva bump 2.36.0 [[#1328](https://github.com/opencloud-eu/opencloud/pull/1328)]
+- Bump reva [[#1315](https://github.com/opencloud-eu/opencloud/pull/1315)]
+
 ## [3.2.1](https://github.com/opencloud-eu/opencloud/releases/tag/v3.2.1) - 2025-07-30
 
 ### ❤️ Thanks to all contributors! ❤️

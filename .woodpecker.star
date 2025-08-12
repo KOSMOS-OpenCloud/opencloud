@@ -1467,6 +1467,7 @@ def multiServiceE2ePipeline(ctx):
             restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBin"]) + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
+            restoreBrowsersCache() + \
             tikaService() + \
             opencloudServer(storage, extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
             storage_users_services + \
@@ -1478,14 +1479,16 @@ def multiServiceE2ePipeline(ctx):
                     "HEADLESS": True,
                     "RETRY": "1",
                     "REPORT_TRACING": params["reportTracing"],
+                    "PLAYWRIGHT_BROWSERS_PATH": "%s/%s" % (dirs["base"], ".playwright"),
+                    "BROWSER": "chromium",
                 },
                 "commands": [
                     "cd %s/tests/e2e" % dirs["web"],
                     "bash run-e2e.sh %s" % e2e_args,
                 ],
-            }]
+            }] + \
+            uploadTracingResult(ctx)
 
-        uploadTracingResult(ctx) + \
         pipelines.append({
             "name": "e2e-tests-multi-service",
             "steps": steps,

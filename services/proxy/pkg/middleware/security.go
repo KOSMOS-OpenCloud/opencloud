@@ -13,20 +13,26 @@ import (
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
 func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
-	yamlContent, err := loadCSPYaml(proxyCfg)
+	presetYamlContent, customYamlContent, err := loadCSPYaml(proxyCfg)
 	if err != nil {
 		return nil, err
 	}
-	return loadCSPConfig(yamlContent)
+	return loadCSPConfig(presetYamlContent, customYamlContent)
 }
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
-func loadCSPConfig(yamlContent []byte) (*config.CSP, error) {
+func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, error) {
 	// substitute env vars and load to struct
 	gofig.WithOptions(gofig.ParseEnv)
 	gofig.AddDriver(yaml.Driver)
 
-	err := gofig.LoadSources("yaml", yamlContent)
+	// TODO: merge all sources into one struct
+	// ATM it is untested how this merger behaves with multiple sources
+	// it might be better to load preset and custom separately and then merge structs
+	// or load preset first and then custom to override values
+	// especially in hindsight that there will be autoloaded config files from webapps
+	// in the future
+	err := gofig.LoadSources("yaml", presetYamlContent, customYamlContent)
 	if err != nil {
 		return nil, err
 	}
@@ -41,11 +47,12 @@ func loadCSPConfig(yamlContent []byte) (*config.CSP, error) {
 	return &cspConfig, nil
 }
 
-func loadCSPYaml(proxyCfg *config.Config) ([]byte, error) {
+func loadCSPYaml(proxyCfg *config.Config) ([]byte, []byte, error) {
 	if proxyCfg.CSPConfigFileLocation == "" {
-		return []byte(config.DefaultCSPConfig), nil
+		return []byte(config.DefaultCSPConfig), nil, nil
 	}
-	return os.ReadFile(proxyCfg.CSPConfigFileLocation)
+	customCSPYaml, err := os.ReadFile(proxyCfg.CSPConfigFileLocation)
+	return []byte(config.DefaultCSPConfig), customCSPYaml, err
 }
 
 // Security is a middleware to apply security relevant http headers like CSP.

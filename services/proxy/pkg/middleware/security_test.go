@@ -8,7 +8,7 @@ import (
 
 func TestLoadCSPConfig(t *testing.T) {
 	// setup test env
-	yaml := `
+	presetYaml := `
 directives:
   frame-src:
     - '''self'''
@@ -17,12 +17,24 @@ directives:
     - 'https://${COLLABORA_DOMAIN|collabora.opencloud.test}/'
 `
 
-	config, err := loadCSPConfig([]byte(yaml))
+	customYaml := `
+directives:
+  img-src:
+    - '''self'''
+    - 'data:'
+  frame-src:
+    - 'https://some.custom.domain/'
+`
+	config, err := loadCSPConfig([]byte(presetYaml), []byte(customYaml))
 	if err != nil {
 		t.Error(err)
 	}
+	// TODO: this needs to be reworked into some contains assertion
 	assert.Equal(t, config.Directives["frame-src"][0], "'self'")
 	assert.Equal(t, config.Directives["frame-src"][1], "https://embed.diagrams.net/")
 	assert.Equal(t, config.Directives["frame-src"][2], "https://onlyoffice.opencloud.test/")
 	assert.Equal(t, config.Directives["frame-src"][3], "https://collabora.opencloud.test/")
+
+	assert.Equal(t, config.Directives["img-src"][0], "'self'")
+	assert.Equal(t, config.Directives["img-src"][1], "data:")
 }

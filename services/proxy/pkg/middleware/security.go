@@ -32,6 +32,7 @@ func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, er
 	// or load preset first and then custom to override values
 	// especially in hindsight that there will be autoloaded config files from webapps
 	// in the future
+	// TIL: gofig does not merge, it overwrites values from later sources
 	err := gofig.LoadSources("yaml", presetYamlContent, customYamlContent)
 	if err != nil {
 		return nil, err

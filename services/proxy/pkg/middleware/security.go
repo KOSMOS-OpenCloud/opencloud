@@ -27,15 +27,7 @@ func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, er
 	// substitute env vars and load to struct
 	gofig.WithOptions(gofig.ParseEnv)
 	gofig.AddDriver(yaml.Driver)
-
-	// TODO: merge all sources into one struct
-	// ATM it is untested how this merger behaves with multiple sources
-	// it might be better to load preset and custom separately and then merge structs
-	// or load preset first and then custom to override values
-	// especially in hindsight that there will be autoloaded config files from webapps
-	// in the future
-	// TIL: gofig does not merge, it overwrites values from later sources
-
+	
 	presetMap := map[string]interface{}{}
 	err := yamlv3.Unmarshal(presetYamlContent, &presetMap)
 	if err != nil {

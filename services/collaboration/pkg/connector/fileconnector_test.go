@@ -1792,6 +1792,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://cloud.opencloud.test",
+				EnableInsertRemoteImage: true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1889,7 +1890,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				UserCanReview:           false,
 				UserCanWrite:            false,
-				EnableInsertRemoteImage: false,
+				EnableInsertRemoteImage: true,
 				UserID:                  "guest-zzz000",
 				UserFriendlyName:        "guest zzz000",
 				FileSharingURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=sharing",
@@ -1975,6 +1976,7 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://cloud.opencloud.test",
+				EnableInsertRemoteImage: true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2045,6 +2047,7 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:          "https://cloud.opencloud.test/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:             "https://cloud.opencloud.test/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://cloud.opencloud.test",
+				EnableInsertRemoteImage: true,
 			}
 
 			// change wopi app provider

@@ -3,9 +3,12 @@ package channels
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
+	"fmt"
 	stdmail "net/mail"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	mail "github.com/xhit/go-simple-mail/v2"
@@ -118,6 +121,7 @@ func (m Mail) SendMessage(_ context.Context, message *Message) error {
 	email := mail.NewMSG()
 	email.SetFrom(appendSender(message.Sender, m.smtpAddress)).AddTo(message.Recipient...)
 	email.SetSubject(message.Subject)
+	email.AddHeader("Message-ID", generateMessageID(m.smtpAddress.Address))
 	email.SetBody(mail.TextPlain, message.TextBody)
 	if message.HTMLBody != "" {
 		email.AddAlternative(mail.TextHTML, message.HTMLBody)
@@ -134,4 +138,23 @@ func appendSender(sender string, a stdmail.Address) string {
 		a.Name = strings.TrimSpace(sender + " via " + a.Name)
 	}
 	return a.String()
+}
+
+// generateMessageID generates a unique Message-ID header value according to RFC 5322
+func generateMessageID(domain string) string {
+	// Extract domain from email address if it contains @
+	if idx := strings.LastIndex(domain, "@"); idx != -1 {
+		domain = domain[idx+1:]
+	}
+
+	// Generate random bytes for uniqueness
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		// Fallback to timestamp-based ID if random fails
+		return fmt.Sprintf("<%d@%s>", time.Now().UnixNano(), domain)
+	}
+
+	// Create Message-ID: <timestamp.random@domain>
+	timestamp := time.Now().Unix()
+	return fmt.Sprintf("<%d.%x@%s>", timestamp, b, domain)
 }

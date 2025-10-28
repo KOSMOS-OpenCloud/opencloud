@@ -184,7 +184,8 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		cTime = createShareResponse.GetShare().GetCtime()
 		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
-		user, err := s.identityCache.GetCS3User(ctx, objectID)
+		// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
+		user, err := s.identityCache.GetCS3User(ctx, "", objectID)
 		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
 			user, err = s.identityCache.GetAcceptedCS3User(ctx, objectID)
 			if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
@@ -259,14 +260,15 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	}
 
 	if user, ok := revactx.ContextGetUser(ctx); ok {
-		identity, err := userIdToIdentity(ctx, s.identityCache, user.GetId().GetOpaqueId())
+		// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
+		userIdentity, err := userIdToIdentity(ctx, s.identityCache, "", user.GetId().GetOpaqueId())
 		if err != nil {
 			s.logger.Error().Err(err).Msg("identity lookup failed")
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, err.Error())
 		}
 		permission.SetInvitation(libregraph.SharingInvitation{
 			InvitedBy: &libregraph.IdentitySet{
-				User: &identity,
+				User: &userIdentity,
 			},
 		})
 	}

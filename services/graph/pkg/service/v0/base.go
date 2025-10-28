@@ -170,7 +170,8 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			}
 			isGroup = true
 		} else {
-			cs3Identity, err = userIdToIdentity(ctx, g.identityCache, tmp)
+			// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
+			cs3Identity, err = userIdToIdentity(ctx, g.identityCache, "", tmp)
 			if err != nil {
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}

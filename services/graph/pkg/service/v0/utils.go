@@ -92,11 +92,11 @@ func IsShareJail(id *storageprovider.ResourceId) bool {
 
 // userIdToIdentity looks the user for the supplied id using the cache and returns it
 // as a libregraph.Identity
-func userIdToIdentity(ctx context.Context, cache identity.IdentityCache, userID string) (libregraph.Identity, error) {
+func userIdToIdentity(ctx context.Context, cache identity.IdentityCache, tennantId, userID string) (libregraph.Identity, error) {
 	identity := libregraph.Identity{
 		Id: libregraph.PtrString(userID),
 	}
-	user, err := cache.GetUser(ctx, userID)
+	user, err := cache.GetUser(ctx, tennantId, userID)
 	if err == nil {
 		identity.SetDisplayName(user.GetDisplayName())
 		identity.SetLibreGraphUserType(user.GetUserType())
@@ -126,7 +126,7 @@ func cs3UserIdToIdentity(ctx context.Context, cache identity.IdentityCache, cs3U
 		return federatedIdToIdentity(ctx, cache, cs3UserID.GetOpaqueId())
 	}
 	if cs3UserID.GetType() != cs3User.UserType_USER_TYPE_SPACE_OWNER {
-		return userIdToIdentity(ctx, cache, cs3UserID.GetOpaqueId())
+		return userIdToIdentity(ctx, cache, cs3UserID.GetTenantId(), cs3UserID.GetOpaqueId())
 	}
 	return libregraph.Identity{Id: libregraph.PtrString(cs3UserID.GetOpaqueId())}, nil
 }

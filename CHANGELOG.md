@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.5](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.5) - 2025-10-28
+
+### ❤️ Thanks to all contributors! ❤️
+
+@ScharfViktor
+
+### ✅ Tests
+
+- Fix tests in the stable branch [[#1731](https://github.com/opencloud-eu/opencloud/pull/1731)]
+
 ## [2.0.4](https://github.com/opencloud-eu/opencloud/releases/tag/v2.0.4) - 2025-07-11
 
 ### ❤️ Thanks to all contributors! ❤️

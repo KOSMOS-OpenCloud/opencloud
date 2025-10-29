@@ -91,6 +91,9 @@ func (cache IdentityCache) GetUser(ctx context.Context, tennantId, userid string
 	if err != nil {
 		return libregraph.User{}, err
 	}
+	if tennantId != u.GetId().GetTenantId() {
+		return libregraph.User{}, ErrNotFound
+	}
 	return *CreateUserModelFromCS3(u), nil
 }
 
@@ -111,9 +114,17 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tennantId, userid str
 			}
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		}
-		cache.users.Set(userid, user, ttlcache.DefaultTTL)
+		// check if the user is in the correct tenant
+		// if not we need to return before the cache is touched
+		if user.GetId().GetTenantId() != tennantId {
+			return nil, ErrNotFound
+		}
 
+		cache.users.Set(userid, user, ttlcache.DefaultTTL)
 	} else {
+		if user.GetId().GetTenantId() != tennantId {
+			return nil, ErrNotFound
+		}
 		user = item.Value()
 	}
 	return user, nil

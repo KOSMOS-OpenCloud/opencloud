@@ -93,3 +93,11 @@ func MissingWOPISecretError(service string) error {
 		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
+
+func MissingURLSigningSecret(service string) error {
+	return fmt.Errorf("The URL signing secret has not been set properly in your config for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by using 'opencloud init --diff' and applying the patch or setting a value manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}

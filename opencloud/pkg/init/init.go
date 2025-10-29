@@ -68,7 +68,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		systemUserID, adminUserID, graphApplicationID, storageUsersMountID, serviceAccountID string
 		idmServicePassword, idpServicePassword, ocAdminServicePassword, revaServicePassword  string
 		tokenManagerJwtSecret, collaborationWOPISecret, machineAuthAPIKey, systemUserAPIKey  string
-		revaTransferSecret, thumbnailsTransferSecret, serviceAccountSecret                   string
+		revaTransferSecret, thumbnailsTransferSecret, serviceAccountSecret, urlSigningSecret string
 	)
 
 	if diff {
@@ -95,6 +95,13 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		revaTransferSecret = oldCfg.TransferSecret
 		thumbnailsTransferSecret = oldCfg.Thumbnails.Thumbnail.TransferSecret
 		serviceAccountSecret = oldCfg.Graph.ServiceAccount.ServiceAccountSecret
+		urlSigningSecret = oldCfg.URLSigningSecret
+		if urlSigningSecret == "" {
+			urlSigningSecret, err = generators.GenerateRandomPassword(passwordLength)
+			if err != nil {
+				return fmt.Errorf("could not generate random secret for urlSigningSecret: %s", err)
+			}
+		}
 	} else {
 		systemUserID = uuid.Must(uuid.NewV4()).String()
 		adminUserID = uuid.Must(uuid.NewV4()).String()
@@ -142,13 +149,17 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		if err != nil {
 			return fmt.Errorf("could not generate random password for revaTransferSecret: %s", err)
 		}
+		urlSigningSecret, err = generators.GenerateRandomPassword(passwordLength)
+		if err != nil {
+			return fmt.Errorf("could not generate random secret for urlSigningSecret: %s", err)
+		}
 		thumbnailsTransferSecret, err = generators.GenerateRandomPassword(passwordLength)
 		if err != nil {
 			return fmt.Errorf("could not generate random password for thumbnailsTransferSecret: %s", err)
 		}
 		serviceAccountSecret, err = generators.GenerateRandomPassword(passwordLength)
 		if err != nil {
-			return fmt.Errorf("could not generate random password for thumbnailsTransferSecret: %s", err)
+			return fmt.Errorf("could not generate random secret for serviceAccountSecret: %s", err)
 		}
 	}
 
@@ -164,6 +175,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		MachineAuthAPIKey: machineAuthAPIKey,
 		SystemUserAPIKey:  systemUserAPIKey,
 		TransferSecret:    revaTransferSecret,
+		URLSigningSecret:  urlSigningSecret,
 		SystemUserID:      systemUserID,
 		AdminUserID:       adminUserID,
 		Idm: IdmService{

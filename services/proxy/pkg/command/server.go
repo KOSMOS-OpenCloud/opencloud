@@ -311,15 +311,11 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		RevaGatewaySelector: gatewaySelector,
 	})
 
-	var signURLVerifier signedurl.Verifier
-
-	if cfg.PreSignedURL.JWTSigningSharedSecret != "" {
-		var err error
-		signURLVerifier, err = signedurl.NewJWTSignedURL(signedurl.WithSecret(cfg.PreSignedURL.JWTSigningSharedSecret))
-		if err != nil {
-			logger.Fatal().Err(err).Msg("Failed to initialize signed URL configuration.")
-		}
+	signURLVerifier, err := signedurl.NewJWTSignedURL(signedurl.WithSecret(cfg.Commons.URLSigningSecret))
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to initialize signed URL configuration.")
 	}
+
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
 		PreSignedURLConfig: cfg.PreSignedURL,

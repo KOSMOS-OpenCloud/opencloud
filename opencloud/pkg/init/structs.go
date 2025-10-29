@@ -19,6 +19,7 @@ type OpenCloudConfig struct {
 	MachineAuthAPIKey string                `yaml:"machine_auth_api_key"`
 	SystemUserAPIKey  string                `yaml:"system_user_api_key"`
 	TransferSecret    string                `yaml:"transfer_secret"`
+	URLSigningSecret  string                `yaml:"url_signing_secret"`
 	SystemUserID      string                `yaml:"system_user_id"`
 	AdminUserID       string                `yaml:"admin_user_id"`
 	Graph             GraphService          `yaml:"graph"`

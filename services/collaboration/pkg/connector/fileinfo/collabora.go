@@ -56,6 +56,8 @@ type Collabora struct {
 	SaveAsPostmessage bool `json:"SaveAsPostmessage,omitempty"`
 	// If set to true, it allows the document owner (the one with OwnerId =UserId) to send a closedocument message (see protocol.txt)
 	EnableOwnerTermination bool `json:"EnableOwnerTermination,omitempty"`
+	// If set to true, the user has administrator rights in the integration. Some functionality of Collabora Online, such as update check and server audit are supposed to be shown to administrators only.
+	IsAdminUser bool `json:"IsAdminUser"`
 
 	// JSON object that contains additional info about the user, namely the avatar image.
 	//UserExtraInfo -> requires definition, currently not used
@@ -131,6 +133,8 @@ func (cinfo *Collabora) SetProperties(props map[string]interface{}) {
 		//UserPrivateInfo -> requires definition, currently not used
 		case KeyWatermarkText:
 			cinfo.WatermarkText = value.(string)
+		case KeyIsAdminUser:
+			cinfo.IsAdminUser = value.(bool)
 
 		case KeyEnableShare:
 			cinfo.EnableShare = value.(bool)

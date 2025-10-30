@@ -1671,6 +1671,13 @@ var _ = Describe("FileConnector", func() {
 			}
 			ctx = ctxpkg.ContextSetUser(ctx, u)
 
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(
+				&permissions.CheckPermissionResponse{
+					Status: status.NewOK(ctx),
+				},
+				nil,
+			)
+
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
 				Info: &providerv1beta1.ResourceInfo{

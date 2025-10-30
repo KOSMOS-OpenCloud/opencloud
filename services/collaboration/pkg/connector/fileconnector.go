@@ -1198,6 +1198,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	isAnonymousUser := true
 
 	isPublicShare := false
+	isAdminUser := false
 	user := ctxpkg.ContextMustGetUser(ctx)
 	if user.String() != "" {
 		// if we have a wopiContext.User
@@ -1207,6 +1208,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 			isAnonymousUser = false
 			userFriendlyName = user.GetDisplayName()
 			userId = hexEncodedWopiUserId
+
+			isAdminUser, err = utils.CheckPermission(ctx, "WebOffice.Manage", gwc)
+			if err != nil {
+				logger.Error().Err(err).Msg("CheckPermission failed")
+				isAdminUser = false
+			}
 		}
 	}
 
@@ -1268,6 +1275,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeySupportsRename:             true,
 
 		fileinfo.KeyIsAnonymousUser:  isAnonymousUser,
+		fileinfo.KeyIsAdminUser:      isAdminUser,
 		fileinfo.KeyUserFriendlyName: userFriendlyName,
 		fileinfo.KeyUserID:           userId,
 

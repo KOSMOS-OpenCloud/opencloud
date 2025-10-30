@@ -85,19 +85,19 @@ func NewIdentityCache(opts ...IdentityCacheOption) IdentityCache {
 }
 
 // GetUser looks up a user by id, if the user is not cached, yet it will do a lookup via the CS3 API
-func (cache IdentityCache) GetUser(ctx context.Context, tennantId, userid string) (libregraph.User, error) {
+func (cache IdentityCache) GetUser(ctx context.Context, tenantId, userid string) (libregraph.User, error) {
 	// can we get the tenant from the context or do we have to pass it?
-	u, err := cache.GetCS3User(ctx, tennantId, userid)
+	u, err := cache.GetCS3User(ctx, tenantId, userid)
 	if err != nil {
 		return libregraph.User{}, err
 	}
-	if tennantId != u.GetId().GetTenantId() {
+	if tenantId != u.GetId().GetTenantId() {
 		return libregraph.User{}, ErrNotFound
 	}
 	return *CreateUserModelFromCS3(u), nil
 }
 
-func (cache IdentityCache) GetCS3User(ctx context.Context, tennantId, userid string) (*cs3User.User, error) {
+func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid string) (*cs3User.User, error) {
 	var user *cs3User.User
 	if item := cache.users.Get(userid); item == nil {
 		gatewayClient, err := cache.gatewaySelector.Next()
@@ -116,13 +116,13 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tennantId, userid str
 		}
 		// check if the user is in the correct tenant
 		// if not we need to return before the cache is touched
-		if user.GetId().GetTenantId() != tennantId {
+		if user.GetId().GetTenantId() != tenantId {
 			return nil, ErrNotFound
 		}
 
 		cache.users.Set(userid, user, ttlcache.DefaultTTL)
 	} else {
-		if user.GetId().GetTenantId() != tennantId {
+		if user.GetId().GetTenantId() != tenantId {
 			return nil, ErrNotFound
 		}
 		user = item.Value()

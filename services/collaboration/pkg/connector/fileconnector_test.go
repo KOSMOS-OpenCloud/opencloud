@@ -13,6 +13,7 @@ import (
 	auth "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -1800,6 +1801,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://cloud.opencloud.test",
 				EnableInsertRemoteImage: true,
+				IsAnonymousUser:         true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -1936,6 +1938,13 @@ var _ = Describe("FileConnector", func() {
 			}
 			ctx = ctxpkg.ContextSetUser(ctx, u)
 
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(
+				&permissions.CheckPermissionResponse{
+					Status: status.NewOK(ctx),
+				},
+				nil,
+			)
+
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),
 				Info: &providerv1beta1.ResourceInfo{
@@ -1984,6 +1993,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbDocName:       "test.txt",
 				PostMessageOrigin:       "https://cloud.opencloud.test",
 				EnableInsertRemoteImage: true,
+				IsAdminUser:             true,
 			}
 
 			response, err := fc.CheckFileInfo(ctx)
@@ -2009,6 +2019,13 @@ var _ = Describe("FileConnector", func() {
 				DisplayName: "Pet Shaft",
 			}
 			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(
+				&permissions.CheckPermissionResponse{
+					Status: status.NewOK(ctx),
+				},
+				nil,
+			)
 
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
 				Status: status.NewOK(ctx),

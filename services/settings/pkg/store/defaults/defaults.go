@@ -140,7 +140,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			SetProjectSpaceQuotaPermission(All),
 			SettingsManagementPermission(All),
 			SpaceAbilityPermission(All),
-			WebOfficManagementPermssion(All),
+			WebOfficeManagementPermssion(All),
 			WriteFavoritesPermission(Own),
 		},
 	}

@@ -623,12 +623,12 @@ func WriteFavoritesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.
 }
 
 // WebOfficManagementPermssion is the permission to mark/unmark files as favorites
-func WebOfficManagementPermssion(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+func WebOfficeManagementPermssion(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{
 		Id:          "27a29046-a816-424f-bd71-2ffb9029162f",
 		Name:        "WebOffice.Manage",
 		DisplayName: "Manage WebOffice",
-		Description: "This permission gives access to the admin featuer in the WebOffice suite.",
+		Description: "This permission gives access to the admin features in the WebOffice suite.",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},

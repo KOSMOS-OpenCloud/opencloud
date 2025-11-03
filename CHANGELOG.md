@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.7.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.7.0) - 2025-11-03
+
+### ❤️ Thanks to all contributors! ❤️
+
+@ScharfViktor, @individual-it, @kulmann, @rhafer, @schweigisito, @sdwilsh
+
+### ✅ Tests
+
+- check status of postprocessing before accesing the file [[#1762](https://github.com/opencloud-eu/opencloud/pull/1762)]
+
+### 📈 Enhancement
+
+- multi-tenancy: Optional attributes on provision API [[#1663](https://github.com/opencloud-eu/opencloud/pull/1663)]
+- fix: fix #1698 - Notification email doesn't contain Message-Id header [[#1708](https://github.com/opencloud-eu/opencloud/pull/1708)]
+
+### 🐛 Bug Fixes
+
+- fix: only search LDAP group by name [[#1724](https://github.com/opencloud-eu/opencloud/pull/1724)]
+
+### 📦️ Dependencies
+
+- [full-ci] bump web 4.2.0 and opencloud 3.7.0 version [[#1765](https://github.com/opencloud-eu/opencloud/pull/1765)]
+
 ## [3.6.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.6.0) - 2025-10-27
 
 ### ❤️ Thanks to all contributors! ❤️

@@ -1654,6 +1654,7 @@ def dockerRelease(ctx, repo, build_type):
                 "name": "dryrun",
                 "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
+                    "context": "..",
                     "dry_run": True,
                     "platforms": "linux/amd64",  # do dry run only on the native platform
                     "repo": "%s,quay.io/%s" % (repo, repo),
@@ -1676,6 +1677,7 @@ def dockerRelease(ctx, repo, build_type):
                 "name": "build-and-push",
                 "image": PLUGINS_DOCKER_BUILDX,
                 "settings": {
+                    "context": "..",
                     "repo": "%s,quay.io/%s" % (repo, repo),
                     "platforms": "linux/amd64,linux/arm64",  # we can add remote builders
                     "auto_tag": False if build_type == "daily" else True,

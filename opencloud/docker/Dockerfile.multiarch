@@ -6,12 +6,12 @@ ARG STRING
 
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
-WORKDIR /opencloud
-RUN --mount=type=bind,target=/opencloud \
+WORKDIR /build
+RUN --mount=type=bind,target=/build,rw \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache \
     GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" ; \
-    make -C opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true DIST=/dist
+    make -C opencloud/opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true DIST=/dist
 
 FROM alpine:3.21
 ARG VERSION

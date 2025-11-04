@@ -103,6 +103,10 @@ func EnsureCommons(cfg *config.Config) {
 	// copy url signing secret to the commons part if set
 	if cfg.URLSigningSecret != "" {
 		cfg.Commons.URLSigningSecret = cfg.URLSigningSecret
+	} else {
+		// fall back to transfer secret for url signing secret to avoid
+		// issues when upgradin from an older release
+		cfg.Commons.URLSigningSecret = cfg.TransferSecret
 	}
 
 	// copy metadata user id to the commons part if set

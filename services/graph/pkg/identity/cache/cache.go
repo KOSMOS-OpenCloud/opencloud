@@ -100,7 +100,7 @@ func (cache IdentityCache) GetUser(ctx context.Context, tenantId, userid string)
 
 func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid string) (*cs3User.User, error) {
 	var user *cs3User.User
-	if item := cache.users.Get(userid); item == nil {
+	if item := cache.users.Get(tenantId + "|" + userid); item == nil {
 		gatewayClient, err := cache.gatewaySelector.Next()
 		if err != nil {
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
@@ -121,7 +121,7 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid stri
 			return nil, identity.ErrNotFound
 		}
 
-		cache.users.Set(userid, user, ttlcache.DefaultTTL)
+		cache.users.Set(tenantId+"|"+userid, user, ttlcache.DefaultTTL)
 	} else {
 		if user.GetId().GetTenantId() != tenantId {
 			return nil, identity.ErrNotFound

@@ -1,4 +1,4 @@
-package identity
+package cache
 
 import (
 	"context"
@@ -28,7 +28,7 @@ var _ = Describe("Cache", func() {
 	Describe("GetUser", func() {
 		It("should return not error", func() {
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan.GetId().OpaqueId, &alan, 3600)
+			idc.users.Set(alan.GetId().GetOpaqueId(), &alan, 3600)
 
 			ru, err := idc.GetUser(ctx, "", "alan")
 			Expect(err).To(BeNil())
@@ -40,9 +40,18 @@ var _ = Describe("Cache", func() {
 		It("should return an error, if the tenant id does not match", func() {
 			alan.GetId().TenantId = "1234"
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan.GetId().OpaqueId, &alan, 3600)
+			idc.users.Set(alan.GetId().GetOpaqueId(), &alan, 3600)
 			_, err := idc.GetUser(ctx, "5678", "alan")
 			Expect(err).ToNot(BeNil())
+		})
+
+		It("should not return an errorr, if the tenant id does match", func() {
+			alan.GetId().TenantId = "1234"
+			// Persist the user to the cache for 1 hour
+			idc.users.Set(alan.GetId().GetOpaqueId(), &alan, 3600)
+			ru, err := idc.GetUser(ctx, "1234", "alan")
+			Expect(err).To(BeNil())
+			Expect(ru.GetDisplayName()).To(Equal(alan.GetDisplayName()))
 		})
 	})
 })

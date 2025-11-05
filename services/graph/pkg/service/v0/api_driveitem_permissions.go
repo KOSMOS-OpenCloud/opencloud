@@ -38,6 +38,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/cache"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/validate"
 )
@@ -89,7 +90,7 @@ type ListPermissionsQueryOptions struct {
 }
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache cache.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
 	return DriveItemPermissionsService{
 		BaseGraphService: BaseGraphService{
 			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},

@@ -29,6 +29,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/cache"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/linktype"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
 )
@@ -44,7 +45,7 @@ type BaseGraphProvider interface {
 type BaseGraphService struct {
 	logger          *log.Logger
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
-	identityCache   identity.IdentityCache
+	identityCache   cache.IdentityCache
 	config          *config.Config
 	availableRoles  []*libregraph.UnifiedRoleDefinition
 }

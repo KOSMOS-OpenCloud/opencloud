@@ -102,7 +102,7 @@ func EnsureCommons(cfg *config.Config) {
 
 	// make sure url signing secret is set and copy it to the commons part
 	// fall back to transfer secret for url signing secret to avoid
-	// issues when upgradin from an older release
+	// issues when upgrading from an older release
 	if cfg.URLSigningSecret == "" {
 		cfg.URLSigningSecret = cfg.TransferSecret
 	}

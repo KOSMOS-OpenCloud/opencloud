@@ -39,7 +39,7 @@ var _ = Describe("Cache", func() {
 	})
 
 	Describe("GetUser", func() {
-		FIt("should return no error", func() {
+		It("should return no error", func() {
 			alan := &cs3User.User{
 				Id: &cs3User.UserId{
 					OpaqueId: "alan",
@@ -54,7 +54,7 @@ var _ = Describe("Cache", func() {
 			ru, err := idc.GetUser(ctx, "", "alan")
 			Expect(err).To(BeNil())
 			Expect(ru).ToNot(BeNil())
-			Expect(ru.GetId()).To(Equal(alan.GetId()))
+			Expect(ru.GetId()).To(Equal(alan.GetId().GetOpaqueId()))
 			Expect(ru.GetDisplayName()).To(Equal(alan.GetDisplayName()))
 		})
 
@@ -81,7 +81,9 @@ var _ = Describe("Cache", func() {
 				DisplayName: "Alan",
 			}
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, 3600)
+			cu := idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, 3600)
+			// Test if element has been persisted in the cache
+			Expect(cu.Value().GetId().GetOpaqueId()).To(Equal(alan.GetId().GetOpaqueId()))
 			ru, err := idc.GetUser(ctx, "1234", "alan")
 			Expect(err).To(BeNil())
 			Expect(ru.GetDisplayName()).To(Equal(alan.GetDisplayName()))

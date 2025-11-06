@@ -58,21 +58,31 @@ var _ = Describe("Cache", func() {
 			Expect(ru.GetDisplayName()).To(Equal(alan.GetDisplayName()))
 		})
 
-		It("should return an error, if the tenant id does not match", func() {
-			alan := &cs3User.User{
+		It("should return the correct user if two users with the same uid and different tennant ids exist", func() {
+			alan1 := &cs3User.User{
 				Id: &cs3User.UserId{
 					OpaqueId: "alan",
 					TenantId: "1234",
 				},
-				DisplayName: "Alan",
+				DisplayName: "Alan1",
+			}
+
+			alan2 := &cs3User.User{
+				Id: &cs3User.UserId{
+					OpaqueId: "alan",
+					TenantId: "5678",
+				},
+				DisplayName: "Alan2",
 			}
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, 3600)
-			_, err := idc.GetUser(ctx, "5678", "alan")
-			Expect(err).ToNot(BeNil())
+			idc.users.Set(alan1.GetId().GetTenantId()+"|"+alan1.GetId().GetOpaqueId(), alan1, 3600)
+			idc.users.Set(alan2.GetId().GetTenantId()+"|"+alan2.GetId().GetOpaqueId(), alan2, 3600)
+			ru, err := idc.GetUser(ctx, "5678", "alan")
+			Expect(err).To(BeNil())
+			Expect(ru.GetDisplayName()).To(Equal(alan2.GetDisplayName()))
 		})
 
-		It("should not return an errorr, if the tenant id does match", func() {
+		It("should not return an error, if the tenant id does match", func() {
 			alan := &cs3User.User{
 				Id: &cs3User.UserId{
 					OpaqueId: "alan",

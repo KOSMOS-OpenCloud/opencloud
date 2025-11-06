@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# LinkinWires <darkinsonic13@gmail.com>, 2025
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2025
 # 
 #, fuzzy
 msgid ""
@@ -13,13 +13,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 "POT-Creation-Date: 2025-11-06 00:02+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
-"Last-Translator: LinkinWires <darkinsonic13@gmail.com>, 2025\n"
-"Language-Team: Ukrainian (https://app.transifex.com/opencloud-eu/teams/204053/uk/)\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2025\n"
+"Language-Team: Finnish (https://app.transifex.com/opencloud-eu/teams/204053/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
 #. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
@@ -30,23 +30,23 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:128 pkg/unifiedrole/roles.go:140
 #: pkg/unifiedrole/roles.go:146
 msgid "Can edit"
-msgstr "Може редагувати"
+msgstr "Voi muokata"
 
 #. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:134
 msgid "Can edit without versions"
-msgstr "Може редагувати (без версій)"
+msgstr "Voi muokata ilman versioita"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:158
 msgid "Can manage"
-msgstr "Може керувати"
+msgstr "Voi hallita"
 
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:152
 msgid "Can upload"
-msgstr "Може вивантажувати"
+msgstr "Voi lähettää"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
@@ -54,89 +54,79 @@ msgstr "Може вивантажувати"
 #: pkg/unifiedrole/roles.go:98 pkg/unifiedrole/roles.go:104
 #: pkg/unifiedrole/roles.go:110
 msgid "Can view"
-msgstr "Може переглядати"
+msgstr "Voi nähdä"
 
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:164
 msgid "Can view (secure)"
-msgstr "Може переглядати (обмежено)"
+msgstr "Voi nähdä (turvallinen)"
 
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:170
 msgid "Cannot access"
-msgstr "Не має доступу"
+msgstr "Ei pääsyä"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:167
 msgid "Deny all access."
-msgstr "Заборонити будь-який доступ."
+msgstr "Estä kaikki pääsy."
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
 msgid "Here you can add a description for this Space."
-msgstr "Тут можна додати опис до цього простору."
+msgstr "Täällä voit lisätä kuvauksen avaruudelle."
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:95 pkg/unifiedrole/roles.go:107
 msgid "View and download."
-msgstr "Може переглядати та завантажувати файли."
+msgstr "Näytä ja lataa."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:161
 msgid "View only documents, images and PDFs. Watermarks will be applied."
-msgstr ""
-"Може переглядати лише документи, зображення та PDF-файли. Будуть застосовані"
-" водяні знаки."
+msgstr "Näytä vain asiakirjat, kuvat ja PDF:t. Vesileimat lisätään."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:137
 msgid "View, download and edit."
-msgstr "Може переглядати, завантажувати та редагувати файли."
+msgstr "Näytä, lataa ja muokkaa."
 
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:101
 msgid "View, download and show all invited people."
-msgstr "Може переглядати, завантажувати та показувати усіх запрошених людей."
+msgstr "Näytä, lataa ja näytä kaikki kutsutut henkilöt."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:149
 msgid "View, download and upload."
-msgstr "Може переглядати, завантажувати та вивантажувати файли."
+msgstr "Näytä, lataa ja lähetä."
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:143
 msgid "View, download, edit and show all invited people."
-msgstr ""
-"Може переглядати, завантажувати, редагувати та показувати усіх запрошених "
-"людей."
+msgstr "Näytä, lataa, muokkaa ja näytä kaikki kaikki kutsutut henkilöt."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:113 pkg/unifiedrole/roles.go:131
 msgid "View, download, upload, edit, add and delete."
-msgstr ""
-"Може переглядати, завантажувати, вивантажувати, редагувати, додавати та "
-"видаляти файли."
+msgstr "Näytä, lataa lähetä, muokkaa, lisää ja poista."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:155
 msgid "View, download, upload, edit, add, delete and manage members."
-msgstr ""
-"Може переглядати, завантажувати, вивантажувати, редагувати, додавати та "
-"видаляти файли, а також може керувати учасниками."
+msgstr "Näytä, lataa, lähetä, muokkaa, lisää, poista ja hallitse jäseniä."
 
 #. UnifiedRoleListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:119
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
-"Може переглядати, завантажувати, редагувати, додавати, видаляти та "
-"показувати усіх запрошених людей."
+"Näytä, lataa, lähetä, muokkaa, lisää, poista ja näytä kaikki kutsutut "
+"henkilöt."
 
 #. UnifiedRole SpaseEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:125
 msgid "View, download, upload, edit, add, delete including the history."
-msgstr ""
-"Може переглядати, завантажувати, вивантажувати, редагувати, додавати та "
-"видаляти файли, у тому числі їх історію."
+msgstr "Näytä, lataa, lähetä, muokkaa, lisää, poista mukaan lukien historia."

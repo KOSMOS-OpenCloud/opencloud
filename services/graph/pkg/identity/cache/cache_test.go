@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -48,7 +49,7 @@ var _ = Describe("Cache", func() {
 				DisplayName: "Alan",
 			}
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, 3600)
+			idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, time.Hour)
 
 			// getting the cache item in cache.go line 103 does not work
 			ru, err := idc.GetUser(ctx, "", "alan")
@@ -75,11 +76,14 @@ var _ = Describe("Cache", func() {
 				DisplayName: "Alan2",
 			}
 			// Persist the user to the cache for 1 hour
-			idc.users.Set(alan1.GetId().GetTenantId()+"|"+alan1.GetId().GetOpaqueId(), alan1, 3600)
-			idc.users.Set(alan2.GetId().GetTenantId()+"|"+alan2.GetId().GetOpaqueId(), alan2, 3600)
+			idc.users.Set(alan1.GetId().GetTenantId()+"|"+alan1.GetId().GetOpaqueId(), alan1, time.Hour)
+			idc.users.Set(alan2.GetId().GetTenantId()+"|"+alan2.GetId().GetOpaqueId(), alan2, time.Hour)
 			ru, err := idc.GetUser(ctx, "5678", "alan")
 			Expect(err).To(BeNil())
 			Expect(ru.GetDisplayName()).To(Equal(alan2.GetDisplayName()))
+			ru, err = idc.GetUser(ctx, "1234", "alan")
+			Expect(err).To(BeNil())
+			Expect(ru.GetDisplayName()).To(Equal(alan1.GetDisplayName()))
 		})
 
 		It("should not return an error, if the tenant id does match", func() {
@@ -91,7 +95,7 @@ var _ = Describe("Cache", func() {
 				DisplayName: "Alan",
 			}
 			// Persist the user to the cache for 1 hour
-			cu := idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, 3600)
+			cu := idc.users.Set(alan.GetId().GetTenantId()+"|"+alan.GetId().GetOpaqueId(), alan, time.Hour)
 			// Test if element has been persisted in the cache
 			Expect(cu.Value().GetId().GetOpaqueId()).To(Equal(alan.GetId().GetOpaqueId()))
 			ru, err := idc.GetUser(ctx, "1234", "alan")

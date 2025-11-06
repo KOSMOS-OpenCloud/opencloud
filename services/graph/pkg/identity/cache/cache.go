@@ -123,7 +123,7 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid stri
 
 		cache.users.Set(tenantId+"|"+userid, user, ttlcache.DefaultTTL)
 	} else {
-		if user.GetId().GetTenantId() != tenantId {
+		if item.Value().GetId().GetTenantId() != tenantId {
 			return nil, identity.ErrNotFound
 		}
 		user = item.Value()

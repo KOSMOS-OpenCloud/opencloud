@@ -37,7 +37,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/mocks"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
-	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
+	identitycache "github.com/opencloud-eu/opencloud/services/graph/pkg/identity/cache"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/linktype"
 	svc "github.com/opencloud-eu/opencloud/services/graph/pkg/service/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
@@ -56,7 +56,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				OpaqueId: "user",
 			},
 		}
-		cache        identity.IdentityCache
+		cache        identitycache.IdentityCache
 		statResponse *provider.StatResponse
 		driveItemId  *provider.ResourceId
 		ctx          context.Context
@@ -70,7 +70,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 
-		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
+		cache = identitycache.NewIdentityCache(identitycache.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg = defaults.FullDefaultConfig()
 		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)

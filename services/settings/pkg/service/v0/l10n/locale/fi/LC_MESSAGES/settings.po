@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-11-06 00:02+0000\n"
+"POT-Creation-Date: 2025-11-07 00:02+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2025\n"
 "Language-Team: Finnish (https://app.transifex.com/opencloud-eu/teams/204053/fi/)\n"
@@ -72,6 +72,8 @@ msgid ""
 "Notify when a file I uploaded was rejected because of a virus infection or "
 "policy violation"
 msgstr ""
+"Ilmoita, kun lähettämäni tiedosto hylättiin joko virustartunnan tai "
+"käytäntöloukkauksen vuoksi"
 
 #. description of the notification option 'Share Removed'
 #: pkg/store/defaults/templates.go:14
@@ -86,17 +88,17 @@ msgstr "Ilmoita kun vastaanotettu jako on vanhentunut"
 #. description of the notification option 'Space Deleted'
 #: pkg/store/defaults/templates.go:38
 msgid "Notify when a space I am member of has been deleted"
-msgstr ""
+msgstr "Ilmoita, kun avaruus, jonka jäsen olen, on poistettu"
 
 #. description of the notification option 'Space Disabled'
 #: pkg/store/defaults/templates.go:34
 msgid "Notify when a space I am member of has been disabled"
-msgstr ""
+msgstr "Ilmoita, kun avaruus, jonka jäsen olen, on poistettu käytöstä"
 
 #. description of the notification option 'Space Membership Expired'
 #: pkg/store/defaults/templates.go:30
 msgid "Notify when a space membership has expired"
-msgstr ""
+msgstr "Ilmoita, kun avaruuden jäsenyys on vanhentunut"
 
 #. name of the notification option 'Space Unshared'
 #: pkg/store/defaults/templates.go:24

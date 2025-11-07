@@ -399,7 +399,7 @@ class NotificationContext implements Context {
 			$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 			++$count;
 		} while (!isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message)
-			&& $count <= 5
+			&& $count <= 10
 		);
 		if (isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message)) {
 			$actualMessage = str_replace(

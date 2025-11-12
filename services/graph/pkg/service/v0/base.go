@@ -17,6 +17,7 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -171,8 +172,8 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			}
 			isGroup = true
 		} else {
-			// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
-			cs3Identity, err = userIdToIdentity(ctx, g.identityCache, "", tmp)
+			tenantId := revactx.ContextMustGetUser(ctx).GetId().GetTenantId()
+			cs3Identity, err = userIdToIdentity(ctx, g.identityCache, tenantId, tmp)
 			if err != nil {
 				g.logger.Warn().Str("userid", tmp).Msg("User not found by id")
 			}

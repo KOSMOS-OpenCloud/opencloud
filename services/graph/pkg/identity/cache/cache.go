@@ -107,6 +107,7 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid stri
 		}
 		cs3UserID := &cs3User.UserId{
 			OpaqueId: userid,
+			TenantId: tenantId,
 		}
 		user, err = revautils.GetUserNoGroups(ctx, cs3UserID, gatewayClient)
 		if err != nil {
@@ -123,9 +124,6 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid stri
 
 		cache.users.Set(tenantId+"|"+userid, user, ttlcache.DefaultTTL)
 	} else {
-		if item.Value().GetId().GetTenantId() != tenantId {
-			return nil, identity.ErrNotFound
-		}
 		user = item.Value()
 	}
 	return user, nil

@@ -104,6 +104,7 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 
 // Invite invites a user to a drive item.
 func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+	tenantId := revactx.ContextMustGetUser(ctx).GetId().GetTenantId()
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return libregraph.Permission{}, err
@@ -185,8 +186,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		cTime = createShareResponse.GetShare().GetCtime()
 		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
-		// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
-		user, err := s.identityCache.GetCS3User(ctx, "", objectID)
+		user, err := s.identityCache.GetCS3User(ctx, tenantId, objectID)
 		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
 			user, err = s.identityCache.GetAcceptedCS3User(ctx, objectID)
 			if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
@@ -261,8 +261,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	}
 
 	if user, ok := revactx.ContextGetUser(ctx); ok {
-		// TODO: get tenantId from revactx.ContextGetUser(ctx), maybe we need to extent the user struct
-		userIdentity, err := userIdToIdentity(ctx, s.identityCache, "", user.GetId().GetOpaqueId())
+		userIdentity, err := userIdToIdentity(ctx, s.identityCache, tenantId, user.GetId().GetOpaqueId())
 		if err != nil {
 			s.logger.Error().Err(err).Msg("identity lookup failed")
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, err.Error())

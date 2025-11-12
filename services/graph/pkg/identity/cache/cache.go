@@ -116,11 +116,6 @@ func (cache IdentityCache) GetCS3User(ctx context.Context, tenantId, userid stri
 			}
 			return nil, errorcode.New(errorcode.GeneralException, err.Error())
 		}
-		// check if the user is in the correct tenant
-		// if not we need to return before the cache is touched
-		if user.GetId().GetTenantId() != tenantId {
-			return nil, identity.ErrNotFound
-		}
 
 		cache.users.Set(tenantId+"|"+userid, user, ttlcache.DefaultTTL)
 	} else {

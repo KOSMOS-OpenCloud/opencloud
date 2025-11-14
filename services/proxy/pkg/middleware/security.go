@@ -19,7 +19,11 @@ func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
 	if err != nil {
 		return nil, err
 	}
-	return loadCSPConfig(presetYamlContent, customYamlContent)
+	if proxyCfg.CSPConfigFileOverrideLocation == "" {
+		return loadCSPConfig(presetYamlContent, customYamlContent)
+	} else {
+		return loadCSPConfig(presetYamlContent, []byte{})
+	}
 }
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
@@ -27,7 +31,7 @@ func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, er
 	// substitute env vars and load to struct
 	gofig.WithOptions(gofig.ParseEnv)
 	gofig.AddDriver(yaml.Driver)
-	
+
 	presetMap := map[string]interface{}{}
 	err := yamlv3.Unmarshal(presetYamlContent, &presetMap)
 	if err != nil {

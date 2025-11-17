@@ -9,7 +9,6 @@ The service works in conjunction with the `app-registry` service, which maintain
 The `app-provider` service integrates with:
 - `app-registry` - For discovering which applications are available for specific MIME types
 - `frontend` - The frontend service forwards app provider requests (default endpoint `/app`) to this service
-- `gateway` - Routes requests to the app provider service
 
 ## Configuration
 

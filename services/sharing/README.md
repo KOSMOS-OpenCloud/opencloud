@@ -18,7 +18,6 @@ The sharing service integrates with:
 - `frontend` and `ocs` - Provide HTTP APIs that translate to CS3 sharing calls
 - `storage-shares` - Stores and manages received shares
 - `storage-publiclink` - Manages public link shares
-- `gateway` - Routes sharing requests
 - `graph` - Provides LibreGraph API for sharing with roles
 
 ## Share Types

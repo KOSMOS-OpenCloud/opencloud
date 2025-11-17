@@ -18,7 +18,6 @@ The service provides CS3 gRPC APIs for:
 - Listing users
 - Getting user information
 - Finding users by username, email, or ID
-- User authentication and validation
 
 ## Usage
 

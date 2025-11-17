@@ -1,20 +1,17 @@
 # Storage Shares
 
-The `storage-shares` service provides storage backend functionality for user and group shares in OpenCloud. It implements the CS3 storage provider interface specifically for managing shared resources.
+The `storage-shares` service provides storage backend functionality for user and group shares in OpenCloud. It implements the CS3 storage provider interface specifically for working with shared resources.
 
 ## Overview
 
 This service is part of the storage services family and is responsible for:
-- Storing metadata about user and group shares
 - Providing a virtual view of received shares
-- Managing share mountpoints
 - Handling access to resources shared by other users
 
 ## Integration
 
 The storage-shares service integrates with:
-- `sharing` service - Creates and manages shares
-- `gateway` service - Routes requests to shared resources
+- `sharing` service - Manages and persists shares
 - `storage-users` service - Accesses the underlying file content
 - `frontend` and `ocdav` - Provide HTTP/WebDAV access to shares
 
@@ -33,4 +30,4 @@ See the `gateway` README for more details on storage registry configuration.
 
 ## Scalability
 
-The storage-shares service can be scaled horizontally. When running multiple instances, ensure that the share metadata storage configuration is identical across all instances.
+The storage-shares service can be scaled horizontally.

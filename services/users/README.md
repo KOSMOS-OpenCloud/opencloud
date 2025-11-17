@@ -22,7 +22,7 @@ The service provides CS3 gRPC APIs for:
 
 ## Usage
 
-The users service is primarily used internally by other OpenCloud services rather than being accessed directly by clients. The `frontend`, `ocs`, and `graph` services translate HTTP API requests into CS3 API calls to this service.
+The users service is only used internally by other OpenCloud services and not being accessed directly by clients. The `frontend`, `ocs`, and `graph` services translate HTTP API requests into CS3 API calls to this service.
 
 ## Scalability
 

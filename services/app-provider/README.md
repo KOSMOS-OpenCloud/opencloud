@@ -18,4 +18,4 @@ The service can be configured via environment variables. Key configuration optio
 
 ## Scalability
 
-The app-provider service can be scaled horizontally as it primarily acts as a coordinator between applications and the OpenCloud storage layer.
+The app-provider service can be scaled horizontally as it primarily acts as a coordinator between applications and the OpenCloud backend services.

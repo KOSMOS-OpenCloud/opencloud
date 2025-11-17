@@ -1,20 +1,17 @@
 # Storage PublicLink
 
-The `storage-publiclink` service provides storage backend functionality for public link shares in OpenCloud. It implements the CS3 storage provider interface specifically for managing public link shared resources.
+The `storage-publiclink` service provides storage backend functionality for public link shares in OpenCloud. It implements the CS3 storage provider interface specifically for working with public link shared resources.
 
 ## Overview
 
 This service is part of the storage services family and is responsible for:
-- Storing metadata about public link shares
 - Providing access to publicly shared resources
-- Managing public link tokens and permissions
 - Handling anonymous access to shared content
 
 ## Integration
 
 The storage-publiclink service integrates with:
-- `sharing` service - Creates and manages public link shares
-- `gateway` service - Routes requests to publicly shared resources
+- `sharing` service - Manages and persists public link shares
 - `frontend` and `ocdav` - Provide HTTP/WebDAV access to public links
 - Storage drivers - Accesses the actual file content
 
@@ -37,4 +34,4 @@ Public link shares can be configured with:
 
 ## Scalability
 
-The storage-publiclink service can be scaled horizontally. When running multiple instances, ensure that the storage backend configuration is identical across all instances.
+The storage-publiclink service can be scaled horizontally.

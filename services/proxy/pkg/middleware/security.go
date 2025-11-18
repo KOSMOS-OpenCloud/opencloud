@@ -19,11 +19,7 @@ func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
 	if err != nil {
 		return nil, err
 	}
-	if proxyCfg.CSPConfigFileOverrideLocation == "" {
-		return loadCSPConfig(yamlContent, customYamlContent)
-	} else {
-		return loadCSPConfig(yamlContent, []byte{})
-	}
+	return loadCSPConfig(yamlContent, customYamlContent)
 }
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.

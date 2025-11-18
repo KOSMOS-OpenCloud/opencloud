@@ -15,14 +15,14 @@ import (
 
 // LoadCSPConfig loads CSP header configuration from a yaml file.
 func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
-	presetYamlContent, customYamlContent, err := loadCSPYaml(proxyCfg)
+	yamlContent, customYamlContent, err := loadCSPYaml(proxyCfg)
 	if err != nil {
 		return nil, err
 	}
 	if proxyCfg.CSPConfigFileOverrideLocation == "" {
-		return loadCSPConfig(presetYamlContent, customYamlContent)
+		return loadCSPConfig(yamlContent, customYamlContent)
 	} else {
-		return loadCSPConfig(presetYamlContent, []byte{})
+		return loadCSPConfig(yamlContent, []byte{})
 	}
 }
 
@@ -126,6 +126,10 @@ func sliceContains(slice []interface{}, val interface{}) bool {
 }
 
 func loadCSPYaml(proxyCfg *config.Config) ([]byte, []byte, error) {
+	if proxyCfg.CSPConfigFileOverrideLocation != "" {
+		overrideCSPYaml, err := os.ReadFile(proxyCfg.CSPConfigFileOverrideLocation)
+		return overrideCSPYaml, []byte{}, err
+	}
 	if proxyCfg.CSPConfigFileLocation == "" {
 		return []byte(config.DefaultCSPConfig), nil, nil
 	}

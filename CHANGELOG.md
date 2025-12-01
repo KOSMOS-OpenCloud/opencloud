@@ -1,5 +1,80 @@
 # Changelog
 
+## [4.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v4.0.0) - 2025-12-01
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @MahdiBaghbani, @ScharfViktor, @butonic, @dragonchaser, @flimmy, @fschade, @individual-it, @jnweiger, @kulmann, @micbar, @mikelolasagasti, @pbleser-oc, @rhafer, @schweigisito
+
+### 💥 Breaking changes
+
+- collaboration: Enable `InsertRemoteImage` option [[#1692](https://github.com/opencloud-eu/opencloud/pull/1692)]
+
+### 📚 Documentation
+
+- Fix typos in antivirus README documentation [[#1940](https://github.com/opencloud-eu/opencloud/pull/1940)]
+- fix: add missing service README.md files with basic description [[#1859](https://github.com/opencloud-eu/opencloud/pull/1859)]
+- Fix README.md files which contain broken or missing links [[#1854](https://github.com/opencloud-eu/opencloud/pull/1854)]
+
+### 🐛 Bug Fixes
+
+- introduce OC_EVENTS_TLS_INSECURE [[#1936](https://github.com/opencloud-eu/opencloud/pull/1936)]
+- kill unused env vars [[#1888](https://github.com/opencloud-eu/opencloud/pull/1888)]
+- rc-handling was only active for the dryrun, not the real build-and-push [[#1919](https://github.com/opencloud-eu/opencloud/pull/1919)]
+- handle objectguid endianess [[#1901](https://github.com/opencloud-eu/opencloud/pull/1901)]
+- fix: add update server to default csp rules [[#1875](https://github.com/opencloud-eu/opencloud/pull/1875)]
+- fix: add missing capability flag support-radicale [[#1891](https://github.com/opencloud-eu/opencloud/pull/1891)]
+- fix opensearch client certificate [[#1890](https://github.com/opencloud-eu/opencloud/pull/1890)]
+- Bump reva [[#1882](https://github.com/opencloud-eu/opencloud/pull/1882)]
+- load two yaml configs [[#1617](https://github.com/opencloud-eu/opencloud/pull/1617)]
+- make user cache tenant aware [[#1732](https://github.com/opencloud-eu/opencloud/pull/1732)]
+- fix: sanitise markdow code to make docusaurus happy [[#1851](https://github.com/opencloud-eu/opencloud/pull/1851)]
+- update launch.json [[#1843](https://github.com/opencloud-eu/opencloud/pull/1843)]
+- docs: Fix auth-app examples in README [[#1844](https://github.com/opencloud-eu/opencloud/pull/1844)]
+- fix: fix typo in treesize logging [[#1826](https://github.com/opencloud-eu/opencloud/pull/1826)]
+- fix: set global signing secret fallback correctly [[#1781](https://github.com/opencloud-eu/opencloud/pull/1781)]
+
+### 📈 Enhancement
+
+- feat(ocm): add WAYF configuration for reva OCM service [[#1714](https://github.com/opencloud-eu/opencloud/pull/1714)]
+- log missing name or id attributes [[#1914](https://github.com/opencloud-eu/opencloud/pull/1914)]
+- collabora: Set IsAdminUser and IsAnonymousUser in CheckFileInfo [[#1745](https://github.com/opencloud-eu/opencloud/pull/1745)]
+
+### ✅ Tests
+
+- [full-ci] disable running ci with watch fs when full-ci [[#1902](https://github.com/opencloud-eu/opencloud/pull/1902)]
+- api-tests: delete spaces before users [[#1877](https://github.com/opencloud-eu/opencloud/pull/1877)]
+- update tika version [[#1872](https://github.com/opencloud-eu/opencloud/pull/1872)]
+- add share sync to collaborativePosix suite [[#1806](https://github.com/opencloud-eu/opencloud/pull/1806)]
+- removed test virus files from repo [[#1812](https://github.com/opencloud-eu/opencloud/pull/1812)]
+- increase timeouts waiting for notification & search [[#1802](https://github.com/opencloud-eu/opencloud/pull/1802)]
+- Sync share before action [[#1795](https://github.com/opencloud-eu/opencloud/pull/1795)]
+- correct STORAGE_USERS_POSIX_WATCH_FS env typo in CI [[#1746](https://github.com/opencloud-eu/opencloud/pull/1746)]
+
+### 📦️ Dependencies
+
+- [full-ci] revaBump-v2.40.1 [[#1927](https://github.com/opencloud-eu/opencloud/pull/1927)]
+- [full-ci] chore: bump web to v4.2.1 [[#1938](https://github.com/opencloud-eu/opencloud/pull/1938)]
+- build(deps): bump google.golang.org/grpc from 1.76.0 to 1.77.0 [[#1923](https://github.com/opencloud-eu/opencloud/pull/1923)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.12.1 to 2.12.2 [[#1922](https://github.com/opencloud-eu/opencloud/pull/1922)]
+- build(deps): bump github.com/kovidgoyal/imaging from 1.7.2 to 1.8.17 [[#1912](https://github.com/opencloud-eu/opencloud/pull/1912)]
+- build(deps): bump golang.org/x/crypto from 0.44.0 to 0.45.0 [[#1911](https://github.com/opencloud-eu/opencloud/pull/1911)]
+- [decomposed]Update version 4.0.0 rc.2 [[#1917](https://github.com/opencloud-eu/opencloud/pull/1917)]
+- chore: bump web to v4.2.1-rc.1 [[#1900](https://github.com/opencloud-eu/opencloud/pull/1900)]
+- revaBump-getting#428 [[#1887](https://github.com/opencloud-eu/opencloud/pull/1887)]
+- build(deps): bump github.com/blevesearch/bleve/v2 from 2.5.4 to 2.5.5 [[#1884](https://github.com/opencloud-eu/opencloud/pull/1884)]
+- build(deps): bump github.com/olekukonko/tablewriter from 1.1.0 to 1.1.1 [[#1869](https://github.com/opencloud-eu/opencloud/pull/1869)]
+- build(deps): bump golang.org/x/term from 0.36.0 to 0.37.0 [[#1845](https://github.com/opencloud-eu/opencloud/pull/1845)]
+- reva-bump-2.39.2. update opencloud 4.0.0-rc.1 [[#1849](https://github.com/opencloud-eu/opencloud/pull/1849)]
+- build(deps): bump golang.org/x/sync from 0.17.0 to 0.18.0 [[#1836](https://github.com/opencloud-eu/opencloud/pull/1836)]
+- build(deps): bump golang.org/x/oauth2 from 0.32.0 to 0.33.0 [[#1828](https://github.com/opencloud-eu/opencloud/pull/1828)]
+- build(deps): bump github.com/KimMachineGun/automemlimit from 0.7.4 to 0.7.5 [[#1787](https://github.com/opencloud-eu/opencloud/pull/1787)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.9.0 to 1.10.1 [[#1788](https://github.com/opencloud-eu/opencloud/pull/1788)]
+- Bump reva [[#1786](https://github.com/opencloud-eu/opencloud/pull/1786)]
+- build(deps): bump github.com/gabriel-vasile/mimetype from 1.4.10 to 1.4.11 [[#1775](https://github.com/opencloud-eu/opencloud/pull/1775)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.12.0 to 2.12.1 [[#1706](https://github.com/opencloud-eu/opencloud/pull/1706)]
+- build(deps): bump github.com/onsi/ginkgo/v2 from 2.27.1 to 2.27.2 [[#1754](https://github.com/opencloud-eu/opencloud/pull/1754)]
+
 ## [3.7.0](https://github.com/opencloud-eu/opencloud/releases/tag/v3.7.0) - 2025-11-03
 
 ### ❤️ Thanks to all contributors! ❤️

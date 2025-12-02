@@ -10,37 +10,21 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
 // RestartPostprocessing cli command to restart postprocessing
-func RestartPostprocessing(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:    "resume",
+func RestartPostprocessing(cfg *config.Config) *cobra.Command {
+	restartPostprocessingCmd := &cobra.Command{
+		Use:     "resume",
 		Aliases: []string{"restart"},
-		Usage:   "resume postprocessing for an uploadID",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "upload-id",
-				Aliases: []string{"u"},
-				Usage:   "the uploadid to resume. Ignored if unset.",
-			},
-			&cli.StringFlag{
-				Name:    "step",
-				Aliases: []string{"s"},
-				Usage:   "resume all uploads in the given postprocessing step. Ignored if upload-id is set.",
-				Value:   "finished",
-			},
-			&cli.BoolFlag{
-				Name:    "restart",
-				Aliases: []string{"r"},
-				Usage:   "restart postprocessing for the given uploadID. Ignores the step flag.",
-			},
-		},
-		Before: func(c *cli.Context) error {
+		Short:   "resume postprocessing for an uploadID",
+
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 			stream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
 				Endpoint:             cfg.Postprocessing.Events.Endpoint,
@@ -55,14 +39,14 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			uid, step := c.String("upload-id"), ""
+			uid, step := cmd.Flag("upload-id").Value.String(), ""
 			if uid == "" {
-				step = c.String("step")
+				step = cmd.Flag("step").Value.String()
 			}
 
 			var ev events.Unmarshaller
 			switch {
-			case c.Bool("retrigger"):
+			case cmd.Flag("restart").Changed:
 				ev = events.RestartPostprocessing{
 					UploadID:  uid,
 					Timestamp: utils.TSNow(),
@@ -78,4 +62,25 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 			return events.Publish(context.Background(), stream, ev)
 		},
 	}
+
+	restartPostprocessingCmd.Flags().StringP(
+		"upload-id",
+		"u",
+		"",
+		"the uploadid to resume. Ignored if unset.",
+	)
+	restartPostprocessingCmd.Flags().StringP(
+		"step",
+		"s",
+		"finished",
+		"resume all uploads in the given postprocessing step. Ignored if upload-id is set.",
+	)
+	restartPostprocessingCmd.Flags().BoolP(
+		"restart",
+		"r",
+		false,
+		"restart postprocessing for the given uploadID. Ignores the step flag.",
+	)
+
+	return restartPostprocessingCmd
 }

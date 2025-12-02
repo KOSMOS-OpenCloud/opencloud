@@ -5,12 +5,12 @@ import (
 
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/services/antivirus/pkg/config"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 // GetCommands provides all commands for this service
-func GetCommands(cfg *config.Config) cli.Commands {
-	return []*cli.Command{
+func GetCommands(cfg *config.Config) []*cobra.Command {
+	return []*cobra.Command{
 		Server(cfg),
 		Health(cfg),
 		Version(cfg),
@@ -19,11 +19,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 
 // Execute is the entry point for the antivirus command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultApp(&cli.App{
-		Name:     "antivirus",
-		Usage:    "Antivirus service for OpenCloud",
-		Commands: GetCommands(cfg),
+	app := clihelper.DefaultAppCobra(&cobra.Command{
+		Use:   "antivirus",
+		Short: "Antivirus service for OpenCloud",
 	})
-
-	return app.RunContext(cfg.Context, os.Args)
+	app.AddCommand(GetCommands(cfg)...)
+	app.SetArgs(os.Args[1:])
+	return app.ExecuteContext(cfg.Context)
 }

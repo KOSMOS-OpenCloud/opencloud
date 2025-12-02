@@ -7,9 +7,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/runner"
@@ -24,20 +21,22 @@ import (
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/http"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
+
+	"github.com/spf13/cobra"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			traceProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}

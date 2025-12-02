@@ -6,14 +6,10 @@ import (
 
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	"github.com/opencloud-eu/reva/v2/pkg/auth/scope"
+	"github.com/spf13/cobra"
 
 	"time"
 
-	applicationsv1beta1 "github.com/cs3org/go-cs3apis/cs3/auth/applications/v1beta1"
-	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
@@ -21,33 +17,25 @@ import (
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config/parser"
 	ctxpkg "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/urfave/cli/v2"
+
+	applicationsv1beta1 "github.com/cs3org/go-cs3apis/cs3/auth/applications/v1beta1"
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"google.golang.org/grpc/metadata"
 )
 
 // Create is the entrypoint for the app auth create command
-func Create(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "create",
-		Usage:    "create an app auth token for a user",
-		Category: "maintenance",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "user-name",
-				Value: "",
-				Usage: "user to create the app-token for",
-			},
-			&cli.StringFlag{
-				Name:  "expiration",
-				Value: "72h",
-				Usage: "expiration of the app password, e.g. 72h, 1h, 1m, 1s. Default is 72h.",
-			},
-		},
-		Before: func(_ *cli.Context) error {
+func Create(cfg *config.Config) *cobra.Command {
+	createCmd := &cobra.Command{
+		Use:   "create",
+		Short: "create an app auth token for a user",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
-			traceProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -68,7 +56,7 @@ func Create(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			userName := c.String("user-name")
+			userName := cmd.Flag("user-name").Value.String()
 			if userName == "" {
 				fmt.Printf("Username to create app token for: ")
 				if _, err := fmt.Scanln(&userName); err != nil {
@@ -97,7 +85,7 @@ func Create(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			expiry, err := time.ParseDuration(c.String("expiration"))
+			expiry, err := time.ParseDuration(cmd.Flag("expiration").Value.String())
 			if err != nil {
 				return err
 			}
@@ -121,4 +109,16 @@ func Create(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	createCmd.Flags().String(
+		"user-name",
+		"",
+		"user to create the app-token for",
+	)
+	createCmd.Flags().String(
+		"expiration",
+		"72h",
+		"expiration of the app password, e.g. 72h, 1h, 1m, 1s. Default is 72h.",
+	)
+
+	return createCmd
 }

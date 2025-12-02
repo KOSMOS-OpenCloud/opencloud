@@ -11,7 +11,7 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/tw"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -41,64 +41,28 @@ type Session struct {
 }
 
 // Uploads is the entry point for the uploads command
-func Uploads(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-
-		Name:  "uploads",
-		Usage: "manage unfinished uploads",
-		Subcommands: []*cli.Command{
-			ListUploadSessions(cfg),
-		},
+func Uploads(cfg *config.Config) *cobra.Command {
+	uploadsCmd := &cobra.Command{
+		Use:   "uploads",
+		Short: "manage unfinished uploads",
 	}
+	uploadsCmd.AddCommand([]*cobra.Command{
+		ListUploadSessions(cfg),
+	}...)
+
+	return uploadsCmd
+
 }
 
 // ListUploadSessions prints a list of upload sessiens
-func ListUploadSessions(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "sessions",
-		Usage: "Print a list of upload sessions",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "id",
-				DefaultText: "unset",
-				Usage:       "filter sessions by upload session id",
-			},
-			&cli.BoolFlag{
-				Name:        "processing",
-				DefaultText: "unset",
-				Usage:       "filter sessions by processing status",
-			},
-			&cli.BoolFlag{
-				Name:        "expired",
-				DefaultText: "unset",
-				Usage:       "filter sessions by expired status",
-			},
-			&cli.BoolFlag{
-				Name:        "has-virus",
-				DefaultText: "unset",
-				Usage:       "filter sessions by virus scan result",
-			},
-			&cli.BoolFlag{
-				Name:  "json",
-				Usage: "output as json",
-			},
-			&cli.BoolFlag{
-				Name:  "restart",
-				Usage: "send restart event for all listed sessions. Only one of resume/restart/clean can be set.",
-			},
-			&cli.BoolFlag{
-				Name:  "resume",
-				Usage: "send resume event for all listed sessions. Only one of resume/restart/clean can be set.",
-			},
-			&cli.BoolFlag{
-				Name:  "clean",
-				Usage: "remove uploads for all listed sessions. Only one of resume/restart/clean can be set.",
-			},
-		},
-		Before: func(c *cli.Context) error {
+func ListUploadSessions(cfg *config.Config) *cobra.Command {
+	listUploadSessionsCmd := &cobra.Command{
+		Use:   "sessions",
+		Short: "Print a list of upload sessions",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 			f, ok := registry.NewFuncs[cfg.Driver]
 			if !ok {
@@ -131,7 +95,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var stream events.Stream
-			if c.Bool("restart") || c.Bool("resume") {
+			if cmd.Flag("restart").Changed || cmd.Flag("resume").Changed {
 				stream, err = event.NewStream(cfg)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to create event stream: %v\n", err)
@@ -139,8 +103,8 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			filter := buildFilter(c)
-			uploads, err := managingFS.ListUploadSessions(c.Context, filter)
+			filter := buildFilter(cmd)
+			uploads, err := managingFS.ListUploadSessions(cmd.Context(), filter)
 			if err != nil {
 				return err
 			}
@@ -150,7 +114,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				raw   []Session
 			)
 
-			if !c.Bool("json") {
+			if !cmd.Flag("json").Changed {
 				fmt.Println(buildInfo(filter))
 
 				table = tablewriter.NewTable(os.Stdout, tablewriter.WithHeaderAutoFormat(tw.Off))
@@ -175,7 +139,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 					ScanResult: sr,
 				}
 
-				if c.Bool("json") {
+				if cmd.Flag("json").Changed {
 					raw = append(raw, session)
 				} else {
 					table.Append([]string{
@@ -194,7 +158,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				}
 
 				switch {
-				case c.Bool("restart"):
+				case cmd.Flag("restart").Changed:
 					if err := events.Publish(context.Background(), stream, events.RestartPostprocessing{
 						UploadID:  u.ID(),
 						Timestamp: utils.TSNow(),
@@ -204,7 +168,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						os.Exit(1)
 					}
 
-				case c.Bool("resume"):
+				case cmd.Flag("resume").Changed:
 					if err := events.Publish(context.Background(), stream, events.ResumePostprocessing{
 						UploadID:  u.ID(),
 						Timestamp: utils.TSNow(),
@@ -214,15 +178,15 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						os.Exit(1)
 					}
 
-				case c.Bool("clean"):
-					if err := u.Purge(c.Context); err != nil {
+				case cmd.Flag("clean").Changed:
+					if err := u.Purge(cmd.Context()); err != nil {
 						fmt.Fprintf(os.Stderr, "Failed to clean upload session '%s'\n", u.ID())
 					}
 				}
 
 			}
 
-			if !c.Bool("json") {
+			if !cmd.Flag("json").Changed {
 				table.Render()
 				return nil
 			}
@@ -236,24 +200,33 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	listUploadSessionsCmd.Flags().String("id", "unset", "filter sessions by upload session id")
+	listUploadSessionsCmd.Flags().Bool("processing", false, "filter sessions by processing status")
+	listUploadSessionsCmd.Flags().Bool("expired", false, "filter sessions by expired status")
+	listUploadSessionsCmd.Flags().Bool("has-virus", false, "filter sessions by virus scan result")
+	listUploadSessionsCmd.Flags().Bool("json", false, "output as json")
+	listUploadSessionsCmd.Flags().Bool("restart", false, "send restart event for all listed sessions. Only one of resume/restart/clean can be set.")
+	listUploadSessionsCmd.Flags().Bool("resume", false, "send resume event for all listed sessions. Only one of resume/restart/clean can be set.")
+	listUploadSessionsCmd.Flags().Bool("clean", false, "remove uploads for all listed sessions. Only one of resume/restart/clean can be set.")
+	return listUploadSessionsCmd
 }
 
-func buildFilter(c *cli.Context) storage.UploadSessionFilter {
+func buildFilter(cmd *cobra.Command) storage.UploadSessionFilter {
 	filter := storage.UploadSessionFilter{}
-	if c.IsSet("processing") {
-		processingValue := c.Bool("processing")
+	if cmd.Flag("processing").Changed {
+		processingValue := cmd.Flag("processing").Changed
 		filter.Processing = &processingValue
 	}
-	if c.IsSet("expired") {
-		expiredValue := c.Bool("expired")
+	if cmd.Flag("expired").Changed {
+		expiredValue := cmd.Flag("expired").Changed
 		filter.Expired = &expiredValue
 	}
-	if c.IsSet("has-virus") {
-		infectedValue := c.Bool("has-virus")
+	if cmd.Flag("has-virus").Changed {
+		infectedValue := cmd.Flag("has-virus").Changed
 		filter.HasVirus = &infectedValue
 	}
-	if c.IsSet("id") {
-		idValue := c.String("id")
+	if cmd.Flag("id").Changed {
+		idValue := cmd.Flag("id").Value.String()
 		filter.ID = &idValue
 	}
 	return filter

@@ -11,7 +11,7 @@ set -euo pipefail
 #   OC_VERSION: Version to download, e.g. OC_VERSION="1.2.0"
 
 # Call this script directly from opencloud:
-# curl -L https://opencloud.eu/quickinstall.sh | /bin/bash
+# curl -L https://opencloud.eu/install | /bin/bash
 
 # This function is borrowed from openSUSEs /usr/bin/old, thanks.
 function backup_file () {

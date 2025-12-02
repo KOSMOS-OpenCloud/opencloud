@@ -3,15 +3,15 @@ package command
 import (
 	"os"
 
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/services/sse/pkg/config"
+
+	"github.com/spf13/cobra"
 )
 
 // GetCommands provides all commands for this service
-func GetCommands(cfg *config.Config) cli.Commands {
-	return []*cli.Command{
+func GetCommands(cfg *config.Config) []*cobra.Command {
+	return []*cobra.Command{
 		Server(cfg),
 		Health(cfg),
 		Version(cfg),
@@ -20,11 +20,12 @@ func GetCommands(cfg *config.Config) cli.Commands {
 
 // Execute is the entry point for the sse command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultApp(&cli.App{
-		Name:     "sse",
-		Usage:    "Serve sse for OpenCloud",
-		Commands: GetCommands(cfg),
+	app := clihelper.DefaultAppCobra(&cobra.Command{
+		Use:   "sse",
+		Short: "Serve sse for OpenCloud",
 	})
+	app.AddCommand(GetCommands(cfg)...)
+	app.SetArgs(os.Args[1:])
 
-	return app.RunContext(cfg.Context, os.Args)
+	return app.ExecuteContext(cfg.Context)
 }

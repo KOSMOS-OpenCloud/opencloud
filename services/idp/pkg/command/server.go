@@ -25,18 +25,18 @@ import (
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/metrics"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/server/http"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
 const _rsaKeySize = 4096
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			err := configlog.ReturnFatal(parser.ParseConfig(cfg))
 			if err != nil {
 				return err
@@ -52,9 +52,9 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			return nil
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			traceProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}

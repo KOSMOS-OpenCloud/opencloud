@@ -5,11 +5,6 @@ import (
 	"fmt"
 	"os/signal"
 
-	"github.com/opencloud-eu/reva/v2/pkg/events"
-	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
-	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/generators"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
@@ -22,6 +17,11 @@ import (
 	"github.com/opencloud-eu/opencloud/services/clientlog/pkg/metrics"
 	"github.com/opencloud-eu/opencloud/services/clientlog/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/clientlog/pkg/service"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
+
+	"github.com/spf13/cobra"
 )
 
 // all events we care about
@@ -47,17 +47,16 @@ var _registeredEvents = []events.Unmarshaller{
 }
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			tracerProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			tracerProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}

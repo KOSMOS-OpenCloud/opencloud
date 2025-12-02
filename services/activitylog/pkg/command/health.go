@@ -2,16 +2,16 @@ package command
 
 import (
 	"github.com/opencloud-eu/opencloud/services/activitylog/pkg/config"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 // Health is the entrypoint for the health command.
-func Health(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "health",
-		Usage: "Check health status",
-		Action: func(c *cli.Context) error {
-			// Not implemented
+func Health(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "health",
+		Short: "Check health status",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// not implemented
 			return nil
 		},
 	}

@@ -8,19 +8,19 @@ import (
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/logging"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
 // Health is the entrypoint for the health command.
-func Health(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "health",
-		Usage:    "check health status",
-		Category: "info",
-		Before: func(c *cli.Context) error {
+func Health(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "health",
+		Short: "check health status",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			resp, err := http.Get(

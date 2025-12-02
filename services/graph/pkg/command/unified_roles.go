@@ -5,15 +5,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/olekukonko/tablewriter"
-	"github.com/olekukonko/tablewriter/renderer"
-	"github.com/olekukonko/tablewriter/tw"
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/unifiedrole"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/renderer"
+	"github.com/olekukonko/tablewriter/tw"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -34,15 +34,14 @@ var (
 )
 
 // UnifiedRoles bundles available commands for unified roles
-func UnifiedRoles(cfg *config.Config) cli.Commands {
-	cmds := cli.Commands{
+func UnifiedRoles(cfg *config.Config) []*cobra.Command {
+	cmds := []*cobra.Command{
 		listUnifiedRoles(cfg),
 	}
 
 	for _, cmd := range cmds {
-		cmd.Category = "unified-roles"
-		cmd.Name = strings.Join([]string{cmd.Name, "unified-roles"}, "-")
-		cmd.Before = func(c *cli.Context) error {
+		cmd.Use = strings.Join([]string{cmd.Use, "unified-roles"}, "-")
+		cmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg))
 		}
 	}
@@ -51,11 +50,11 @@ func UnifiedRoles(cfg *config.Config) cli.Commands {
 }
 
 // unifiedRolesStatus lists available unified roles, it contains an indicator to show if the role is enabled or not
-func listUnifiedRoles(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "list",
-		Usage: "list available unified roles",
-		Action: func(c *cli.Context) error {
+func listUnifiedRoles(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "list",
+		Short: "list available unified roles",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			r := tw.Rendition{
 				Settings: tw.Settings{
 					Separators: tw.Separators{

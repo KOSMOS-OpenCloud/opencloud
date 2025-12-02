@@ -4,15 +4,14 @@ import (
 	"os"
 
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
-
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
+
+	"github.com/spf13/cobra"
 )
 
 // GetCommands provides all commands for this service
-func GetCommands(cfg *config.Config) cli.Commands {
-	return append([]*cli.Command{
+func GetCommands(cfg *config.Config) []*cobra.Command {
+	return append([]*cobra.Command{
 		// start this service
 		Server(cfg),
 
@@ -26,10 +25,12 @@ func GetCommands(cfg *config.Config) cli.Commands {
 
 // Execute is the entry point for the opencloud graph command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultApp(&cli.App{
-		Name:     "graph",
-		Usage:    "Serve Graph API for OpenCloud",
-		Commands: GetCommands(cfg),
+	app := clihelper.DefaultAppCobra(&cobra.Command{
+		Use:   "graph",
+		Short: "Serve Graph API for OpenCloud",
 	})
-	return app.RunContext(cfg.Context, os.Args)
+	app.AddCommand(GetCommands(cfg)...)
+	app.SetArgs(os.Args[1:])
+
+	return app.ExecuteContext(cfg.Context)
 }

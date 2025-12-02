@@ -120,6 +120,28 @@ func DefaultConfig() *config.Config {
 			PublicShareMustHavePassword: true,
 			IncludeOCMSharees:           false,
 		},
+		OCDav: config.OCDav{
+			Prefix:                "",
+			SkipUserGroupsInToken: false,
+
+			WebdavNamespace: "/users/{{.Id.OpaqueId}}",
+			FilesNamespace:  "/users/{{.Id.OpaqueId}}",
+			SharesNamespace: "/Shares",
+			OCMNamespace:    "/public",
+			PublicURL:       "https://localhost:9200",
+			Insecure:        false,
+			EnableHTTPTPC:   false,
+			Timeout:         84300,
+			Status: config.Status{
+				Version:        version.Legacy,
+				VersionString:  version.LegacyString,
+				ProductVersion: version.GetString(),
+				Product:        "OpenCloud",
+				ProductName:    "OpenCloud",
+				Edition:        "",
+			},
+			AllowPropfindDepthInfinity: false,
+		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
 				CredentialsByUserAgent: map[string]string{},

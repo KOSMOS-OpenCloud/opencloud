@@ -198,6 +198,10 @@ go-mod-tidy:
 test:
 	@go test -v -tags '$(TAGS)' -coverprofile coverage.out ./...
 
+.PHONY: test-with-race
+test-with-race:
+	@go test -race -v -tags '$(TAGS)' -coverprofile coverage.out ./...
+
 .PHONY: go-coverage
 go-coverage:
 	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;

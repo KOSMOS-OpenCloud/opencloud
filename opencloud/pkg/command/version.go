@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/olekukonko/tablewriter"
-	"github.com/olekukonko/tablewriter/tw"
-	"github.com/urfave/cli/v2"
-	mreg "go-micro.dev/v4/registry"
-
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/version"
+	"github.com/spf13/cobra"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
+	mreg "go-micro.dev/v4/registry"
 )
 
 const (
@@ -20,23 +20,16 @@ const (
 )
 
 // VersionCommand is the entrypoint for the version command.
-func VersionCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "version",
-		Usage: "print the version of this binary and all running service instances",
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  _skipServiceListingFlagName,
-				Usage: "skip service listing",
-			},
-		},
-		Category: "info",
-		Action: func(c *cli.Context) error {
+func VersionCommand(cfg *config.Config) *cobra.Command {
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "print the version of this binary and all running service instances",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Edition: %s\n", version.Edition)
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 
-			if c.Bool(_skipServiceListingFlagName) {
+			if cmd.Flag(_skipServiceListingFlagName).Changed {
 				return nil
 			}
 
@@ -75,6 +68,8 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	versionCmd.Flags().Bool(_skipServiceListingFlagName, false, "skip service listing")
+	return versionCmd
 }
 
 func init() {

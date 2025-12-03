@@ -27,7 +27,7 @@ func GetCommands(cfg *config.Config) []*cobra.Command {
 
 // Execute is the entry point for the opencloud-storage-users command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultAppCobra(&cobra.Command{
+	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "storage-users",
 		Short: "Provide storage for users and projects in OpenCloud",
 	})

@@ -26,7 +26,7 @@ func GetCommands(cfg *config.Config) []*cobra.Command {
 
 // Execute is the entry point for the opencloud auth-app command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultAppCobra(&cobra.Command{
+	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "auth-app",
 		Short: "Provide app authentication for OpenCloud",
 	})

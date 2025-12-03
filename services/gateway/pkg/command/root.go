@@ -25,7 +25,7 @@ func GetCommands(cfg *config.Config) []*cobra.Command {
 
 // Execute is the entry point for the opencloud-gateway command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultAppCobra(&cobra.Command{
+	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "gateway",
 		Short: "Provide a CS3api gateway for OpenCloud",
 	})

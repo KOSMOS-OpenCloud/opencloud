@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) []*cobra.Command {
 
 // Execute is the entry point for the opencloud auth-bearer command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultAppCobra(&cobra.Command{
+	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "auth-bearer",
 		Short: "Provide bearer authentication for OpenCloud",
 	})

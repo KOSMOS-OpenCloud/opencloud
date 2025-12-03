@@ -17,7 +17,7 @@ import (
 func Execute() error {
 	cfg := config.DefaultConfig()
 
-	app := clihelper.DefaultAppCobra(&cobra.Command{
+	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "opencloud",
 		Short: "opencloud",
 	})

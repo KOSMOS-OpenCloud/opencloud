@@ -8,7 +8,7 @@ import (
 
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
-	
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

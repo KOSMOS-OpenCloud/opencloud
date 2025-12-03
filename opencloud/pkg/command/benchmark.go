@@ -21,105 +21,46 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 // BenchmarkCommand is the entrypoint for the benchmark commands.
-func BenchmarkCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:        "benchmark",
-		Usage:       "cli tools to test low and high level performance",
-		Category:    "benchmark",
-		Subcommands: []*cli.Command{BenchmarkClientCommand(cfg), BenchmarkSyscallsCommand(cfg)},
+func BenchmarkCommand(cfg *config.Config) *cobra.Command {
+	benchCmd := &cobra.Command{
+		Use:   "benchmark",
+		Short: "cli tools to test low and high level performance",
 	}
+	benchCmd.AddCommand(BenchmarkClientCommand(cfg), BenchmarkSyscallsCommand(cfg))
+	return benchCmd
 }
 
 // BenchmarkClientCommand is the entrypoint for the benchmark client command.
-func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name: "client",
-
-		Usage: "Start a client that continuously makes web requests and prints stats. The options mimic curl, but URL must be at the end.",
-		Flags: []cli.Flag{
-
-			// TODO with v3 'flag.Persistent: true' can be set to make the order of flags no longer relevant \o/
-			// flags mimicing curl
-			&cli.StringFlag{
-				Name:    "request",
-				Aliases: []string{"X"},
-				Value:   "PROPFIND",
-				Usage:   "Specifies a custom request method to use when communicating with the HTTP server.",
-			},
-			&cli.StringFlag{
-				Name:    "user",
-				Aliases: []string{"u"},
-				Value:   "admin:admin",
-				Usage:   "Specify the user name and password to use for server authentication.",
-			},
-			&cli.BoolFlag{
-				Name:    "insecure",
-				Aliases: []string{"k"},
-				Usage:   "Skip the TLS verification step and proceed without checking.",
-			},
-			&cli.StringFlag{
-				Name:    "data",
-				Aliases: []string{"d"},
-				Usage:   "Sends the specified data in a request to the HTTP server.",
-				// TODE support multiple data flags, support data-binary, data-raw
-			},
-			&cli.StringSliceFlag{
-				Name:    "header",
-				Aliases: []string{"H"},
-				Usage:   "Extra header to include in information sent.",
-			},
-			&cli.StringFlag{
-				Name: "rate",
-				Usage: `Specify the maximum transfer frequency you allow a client to use - in number of transfer starts per time unit (sometimes called request rate).
-	The request rate is provided as "N/U" where N is an integer number and U is a time unit. Supported units are 's' (second), 'm' (minute), 'h' (hour) and 'd' /(day, as in a 24 hour unit). The default time unit, if no "/U" is provided, is number of transfers per hour.`,
-			},
-			/*
-				&cli.StringFlag{
-					Name:    "oauth2-bearer",
-					Usage:   "Specify the Bearer Token for OAUTH 2.0 server authentication.",
-				},
-				&cli.StringFlag{
-					Name:    "user-agent",
-					Aliases: []string{"A"},
-					Value:   "admin:admin",
-					Usage:   "Specify the User-Agent string to send to the HTTP	server.",
-				},
-			*/
-			// other flags
-			&cli.StringFlag{
-				Name:  "bearer-token-command",
-				Usage: "Command to execute for a bearer token, e.g. 'oidc-token opencloud'. When set, disables basic auth.",
-			},
-			&cli.IntFlag{
-				Name:  "every",
-				Usage: "Aggregate stats every time this amount of seconds has passed.",
-			},
-			&cli.IntFlag{
-				Name:    "jobs",
-				Aliases: []string{"j"},
-				Value:   1,
-				Usage:   "Number of parallel clients to start.",
-			},
-		},
-		Category: "benchmark",
-		Action: func(c *cli.Context) error {
+func BenchmarkClientCommand(cfg *config.Config) *cobra.Command {
+	benchClientCmd := &cobra.Command{
+		Use:   "client",
+		Short: "Start a client that continuously makes web requests and prints stats. The options mimic curl, but URL must be at the end.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			jobs, err := cmd.Flags().GetInt("jobs")
+			if err != nil {
+				return err
+			}
 			opt := clientOptions{
-				request:  c.String("request"),
-				url:      c.Args().First(),
-				insecure: c.Bool("insecure"),
-				jobs:     c.Int("jobs"),
+				request:  cmd.Flag("request").Value.String(),
+				url:      args[0],
+				insecure: cmd.Flag("insecure").Changed,
+				jobs:     jobs,
 				headers:  make(map[string]string),
-				data:     []byte(c.String("data")),
+				data:     []byte(cmd.Flag("data").Value.String()),
 			}
 			if opt.url == "" {
 				log.Fatal(errors.New("no URL specified"))
 			}
 
-			for _, h := range c.StringSlice("headers") {
+			headersSlice, err := cmd.Flags().GetStringSlice("headers")
+			if err != nil {
+				return err
+			}
+			for _, h := range headersSlice {
 				parts := strings.SplitN(h, ":", 2)
 				if len(parts) != 2 {
 					log.Fatal(errors.New("invalid header '" + h + "'"))
@@ -127,7 +68,7 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 				opt.headers[parts[0]] = strings.TrimSpace(parts[1])
 			}
 
-			rate := c.String("rate")
+			rate := cmd.Flag("rate").Value.String()
 			if rate != "" {
 				parts := strings.SplitN(rate, "/", 2)
 				num, err := strconv.Atoi(parts[0])
@@ -150,12 +91,12 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 				opt.rateDelay = unit / time.Duration(num)
 			}
 
-			user := c.String("user")
+			user := cmd.Flag("user").Value.String()
 			opt.auth = func() string {
 				return "Basic " + base64.StdEncoding.EncodeToString([]byte(user))
 			}
 
-			btc := c.String("bearer-token-command")
+			btc := cmd.Flag("bearer-token-command").Value.String()
 			if btc != "" {
 				parts := strings.SplitN(btc, " ", 2)
 				var cmd *exec.Cmd
@@ -173,7 +114,10 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			every := c.Int("every")
+			every, err := cmd.Flags().GetInt("every")
+			if err != nil {
+				return err
+			}
 			if every != 0 {
 				opt.ticker = time.NewTicker(time.Second * time.Duration(every))
 				defer opt.ticker.Stop()
@@ -183,6 +127,22 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 
 		},
 	}
+
+	// TODO with v3 'flag.Persistent: true' can be set to make the order of flags no longer relevant \o/
+	// flags mimicing curl
+	benchClientCmd.Flags().StringP("request", "X", "PROPFIND", "Specifies a custom request method to use when communicating with the HTTP server.")
+	benchClientCmd.Flags().StringP("user", "u", "admin:admin", "Specify the user name and password to use for server authentication.")
+	benchClientCmd.Flags().BoolP("insecure", "k", false, "Skip the TLS verification step and proceed without checking.")
+	benchClientCmd.Flags().StringP("data", "d", "", "Sends the specified data in a request to the HTTP server.")
+	benchClientCmd.Flags().StringSliceP("headers", "H", []string{}, "Extra header to include in information sent.")
+	benchClientCmd.Flags().String("rate", "", "Specify the maximum transfer frequency you allow a client to use - in number of transfer starts per time unit (sometimes called request rate). The request rate is provided as \"N/U\" where N is an integer number and U is a time unit. Supported units are 's' (second), 'm' (minute), 'h' (hour) and 'd' /(day, as in a 24 hour unit). The default time unit, if no \"/U\" is provided, is number of transfers per hour.")
+
+	// other flags
+	benchClientCmd.Flags().IntP("jobs", "j", 1, "Number of parallel clients to start. Defaults to 1.")
+	benchClientCmd.Flags().Int("every", 0, "Aggregate stats every time this amount of seconds has passed.")
+	benchClientCmd.Flags().String("bearer-token-command", "", "Command to execute for a bearer token, e.g. 'oidc-token opencloud'. When set, disables basic auth.")
+
+	return benchClientCmd
 }
 
 type clientOptions struct {
@@ -280,25 +240,13 @@ func client(o clientOptions) error {
 }
 
 // BenchmarkSyscallsCommand is the entrypoint for the benchmark syscalls command.
-func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "syscalls",
-		Usage: "test the performance of syscalls",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "path",
-				Usage: "Path to test",
-			},
-			&cli.StringFlag{
-				Name:  "iterations",
-				Value: "100",
-				Usage: "Number of iterations to execute",
-			},
-		},
-		Category: "benchmark",
-		Action: func(c *cli.Context) error {
+func BenchmarkSyscallsCommand(cfg *config.Config) *cobra.Command {
+	benchSysCallCmd := &cobra.Command{
+		Use:   "syscalls",
+		Short: "test the performance of syscalls",
+		RunE: func(cmd *cobra.Command, args []string) error {
 
-			path := c.String("path")
+			path := cmd.Flag("path").Value.String()
 			if path == "" {
 				f, err := os.CreateTemp("", "opencloud-bench-temp-")
 				if err != nil {
@@ -309,11 +257,16 @@ func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
 				defer os.Remove(path)
 			}
 
-			iterations := c.Int("iterations")
-
+			iterations, err := cmd.Flags().GetInt("iterations")
+			if err != nil {
+				return err
+			}
 			return benchmark(iterations, path)
 		},
 	}
+	benchSysCallCmd.Flags().String("path", "", "Path to test")
+	benchSysCallCmd.Flags().Int("iterations", 100, "Number of iterations to execute")
+	return benchSysCallCmd
 }
 
 func benchmark(iterations int, path string) error {

@@ -9,8 +9,6 @@ import (
 	"sort"
 	"strings"
 
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -25,69 +23,61 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/tree"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
+
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/rs/zerolog"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 // DecomposedfsCommand is the entrypoint for the groups command.
-func DecomposedfsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "decomposedfs",
-		Usage:    `cli tools to inspect and manipulate a decomposedfs storage.`,
-		Category: "maintenance",
-		Subcommands: []*cli.Command{
-			metadataCmd(cfg),
-			checkCmd(cfg),
-		},
+func DecomposedfsCommand(cfg *config.Config) *cobra.Command {
+	decomposedCmd := &cobra.Command{
+		Use:   "decomposedfs",
+		Short: `cli tools to inspect and manipulate a decomposedfs storage.`,
 	}
+	decomposedCmd.AddCommand(metadataCmd(cfg), checkCmd(cfg))
+	return decomposedCmd
 }
 
 func init() {
 	register.AddCommand(DecomposedfsCommand)
 }
 
-func checkCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "check-treesize",
-		Usage: `cli tool to check the treesize metadata of a Space`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "root",
-				Aliases:  []string{"r"},
-				Required: true,
-				Usage:    "Path to the root directory of the decomposedfs",
-			},
-			&cli.StringFlag{
-				Name:     "node",
-				Required: true,
-				Aliases:  []string{"n"},
-				Usage:    "Space ID of the Space to inspect",
-			},
-			&cli.BoolFlag{
-				Name:  "repair",
-				Usage: "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while OpenCloud is not running.",
-			},
-			&cli.BoolFlag{
-				Name:  "force",
-				Usage: "Do not prompt for confirmation when running in repair mode.",
-			},
-		},
-		Action: check,
+func checkCmd(cfg *config.Config) *cobra.Command {
+	cCmd := &cobra.Command{
+		Use:   "check-treesize",
+		Short: `cli tool to check the treesize metadata of a Space`,
+		RunE:  check,
 	}
+	cCmd.Flags().StringP("root", "r", "", "Path to the root directory of the decomposedfs")
+	err := cCmd.MarkFlagRequired("root")
+	if err != nil {
+		fmt.Println(err)
+	}
+	cCmd.Flags().StringP("node", "n", "", "Space ID of the Space to inspect")
+	err = cCmd.MarkFlagRequired("node")
+	if err != nil {
+		fmt.Println(err)
+	}
+	cCmd.Flags().Bool("repair", false, "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while OpenCloud is not running.")
+	cCmd.Flags().Bool("force", false, "Do not prompt for confirmation when running in repair mode.")
+
+	return cCmd
 }
 
-func check(c *cli.Context) error {
-	rootFlag := c.String("root")
-	repairFlag := c.Bool("repair")
+func check(cmd *cobra.Command, args []string) error {
+	rootFlag := cmd.Flag("root").Value.String()
+	repairFlag := cmd.Flag("repair").Changed
 
-	if repairFlag && !c.Bool("force") {
+	if repairFlag && !cmd.Flag("force").Changed {
 		answer := strings.ToLower(stringPrompt("IMPORTANT: Only use '--repair' when OpenCloud is not running. Do you want to continue? [yes | no = default]"))
 		if answer != "yes" && answer != "y" {
 			return nil
 		}
 	}
 
-	lu, backend := getBackend(c)
+	lu, backend := getBackend(cmd)
 	o := &options.Options{
 		MetadataBackend: backend.Name(),
 		MaxConcurrency:  100,
@@ -100,7 +90,7 @@ func check(c *cli.Context) error {
 
 	tree := tree.New(lu, bs, o, permissions.Permissions{}, store.Create(), &zerolog.Logger{})
 
-	nId := c.String("node")
+	nId := cmd.Flag("node").Value.String()
 	n, err := lu.NodeFromSpaceID(context.Background(), nId)
 	if err != nil || !n.Exists {
 		fmt.Println("Can not find node '" + nId + "'")
@@ -116,7 +106,7 @@ func check(c *cli.Context) error {
 		})
 
 	treeSize, err := walkTree(ctx, tree, lu, n, repairFlag)
-	treesizeFromMetadata, err := n.GetTreeSize(c.Context)
+	treesizeFromMetadata, err := n.GetTreeSize(cmd.Context())
 	if err != nil {
 		fmt.Printf("failed to read treesize of node: %s: %s\n", n.ID, err)
 	}
@@ -126,7 +116,7 @@ func check(c *cli.Context) error {
 		if repairFlag {
 			fmt.Printf("Fixing tree size for node: %s. Calculated treesize: %d\n",
 				n.ID, treeSize)
-			n.SetTreeSize(c.Context, treeSize)
+			n.SetTreeSize(cmd.Context(), treeSize)
 		}
 	}
 	return nil
@@ -185,105 +175,83 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 	return treesize, nil
 }
 
-func metadataCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "metadata",
-		Usage: `cli tools to inspect and manipulate node metadata`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "root",
-				Aliases:  []string{"r"},
-				Required: true,
-				Usage:    "Path to the decomposedfs",
-			},
-			&cli.StringFlag{
-				Name:     "node",
-				Required: true,
-				Aliases:  []string{"n"},
-				Usage:    "Path to or ID of the node to inspect",
-			},
-		},
-		Subcommands: []*cli.Command{dumpCmd(cfg), getCmd(cfg), setCmd(cfg)},
+func metadataCmd(cfg *config.Config) *cobra.Command {
+	metaCmd := &cobra.Command{
+		Use:   "metadata",
+		Short: `cli tools to inspect and manipulate node metadata`,
 	}
+	metaCmd.AddCommand(dumpCmd(cfg), getCmd(cfg), setCmd(cfg))
+	metaCmd.Flags().StringP("root", "r", "", "Path to the root directory of the decomposedfs")
+	err := metaCmd.MarkFlagRequired("root")
+	if err != nil {
+		fmt.Println(err)
+	}
+	metaCmd.Flags().StringP("node", "n", "", "Path to or ID of the node to inspect")
+	err = metaCmd.MarkFlagRequired("node")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return metaCmd
 }
 
-func dumpCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "dump",
-		Usage: `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
-		Action: func(c *cli.Context) error {
-			lu, backend := getBackend(c)
-			path, err := getNode(c, lu)
+func dumpCmd(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "dump",
+		Short: `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			lu, backend := getBackend(cmd)
+			path, err := getNode(cmd, lu)
 			if err != nil {
 				return err
 			}
 
-			attribs, err := backend.All(c.Context, path)
+			attribs, err := backend.All(cmd.Context(), path)
 			if err != nil {
 				fmt.Println("Error reading attributes")
 				return err
 			}
-			printAttribs(attribs, c.String("attribute"))
+			printAttribs(attribs, cmd.Flag("attribute").Value.String())
 			return nil
 		},
 	}
 }
 
-func getCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "get",
-		Usage: `print a specific attribute of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "attribute",
-				Aliases: []string{"a"},
-				Usage:   "attribute to inspect",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			lu, backend := getBackend(c)
-			path, err := getNode(c, lu)
+func getCmd(cfg *config.Config) *cobra.Command {
+	gCmd := &cobra.Command{
+		Use:   "get",
+		Short: `print a specific attribute of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			lu, backend := getBackend(cmd)
+			path, err := getNode(cmd, lu)
 			if err != nil {
 				return err
 			}
 
-			attribs, err := backend.All(c.Context, path)
+			attribs, err := backend.All(cmd.Context(), path)
 			if err != nil {
 				fmt.Println("Error reading attributes")
 				return err
 			}
-			printAttribs(attribs, c.String("attribute"))
+			printAttribs(attribs, cmd.Flag("attribute").Value.String())
 			return nil
 		},
 	}
+	gCmd.Flags().StringP("attribute", "a", "", "attribute to inspect, can be a glob pattern (e.g. 'user.*' will match all attributes starting with 'user.').")
+	return gCmd
 }
 
-func setCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "set",
-		Usage: `manipulate metadata of the given node. Binary attributes can be given hex encoded (prefix by '0x') or base64 encoded (prefix by '0s').`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "attribute",
-				Required: true,
-				Aliases:  []string{"a"},
-				Usage:    "attribute to inspect",
-			},
-			&cli.StringFlag{
-				Name:     "value",
-				Required: true,
-				Aliases:  []string{"v"},
-				Usage:    "value to set",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			lu, backend := getBackend(c)
-			n, err := getNode(c, lu)
+func setCmd(cfg *config.Config) *cobra.Command {
+	sCmd := &cobra.Command{
+		Use:   "set",
+		Short: `manipulate metadata of the given node. Binary attributes can be given hex encoded (prefix by '0x') or base64 encoded (prefix by '0s').`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			lu, backend := getBackend(cmd)
+			n, err := getNode(cmd, lu)
 			if err != nil {
 				return err
 			}
 
-			v := c.String("value")
+			v := cmd.Flag("value").Value.String()
 			if strings.HasPrefix(v, "0s") {
 				b64, err := base64.StdEncoding.DecodeString(v[2:])
 				if err == nil {
@@ -300,7 +268,7 @@ func setCmd(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			err = backend.Set(c.Context, n, c.String("attribute"), []byte(v))
+			err = backend.Set(cmd.Context(), n, cmd.Flag("attribute").Value.String(), []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
@@ -308,6 +276,19 @@ func setCmd(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	sCmd.Flags().StringP("attribute", "a", "", "attribute to inspect, can be a glob pattern (e.g. 'user.*' will match all attributes starting with 'user.').")
+	err := sCmd.MarkFlagRequired("attribute")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	sCmd.Flags().StringP("value", "v", "", "value to set")
+	err = sCmd.MarkFlagRequired("value")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return sCmd
 }
 
 func backend(root, backend string) metadata.Backend {
@@ -320,8 +301,8 @@ func backend(root, backend string) metadata.Backend {
 	return metadata.NullBackend{}
 }
 
-func getBackend(c *cli.Context) (*lookup.Lookup, metadata.Backend) {
-	rootFlag := c.String("root")
+func getBackend(cmd *cobra.Command) (*lookup.Lookup, metadata.Backend) {
+	rootFlag := cmd.Flag("root").Value.String()
 
 	bod := lookup.DetectBackendOnDisk(rootFlag)
 	backend := backend(rootFlag, bod)
@@ -332,8 +313,8 @@ func getBackend(c *cli.Context) (*lookup.Lookup, metadata.Backend) {
 	return lu, backend
 }
 
-func getNode(c *cli.Context, lu *lookup.Lookup) (*node.Node, error) {
-	nodeFlag := c.String("node")
+func getNode(cmd *cobra.Command, lu *lookup.Lookup) (*node.Node, error) {
+	nodeFlag := cmd.Flag("node").Value.String()
 
 	id, err := storagespace.ParseID(nodeFlag)
 	if err != nil {

@@ -11,62 +11,44 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
 	decomposedbs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed/blobstore"
 	decomposeds3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposeds3/blobstore"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 // BackupCommand is the entrypoint for the backup command
-func BackupCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "backup",
-		Usage: "OpenCloud backup functionality",
-		Subcommands: []*cli.Command{
-			ConsistencyCommand(cfg),
-		},
-		Before: func(c *cli.Context) error {
+func BackupCommand(cfg *config.Config) *cobra.Command {
+	bckCmd := &cobra.Command{
+		Use:   "backup",
+		Short: "OpenCloud backup functionality",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
 		},
-		Action: func(_ *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Read the docs")
 			return nil
 		},
 	}
+	bckCmd.AddCommand(ConsistencyCommand(cfg))
+	return bckCmd
 }
 
 // ConsistencyCommand is the entrypoint for the consistency Command
-func ConsistencyCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "consistency",
-		Usage: "check backup consistency",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "basepath",
-				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:    "blobstore",
-				Aliases: []string{"b"},
-				Usage:   "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed",
-				Value:   "decomposed",
-			},
-			&cli.BoolFlag{
-				Name:  "fail",
-				Usage: "exit with non-zero status if consistency check fails",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			basePath := c.String("basepath")
+func ConsistencyCommand(cfg *config.Config) *cobra.Command {
+	consCmd := &cobra.Command{
+		Use:   "consistency",
+		Short: "check backup consistency",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			basePath := cmd.Flag("basepath").Value.String()
 			if basePath == "" {
 				fmt.Println("basepath is required")
-				return cli.ShowCommandHelp(c, "consistency")
+				_ = cmd.Help()
+				return nil
 			}
 
 			var (
 				bs  backup.ListBlobstore
 				err error
 			)
-			switch c.String("blobstore") {
+			switch cmd.Flag("blobstore").Value.String() {
 			case "decomposeds3":
 				bs, err = decomposeds3bs.New(
 					cfg.StorageUsers.Drivers.DecomposedS3.Endpoint,
@@ -87,7 +69,7 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 				fmt.Println(err)
 				return err
 			}
-			if err := backup.CheckProviderConsistency(basePath, bs, c.Bool("fail")); err != nil {
+			if err := backup.CheckProviderConsistency(basePath, bs, cmd.Flag("fail").Changed); err != nil {
 				fmt.Println(err)
 				return err
 			}
@@ -95,6 +77,14 @@ func ConsistencyCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	consCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)")
+	err := consCmd.MarkFlagRequired("basepath")
+	if err != nil {
+		fmt.Println(err)
+	}
+	consCmd.Flags().StringP("blobstore", "b", "", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
+	consCmd.Flags().Bool("fail", false, "exit with non-zero status if consistency check fails")
+	return consCmd
 }
 
 func init() {

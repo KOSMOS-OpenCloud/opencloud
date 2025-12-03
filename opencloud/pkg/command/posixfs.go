@@ -10,9 +10,10 @@ import (
 
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
+
 	"github.com/pkg/xattr"
+	"github.com/spf13/cobra"
 	"github.com/theckman/yacspin"
-	"github.com/urfave/cli/v2"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -37,15 +38,15 @@ type EntryInfo struct {
 }
 
 // PosixfsCommand is the entrypoint for the posixfs command.
-func PosixfsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "posixfs",
-		Usage:    `cli tools to inspect and manipulate a posixfs storage.`,
-		Category: "maintenance",
-		Subcommands: []*cli.Command{
-			consistencyCmd(cfg),
-		},
+func PosixfsCommand(cfg *config.Config) *cobra.Command {
+	posixCmd := &cobra.Command{
+		Use:   "posixfs",
+		Short: `cli tools to inspect and manipulate a posixfs storage.`,
 	}
+
+	posixCmd.AddCommand(consistencyCmd(cfg))
+
+	return posixCmd
 }
 
 func init() {
@@ -53,27 +54,23 @@ func init() {
 }
 
 // consistencyCmd returns a command to check the consistency of the posixfs storage.
-func consistencyCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "consistency",
-		Usage: "check the consistency of the posixfs storage",
-		Action: func(c *cli.Context) error {
-			return checkPosixfsConsistency(c, cfg)
-		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "root",
-				Aliases:  []string{"r"},
-				Required: true,
-				Usage:    "Path to the root directory of the posixfs storage",
-			},
+func consistencyCmd(cfg *config.Config) *cobra.Command {
+	consCmd := &cobra.Command{
+		Use:   "consistency",
+		Short: "check the consistency of the posixfs storage",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return checkPosixfsConsistency(cmd, cfg)
 		},
 	}
+	consCmd.Flags().StringP("root", "r", "", "Path to the root directory of the posixfs storage")
+	_ = consCmd.MarkFlagRequired("root")
+
+	return consCmd
 }
 
 // checkPosixfsConsistency checks the consistency of the posixfs storage.
-func checkPosixfsConsistency(c *cli.Context, cfg *config.Config) error {
-	rootPath := c.String("root")
+func checkPosixfsConsistency(cmd *cobra.Command, cfg *config.Config) error {
+	rootPath := cmd.Flag("root").Value.String()
 	indexesPath := filepath.Join(rootPath, "indexes")
 
 	_, err := os.Stat(indexesPath)

@@ -2,7 +2,7 @@ package register
 
 import (
 	"github.com/opencloud-eu/opencloud/pkg/config"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -11,7 +11,7 @@ var (
 )
 
 // Command defines the register command.
-type Command func(*config.Config) *cli.Command
+type Command func(*config.Config) *cobra.Command
 
 // AddCommand appends a command to Commands.
 func AddCommand(cmd Command) {

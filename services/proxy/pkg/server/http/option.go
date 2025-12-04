@@ -4,11 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/justinas/alice"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/metrics"
-	"github.com/urfave/cli/v2"
+
+	"github.com/justinas/alice"
+	"github.com/spf13/pflag"
 )
 
 // Option defines a single option function.
@@ -21,7 +22,7 @@ type Options struct {
 	Config      *config.Config
 	Handler     http.Handler
 	Metrics     *metrics.Metrics
-	Flags       []cli.Flag
+	Flags       []pflag.Flag
 	Middlewares alice.Chain
 }
 
@@ -65,9 +66,9 @@ func Metrics(val *metrics.Metrics) Option {
 }
 
 // Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
+func Flags(flags ...pflag.Flag) Option {
 	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

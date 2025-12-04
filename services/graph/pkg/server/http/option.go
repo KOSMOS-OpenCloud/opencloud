@@ -3,13 +3,13 @@ package http
 import (
 	"context"
 
-	"github.com/nats-io/nats.go/jetstream"
-	"github.com/urfave/cli/v2"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/metrics"
+
+	"github.com/nats-io/nats.go/jetstream"
+	"github.com/spf13/pflag"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -21,7 +21,7 @@ type Options struct {
 	Context       context.Context
 	Config        *config.Config
 	Metrics       *metrics.Metrics
-	Flags         []cli.Flag
+	Flags         []pflag.Flag
 	Namespace     string
 	TraceProvider trace.TracerProvider
 	NatsKeyValue  jetstream.KeyValue
@@ -67,9 +67,9 @@ func Metrics(val *metrics.Metrics) Option {
 }
 
 // Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
+func Flags(flags ...pflag.Flag) Option {
 	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

@@ -8,7 +8,8 @@ import (
 	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/auth-app/pkg/config"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/pflag"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -20,7 +21,7 @@ type Options struct {
 	Logger          log.Logger
 	Context         context.Context
 	Config          *config.Config
-	Flags           []cli.Flag
+	Flags           []pflag.Flag
 	Namespace       string
 	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	RoleClient      settingssvc.RoleService
@@ -60,9 +61,9 @@ func Config(val *config.Config) Option {
 }
 
 // Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
+func Flags(flags ...pflag.Flag) Option {
 	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

@@ -2146,7 +2146,7 @@ github.com/tus/tusd/v2/pkg/handler
 ## explicit; go 1.13
 github.com/unrolled/secure
 github.com/unrolled/secure/cspbuilder
-# github.com/urfave/cli/v2 v2.27.7
+# github.com/urfave/cli/v2 v2.27.5
 ## explicit; go 1.18
 github.com/urfave/cli/v2
 # github.com/valyala/fastjson v1.6.4

@@ -78,6 +78,7 @@ require (
 	github.com/sirupsen/logrus v1.9.4-0.20230606125235-dd1b4c2e81af
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.1
+	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/test-go/testify v1.1.4
@@ -89,7 +90,6 @@ require (
 	github.com/tidwall/sjson v1.2.5
 	github.com/tus/tusd/v2 v2.8.0
 	github.com/unrolled/secure v1.16.0
-	github.com/urfave/cli/v2 v2.27.7
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go-micro.dev/v4 v4.11.0
@@ -356,7 +356,6 @@ require (
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/studio-b12/gowebdav v0.9.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -368,6 +367,7 @@ require (
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
+	github.com/urfave/cli/v2 v2.27.5 // indirect
 	github.com/valyala/fastjson v1.6.4 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.30 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect

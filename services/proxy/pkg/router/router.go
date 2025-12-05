@@ -272,7 +272,11 @@ func (rt Router) regexRouteMatcher(pattern string, target url.URL) bool {
 }
 
 func prefixRouteMatcher(prefix string, target url.URL) bool {
-	return strings.HasPrefix(path.Clean(target.Path), prefix) && prefix != "/"
+	cleanTarget := path.Clean(target.Path)
+	if strings.HasSuffix(target.Path, "/") {
+		cleanTarget += "/"
+	}
+	return strings.HasPrefix(cleanTarget, prefix) && prefix != "/"
 }
 
 func singleJoiningSlash(a, b string) string {

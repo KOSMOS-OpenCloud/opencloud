@@ -24,9 +24,14 @@ func Execute() error {
 
 	for _, fn := range register.Commands {
 		cmd := fn(cfg)
-		cmd.RunE = func(cmd *cobra.Command, args []string) error {
-			cmd.Help()
-			return nil
+		// if the command has a RunE function, it is a subcommand of root
+		// if not it is a consumed root command from the services
+		// wee need to overwrite the RunE function to get the help output there
+		if cmd.RunE == nil {
+			cmd.RunE = func(cmd *cobra.Command, args []string) error {
+				cmd.Help()
+				return nil
+			}
 		}
 		app.AddCommand(cmd)
 	}

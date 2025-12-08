@@ -23,7 +23,12 @@ func Execute() error {
 	})
 
 	for _, fn := range register.Commands {
-		app.AddCommand(fn(cfg))
+		cmd := fn(cfg)
+		cmd.RunE = func(cmd *cobra.Command, args []string) error {
+			cmd.Help()
+			return nil
+		}
+		app.AddCommand(cmd)
 	}
 	app.SetArgs(os.Args[1:])
 	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)

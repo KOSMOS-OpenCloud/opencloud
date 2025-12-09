@@ -388,6 +388,8 @@ config = {
         "production": {
             # NOTE: need to be updated if new production releases are determined
             "tags": ["2.0", "4.0"],
+            # NOTE: need to be set to true if patch releases are made from stable-X-branches
+            "skip_rolling": "false",
             "repo": docker_repo_slug,
             "build_type": "production",
         },
@@ -1617,13 +1619,19 @@ def dockerReleases(ctx):
 
         # iterate over production tags to see if this is a production release
         is_production = False
+        skip_rolling = False
         for prod_tag in config["dockerReleases"]["production"]["tags"]:
             if tag.startswith(prod_tag):
                 is_production = True
+                skip_rolling = config["dockerReleases"]["production"]["skip_rolling"]
                 break
 
         if is_production:
             docker_releases.append("production")
+            # a new production realease is also a rolling release
+            # unless skip_rolling is set in the config, i.e. for patch-releases on stable-branch
+            if not skip_rolling:
+                docker_releases.append("rolling")
 
         else:
             docker_releases.append("rolling")

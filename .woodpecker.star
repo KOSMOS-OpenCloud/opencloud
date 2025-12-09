@@ -1608,7 +1608,7 @@ def uploadTracingResult(ctx):
 
 def dockerReleases(ctx):
     pipelines = []
-    docker_repos = []
+    docker_releases = []
     build_type = ""
 
     # only make realeases on tag events
@@ -1623,19 +1623,18 @@ def dockerReleases(ctx):
                 break
 
         if is_production:
-            docker_repos.append(config["dockerReleases"]["production"]["repo"])
-            build_type = config["dockerReleases"]["production"]["build_type"]
+            docker_releases.append("production")
 
         else:
-            docker_repos.append(config["dockerReleases"]["rolling"]["repo"])
-            build_type = config["dockerReleases"]["rolling"]["build_type"]
+            docker_releases.append("rolling")
 
     # on non tag events, do daily build
     else:
-        docker_repos.append(config["dockerReleases"]["daily"]["repo"])
-        build_type = config["dockerReleases"]["daily"]["build_type"]
+        docker_releases.append("daily")
 
-    for repo in docker_repos:
+    for releaseConfigName in docker_releases:
+        repo = config["dockerReleases"][releaseConfigName]["repo"]
+        build_type = config["dockerReleases"][releaseConfigName]["build_type"]
         repo_pipelines = []
         repo_pipelines.append(dockerRelease(ctx, repo, build_type))
 

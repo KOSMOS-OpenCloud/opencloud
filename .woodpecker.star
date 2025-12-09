@@ -1611,9 +1611,11 @@ def dockerReleases(ctx):
     docker_repos = []
     build_type = ""
 
+    # only make realeases on tag events
     if ctx.build.event == "tag":
         tag = ctx.build.ref.replace("refs/tags/v", "").lower()
 
+        # iterate over production tags to see if this is a production release
         is_production = False
         for prod_tag in config["dockerReleases"]["production"]["tags"]:
             if tag.startswith(prod_tag):
@@ -1628,6 +1630,7 @@ def dockerReleases(ctx):
             docker_repos.append(config["dockerReleases"]["rolling"]["repo"])
             build_type = config["dockerReleases"]["rolling"]["build_type"]
 
+    # on non tag events, do daily build
     else:
         docker_repos.append(config["dockerReleases"]["daily"]["repo"])
         build_type = config["dockerReleases"]["daily"]["build_type"]

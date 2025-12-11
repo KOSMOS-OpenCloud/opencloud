@@ -24,6 +24,14 @@ func Execute() error {
 
 	for _, commandFactory := range register.Commands {
 		command := commandFactory(cfg)
+
+		if command.GroupID != "" && !app.ContainsGroup(command.GroupID) {
+			app.AddGroup(&cobra.Group{
+				ID:    command.GroupID,
+				Title: command.GroupID,
+			})
+		}
+
 		app.AddCommand(command)
 	}
 	app.SetArgs(os.Args[1:])

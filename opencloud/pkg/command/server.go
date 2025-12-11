@@ -18,6 +18,7 @@ func Server(cfg *config.Config) *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, false))
 		},
+		GroupID: CommandGroupServer,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Prefer the in-memory registry as the default when running in single-binary mode
 			r := runtime.New(cfg)

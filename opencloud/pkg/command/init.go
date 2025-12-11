@@ -17,10 +17,11 @@ import (
 )
 
 // InitCommand is the entrypoint for the init command
-func InitCommand(cfg *config.Config) *cobra.Command {
+func InitCommand(_ *config.Config) *cobra.Command {
 	initCmd := &cobra.Command{
-		Use:   "init",
-		Short: "initialise an OpenCloud config",
+		Use:     "init",
+		Short:   "initialise an OpenCloud config",
+		GroupID: CommandGroupServer,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			insecureFlag := cmd.Flag("insecure").Value.String()
 			insecure := false

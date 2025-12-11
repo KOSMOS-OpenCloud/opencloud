@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/version"
-	"github.com/spf13/cobra"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/tw"
@@ -22,8 +23,9 @@ const (
 // VersionCommand is the entrypoint for the version command.
 func VersionCommand(cfg *config.Config) *cobra.Command {
 	versionCmd := &cobra.Command{
-		Use:   "version",
-		Short: "print the version of this binary and all running service instances",
+		Use:     "version",
+		Short:   "print the version of this binary and all running service instances",
+		GroupID: CommandGroupServer,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Edition: %s\n", version.Edition)

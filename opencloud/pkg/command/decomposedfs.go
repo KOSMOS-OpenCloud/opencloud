@@ -33,8 +33,9 @@ import (
 // DecomposedfsCommand is the entrypoint for the groups command.
 func DecomposedfsCommand(cfg *config.Config) *cobra.Command {
 	decomposedCmd := &cobra.Command{
-		Use:   "decomposedfs",
-		Short: `cli tools to inspect and manipulate a decomposedfs storage.`,
+		Use:     "decomposedfs",
+		Short:   `cli tools to inspect and manipulate a decomposedfs storage.`,
+		GroupID: CommandGroupStorage,
 	}
 	decomposedCmd.AddCommand(metadataCmd(cfg), checkCmd(cfg))
 	return decomposedCmd

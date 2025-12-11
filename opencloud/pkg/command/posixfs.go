@@ -40,8 +40,9 @@ type EntryInfo struct {
 // PosixfsCommand is the entrypoint for the posixfs command.
 func PosixfsCommand(cfg *config.Config) *cobra.Command {
 	posixCmd := &cobra.Command{
-		Use:   "posixfs",
-		Short: `cli tools to inspect and manipulate a posixfs storage.`,
+		Use:     "posixfs",
+		Short:   `cli tools to inspect and manipulate a posixfs storage.`,
+		GroupID: CommandGroupStorage,
 	}
 
 	posixCmd.AddCommand(consistencyCmd(cfg))

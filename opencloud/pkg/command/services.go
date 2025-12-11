@@ -1,7 +1,8 @@
 package command
 
 import (
-	"github.com/opencloud-eu/opencloud/opencloud/pkg/command/helper"
+	"fmt"
+
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -268,8 +269,9 @@ var serviceCommands = []register.Command{
 // ServiceCommand composes a cobra command from the given inputs.
 func ServiceCommand(cfg *config.Config, serviceName string, subCommands []*cobra.Command, f func(*config.Config)) *cobra.Command {
 	command := &cobra.Command{
-		Use:   serviceName,
-		Short: helper.SubcommandDescription(serviceName),
+		Use:     serviceName,
+		Short:   fmt.Sprintf("%s service commands", serviceName),
+		GroupID: CommandGroupServices,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			configlog.Error(parser.ParseConfig(cfg, true))
 			f(cfg)

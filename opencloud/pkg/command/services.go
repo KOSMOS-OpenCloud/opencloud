@@ -52,7 +52,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var svccmds = []register.Command{
+var serviceCommands = []register.Command{
 	func(cfg *config.Config) *cobra.Command {
 		return ServiceCommand(cfg, cfg.Activitylog.Service.Name, activitylog.GetCommands(cfg.Activitylog), func(c *config.Config) {
 			cfg.Activitylog.Commons = cfg.Commons
@@ -265,9 +265,9 @@ var svccmds = []register.Command{
 	},
 }
 
-// ServiceCommand is the entry point for the all service commands.
-func ServiceCommand(cfg *config.Config, serviceName string, subcommands []*cobra.Command, f func(*config.Config)) *cobra.Command {
-	svcCommand := &cobra.Command{
+// ServiceCommand composes a cobra command from the given inputs.
+func ServiceCommand(cfg *config.Config, serviceName string, subCommands []*cobra.Command, f func(*config.Config)) *cobra.Command {
+	command := &cobra.Command{
 		Use:   serviceName,
 		Short: helper.SubcommandDescription(serviceName),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -276,12 +276,21 @@ func ServiceCommand(cfg *config.Config, serviceName string, subcommands []*cobra
 			return nil
 		},
 	}
-	svcCommand.AddCommand(subcommands...)
-	return svcCommand
+
+	// if a service should have multiple child commands,
+	// we expect that at least one argument is needed;
+	// this helps cobra to force display all available child commands.
+	if len(subCommands) > 0 {
+		command.Args = cobra.MinimumNArgs(1)
+	}
+
+	command.AddCommand(subCommands...)
+
+	return command
 }
 
 func init() {
-	for _, c := range svccmds {
+	for _, c := range serviceCommands {
 		register.AddCommand(c)
 	}
 }

@@ -1,13 +1,14 @@
 package register
 
 import (
-	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/spf13/cobra"
+
+	"github.com/opencloud-eu/opencloud/pkg/config"
 )
 
 var (
-	// Commands defines the slice of commands.
-	Commands = []Command{}
+	// Commands define the slice of commands.
+	Commands []Command
 )
 
 // Command defines the register command.

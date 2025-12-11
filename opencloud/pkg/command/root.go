@@ -22,18 +22,9 @@ func Execute() error {
 		Short: "opencloud",
 	})
 
-	for _, fn := range register.Commands {
-		cmd := fn(cfg)
-		// if the command has a RunE function, it is a subcommand of root
-		// if not it is a consumed root command from the services
-		// wee need to overwrite the RunE function to get the help output there
-		if cmd.RunE == nil {
-			cmd.RunE = func(cmd *cobra.Command, args []string) error {
-				cmd.Help()
-				return nil
-			}
-		}
-		app.AddCommand(cmd)
+	for _, commandFactory := range register.Commands {
+		command := commandFactory(cfg)
+		app.AddCommand(command)
 	}
 	app.SetArgs(os.Args[1:])
 	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)

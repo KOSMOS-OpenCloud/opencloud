@@ -1628,6 +1628,7 @@ def dockerReleases(ctx):
 
         if is_production:
             docker_releases.append("production")
+
             # a new production realease is also a rolling release
             # unless skip_rolling is set in the config, i.e. for patch-releases on stable-branch
             if not skip_rolling:
@@ -1636,7 +1637,7 @@ def dockerReleases(ctx):
         else:
             docker_releases.append("rolling")
 
-    # on non tag events, do daily build
+        # on non tag events, do daily build
     else:
         docker_releases.append("daily")
 
@@ -1662,6 +1663,7 @@ def dockerRelease(ctx, repo, build_type):
     build_args = {
         "REVISION": "%s" % ctx.build.commit,
         "VERSION": "%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "daily"),
+        "EDITION": "stable" if build_type == "production" else "rolling",
     }
 
     # if no additional tag is given, the build-plugin adds latest
@@ -1825,6 +1827,7 @@ def binaryRelease(ctx, arch, depends_on = []):
                 "image": OC_CI_GOLANG,
                 "environment": {
                     "VERSION": (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "daily"),
+                    "EDITION": "rolling",
                     "HTTP_PROXY": {
                         "from_secret": "ci_http_proxy",
                     },

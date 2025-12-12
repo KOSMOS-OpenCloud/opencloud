@@ -191,8 +191,8 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			assumeYes, _ := cmd.Flags().GetBool("yes")
-			if !assumeYes {
+			applyYesFlag, _ := cmd.Flags().GetBool("yes")
+			if !applyYesFlag {
 				for {
 					fmt.Printf("Found %d items that could be restored, continue (Y/n), show the items list (s): ", len(res.GetRecycleItems()))
 					var i string

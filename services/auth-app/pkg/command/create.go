@@ -114,9 +114,9 @@ func Create(cfg *config.Config) *cobra.Command {
 		"",
 		"user to create the app-token for",
 	)
-	createCmd.Flags().String(
+	createCmd.Flags().Duration(
 		"expiration",
-		"72h",
+		time.Hour*72,
 		"expiration of the app password, e.g. 72h, 1h, 1m, 1s. Default is 72h.",
 	)
 

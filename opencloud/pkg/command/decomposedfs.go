@@ -68,7 +68,7 @@ func checkCmd(cfg *config.Config) *cobra.Command {
 }
 
 func check(cmd *cobra.Command, args []string) error {
-	rootFlag := cmd.Flag("root").Value.String()
+	rootFlag, _ := cmd.Flags().GetString("root")
 	repairFlag, _ := cmd.Flags().GetBool("repair")
 	forceFlag, _ := cmd.Flags().GetBool("force")
 
@@ -92,7 +92,7 @@ func check(cmd *cobra.Command, args []string) error {
 
 	tree := tree.New(lu, bs, o, permissions.Permissions{}, store.Create(), &zerolog.Logger{})
 
-	nId := cmd.Flag("node").Value.String()
+	nId, _ := cmd.Flags().GetString("node")
 	n, err := lu.NodeFromSpaceID(context.Background(), nId)
 	if err != nil || !n.Exists {
 		fmt.Println("Can not find node '" + nId + "'")
@@ -253,7 +253,7 @@ func setCmd(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
-			v := cmd.Flag("value").Value.String()
+			v, _ := cmd.Flags().GetString("value")
 			if strings.HasPrefix(v, "0s") {
 				b64, err := base64.StdEncoding.DecodeString(v[2:])
 				if err == nil {
@@ -304,7 +304,7 @@ func backend(root, backend string) metadata.Backend {
 }
 
 func getBackend(cmd *cobra.Command) (*lookup.Lookup, metadata.Backend) {
-	rootFlag := cmd.Flag("root").Value.String()
+	rootFlag, _ := cmd.Flags().GetString("root")
 
 	bod := lookup.DetectBackendOnDisk(rootFlag)
 	backend := backend(rootFlag, bod)
@@ -316,7 +316,7 @@ func getBackend(cmd *cobra.Command) (*lookup.Lookup, metadata.Backend) {
 }
 
 func getNode(cmd *cobra.Command, lu *lookup.Lookup) (*node.Node, error) {
-	nodeFlag := cmd.Flag("node").Value.String()
+	nodeFlag, _ := cmd.Flags().GetString("node")
 
 	id, err := storagespace.ParseID(nodeFlag)
 	if err != nil {

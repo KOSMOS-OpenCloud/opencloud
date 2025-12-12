@@ -45,7 +45,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
 		Use:   "purge",
 		Short: "purge revisions",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			basePath := cmd.Flag("basepath").Value.String()
+			basePath, _ := cmd.Flags().GetString("basepath")
 			if basePath == "" {
 				fmt.Println("basepath is required")
 				_ = cmd.Help()
@@ -84,7 +84,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
 				rid = &resid
 			}
 
-			mechanism := cmd.Flag("glob-mechanism").Value.String()
+			mechanism, _ := cmd.Flags().GetString("glob-mechanism")
 			if rid.GetOpaqueId() != "" {
 				mechanism = "glob"
 			}

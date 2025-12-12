@@ -161,7 +161,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 				_ = cmd.Help()
 				return fmt.Errorf("spaceID is requiered")
 			}
-			option := cmd.Flag("option").Value.String()
+			option, _ := cmd.Flags().GetString("option")
 			switch option {
 			case "skip":
 				overwriteOption = SKIP
@@ -273,7 +273,7 @@ func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 				_ = cmd.Help()
 				return fmt.Errorf("itemID is requered")
 			}
-			option := cmd.Flag("option").Value.String()
+			option, _ := cmd.Flags().GetString("option")
 			switch option {
 			case "skip":
 				overwriteOption = SKIP

@@ -34,7 +34,7 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 		Use:   "consistency",
 		Short: "check backup consistency",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			basePath := cmd.Flag("basepath").Value.String()
+			basePath, _ := cmd.Flags().GetString("basepath")
 			if basePath == "" {
 				fmt.Println("basepath is required")
 				_ = cmd.Help()

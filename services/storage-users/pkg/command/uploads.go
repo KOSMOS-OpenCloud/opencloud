@@ -231,7 +231,7 @@ func buildFilter(cmd *cobra.Command) storage.UploadSessionFilter {
 		filter.HasVirus = &infectedValue
 	}
 	if cmd.Flag("id").Changed {
-		idValue := cmd.Flag("id").Value.String()
+		idValue, _ := cmd.Flags().GetString("id")
 		if idValue != "" {
 			filter.ID = &idValue
 		}

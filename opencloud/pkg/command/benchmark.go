@@ -69,7 +69,7 @@ func BenchmarkClientCommand(cfg *config.Config) *cobra.Command {
 				opt.headers[parts[0]] = strings.TrimSpace(parts[1])
 			}
 
-			rate := cmd.Flag("rate").Value.String()
+			rate, _ := cmd.Flags().GetString("rate")
 			if rate != "" {
 				parts := strings.SplitN(rate, "/", 2)
 				num, err := strconv.Atoi(parts[0])
@@ -92,12 +92,12 @@ func BenchmarkClientCommand(cfg *config.Config) *cobra.Command {
 				opt.rateDelay = unit / time.Duration(num)
 			}
 
-			user := cmd.Flag("user").Value.String()
+			user, _ := cmd.Flags().GetString("user")
 			opt.auth = func() string {
 				return "Basic " + base64.StdEncoding.EncodeToString([]byte(user))
 			}
 
-			btc := cmd.Flag("bearer-token-command").Value.String()
+			btc, _ := cmd.Flags().GetString("bearer-token-command")
 			if btc != "" {
 				parts := strings.SplitN(btc, " ", 2)
 				var cmd *exec.Cmd
@@ -247,7 +247,7 @@ func BenchmarkSyscallsCommand(cfg *config.Config) *cobra.Command {
 		Short: "test the performance of syscalls",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			path := cmd.Flag("path").Value.String()
+			path, _ := cmd.Flags().GetString("path")
 			if path == "" {
 				f, err := os.CreateTemp("", "opencloud-bench-temp-")
 				if err != nil {

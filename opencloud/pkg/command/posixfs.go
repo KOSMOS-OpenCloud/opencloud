@@ -71,7 +71,7 @@ func consistencyCmd(cfg *config.Config) *cobra.Command {
 
 // checkPosixfsConsistency checks the consistency of the posixfs storage.
 func checkPosixfsConsistency(cmd *cobra.Command, cfg *config.Config) error {
-	rootPath := cmd.Flag("root").Value.String()
+	rootPath, _ := cmd.Flags().GetString("root")
 	indexesPath := filepath.Join(rootPath, "indexes")
 
 	_, err := os.Stat(indexesPath)

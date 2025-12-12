@@ -56,7 +56,7 @@ func Create(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
-			userName := cmd.Flag("user-name").Value.String()
+			userName, _ := cmd.Flags().GetString("user-name")
 			if userName == "" {
 				fmt.Printf("Username to create app token for: ")
 				if _, err := fmt.Scanln(&userName); err != nil {

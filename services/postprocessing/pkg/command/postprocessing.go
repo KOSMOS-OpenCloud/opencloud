@@ -39,7 +39,7 @@ func RestartPostprocessing(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
-			uid, step := cmd.Flag("upload-id").Value.String(), ""
+			uid, step, _ := cmd.Flags().GetString("upload-id"), ""
 			if uid == "" {
 				step = cmd.Flag("step").Value.String()
 			}

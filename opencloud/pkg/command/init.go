@@ -23,7 +23,7 @@ func InitCommand(_ *config.Config) *cobra.Command {
 		Short:   "initialise an OpenCloud config",
 		GroupID: CommandGroupServer,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			insecureFlag := cmd.Flag("insecure").Value.String()
+			insecureFlag, _ := cmd.Flags().GetString("insecure")
 			insecure := false
 			if insecureFlag == "ask" {
 				answer := strings.ToLower(stringPrompt("Do you want to configure OpenCloud with certificate checking disabled?\n This is not recommended for public instances! [yes | no = default]"))

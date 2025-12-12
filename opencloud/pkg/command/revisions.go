@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/revisions"
 	"github.com/opencloud-eu/opencloud/pkg/config"
@@ -29,12 +30,8 @@ func RevisionsCommand(cfg *config.Config) *cobra.Command {
 	revCmd := &cobra.Command{
 		Use:   "revisions",
 		Short: "OpenCloud revisions functionality",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Read the docs")
-			return nil
 		},
 	}
 	revCmd.AddCommand(PurgeRevisionsCommand(cfg))
@@ -113,8 +110,18 @@ func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
 				ch = revisions.List(p, 10)
 			}
 
-			files, blobs, revisions := revisions.PurgeRevisions(ch, bs, cmd.Flag("dry-run").Changed, cmd.Flag("verbose").Changed)
-			printResults(files, blobs, revisions, cmd.Flag("dry-run").Changed)
+			flagDryRun, err := cmd.Flags().GetBool("dry-run")
+			if err != nil {
+				return err
+			}
+
+			flagVerbose, err := cmd.Flags().GetBool("verbose")
+			if err != nil {
+				return err
+			}
+
+			files, blobs, revisionResults := revisions.PurgeRevisions(ch, bs, flagDryRun, flagVerbose)
+			printResults(files, blobs, revisionResults, flagDryRun)
 			return nil
 		},
 	}

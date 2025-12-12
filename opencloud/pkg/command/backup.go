@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/backup"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
@@ -11,7 +13,6 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
 	decomposedbs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposed/blobstore"
 	decomposeds3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposeds3/blobstore"
-	"github.com/spf13/cobra"
 )
 
 // BackupCommand is the entrypoint for the backup command
@@ -19,12 +20,8 @@ func BackupCommand(cfg *config.Config) *cobra.Command {
 	bckCmd := &cobra.Command{
 		Use:   "backup",
 		Short: "OpenCloud backup functionality",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Read the docs")
-			return nil
 		},
 	}
 	bckCmd.AddCommand(ConsistencyCommand(cfg))
@@ -82,7 +79,7 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 	if err != nil {
 		fmt.Println(err)
 	}
-	consCmd.Flags().StringP("blobstore", "b", "", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
+	consCmd.Flags().StringP("blobstore", "b", "decomposed", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
 	consCmd.Flags().Bool("fail", false, "exit with non-zero status if consistency check fails")
 	return consCmd
 }

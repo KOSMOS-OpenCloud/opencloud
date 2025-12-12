@@ -16,8 +16,8 @@ func SendEmail(cfg *config.Config) *cobra.Command {
 		Use:   "send-email",
 		Short: "Send grouped email notifications with daily or weekly interval. Specify at least one of the flags '--daily' or '--weekly'.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			daily := cmd.Flag("daily").Changed
-			weekly := cmd.Flag("weekly").Changed
+			daily, _ := cmd.Flags().GetBool("daily")
+			weekly, _ := cmd.Flags().GetBool("weekly")
 			if !daily && !weekly {
 				return errors.New("at least one of '--daily' or '--weekly' must be set")
 			}

@@ -31,7 +31,8 @@ func VersionCommand(cfg *config.Config) *cobra.Command {
 			fmt.Printf("Edition: %s\n", version.Edition)
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 
-			if cmd.Flag(_skipServiceListingFlagName).Changed {
+			skipServiceListing, _ := cmd.Flags().GetBool(_skipServiceListingFlagName)
+			if skipServiceListing {
 				return nil
 			}
 

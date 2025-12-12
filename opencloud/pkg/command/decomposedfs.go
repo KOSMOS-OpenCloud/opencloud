@@ -52,15 +52,9 @@ func checkCmd(_ *config.Config) *cobra.Command {
 		RunE:  check,
 	}
 	cCmd.Flags().StringP("root", "r", "", "Path to the root directory of the decomposedfs")
-	err := cCmd.MarkFlagRequired("root")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = cCmd.MarkFlagRequired("root")
 	cCmd.Flags().StringP("node", "n", "", "Space ID of the Space to inspect")
-	err = cCmd.MarkFlagRequired("node")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = cCmd.MarkFlagRequired("node")
 	cCmd.Flags().Bool("repair", false, "Try to repair nodes with incorrect treesize metadata. IMPORTANT: Only use this while OpenCloud is not running.")
 	cCmd.Flags().Bool("force", false, "Do not prompt for confirmation when running in repair mode.")
 
@@ -187,15 +181,9 @@ func metadataCmd(cfg *config.Config) *cobra.Command {
 	}
 	metaCmd.AddCommand(dumpCmd(cfg), getCmd(cfg), setCmd(cfg))
 	metaCmd.Flags().StringP("root", "r", "", "Path to the root directory of the decomposedfs")
-	err := metaCmd.MarkFlagRequired("root")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = metaCmd.MarkFlagRequired("root")
 	metaCmd.Flags().StringP("node", "n", "", "Path to or ID of the node to inspect")
-	err = metaCmd.MarkFlagRequired("node")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = metaCmd.MarkFlagRequired("node")
 	return metaCmd
 }
 
@@ -285,16 +273,10 @@ func setCmd(_ *config.Config) *cobra.Command {
 		},
 	}
 	sCmd.Flags().StringP("attribute", "a", "", "attribute to inspect, can be a glob pattern (e.g. 'user.*' will match all attributes starting with 'user.').")
-	err := sCmd.MarkFlagRequired("attribute")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = sCmd.MarkFlagRequired("attribute")
 
 	sCmd.Flags().StringP("value", "v", "", "value to set")
-	err = sCmd.MarkFlagRequired("value")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = sCmd.MarkFlagRequired("value")
 
 	return sCmd
 }

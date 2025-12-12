@@ -35,12 +35,6 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cobra.Command {
 		Short: "purge empty directories",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			basePath, _ := cmd.Flags().GetString("basepath")
-			if basePath == "" {
-				fmt.Println("basepath is required")
-				_ = cmd.Help()
-				return nil
-			}
-
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			if err := trash.PurgeTrashEmptyPaths(basePath, dryRun); err != nil {
 				fmt.Println(err)
@@ -51,10 +45,7 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cobra.Command {
 		},
 	}
 	trashPurgeCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)")
-	err := trashPurgeCmd.MarkFlagRequired("basepath")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = trashPurgeCmd.MarkFlagRequired("basepath")
 
 	trashPurgeCmd.Flags().Bool("dry-run", true, "do not delete anything, just print what would be deleted")
 

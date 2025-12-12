@@ -2,7 +2,6 @@ package command
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
@@ -66,24 +65,14 @@ func cleanupCmd(cfg *config.Config) *cobra.Command {
 		},
 	}
 	cleanCmd.Flags().String("service-account-id", "", "Name of the service account to use for the cleanup")
-	err := viper.BindEnv("service-account-id", "OC_SERVICE_ACCOUNT_ID")
-	if err != nil {
-		fmt.Printf("Could not bind environment variable OC_SERVICE_ACCOUNT_ID: %s", err)
-	}
-	err = viper.BindPFlag("service-account-id", cleanCmd.Flags().Lookup("service-account-id"))
-	if err != nil {
-		fmt.Printf("Could not bind flag OC_SERVICE_ACCOUNT_ID: %s", err)
-	}
+	_ = cleanCmd.MarkFlagRequired("service-account-id")
+	_ = viper.BindEnv("service-account-id", "OC_SERVICE_ACCOUNT_ID")
+	_ = viper.BindPFlag("service-account-id", cleanCmd.Flags().Lookup("service-account-id"))
 
 	cleanCmd.Flags().String("service-account-secret", "", "Secret for the service account")
-	err = viper.BindEnv("service-account-secret", "OC_SERVICE_ACCOUNT_SECRET")
-	if err != nil {
-		fmt.Printf("Could not bind environment variable OC_SERVICE_ACCOUNT_SECRET: %s", err)
-	}
-	err = viper.BindPFlag("service-account-secret", cleanCmd.Flags().Lookup("service-account-secret"))
-	if err != nil {
-		fmt.Printf("Could not bind flag OC_SERVICE_ACCOUNT_SECRET: %s", err)
-	}
+	_ = cleanCmd.MarkFlagRequired("service-account-secret")
+	_ = viper.BindEnv("service-account-secret", "OC_SERVICE_ACCOUNT_SECRET")
+	_ = viper.BindPFlag("service-account-secret", cleanCmd.Flags().Lookup("service-account-secret"))
 
 	return cleanCmd
 }

@@ -34,17 +34,11 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 		Use:   "consistency",
 		Short: "check backup consistency",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			basePath, _ := cmd.Flags().GetString("basepath")
-			if basePath == "" {
-				fmt.Println("basepath is required")
-				_ = cmd.Help()
-				return nil
-			}
-
 			var (
 				bs  backup.ListBlobstore
 				err error
 			)
+			basePath, _ := cmd.Flags().GetString("basepath")
 			blobstoreFlag, _ := cmd.Flags().GetString("blobstore")
 			switch blobstoreFlag {
 			case "decomposeds3":
@@ -77,10 +71,7 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 		},
 	}
 	consCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)")
-	err := consCmd.MarkFlagRequired("basepath")
-	if err != nil {
-		fmt.Println(err)
-	}
+	_ = consCmd.MarkFlagRequired("basepath")
 	consCmd.Flags().StringP("blobstore", "b", "decomposed", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
 	consCmd.Flags().Bool("fail", false, "exit with non-zero status if consistency check fails")
 	return consCmd

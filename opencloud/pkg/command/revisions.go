@@ -46,11 +46,6 @@ func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
 		Short: "purge revisions",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			basePath, _ := cmd.Flags().GetString("basepath")
-			if basePath == "" {
-				fmt.Println("basepath is required")
-				_ = cmd.Help()
-				return nil
-			}
 
 			var (
 				bs  revisions.DelBlobstore
@@ -128,6 +123,7 @@ func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
 		},
 	}
 	revCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/metadata)")
+	_ = revCmd.MarkFlagRequired("basepath")
 	revCmd.Flags().StringP("blobstore", "b", "decomposed", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
 	revCmd.Flags().Bool("dry-run", true, "do not delete anything, just print what would be deleted")
 	revCmd.Flags().BoolP("verbose", "v", false, "print verbose output")

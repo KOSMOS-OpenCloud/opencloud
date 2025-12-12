@@ -94,8 +94,13 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 				os.Exit(1)
 			}
 
+			restart, _ := cmd.Flags().GetBool("restart")
+			resume, _ := cmd.Flags().GetBool("resume")
+			clean, _ := cmd.Flags().GetBool("clean")
+			renderJson, _ := cmd.Flags().GetBool("json")
+
 			var stream events.Stream
-			if cmd.Flag("restart").Changed || cmd.Flag("resume").Changed {
+			if restart || resume {
 				stream, err = event.NewStream(cfg)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to create event stream: %v\n", err)
@@ -114,7 +119,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 				raw   []Session
 			)
 
-			if !cmd.Flag("json").Changed {
+			if !renderJson {
 				fmt.Println(buildInfo(filter))
 
 				table = tablewriter.NewTable(os.Stdout, tablewriter.WithHeaderAutoFormat(tw.Off))
@@ -139,7 +144,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 					ScanResult: sr,
 				}
 
-				if cmd.Flag("json").Changed {
+				if renderJson {
 					raw = append(raw, session)
 				} else {
 					table.Append([]string{
@@ -158,7 +163,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 				}
 
 				switch {
-				case cmd.Flag("restart").Changed:
+				case restart:
 					if err := events.Publish(context.Background(), stream, events.RestartPostprocessing{
 						UploadID:  u.ID(),
 						Timestamp: utils.TSNow(),
@@ -168,7 +173,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 						os.Exit(1)
 					}
 
-				case cmd.Flag("resume").Changed:
+				case resume:
 					if err := events.Publish(context.Background(), stream, events.ResumePostprocessing{
 						UploadID:  u.ID(),
 						Timestamp: utils.TSNow(),
@@ -178,7 +183,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 						os.Exit(1)
 					}
 
-				case cmd.Flag("clean").Changed:
+				case clean:
 					if err := u.Purge(cmd.Context()); err != nil {
 						fmt.Fprintf(os.Stderr, "Failed to clean upload session '%s'\n", u.ID())
 					}
@@ -186,7 +191,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 
 			}
 
-			if !cmd.Flag("json").Changed {
+			if !renderJson {
 				table.Render()
 				return nil
 			}
@@ -200,7 +205,7 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 			return nil
 		},
 	}
-	listUploadSessionsCmd.Flags().String("id", "unset", "filter sessions by upload session id")
+	listUploadSessionsCmd.Flags().String("id", "", "filter sessions by upload session id")
 	listUploadSessionsCmd.Flags().Bool("processing", false, "filter sessions by processing status")
 	listUploadSessionsCmd.Flags().Bool("expired", false, "filter sessions by expired status")
 	listUploadSessionsCmd.Flags().Bool("has-virus", false, "filter sessions by virus scan result")
@@ -214,20 +219,22 @@ func ListUploadSessions(cfg *config.Config) *cobra.Command {
 func buildFilter(cmd *cobra.Command) storage.UploadSessionFilter {
 	filter := storage.UploadSessionFilter{}
 	if cmd.Flag("processing").Changed {
-		processingValue := cmd.Flag("processing").Changed
+		processingValue, _ := cmd.Flags().GetBool("processing")
 		filter.Processing = &processingValue
 	}
 	if cmd.Flag("expired").Changed {
-		expiredValue := cmd.Flag("expired").Changed
+		expiredValue, _ := cmd.Flags().GetBool("expired")
 		filter.Expired = &expiredValue
 	}
 	if cmd.Flag("has-virus").Changed {
-		infectedValue := cmd.Flag("has-virus").Changed
+		infectedValue, _ := cmd.Flags().GetBool("has-virus")
 		filter.HasVirus = &infectedValue
 	}
 	if cmd.Flag("id").Changed {
 		idValue := cmd.Flag("id").Value.String()
-		filter.ID = &idValue
+		if idValue != "" {
+			filter.ID = &idValue
+		}
 	}
 	return filter
 }

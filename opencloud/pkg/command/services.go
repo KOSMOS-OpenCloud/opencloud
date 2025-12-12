@@ -272,18 +272,11 @@ func ServiceCommand(cfg *config.Config, serviceName string, subCommands []*cobra
 		Use:     serviceName,
 		Short:   fmt.Sprintf("%s service commands", serviceName),
 		GroupID: CommandGroupServices,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			configlog.Error(parser.ParseConfig(cfg, true))
 			f(cfg)
 			return nil
 		},
-	}
-
-	// if a service should have multiple child commands,
-	// we expect that at least one argument is needed;
-	// this helps cobra to force display all available child commands.
-	if len(subCommands) > 0 {
-		command.Args = cobra.MinimumNArgs(1)
 	}
 
 	command.AddCommand(subCommands...)

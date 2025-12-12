@@ -93,7 +93,8 @@ func listTrashBinItems(cfg *config.Config) *cobra.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log := cliLogger(cmd.Flag("verbose").Changed)
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID string
 			if len(args) > 0 {
 				spaceID = args[0]
@@ -150,17 +151,18 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log := cliLogger(cmd.Flag("verbose").Changed)
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID string
 			if len(args) > 0 {
 				spaceID = args[0]
 			}
 			if spaceID == "" {
 				_ = cmd.Help()
-				fmt.Errorf("spaceID is requiered")
-				os.Exit(1)
+				return fmt.Errorf("spaceID is requiered")
 			}
-			switch cmd.Flag("option").Value.String() {
+			option := cmd.Flag("option").Value.String()
+			switch option {
 			case "skip":
 				overwriteOption = SKIP
 			case "replace":
@@ -169,8 +171,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 				overwriteOption = KEEP_BOTH
 			default:
 				_ = cmd.Help()
-				fmt.Errorf("The option flag is invalid")
-				os.Exit(1)
+				return fmt.Errorf("option flag '%s' is invalid", option)
 			}
 			log.Info().Msgf("Restoring trash-bin items for spaceID: '%s' ...", spaceID)
 
@@ -190,8 +191,8 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			if !cmd.Flag("yes").Changed {
+			assumeYes, _ := cmd.Flags().GetBool("yes")
+			if !assumeYes {
 				for {
 					fmt.Printf("Found %d items that could be restored, continue (Y/n), show the items list (s): ", len(res.GetRecycleItems()))
 					var i string
@@ -214,7 +215,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 				}
 			}
 
-			log.Info().Msgf("Run restoring-all with option=%s", cmd.Flag("option").Value.String())
+			log.Info().Msgf("Run restoring-all with option=%s", option)
 			for _, item := range res.GetRecycleItems() {
 				log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s'", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()))
 				dstRes, err := restore(ctx, client, ref, item, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
@@ -254,18 +255,16 @@ func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 	restoreTrashBinItemCmd := &cobra.Command{
 		Use:   "restore",
 		Short: "Restore a trash-bin item by ID.",
-		// TODO: not sure this could also be 2
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log := cliLogger(cmd.Flag("verbose").Changed)
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID, itemID string
-			if len(args) > 1 {
-				spaceID = args[0]
-				itemID = args[1]
-			}
+			spaceID = args[0]
+			itemID = args[1]
 			if spaceID == "" {
 				_ = cmd.Help()
 				return fmt.Errorf("spaceID is requered")
@@ -274,7 +273,8 @@ func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 				_ = cmd.Help()
 				return fmt.Errorf("itemID is requered")
 			}
-			switch cmd.Flag("option").Value.String() {
+			option := cmd.Flag("option").Value.String()
+			switch option {
 			case "skip":
 				overwriteOption = SKIP
 			case "replace":
@@ -283,8 +283,7 @@ func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 				overwriteOption = KEEP_BOTH
 			default:
 				_ = cmd.Help()
-				fmt.Errorf("The option flag is invalid")
-				os.Exit(1)
+				return fmt.Errorf("option flag '%s' is invalid", option)
 			}
 			log.Info().Msgf("Restoring trash-bin item for spaceID: '%s' itemID: '%s' ...", spaceID, itemID)
 
@@ -317,7 +316,7 @@ func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 			if !found {
 				return fmt.Errorf("itemID '%s' not found", itemID)
 			}
-			log.Info().Msgf("Run restoring with option=%s", cmd.Flag("option").Value.String())
+			log.Info().Msgf("Run restoring with option=%s", option)
 			log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s", itemRef.GetKey(), itemRef.GetRef().GetPath(), itemType(itemRef.GetType()))
 			dstRes, err := restore(ctx, client, ref, itemRef, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 			if err != nil {

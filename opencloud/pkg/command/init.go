@@ -33,11 +33,11 @@ func InitCommand(_ *config.Config) *cobra.Command {
 			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
-			forceOverwrite, _ := cmd.Flags().GetBool("force-overwrite")
-			diff, _ := cmd.Flags().GetBool("force-overwrite")
-			err := ocinit.CreateConfig(insecure, forceOverwrite,
-				diff, cmd.Flag("config-path").Value.String(),
-				cmd.Flag("admin-password").Value.String())
+			forceOverwriteFlag, _ := cmd.Flags().GetBool("force-overwrite")
+			diffFlag, _ := cmd.Flags().GetBool("force-overwrite")
+			configPathFlag, _ := cmd.Flags().GetString("config-path")
+			adminPasswordFlag, _ := cmd.Flags().GetString("admin-password")
+			err := ocinit.CreateConfig(insecure, forceOverwriteFlag, diffFlag, configPathFlag, adminPasswordFlag)
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}

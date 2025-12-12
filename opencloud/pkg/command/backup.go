@@ -45,7 +45,8 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 				bs  backup.ListBlobstore
 				err error
 			)
-			switch cmd.Flag("blobstore").Value.String() {
+			blobstoreFlag, _ := cmd.Flags().GetString("blobstore")
+			switch blobstoreFlag {
 			case "decomposeds3":
 				bs, err = decomposeds3bs.New(
 					cfg.StorageUsers.Drivers.DecomposedS3.Endpoint,

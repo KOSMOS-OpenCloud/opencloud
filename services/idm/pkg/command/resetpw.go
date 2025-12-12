@@ -35,7 +35,8 @@ func ResetPassword(cfg *config.Config) *cobra.Command {
 			ctx, cancel := context.WithCancel(cmd.Context())
 
 			defer cancel()
-			return resetPassword(ctx, logger, cfg, cmd.Flag("user-name").Value.String())
+			userNameFlag, _ := cmd.Flags().GetString("user-name")
+			return resetPassword(ctx, logger, cfg, userNameFlag)
 		},
 	}
 	resetPasswordCmd.Flags().StringP(

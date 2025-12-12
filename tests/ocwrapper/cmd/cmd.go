@@ -30,16 +30,23 @@ func serveCmd() *cobra.Command {
 			common.Wg.Add(2)
 
 			// set configs
-			opencloudConfig.Set("bin", cmd.Flag("bin").Value.String())
-			opencloudConfig.Set("url", cmd.Flag("url").Value.String())
-			opencloudConfig.Set("retry", cmd.Flag("retry").Value.String())
-			opencloudConfig.Set("adminUsername", cmd.Flag("admin-username").Value.String())
-			opencloudConfig.Set("adminPassword", cmd.Flag("admin-password").Value.String())
+			binFlag, _ := cmd.Flags().GetString("bin")
+			opencloudConfig.Set("bin", binFlag)
+			urlFlag, _ := cmd.Flags().GetString("url")
+			opencloudConfig.Set("url", urlFlag)
+			retryFlag, _ := cmd.Flags().GetString("retry")
+			opencloudConfig.Set("retry", retryFlag)
+			adminUsernameFlag, _ := cmd.Flags().GetString("admin-username")
+			opencloudConfig.Set("adminUsername", adminUsernameFlag)
+			adminPasswordFlag, _ := cmd.Flags().GetString("admin-password")
+			opencloudConfig.Set("adminPassword", adminPasswordFlag)
 
-			if cmd.Flag("skip-OpenCloud-run").Value.String() == "false" {
+			skipOpenCloudRunFlag, _ := cmd.Flags().GetBool("skip-OpenCloud-run")
+			if !skipOpenCloudRunFlag {
 				go opencloud.Start(nil)
 			}
-			go wrapper.Start(cmd.Flag("port").Value.String())
+			portFlag, _ := cmd.Flags().GetString("port")
+			go wrapper.Start(portFlag)
 		},
 	}
 

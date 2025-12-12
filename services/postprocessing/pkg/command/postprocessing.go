@@ -39,9 +39,10 @@ func RestartPostprocessing(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
-			uid, step, _ := cmd.Flags().GetString("upload-id"), ""
+			uid, _ := cmd.Flags().GetString("upload-id")
+			step := ""
 			if uid == "" {
-				step = cmd.Flag("step").Value.String()
+				step, _ = cmd.Flags().GetString("step")
 			}
 
 			restart, _ := cmd.Flags().GetBool("restart")

@@ -85,7 +85,7 @@ func Create(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
-			expiry, err := time.ParseDuration(cmd.Flag("expiration").Value.String())
+			expiry, err := cmd.Flags().GetDuration("expiration")
 			if err != nil {
 				return err
 			}

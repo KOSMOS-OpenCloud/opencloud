@@ -45,7 +45,7 @@ func init() {
 	register.AddCommand(DecomposedfsCommand)
 }
 
-func checkCmd(cfg *config.Config) *cobra.Command {
+func checkCmd(_ *config.Config) *cobra.Command {
 	cCmd := &cobra.Command{
 		Use:   "check-treesize",
 		Short: `cli tool to check the treesize metadata of a Space`,
@@ -108,6 +108,9 @@ func check(cmd *cobra.Command, args []string) error {
 		})
 
 	treeSize, err := walkTree(ctx, tree, lu, n, repairFlag)
+	if err != nil {
+		fmt.Printf("failed to walk tree of node %s: %s\n", n.ID, err)
+	}
 	treesizeFromMetadata, err := n.GetTreeSize(cmd.Context())
 	if err != nil {
 		fmt.Printf("failed to read treesize of node: %s: %s\n", n.ID, err)
@@ -196,7 +199,7 @@ func metadataCmd(cfg *config.Config) *cobra.Command {
 	return metaCmd
 }
 
-func dumpCmd(cfg *config.Config) *cobra.Command {
+func dumpCmd(_ *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "dump",
 		Short: `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
@@ -212,13 +215,14 @@ func dumpCmd(cfg *config.Config) *cobra.Command {
 				fmt.Println("Error reading attributes")
 				return err
 			}
-			printAttribs(attribs, cmd.Flag("attribute").Value.String())
+			attributeFlag, _ := cmd.Flags().GetString("attribute")
+			printAttribs(attribs, attributeFlag)
 			return nil
 		},
 	}
 }
 
-func getCmd(cfg *config.Config) *cobra.Command {
+func getCmd(_ *config.Config) *cobra.Command {
 	gCmd := &cobra.Command{
 		Use:   "get",
 		Short: `print a specific attribute of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
@@ -234,7 +238,8 @@ func getCmd(cfg *config.Config) *cobra.Command {
 				fmt.Println("Error reading attributes")
 				return err
 			}
-			printAttribs(attribs, cmd.Flag("attribute").Value.String())
+			attributeFlag, _ := cmd.Flags().GetString("attribute")
+			printAttribs(attribs, attributeFlag)
 			return nil
 		},
 	}
@@ -242,7 +247,7 @@ func getCmd(cfg *config.Config) *cobra.Command {
 	return gCmd
 }
 
-func setCmd(cfg *config.Config) *cobra.Command {
+func setCmd(_ *config.Config) *cobra.Command {
 	sCmd := &cobra.Command{
 		Use:   "set",
 		Short: `manipulate metadata of the given node. Binary attributes can be given hex encoded (prefix by '0x') or base64 encoded (prefix by '0s').`,
@@ -270,7 +275,8 @@ func setCmd(cfg *config.Config) *cobra.Command {
 				}
 			}
 
-			err = backend.Set(cmd.Context(), n, cmd.Flag("attribute").Value.String(), []byte(v))
+			attributeFlag, _ := cmd.Flags().GetString("attribute")
+			err = backend.Set(cmd.Context(), n, attributeFlag, []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
@@ -293,7 +299,7 @@ func setCmd(cfg *config.Config) *cobra.Command {
 	return sCmd
 }
 
-func backend(root, backend string) metadata.Backend {
+func backend(backend string) metadata.Backend {
 	switch backend {
 	case "xattrs":
 		return metadata.NewXattrsBackend(cache.Config{})
@@ -307,7 +313,7 @@ func getBackend(cmd *cobra.Command) (*lookup.Lookup, metadata.Backend) {
 	rootFlag, _ := cmd.Flags().GetString("root")
 
 	bod := lookup.DetectBackendOnDisk(rootFlag)
-	backend := backend(rootFlag, bod)
+	backend := backend(bod)
 	lu := lookup.New(backend, &options.Options{
 		Root:            rootFlag,
 		MetadataBackend: bod,

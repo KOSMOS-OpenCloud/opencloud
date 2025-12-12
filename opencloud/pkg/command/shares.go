@@ -119,8 +119,9 @@ func cleanup(cmd *cobra.Command, cfg *config.Config) error {
 		return configlog.ReturnError(err)
 	}
 
-	serviceUserCtx, err := utils.GetServiceUserContext(cmd.Flag("service-account-id").Value.String(),
-		client, cmd.Flag("service-account-secret").Value.String())
+	serviceAccountIDFlag, _ := cmd.Flags().GetString("service-account-id")
+	serviceAccountSecretFlag, _ := cmd.Flags().GetString("service-account-secret")
+	serviceUserCtx, err := utils.GetServiceUserContext(serviceAccountIDFlag, client, serviceAccountSecretFlag)
 	if err != nil {
 		return configlog.ReturnError(err)
 	}

@@ -44,9 +44,10 @@ func RestartPostprocessing(cfg *config.Config) *cobra.Command {
 				step = cmd.Flag("step").Value.String()
 			}
 
+			restart, _ := cmd.Flags().GetBool("restart")
 			var ev events.Unmarshaller
 			switch {
-			case cmd.Flag("restart").Changed:
+			case restart:
 				ev = events.RestartPostprocessing{
 					UploadID:  uid,
 					Timestamp: utils.TSNow(),

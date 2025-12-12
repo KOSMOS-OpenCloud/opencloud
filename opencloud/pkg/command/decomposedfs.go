@@ -69,9 +69,10 @@ func checkCmd(cfg *config.Config) *cobra.Command {
 
 func check(cmd *cobra.Command, args []string) error {
 	rootFlag := cmd.Flag("root").Value.String()
-	repairFlag := cmd.Flag("repair").Changed
+	repairFlag, _ := cmd.Flags().GetBool("repair")
+	forceFlag, _ := cmd.Flags().GetBool("force")
 
-	if repairFlag && !cmd.Flag("force").Changed {
+	if repairFlag && !forceFlag {
 		answer := strings.ToLower(stringPrompt("IMPORTANT: Only use '--repair' when OpenCloud is not running. Do you want to continue? [yes | no = default]"))
 		if answer != "yes" && answer != "y" {
 			return nil

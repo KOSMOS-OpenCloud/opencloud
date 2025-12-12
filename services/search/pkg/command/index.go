@@ -27,7 +27,8 @@ func Index(cfg *config.Config) *cobra.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if cmd.Flag("space").Value.String() == "" && !cmd.Flag("all-spaces").Changed {
+			allSpaces, _ := cmd.Flags().GetBool("all-spaces")
+			if cmd.Flag("space").Value.String() == "" && !allSpaces {
 				return errors.New("either --space or --all-spaces is required")
 			}
 

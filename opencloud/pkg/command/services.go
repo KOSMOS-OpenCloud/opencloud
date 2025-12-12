@@ -48,7 +48,6 @@ import (
 	web "github.com/opencloud-eu/opencloud/services/web/pkg/command"
 	webdav "github.com/opencloud-eu/opencloud/services/webdav/pkg/command"
 	webfinger "github.com/opencloud-eu/opencloud/services/webfinger/pkg/command"
-	"github.com/urfave/cli/v2"
 
 	"github.com/spf13/cobra"
 )
@@ -164,7 +163,7 @@ var serviceCommands = []register.Command{
 			cfg.Notifications.Commons = cfg.Commons
 		})
 	},
-	func(cfg *config.Config) *cli.Command {
+	func(cfg *config.Config) *cobra.Command {
 		return ServiceCommand(cfg, cfg.OCM.Service.Name, ocm.GetCommands(cfg.OCM), func(c *config.Config) {
 			cfg.OCM.Commons = cfg.Commons
 		})

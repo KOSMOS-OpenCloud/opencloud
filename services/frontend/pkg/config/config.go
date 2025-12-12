@@ -33,7 +33,6 @@ type Config struct {
 	EnableFederatedSharingIncoming bool   `yaml:"enable_federated_sharing_incoming" env:"OC_ENABLE_OCM;FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING" desc:"Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed." introductionVersion:"1.0.0"`
 	EnableFederatedSharingOutgoing bool   `yaml:"enable_federated_sharing_outgoing" env:"OC_ENABLE_OCM;FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING" desc:"Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed." introductionVersion:"1.0.0"`
 	SearchMinLength                int    `yaml:"search_min_length" env:"FRONTEND_SEARCH_MIN_LENGTH" desc:"Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed." introductionVersion:"1.0.0"`
-	Edition                        string `desc:"Edition of OpenCloud. Used for branding purposes." introductionVersion:"1.0.0"`
 	DisableSSE                     bool   `yaml:"disable_sse" env:"OC_DISABLE_SSE;FRONTEND_DISABLE_SSE" desc:"When set to true, clients are informed that the Server-Sent Events endpoint is not accessible." introductionVersion:"1.0.0"`
 	DisableRadicale                bool   `yaml:"disable_radicale" env:"FRONTEND_DISABLE_RADICALE" desc:"When set to true, clients are informed that the Radicale (CalDAV/CardDAV) is not accessible." introductionVersion:"4.0.0"`
 	DefaultLinkPermissions         int    `yaml:"default_link_permissions" env:"FRONTEND_DEFAULT_LINK_PERMISSIONS" desc:"Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1." introductionVersion:"1.0.0"`
@@ -173,19 +172,14 @@ type OCDav struct {
 
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OC_MACHINE_AUTH_API_KEY;OCDAV_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services." introductionVersion:"1.0.0"`
 
-	Status Status `yaml:"-"`
-
 	AllowPropfindDepthInfinity bool `yaml:"allow_propfind_depth_infinity" env:"OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" desc:"Allow the use of depth infinity in PROPFINDS. When enabled, a propfind will traverse through all subfolders. If many subfolders are expected, depth infinity can cause heavy server load and/or delayed response times." introductionVersion:"1.0.0"`
+
+	NameValidation NameValidation `yaml:"name_validation"`
 }
 
-// Status holds the configurable values for the status.php
-type Status struct {
-	Version        string
-	VersionString  string
-	Product        string
-	ProductName    string
-	ProductVersion string
-	Edition        string `yaml:"edition" env:"OC_EDITION;OCDAV_EDITION" desc:"Edition of OpenCloud. Used for branding purposes." introductionVersion:"1.0.0"`
+type NameValidation struct {
+	InvalidChars []string `yaml:"invalid_chars" env:"OCDAV_NAME_VALIDATION_INVALID_CHARS" desc:"List of characters that are not allowed in file or folder names." introductionVersion:"%%NEXT%%"`
+	MaxLength    int      `yaml:"max_length" env:"OCDAV_NAME_VALIDATION_MAX_LENGTH" desc:"Max lenght og file or folder names." introductionVersion:"%%NEXT%%"`
 }
 
 type CacheWarmupDrivers struct {

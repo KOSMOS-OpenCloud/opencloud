@@ -209,7 +209,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 									"needsDbUpgrade": false,
 									"version":        version.Legacy,
 									"versionstring":  version.LegacyString,
-									"edition":        cfg.Edition,
+									"edition":        version.Edition,
 									"productname":    "OpenCloud",
 									"product":        "OpenCloud",
 									"productversion": version.GetString(),
@@ -371,16 +371,16 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 					// still not supported
 					//"favorite_storage_driver":   unused,
 					//"favorite_storage_drivers":  unused,
-					"version":              cfg.OCDav.Status.Version,
-					"version_string":       cfg.OCDav.Status.VersionString,
-					"edition":              cfg.OCDav.Status.Edition,
-					"product":              cfg.OCDav.Status.Product,
-					"product_name":         cfg.OCDav.Status.ProductName,
-					"product_version":      cfg.OCDav.Status.ProductVersion,
+					"version":              version.Legacy,
+					"version_string":       version.LegacyString,
+					"edition":              version.Edition,
+					"product":              "OpenCloud",
+					"product_name":         "OpenCloud",
+					"product_version":      version.GetString(),
 					"allow_depth_infinity": cfg.OCDav.AllowPropfindDepthInfinity,
-					"validation":           map[string]interface{}{
-						// "invalid_chars": aka ItemNameInvalidChars option ... unused
-						// "max_length": aka ItemNameMaxLength option ... unused
+					"validation": map[string]interface{}{
+						"invalid_chars": cfg.OCDav.NameValidation.InvalidChars,
+						"max_length":    cfg.OCDav.NameValidation.MaxLength,
 					},
 					"url_signing_shared_secret": cfg.Commons.URLSigningSecret,
 					"machine_auth_apikey":       cfg.MachineAuthAPIKey,

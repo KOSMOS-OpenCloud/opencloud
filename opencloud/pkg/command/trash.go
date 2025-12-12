@@ -41,7 +41,8 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cobra.Command {
 				return nil
 			}
 
-			if err := trash.PurgeTrashEmptyPaths(basePath, cmd.Flag("dry-run").Changed); err != nil {
+			dryRun, _ := cmd.Flags().GetBool("dry-run")
+			if err := trash.PurgeTrashEmptyPaths(basePath, dryRun); err != nil {
 				fmt.Println(err)
 				return err
 			}

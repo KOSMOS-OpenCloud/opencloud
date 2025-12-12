@@ -36,12 +36,12 @@ func ListCommand(cfg *config.Config) *cobra.Command {
 		},
 	}
 	listCmd.Flags().String("hostname", "localhost", "hostname of the runtime")
-	viper.BindEnv("hostname", "OC_RUNTIME_HOST")
-	viper.BindPFlag("hostname", listCmd.Flags().Lookup("hostname"))
+	_ = viper.BindEnv("hostname", "OC_RUNTIME_HOST")
+	_ = viper.BindPFlag("hostname", listCmd.Flags().Lookup("hostname"))
 
 	listCmd.Flags().String("port", "9250", "port of the runtime")
-	viper.BindEnv("port", "OC_RUNTIME_PORT")
-	viper.BindPFlag("port", listCmd.Flags().Lookup("port"))
+	_ = viper.BindEnv("port", "OC_RUNTIME_PORT")
+	_ = viper.BindPFlag("port", listCmd.Flags().Lookup("port"))
 	return listCmd
 }
 

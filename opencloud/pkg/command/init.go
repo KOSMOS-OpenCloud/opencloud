@@ -45,54 +45,24 @@ func InitCommand(_ *config.Config) *cobra.Command {
 		},
 	}
 	initCmd.Flags().String("insecure", "ask", "Allow insecure OpenCloud config")
-	err := viper.BindEnv("insecure", "OC_INSECURE")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable OC_INSECURE: %s", err)
-	}
-	err = viper.BindPFlag("insecure", initCmd.Flags().Lookup("insecure"))
-	if err != nil {
-		log.Fatalf("Could not bind flag OC_INSECURE: %s", err)
-	}
+	_ = viper.BindEnv("insecure", "OC_INSECURE")
+	_ = viper.BindPFlag("insecure", initCmd.Flags().Lookup("insecure"))
 
 	initCmd.Flags().BoolP("diff", "d", false, "Show the difference between the current config and the new one")
 
 	initCmd.Flags().BoolP("force-overwrite", "f", false, "Force overwrite existing config file")
-	err = viper.BindEnv("force-overwrite", "OC_FORCE_CONFIG_OVERWRITE")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable OC_FORCE_CONFIG_OVERWRITE: %s", err)
-	}
-	err = viper.BindPFlag("force-overwrite", initCmd.Flags().Lookup("force-overwrite"))
-	if err != nil {
-		log.Fatalf("Could not bind flag OC_FORCE_CONFIG_OVERWRITE: %s", err)
-	}
+	_ = viper.BindEnv("force-overwrite", "OC_FORCE_CONFIG_OVERWRITE")
+	_ = viper.BindPFlag("force-overwrite", initCmd.Flags().Lookup("force-overwrite"))
 
 	initCmd.Flags().String("config-path", defaults.BaseConfigPath(), "Config path for the OpenCloud runtime")
-	err = viper.BindEnv("config-path", "OC_CONFIG_DIR")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable OC_CONFIG_DIR: %s", err)
-	}
-	err = viper.BindEnv("config-path", "OC_BASE_DATA_PATH")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable OC_BASE_DATA_PATH: %s", err)
-	}
-	err = viper.BindPFlag("config-path", initCmd.Flags().Lookup("config-path"))
-	if err != nil {
-		log.Fatalf("Could not bind flag OC_BASE_DATA_PATH: %s", err)
-	}
+	_ = viper.BindEnv("config-path", "OC_CONFIG_DIR")
+	_ = viper.BindEnv("config-path", "OC_BASE_DATA_PATH")
+	_ = viper.BindPFlag("config-path", initCmd.Flags().Lookup("config-path"))
 
 	initCmd.Flags().String("admin-password", "", "Set admin password instead of using a random generated one")
-	err = viper.BindEnv("admin-password", "ADMIN_PASSWORD")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable ADMIN_PASSWORD: %s", err)
-	}
-	err = viper.BindEnv("admin-password", "IDM_ADMIN_PASSWORD")
-	if err != nil {
-		log.Fatalf("Could not bind environment variable IDM_ADMIN_PASSWORD: %s", err)
-	}
-	err = viper.BindPFlag("admin-password", initCmd.Flags().Lookup("admin-password"))
-	if err != nil {
-		log.Fatalf("Could not bind flag IDM_ADMIN_PASSWORD: %s", err)
-	}
+	_ = viper.BindEnv("admin-password", "ADMIN_PASSWORD")
+	_ = viper.BindEnv("admin-password", "IDM_ADMIN_PASSWORD")
+	_ = viper.BindPFlag("admin-password", initCmd.Flags().Lookup("admin-password"))
 	return initCmd
 }
 

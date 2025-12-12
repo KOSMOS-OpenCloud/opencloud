@@ -44,10 +44,11 @@ func BenchmarkClientCommand(cfg *config.Config) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			insecure, _ := cmd.Flags().GetBool("insecure")
 			opt := clientOptions{
 				request:  cmd.Flag("request").Value.String(),
 				url:      args[0],
-				insecure: cmd.Flag("insecure").Changed,
+				insecure: insecure,
 				jobs:     jobs,
 				headers:  make(map[string]string),
 				data:     []byte(cmd.Flag("data").Value.String()),

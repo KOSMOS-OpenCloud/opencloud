@@ -66,7 +66,8 @@ func ConsistencyCommand(cfg *config.Config) *cobra.Command {
 				fmt.Println(err)
 				return err
 			}
-			if err := backup.CheckProviderConsistency(basePath, bs, cmd.Flag("fail").Changed); err != nil {
+			fail, _ := cmd.Flags().GetBool("fail")
+			if err := backup.CheckProviderConsistency(basePath, bs, fail); err != nil {
 				fmt.Println(err)
 				return err
 			}

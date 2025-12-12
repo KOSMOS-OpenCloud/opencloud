@@ -33,8 +33,10 @@ func InitCommand(_ *config.Config) *cobra.Command {
 			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
-			err := ocinit.CreateConfig(insecure, cmd.Flag("force-overwrite").Changed,
-				cmd.Flag("diff").Changed, cmd.Flag("config-path").Value.String(),
+			forceOverwrite, _ := cmd.Flags().GetBool("force-overwrite")
+			diff, _ := cmd.Flags().GetBool("force-overwrite")
+			err := ocinit.CreateConfig(insecure, forceOverwrite,
+				diff, cmd.Flag("config-path").Value.String(),
 				cmd.Flag("admin-password").Value.String())
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
@@ -74,6 +76,9 @@ func InitCommand(_ *config.Config) *cobra.Command {
 		log.Fatalf("Could not bind environment variable OC_BASE_DATA_PATH: %s", err)
 	}
 	err = viper.BindPFlag("config-path", initCmd.Flags().Lookup("config-path"))
+	if err != nil {
+		log.Fatalf("Could not bind flag OC_BASE_DATA_PATH: %s", err)
+	}
 
 	initCmd.Flags().String("admin-password", "", "Set admin password instead of using a random generated one")
 	err = viper.BindEnv("admin-password", "ADMIN_PASSWORD")
@@ -85,6 +90,9 @@ func InitCommand(_ *config.Config) *cobra.Command {
 		log.Fatalf("Could not bind environment variable IDM_ADMIN_PASSWORD: %s", err)
 	}
 	err = viper.BindPFlag("admin-password", initCmd.Flags().Lookup("admin-password"))
+	if err != nil {
+		log.Fatalf("Could not bind flag IDM_ADMIN_PASSWORD: %s", err)
+	}
 	return initCmd
 }
 

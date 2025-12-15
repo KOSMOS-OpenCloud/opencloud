@@ -1,5 +1,41 @@
 # Changelog
 
+## [4.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v4.1.0) - 2025-12-15
+
+### ❤️ Thanks to all contributors! ❤️
+
+@JammingBen, @ScharfViktor, @Svanvith, @butonic, @flimmy, @fschade, @individual-it, @kulmann, @micbar, @prashant-gurung899, @saw-jan
+
+### 📚 Documentation
+
+- fix typo [[#2024](https://github.com/opencloud-eu/opencloud/pull/2024)]
+- [docs] update policies link [[#1996](https://github.com/opencloud-eu/opencloud/pull/1996)]
+- fix the link in quickstart script for itself [[#1956](https://github.com/opencloud-eu/opencloud/pull/1956)]
+
+### ✅ Tests
+
+- [full-ci][tests-only] test: fix some test flakiness [[#2003](https://github.com/opencloud-eu/opencloud/pull/2003)]
+- [tests-only] Skip test related pipelines for ready-release-go PRs [[#2011](https://github.com/opencloud-eu/opencloud/pull/2011)]
+- [full-ci][tests-only] test: add test to check mismatch offset during TUS upload [[#1993](https://github.com/opencloud-eu/opencloud/pull/1993)]
+- [full-ci][tests-only] test: proper resource existence check [[#1990](https://github.com/opencloud-eu/opencloud/pull/1990)]
+- check propfing after renaming data in file system [[#1809](https://github.com/opencloud-eu/opencloud/pull/1809)]
+- fix-get-attribute-test [[#1974](https://github.com/opencloud-eu/opencloud/pull/1974)]
+
+### 📈 Enhancement
+
+- Show edition in opencloud version command [[#2019](https://github.com/opencloud-eu/opencloud/pull/2019)]
+
+### 🐛 Bug Fixes
+
+- fix: enforce trailing slash for server url [[#1995](https://github.com/opencloud-eu/opencloud/pull/1995)]
+- fix: enhance resource creation with detailed process information [[#1978](https://github.com/opencloud-eu/opencloud/pull/1978)]
+
+### 📦️ Dependencies
+
+- chore: bump web to v4.3.0 [[#2030](https://github.com/opencloud-eu/opencloud/pull/2030)]
+- reva-bump-2.41.0 [[#2032](https://github.com/opencloud-eu/opencloud/pull/2032)]
+- build(deps): bump github.com/testcontainers/testcontainers-go from 0.39.0 to 0.40.0 [[#1931](https://github.com/opencloud-eu/opencloud/pull/1931)]
+
 ## [4.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v4.0.0) - 2025-12-01
 
 ### ❤️ Thanks to all contributors! ❤️

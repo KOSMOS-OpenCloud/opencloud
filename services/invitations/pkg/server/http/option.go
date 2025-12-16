@@ -6,7 +6,8 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/invitations/pkg/config"
 	svc "github.com/opencloud-eu/opencloud/services/invitations/pkg/service/v0"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/pflag"
 )
 
 // Option defines a single option function.
@@ -19,7 +20,7 @@ type Options struct {
 	Logger    log.Logger
 	Context   context.Context
 	Config    *config.Config
-	Flags     []cli.Flag
+	Flags     []pflag.Flag
 	Service   svc.Service
 }
 
@@ -63,9 +64,9 @@ func Config(val *config.Config) Option {
 }
 
 // Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
+func Flags(flags ...pflag.Flag) Option {
 	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

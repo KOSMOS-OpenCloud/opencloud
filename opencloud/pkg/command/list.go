@@ -8,30 +8,17 @@ import (
 
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // ListCommand is the entrypoint for the list command.
-func ListCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "list",
-		Usage:    "list OpenCloud services running in the runtime (supervised mode)",
-		Category: "runtime",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "hostname",
-				Value:       "localhost",
-				EnvVars:     []string{"OC_RUNTIME_HOST"},
-				Destination: &cfg.Runtime.Host,
-			},
-			&cli.StringFlag{
-				Name:        "port",
-				Value:       "9250",
-				EnvVars:     []string{"OC_RUNTIME_PORT"},
-				Destination: &cfg.Runtime.Port,
-			},
-		},
-		Action: func(c *cli.Context) error {
+func ListCommand(cfg *config.Config) *cobra.Command {
+	listCmd := &cobra.Command{
+		Use:   "list",
+		Short: "list OpenCloud services running in the runtime (supervised mode)",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Host, cfg.Runtime.Port))
 			if err != nil {
 				log.Fatalf("Failed to connect to the runtime. Has the runtime been started and did you configure the right runtime address (\"%s\")", cfg.Runtime.Host+":"+cfg.Runtime.Port)
@@ -48,6 +35,14 @@ func ListCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	listCmd.Flags().String("hostname", "localhost", "hostname of the runtime")
+	_ = viper.BindEnv("hostname", "OC_RUNTIME_HOST")
+	_ = viper.BindPFlag("hostname", listCmd.Flags().Lookup("hostname"))
+
+	listCmd.Flags().String("port", "9250", "port of the runtime")
+	_ = viper.BindEnv("port", "OC_RUNTIME_PORT")
+	_ = viper.BindPFlag("port", listCmd.Flags().Lookup("port"))
+	return listCmd
 }
 
 func init() {

@@ -10,12 +10,6 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/go-ldap/ldif"
-	"github.com/libregraph/idm/pkg/ldappassword"
-	"github.com/libregraph/idm/pkg/ldbbolt"
-	"github.com/libregraph/idm/server"
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	pkgcrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -25,18 +19,23 @@ import (
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/logging"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/server/debug"
+
+	"github.com/go-ldap/ldif"
+	"github.com/libregraph/idm/pkg/ldappassword"
+	"github.com/libregraph/idm/pkg/ldbbolt"
+	"github.com/libregraph/idm/server"
+	"github.com/spf13/cobra"
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			var cancel context.CancelFunc
 			if cfg.Context == nil {
 				cfg.Context, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)

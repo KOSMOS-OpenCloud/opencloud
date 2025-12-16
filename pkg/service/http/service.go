@@ -62,7 +62,8 @@ func NewService(opts ...Option) (Service, error) {
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
-		micro.Flags(sopts.Flags...),
+		// TODO: clarify if this is actually used on the go-micro side
+		//micro.Flags(sopts.Flags...),
 		micro.Registry(registry.GetRegistry()),
 		micro.RegisterTTL(registry.GetRegisterTTL()),
 		micro.RegisterInterval(registry.GetRegisterInterval()),

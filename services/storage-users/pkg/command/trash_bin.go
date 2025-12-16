@@ -10,12 +10,6 @@ import (
 	"strings"
 	"time"
 
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/mohae/deepcopy"
-	"github.com/olekukonko/tablewriter"
-	"github.com/olekukonko/tablewriter/tw"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	zlog "github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/config"
@@ -25,8 +19,15 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
+
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mohae/deepcopy"
+	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
 	"github.com/rs/zerolog"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -35,56 +36,37 @@ const (
 	KEEP_BOTH
 )
 
-var _optionFlagTmpl = cli.StringFlag{
-	Name:        "option",
-	Value:       "skip",
-	Aliases:     []string{"o"},
-	Usage:       "The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'.",
-	DefaultText: "The default value is 'skip' overwriting an existing file",
-}
-
-var _verboseFlagTmpl = cli.BoolFlag{
-	Name:    "verbose",
-	Aliases: []string{"v"},
-	Usage:   "Get more verbose output",
-}
-
-var _applyYesFlagTmpl = cli.BoolFlag{
-	Name:    "yes",
-	Aliases: []string{"y"},
-	Usage:   "Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively.",
-}
-
 // TrashBin wraps trash-bin related sub-commands.
-func TrashBin(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "trash-bin",
-		Usage: "manage trash-bin's",
-		Subcommands: []*cli.Command{
-			PurgeExpiredResources(cfg),
-			listTrashBinItems(cfg),
-			restoreAllTrashBinItems(cfg),
-			restoreTrashBindItem(cfg),
-		},
+func TrashBin(cfg *config.Config) *cobra.Command {
+	trashBinCmd := &cobra.Command{
+		Use:   "trash-bin",
+		Short: "manage trash-bin's",
 	}
+
+	trashBinCmd.AddCommand([]*cobra.Command{
+		PurgeExpiredResources(cfg),
+		listTrashBinItems(cfg),
+		restoreAllTrashBinItems(cfg),
+		restoreTrashBinItem(cfg),
+	}...)
+	return trashBinCmd
 }
 
 // PurgeExpiredResources cli command removes old trash-bin items.
-func PurgeExpiredResources(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "purge-expired",
-		Usage: "Purge expired trash-bin items",
-		Flags: []cli.Flag{},
-		Before: func(c *cli.Context) error {
+func PurgeExpiredResources(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "purge-expired",
+		Short: "Purge expired trash-bin items",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			stream, err := event.NewStream(cfg)
 			if err != nil {
 				return err
 			}
 
-			if err := events.Publish(c.Context, stream, event.PurgeTrashBin{ExecutionTime: time.Now()}); err != nil {
+			if err := events.Publish(cmd.Context(), stream, event.PurgeTrashBin{ExecutionTime: time.Now()}); err != nil {
 				return err
 			}
 
@@ -101,29 +83,25 @@ func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 	}
 }
 
-func listTrashBinItems(cfg *config.Config) *cli.Command {
-	var verboseVal bool
-	verboseFlag := _verboseFlagTmpl
-	verboseFlag.Destination = &verboseVal
-	return &cli.Command{
-		Name:      "list",
-		Usage:     "Print a list of all trash-bin items of a space.",
-		ArgsUsage: "['spaceID' required]",
-		Flags: []cli.Flag{
-			&verboseFlag,
-		},
-		Before: func(c *cli.Context) error {
+func listTrashBinItems(cfg *config.Config) *cobra.Command {
+	listTrashBinItemsCmd := &cobra.Command{
+		Use:   "list",
+		Short: "Print a list of all trash-bin items of a space.",
+		// TODO: n might need to equal 2 not sure.
+		Args: cobra.ExactArgs(1),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
-			log := cliLogger(verboseVal)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID string
-			if c.NArg() > 0 {
-				spaceID = c.Args().Get(0)
+			if len(args) > 0 {
+				spaceID = args[0]
 			}
 			if spaceID == "" {
-				_ = cli.ShowSubcommandHelp(c)
-				return fmt.Errorf("spaceID is requered")
+				_ = cmd.Help()
+				return fmt.Errorf("spaceID is requiered")
 			}
 			log.Info().Msgf("Getting trash-bin items for spaceID: '%s' ...", spaceID)
 
@@ -153,42 +131,38 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	listTrashBinItemsCmd.Flags().BoolP(
+		"verbose",
+		"v",
+		false,
+		"Get more verbose output",
+	)
+	return listTrashBinItemsCmd
 }
 
-func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
-	var optionFlagVal string
+func restoreAllTrashBinItems(cfg *config.Config) *cobra.Command {
 	var overwriteOption int
-	optionFlag := _optionFlagTmpl
-	optionFlag.Destination = &optionFlagVal
-	var verboseVal bool
-	verboseFlag := _verboseFlagTmpl
-	verboseFlag.Destination = &verboseVal
-	var applyYesVal bool
-	applyYesFlag := _applyYesFlagTmpl
-	applyYesFlag.Destination = &applyYesVal
-	return &cli.Command{
-		Name:      "restore-all",
-		Usage:     "Restore all trash-bin items for a space.",
-		ArgsUsage: "['spaceID' required]",
-		Flags: []cli.Flag{
-			&optionFlag,
-			&verboseFlag,
-			&applyYesFlag,
-		},
-		Before: func(c *cli.Context) error {
+	restoreAllTrashBinItemsCmd := &cobra.Command{
+		Use:   "restore-all",
+		Short: "Restore all trash-bin items for a space.",
+		// TODO: not sure this could also be 2
+		Args: cobra.ExactArgs(1),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
-			log := cliLogger(verboseVal)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID string
-			if c.NArg() > 0 {
-				spaceID = c.Args().Get(0)
+			if len(args) > 0 {
+				spaceID = args[0]
 			}
 			if spaceID == "" {
-				_ = cli.ShowSubcommandHelp(c)
-				return cli.Exit("The spaceID is required", 1)
+				_ = cmd.Help()
+				return fmt.Errorf("spaceID is requiered")
 			}
-			switch optionFlagVal {
+			option, _ := cmd.Flags().GetString("option")
+			switch option {
 			case "skip":
 				overwriteOption = SKIP
 			case "replace":
@@ -196,8 +170,8 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 			case "keep-both":
 				overwriteOption = KEEP_BOTH
 			default:
-				_ = cli.ShowSubcommandHelp(c)
-				return cli.Exit("The option flag is invalid", 1)
+				_ = cmd.Help()
+				return fmt.Errorf("option flag '%s' is invalid", option)
 			}
 			log.Info().Msgf("Restoring trash-bin items for spaceID: '%s' ...", spaceID)
 
@@ -217,8 +191,8 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-
-			if !applyYesVal {
+			applyYesFlag, _ := cmd.Flags().GetBool("yes")
+			if !applyYesFlag {
 				for {
 					fmt.Printf("Found %d items that could be restored, continue (Y/n), show the items list (s): ", len(res.GetRecycleItems()))
 					var i string
@@ -241,7 +215,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			log.Info().Msgf("Run restoring-all with option=%s", optionFlagVal)
+			log.Info().Msgf("Run restoring-all with option=%s", option)
 			for _, item := range res.GetRecycleItems() {
 				log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s'", item.GetKey(), item.GetRef().GetPath(), itemType(item.GetType()))
 				dstRes, err := restore(ctx, client, ref, item, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
@@ -254,43 +228,53 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	restoreAllTrashBinItemsCmd.Flags().BoolP(
+		"verbose",
+		"v",
+		false,
+		"Get more verbose output",
+	)
+	restoreAllTrashBinItemsCmd.Flags().StringP(
+		"option",
+		"o",
+		"skip",
+		"The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.",
+	)
+	restoreAllTrashBinItemsCmd.Flags().BoolP(
+		"yes",
+		"y",
+		false,
+		"Automatic yes to prompts. Assume 'yes' as answer to all prompts and run non-interactively.",
+	)
+
+	return restoreAllTrashBinItemsCmd
 }
 
-func restoreTrashBindItem(cfg *config.Config) *cli.Command {
-	var optionFlagVal string
+func restoreTrashBinItem(cfg *config.Config) *cobra.Command {
 	var overwriteOption int
-	optionFlag := _optionFlagTmpl
-	optionFlag.Destination = &optionFlagVal
-	var verboseVal bool
-	verboseFlag := _verboseFlagTmpl
-	verboseFlag.Destination = &verboseVal
-	return &cli.Command{
-		Name:      "restore",
-		Usage:     "Restore a trash-bin item by ID.",
-		ArgsUsage: "['spaceID' required] ['itemID' required]",
-		Flags: []cli.Flag{
-			&optionFlag,
-			&verboseFlag,
-		},
-		Before: func(c *cli.Context) error {
+	restoreTrashBinItemCmd := &cobra.Command{
+		Use:   "restore",
+		Short: "Restore a trash-bin item by ID.",
+		Args:  cobra.ExactArgs(2),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
-			log := cliLogger(verboseVal)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			verbose, _ := cmd.Flags().GetBool("verbose")
+			log := cliLogger(verbose)
 			var spaceID, itemID string
-			if c.NArg() > 1 {
-				spaceID = c.Args().Get(0)
-				itemID = c.Args().Get(1)
-			}
+			spaceID = args[0]
+			itemID = args[1]
 			if spaceID == "" {
-				_ = cli.ShowSubcommandHelp(c)
+				_ = cmd.Help()
 				return fmt.Errorf("spaceID is requered")
 			}
 			if itemID == "" {
-				_ = cli.ShowSubcommandHelp(c)
+				_ = cmd.Help()
 				return fmt.Errorf("itemID is requered")
 			}
-			switch optionFlagVal {
+			option, _ := cmd.Flags().GetString("option")
+			switch option {
 			case "skip":
 				overwriteOption = SKIP
 			case "replace":
@@ -298,8 +282,8 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			case "keep-both":
 				overwriteOption = KEEP_BOTH
 			default:
-				_ = cli.ShowSubcommandHelp(c)
-				return cli.Exit("The option flag is invalid", 1)
+				_ = cmd.Help()
+				return fmt.Errorf("option flag '%s' is invalid", option)
 			}
 			log.Info().Msgf("Restoring trash-bin item for spaceID: '%s' itemID: '%s' ...", spaceID, itemID)
 
@@ -332,7 +316,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			if !found {
 				return fmt.Errorf("itemID '%s' not found", itemID)
 			}
-			log.Info().Msgf("Run restoring with option=%s", optionFlagVal)
+			log.Info().Msgf("Run restoring with option=%s", option)
 			log.Info().Msgf("restoring itemID: '%s', path: '%s', type: '%s", itemRef.GetKey(), itemRef.GetRef().GetPath(), itemType(itemRef.GetType()))
 			dstRes, err := restore(ctx, client, ref, itemRef, overwriteOption, cfg.CliMaxAttemptsRenameFile, log)
 			if err != nil {
@@ -342,6 +326,19 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	restoreTrashBinItemCmd.Flags().BoolP(
+		"verbose",
+		"v",
+		false,
+		"Get more verbose output",
+	)
+	restoreTrashBinItemCmd.Flags().StringP(
+		"option",
+		"o",
+		"skip",
+		"The restore option defines the behavior for a file to be restored, where the file name already already exists in the target space. Supported values are: 'skip', 'replace' and 'keep-both'. The default value is 'skip' overwriting an existing file.",
+	)
+	return restoreTrashBinItemCmd
 }
 
 func listRecycle(ctx context.Context, client gateway.GatewayAPIClient, ref provider.Reference) (*provider.ListRecycleResponse, error) {
@@ -354,7 +351,8 @@ func listRecycle(ctx context.Context, client gateway.GatewayAPIClient, ref provi
 		return nil, fmt.Errorf("%s %s", _retrievingErrorMsg, res.Status.Code)
 	}
 	if len(res.GetRecycleItems()) == 0 {
-		return res, cli.Exit("The trash-bin is empty. Nothing to restore", 0)
+		fmt.Errorf("The trash-bin is empty. Nothing to restore")
+		os.Exit(0)
 	}
 	return res, nil
 }

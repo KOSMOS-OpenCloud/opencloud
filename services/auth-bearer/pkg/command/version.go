@@ -6,20 +6,19 @@ import (
 
 	"github.com/opencloud-eu/opencloud/pkg/registry"
 	"github.com/opencloud-eu/opencloud/pkg/version"
+	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
+	"github.com/spf13/cobra"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/tw"
-	"github.com/opencloud-eu/opencloud/services/auth-bearer/pkg/config"
-	"github.com/urfave/cli/v2"
 )
 
 // Version prints the service versions of all running instances.
-func Version(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "version",
-		Usage:    "print the version of this binary and the running services instances",
-		Category: "info",
-		Action: func(c *cli.Context) error {
+func Version(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "print the version of this binary and the running services instances",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 			fmt.Println("")

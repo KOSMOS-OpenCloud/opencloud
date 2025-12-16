@@ -9,7 +9,6 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/generators"
@@ -40,7 +39,9 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/signedurl"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
-	"github.com/urfave/cli/v2"
+
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/spf13/cobra"
 	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -48,15 +49,14 @@ import (
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			userInfoCache := store.Create(
 				store.Store(cfg.OIDC.UserinfoCache.Store),
 				store.TTL(cfg.OIDC.UserinfoCache.TTL),
@@ -77,7 +77,7 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			traceProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}

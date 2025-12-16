@@ -5,12 +5,13 @@ import (
 
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/services/policies/pkg/config"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
 // GetCommands provides all commands for this service
-func GetCommands(cfg *config.Config) cli.Commands {
-	return []*cli.Command{
+func GetCommands(cfg *config.Config) []*cobra.Command {
+	return []*cobra.Command{
 		Server(cfg),
 		Health(cfg),
 		Version(cfg),
@@ -19,11 +20,12 @@ func GetCommands(cfg *config.Config) cli.Commands {
 
 // Execute is the entry point for the policies command.
 func Execute(cfg *config.Config) error {
-	app := clihelper.DefaultApp(&cli.App{
-		Name:     "policies",
-		Usage:    "Serve policies for OpenCloud",
-		Commands: GetCommands(cfg),
+	app := clihelper.DefaultApp(&cobra.Command{
+		Use:   "policies",
+		Short: "Serve policies for OpenCloud",
 	})
+	app.AddCommand(GetCommands(cfg)...)
+	app.SetArgs(os.Args[1:])
 
-	return app.RunContext(cfg.Context, os.Args)
+	return app.ExecuteContext(cfg.Context)
 }

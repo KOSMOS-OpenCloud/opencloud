@@ -6,10 +6,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/opencloud-eu/reva/v2/pkg/store"
-	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
-
 	"github.com/opencloud-eu/opencloud/pkg/runner"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/config"
@@ -17,15 +13,18 @@ import (
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/logging"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/postprocessing/pkg/service"
+	"github.com/opencloud-eu/reva/v2/pkg/store"
+
+	"github.com/spf13/cobra"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				fmt.Printf("%v", err)
@@ -33,7 +32,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			return err
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			var cancel context.CancelFunc
@@ -43,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			ctx := cfg.Context
 
-			traceProvider, err := tracing.GetTraceProvider(c.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}

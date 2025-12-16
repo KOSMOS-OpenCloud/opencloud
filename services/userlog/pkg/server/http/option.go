@@ -11,7 +11,8 @@ import (
 	"github.com/opencloud-eu/opencloud/services/userlog/pkg/metrics"
 	"github.com/opencloud-eu/reva/v2/pkg/events"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/pflag"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -25,7 +26,7 @@ type Options struct {
 	Context          context.Context
 	Config           *config.Config
 	Metrics          *metrics.Metrics
-	Flags            []cli.Flag
+	Flags            []pflag.Flag
 	Namespace        string
 	Store            store.Store
 	Stream           events.Stream
@@ -77,9 +78,9 @@ func Metrics(val *metrics.Metrics) Option {
 }
 
 // Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
+func Flags(flags ...pflag.Flag) Option {
 	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

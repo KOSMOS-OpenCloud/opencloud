@@ -3,57 +3,40 @@ package command
 import (
 	"fmt"
 
-	"github.com/opencloud-eu/opencloud/opencloud/pkg/trash"
-
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
+	"github.com/opencloud-eu/opencloud/opencloud/pkg/trash"
 	"github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/config/parser"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
-func TrashCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "trash",
-		Usage: "OpenCloud trash functionality",
-		Subcommands: []*cli.Command{
-			TrashPurgeEmptyDirsCommand(cfg),
-		},
-		Before: func(c *cli.Context) error {
+func TrashCommand(cfg *config.Config) *cobra.Command {
+	trashCmd := &cobra.Command{
+		Use:   "trash",
+		Short: "OpenCloud trash functionality",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
 		},
-		Action: func(_ *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Read the docs")
 			return nil
 		},
 	}
+	trashCmd.AddCommand(TrashPurgeEmptyDirsCommand(cfg))
+
+	return trashCmd
 }
 
-func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "purge-empty-dirs",
-		Usage: "purge empty directories",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "basepath",
-				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)",
-				Required: true,
-			},
-			&cli.BoolFlag{
-				Name:  "dry-run",
-				Usage: "do not delete anything, just print what would be deleted",
-				Value: true,
-			},
-		},
-		Action: func(c *cli.Context) error {
-			basePath := c.String("basepath")
-			if basePath == "" {
-				fmt.Println("basepath is required")
-				return cli.ShowCommandHelp(c, "trash")
-			}
-
-			if err := trash.PurgeTrashEmptyPaths(basePath, c.Bool("dry-run")); err != nil {
+func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cobra.Command {
+	trashPurgeCmd := &cobra.Command{
+		Use:   "purge-empty-dirs",
+		Short: "purge empty directories",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			basePath, _ := cmd.Flags().GetString("basepath")
+			dryRun, _ := cmd.Flags().GetBool("dry-run")
+			if err := trash.PurgeTrashEmptyPaths(basePath, dryRun); err != nil {
 				fmt.Println(err)
 				return err
 			}
@@ -61,6 +44,12 @@ func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	trashPurgeCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/users)")
+	_ = trashPurgeCmd.MarkFlagRequired("basepath")
+
+	trashPurgeCmd.Flags().Bool("dry-run", true, "do not delete anything, just print what would be deleted")
+
+	return trashPurgeCmd
 }
 
 func init() {

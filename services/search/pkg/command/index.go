@@ -6,44 +6,34 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/urfave/cli/v2"
-	"go-micro.dev/v4/client"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config/parser"
+
+	"github.com/spf13/cobra"
+	"go-micro.dev/v4/client"
 )
 
 // Index is the entrypoint for the server command.
-func Index(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "index",
-		Usage:    "index the files for one one more users",
-		Category: "index management",
-		Aliases:  []string{"i"},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "space",
-				Aliases: []string{"s"},
-				Usage:   "the id of the space to travers and index the files of. This or --all-spaces is required.",
-			},
-			&cli.BoolFlag{
-				Name:  "all-spaces",
-				Usage: "index all spaces instead. This or --space is required.",
-			},
-		},
-		Before: func(_ *cli.Context) error {
+func Index(cfg *config.Config) *cobra.Command {
+	indexCmd := &cobra.Command{
+		Use:     "index",
+		Short:   "index the files for one one more users",
+		Aliases: []string{"i"},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(ctx *cli.Context) error {
-			if ctx.String("space") == "" && !ctx.Bool("all-spaces") {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			allSpacesFlag, _ := cmd.Flags().GetBool("all-spaces")
+			spaceFlag, _ := cmd.Flags().GetString("space")
+			if spaceFlag == "" && !allSpacesFlag {
 				return errors.New("either --space or --all-spaces is required")
 			}
 
-			traceProvider, err := tracing.GetTraceProvider(ctx.Context, cfg.Commons.TracesExporter, cfg.Service.Name)
+			traceProvider, err := tracing.GetTraceProvider(cmd.Context(), cfg.Commons.TracesExporter, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -58,7 +48,7 @@ func Index(cfg *config.Config) *cli.Command {
 
 			c := searchsvc.NewSearchProviderService("eu.opencloud.api.search", grpcClient)
 			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
-				SpaceId: ctx.String("space"),
+				SpaceId: spaceFlag,
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
 			if err != nil {
 				fmt.Println("failed to index space: " + err.Error())
@@ -67,4 +57,17 @@ func Index(cfg *config.Config) *cli.Command {
 			return nil
 		},
 	}
+	indexCmd.Flags().StringP(
+		"space",
+		"s",
+		"",
+		"the id of the space to travers and index the files of. This or --all-spaces is required.")
+
+	indexCmd.Flags().Bool(
+		"all-spaces",
+		false,
+		"index all spaces instead. This or --space is required.",
+	)
+
+	return indexCmd
 }

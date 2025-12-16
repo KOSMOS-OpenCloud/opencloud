@@ -191,6 +191,7 @@ Feature: antivirus
     And user "Brian" should get a notification with subject "Virus found" and message:
       | message   |
       | <message> |
+    When the user waits for "10" seconds for postprocessing to finish
     And as "Brian" file "/Shares/uploadFolder/<new-file-name>" should not exist
     And as "Alice" file "/uploadFolder/<new-file-name>" should not exist
     Examples:

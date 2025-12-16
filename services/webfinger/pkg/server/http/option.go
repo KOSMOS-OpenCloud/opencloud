@@ -3,13 +3,13 @@ package http
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/trace/noop"
-
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/webfinger/pkg/config"
 	svc "github.com/opencloud-eu/opencloud/services/webfinger/pkg/service/v0"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/pflag"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 // Option defines a single option function.
@@ -22,7 +22,7 @@ type Options struct {
 	Logger        log.Logger
 	Context       context.Context
 	Config        *config.Config
-	Flags         []cli.Flag
+	Flags         []pflag.Flag
 	Service       svc.Service
 	TraceProvider trace.TracerProvider
 }
@@ -63,6 +63,13 @@ func Config(val *config.Config) Option {
 func Service(val svc.Service) Option {
 	return func(o *Options) {
 		o.Service = val
+	}
+}
+
+// Flags provides a function to set the flags option.
+func Flags(flags ...pflag.Flag) Option {
+	return func(o *Options) {
+		o.Flags = append(o.Flags, flags...)
 	}
 }
 

@@ -8,44 +8,45 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-ldap/ldap/v3"
-	"github.com/libregraph/idm/pkg/ldbbolt"
-	"github.com/libregraph/idm/server"
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/idm/pkg/logging"
-	"github.com/urfave/cli/v2"
+
+	"github.com/go-ldap/ldap/v3"
+	"github.com/libregraph/idm/pkg/ldbbolt"
+	"github.com/libregraph/idm/server"
+	"github.com/spf13/cobra"
 	bolt "go.etcd.io/bbolt"
 	"golang.org/x/term"
 )
 
 // ResetPassword is the entrypoint for the resetpassword command
-func ResetPassword(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "resetpassword",
-		Usage:    "Reset user password",
-		Category: "password reset",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "user-name",
-				Aliases: []string{"u"},
-				Usage:   "User name",
-				Value:   "admin",
-			},
-		},
-		Before: func(_ *cli.Context) error {
+func ResetPassword(cfg *config.Config) *cobra.Command {
+	resetPasswordCmd := &cobra.Command{
+		Use:   "resetpassword",
+		Short: "Reset user password",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			ctx, cancel := context.WithCancel(c.Context)
+			ctx, cancel := context.WithCancel(cmd.Context())
 
 			defer cancel()
-			return resetPassword(ctx, logger, cfg, c.String("user-name"))
+			userNameFlag, _ := cmd.Flags().GetString("user-name")
+			return resetPassword(ctx, logger, cfg, userNameFlag)
 		},
 	}
+	resetPasswordCmd.Flags().StringP(
+		"user-name",
+		"u",
+		"admin",
+		"User name",
+	)
+
+	return resetPasswordCmd
 }
 
 func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string) error {

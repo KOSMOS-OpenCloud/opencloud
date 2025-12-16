@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/revisions"
 	"github.com/opencloud-eu/opencloud/pkg/config"
@@ -15,7 +16,8 @@ import (
 	decomposeds3bs "github.com/opencloud-eu/reva/v2/pkg/storage/fs/decomposeds3/blobstore"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/lookup"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -24,75 +26,33 @@ var (
 )
 
 // RevisionsCommand is the entrypoint for the revisions command.
-func RevisionsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "revisions",
-		Usage: "OpenCloud revisions functionality",
-		Subcommands: []*cli.Command{
-			PurgeRevisionsCommand(cfg),
-		},
-		Before: func(_ *cli.Context) error {
+func RevisionsCommand(cfg *config.Config) *cobra.Command {
+	revCmd := &cobra.Command{
+		Use:   "revisions",
+		Short: "OpenCloud revisions functionality",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg, true))
 		},
-		Action: func(_ *cli.Context) error {
-			fmt.Println("Read the docs")
-			return nil
-		},
 	}
+	revCmd.AddCommand(PurgeRevisionsCommand(cfg))
+
+	return revCmd
 }
 
 // PurgeRevisionsCommand allows removing all revisions from a storage provider.
-func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "purge",
-		Usage: "purge revisions",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "basepath",
-				Aliases:  []string{"p"},
-				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/metadata)",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:    "blobstore",
-				Aliases: []string{"b"},
-				Usage:   "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed. Note: When using decomposeds3 this needs same configuration as the storage-users service",
-				Value:   "decomposed",
-			},
-			&cli.BoolFlag{
-				Name:  "dry-run",
-				Usage: "do not delete anything, just print what would be deleted",
-				Value: true,
-			},
-			&cli.BoolFlag{
-				Name:    "verbose",
-				Aliases: []string{"v"},
-				Usage:   "print verbose output",
-				Value:   false,
-			},
-			&cli.StringFlag{
-				Name:    "resource-id",
-				Aliases: []string{"r"},
-				Usage:   "purge all revisions of this file/space. If not set, all revisions will be purged",
-			},
-			&cli.StringFlag{
-				Name:  "glob-mechanism",
-				Usage: "the glob mechanism to find all nodes. Can be 'glob', 'list' or 'workers'. 'glob' uses globbing with a single worker. 'workers' spawns multiple go routines, accelatering the command drastically but causing high cpu and ram usage. 'list' looks for references by listing directories with multiple workers. Default is 'glob'",
-				Value: "glob",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			basePath := c.String("basepath")
-			if basePath == "" {
-				fmt.Println("basepath is required")
-				return cli.ShowCommandHelp(c, "revisions")
-			}
+func PurgeRevisionsCommand(cfg *config.Config) *cobra.Command {
+	revCmd := &cobra.Command{
+		Use:   "purge",
+		Short: "purge revisions",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			basePath, _ := cmd.Flags().GetString("basepath")
 
 			var (
 				bs  revisions.DelBlobstore
 				err error
 			)
-			switch c.String("blobstore") {
+			blobstoreFlag, _ := cmd.Flags().GetString("blobstore")
+			switch blobstoreFlag {
 			case "decomposeds3":
 				bs, err = decomposeds3bs.New(
 					cfg.StorageUsers.Drivers.DecomposedS3.Endpoint,
@@ -115,12 +75,13 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 			}
 
 			var rid *provider.ResourceId
-			resid, err := storagespace.ParseID(c.String("resource-id"))
+			resourceIDFlag, _ := cmd.Flags().GetString("resource-id")
+			resid, err := storagespace.ParseID(resourceIDFlag)
 			if err == nil {
 				rid = &resid
 			}
 
-			mechanism := c.String("glob-mechanism")
+			mechanism, _ := cmd.Flags().GetString("glob-mechanism")
 			if rid.GetOpaqueId() != "" {
 				mechanism = "glob"
 			}
@@ -146,11 +107,30 @@ func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 				ch = revisions.List(p, 10)
 			}
 
-			files, blobs, revisions := revisions.PurgeRevisions(ch, bs, c.Bool("dry-run"), c.Bool("verbose"))
-			printResults(files, blobs, revisions, c.Bool("dry-run"))
+			flagDryRun, err := cmd.Flags().GetBool("dry-run")
+			if err != nil {
+				return err
+			}
+
+			flagVerbose, err := cmd.Flags().GetBool("verbose")
+			if err != nil {
+				return err
+			}
+
+			files, blobs, revisionResults := revisions.PurgeRevisions(ch, bs, flagDryRun, flagVerbose)
+			printResults(files, blobs, revisionResults, flagDryRun)
 			return nil
 		},
 	}
+	revCmd.Flags().StringP("basepath", "p", "", "the basepath of the decomposedfs (e.g. /var/tmp/opencloud/storage/metadata)")
+	_ = revCmd.MarkFlagRequired("basepath")
+	revCmd.Flags().StringP("blobstore", "b", "decomposed", "the blobstore type. Can be (none, decomposed, decomposeds3). Default decomposed")
+	revCmd.Flags().Bool("dry-run", true, "do not delete anything, just print what would be deleted")
+	revCmd.Flags().BoolP("verbose", "v", false, "print verbose output")
+	revCmd.Flags().StringP("resource-id", "r", "", "purge all revisions of this file/space. If not set, all revisions will be purged")
+	revCmd.Flags().String("glob-mechanism", "glob", "the glob mechanism to find all nodes. Can be 'glob', 'list' or 'workers'. 'glob' uses globbing with a single worker. 'workers' spawns multiple go routines, accelatering the command drastically but causing high cpu and ram usage. 'list' looks for references by listing directories with multiple workers. Default is 'glob'")
+
+	return revCmd
 }
 
 func printResults(countFiles, countBlobs, countRevisions int, dryRun bool) {

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os/signal"
 
-	"github.com/urfave/cli/v2"
-
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	pkgcrypto "github.com/opencloud-eu/opencloud/pkg/crypto"
 	"github.com/opencloud-eu/opencloud/pkg/runner"
@@ -16,18 +14,19 @@ import (
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/logging"
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/nats/pkg/server/nats"
+
+	"github.com/spf13/cobra"
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
-		Category: "server",
-		Before: func(c *cli.Context) error {
+func Server(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
+		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			var cancel context.CancelFunc

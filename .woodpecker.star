@@ -3,7 +3,7 @@
 
 # Repository
 
-repo_slug = "opencloud-eu/opencloud-internal"
+repo_slug = "${CI_REPO}"
 docker_repo_slug = "opencloudeu/opencloud"
 
 # images

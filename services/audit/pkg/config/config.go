@@ -10,7 +10,7 @@ import (
 type Config struct {
 	Commons  *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service  Service         `yaml:"-"`
-	LogLevel string          `yaml:"level" env:"OC_LOG_LEVEL;AUDIT_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
+	LogLevel string          `yaml:"loglevel" env:"OC_LOG_LEVEL;AUDIT_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
 	Debug    Debug           `yaml:"debug"`
 
 	Events   Events   `yaml:"events"`

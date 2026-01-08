@@ -12,7 +12,7 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	LogLevel string `mapstructure:"level" env:"OC_LOG_LEVEL;CLIENTLOG_USERLOG_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
+	LogLevel string `yaml:"loglevel" env:"OC_LOG_LEVEL;CLIENTLOG_USERLOG_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
 
 	Debug Debug `yaml:"debug"`
 

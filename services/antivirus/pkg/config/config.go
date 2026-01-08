@@ -31,9 +31,8 @@ const (
 type Config struct {
 	Commons  *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	File     string
-	LogLevel string `mapstructure:"level" env:"OC_LOG_LEVEL;ANTIVIRUS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
-
-	Debug Debug `yaml:"debug" mask:"struct"`
+	LogLevel string `yaml:"loglevel" env:"OC_LOG_LEVEL;ANTIVIRUS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"1.0.0"`
+	Debug    Debug  `yaml:"debug" mask:"struct"`
 
 	Service Service `yaml:"-"`
 

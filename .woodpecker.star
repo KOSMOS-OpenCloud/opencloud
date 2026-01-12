@@ -576,7 +576,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + notifyMatrix(ctx)
+    pipelines = test_pipelines + build_release_pipelines + gen_docs_pr(ctx) + notifyMatrix(ctx)
 
     pipelineSanityChecks(pipelines)
     return savePipelineNumber(ctx) + pipelines
@@ -2212,6 +2212,55 @@ def makeGoGenerate(module):
             "environment": CI_HTTP_PROXY_ENV,
         },
     ]
+
+def gen_docs_pr(ctx):
+    return [{
+        "name": "gen-docs-pr",
+        "skip_clone": True,
+        "workspace": {
+            "base": "/woodpecker",
+            "path": "docs_gen_pr",
+        },
+        "steps": [
+            # {
+            #     "name": "clone",
+            #     "image": "woodpeckerci/plugin-git",
+            #     "settings": {
+            #         "remote": "https://github.com/opencloud-eu/markdown-docs-generator.git",
+            #         "path": "/docs_gen_pr",
+            #     },
+            # },
+            {
+                "name": "make-docs-pr",
+                "image": "quay.io/opencloudeu/golang-ci",
+                "environment": {
+                    "GH_TOKEN": {
+                        "from_secret": "github_token",
+                    },
+                },
+                "commands": [
+                    "gh auth status",
+                    "gh repo clone opencloud-eu/markdown-docs-generator /woodpecker/docs_gen_pr"
+                    #"make git-clone",
+                    #"make all",
+                    #"gh auth status",
+                    #"make create-docs-pullrequest",
+                ]
+            },
+        ],
+        "when": [
+            {
+                "event": "push",
+                "branch": "main",
+                "path": "services/*/pkg/config/**/*.go",
+            },
+            {
+                "event": "push",
+                "branch": "add_docs_pr_gen_pipeline",
+                "path": ".woodpecker.star",
+            },
+        ],
+    }]
 
 def notifyMatrix(ctx):
     result = [{

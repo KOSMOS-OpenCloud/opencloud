@@ -2225,17 +2225,29 @@ def gen_docs_pr(ctx):
             {
                 "name": "make-docs-pr",
                 "image": "quay.io/opencloudeu/golang-ci",
+                "pull": True,
                 "environment": {
                     "GH_TOKEN": {
                         "from_secret": "github_token",
                     },
+                    "CI_SSH_KEY": {
+                        "from_secret": "markdown-docs-generator-push-key",
+                    },
+                    "CI_SSH_KEY_DOCS": {
+                        "from_secret": "gh-docs-push-key",
+                    },
+                    "GIT_SSH_COMMAND": "ssh -o StrictHostKeyChecking=no -i /root/id_rsa"
                 },
                 "commands": [
-                    "gh auth status",
-                    "gh repo clone opencloud-eu/markdown-docs-generator /woodpecker/docs_gen_pr",
+                    'echo "$${CI_SSH_KEY}" > /root/id_rsa && chmod 600 /root/id_rsa',
+                    'git config --global user.email "devops@opencloud.eu"',
+                    'git config --global user.name "openclouders"',
+                    "git clone git@github.com:opencloud-eu/markdown-docs-generator.git /woodpecker/docs_gen_pr",
+                    'echo "$${CI_SSH_KEY_DOCS}" > /root/id_rsa && chmod 600 /root/id_rsa',
                     "make git-clone",
                     "make all",
                     "make create-docs-pullrequest",
+                    "echo done",
                 ]
             },
         ],

@@ -2222,14 +2222,6 @@ def gen_docs_pr(ctx):
             "path": "docs_gen_pr",
         },
         "steps": [
-            # {
-            #     "name": "clone",
-            #     "image": "woodpeckerci/plugin-git",
-            #     "settings": {
-            #         "remote": "https://github.com/opencloud-eu/markdown-docs-generator.git",
-            #         "path": "/docs_gen_pr",
-            #     },
-            # },
             {
                 "name": "make-docs-pr",
                 "image": "quay.io/opencloudeu/golang-ci",
@@ -2240,11 +2232,10 @@ def gen_docs_pr(ctx):
                 },
                 "commands": [
                     "gh auth status",
-                    "gh repo clone opencloud-eu/markdown-docs-generator /woodpecker/docs_gen_pr"
-                    #"make git-clone",
-                    #"make all",
-                    #"gh auth status",
-                    #"make create-docs-pullrequest",
+                    "gh repo clone opencloud-eu/markdown-docs-generator /woodpecker/docs_gen_pr",
+                    "make git-clone",
+                    "make all",
+                    "make create-docs-pullrequest",
                 ]
             },
         ],

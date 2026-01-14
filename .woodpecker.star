@@ -576,7 +576,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + gen_docs_pr(ctx) + notifyMatrix(ctx)
+    pipelines = test_pipelines + build_release_pipelines + genDocsPr(ctx) + notifyMatrix(ctx)
 
     pipelineSanityChecks(pipelines)
     return savePipelineNumber(ctx) + pipelines
@@ -2213,7 +2213,7 @@ def makeGoGenerate(module):
         },
     ]
 
-def gen_docs_pr(ctx):
+def genDocsPr(ctx):
     return [{
         "name": "gen-docs-pr",
         "skip_clone": True,
@@ -2236,9 +2236,12 @@ def gen_docs_pr(ctx):
                     "CI_SSH_KEY_DOCS": {
                         "from_secret": "gh-docs-push-key",
                     },
-                    "GIT_SSH_COMMAND": "ssh -o StrictHostKeyChecking=no -i /root/id_rsa"
+                    "GIT_SSH_COMMAND": "ssh -o StrictHostKeyChecking=no -i /root/id_rsa",
+                    "OC_GIT_BRANCH": "${CI_COMMIT_BRANCH}",
+                    "MY_TARGET_BRANCH": "${CI_COMMIT_BRANCH}",
                 },
                 "commands": [
+                    'export DOC_GIT_TARGET_FOLDER="$$(if [ \"$$MY_TARGET_BRANCH\" = \"main\" ]; then echo \"tmpdocs/docs/dev/_static/env-vars/\"; else echo \"tmpdocs/versioned_docs/version-$${MY_TARGET_BRANCH}/dev/_static/env-vars/\"; fi)"',
                     'echo "$${CI_SSH_KEY}" > /root/id_rsa && chmod 600 /root/id_rsa',
                     'git config --global user.email "devops@opencloud.eu"',
                     'git config --global user.name "openclouders"',
@@ -2247,20 +2250,19 @@ def gen_docs_pr(ctx):
                     "make git-clone",
                     "make all",
                     "make create-docs-pullrequest",
-                    "echo done",
                 ]
             },
         ],
         "when": [
             {
                 "event": "push",
-                "branch": "main",
                 "path": "services/*/pkg/config/**/*.go",
+                "branch": "[main, stable-*]",
             },
             {
-                "event": "push",
-                "branch": "add_docs_pr_gen_pipeline",
-                "path": ".woodpecker.star",
+                "event": "cron",
+                "branch": "[main]",
+                "cron": "nightly (@daily)",
             },
         ],
     }]

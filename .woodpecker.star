@@ -2262,7 +2262,7 @@ def genDocsPr(ctx):
             {
                 "event": "cron",
                 "branch": "[main]",
-                "cron": "nightly (@daily)",
+                "cron": "nightly *",
             },
         ],
     }]

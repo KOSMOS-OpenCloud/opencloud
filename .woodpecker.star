@@ -2238,7 +2238,7 @@ def genDocsPr(ctx):
                     },
                     "GIT_SSH_COMMAND": "ssh -o StrictHostKeyChecking=no -i /root/id_rsa",
                     "OC_GIT_BRANCH": "${CI_COMMIT_BRANCH}",
-                    "MY_TARGET_BRANCH": "${CI_COMMIT_BRANCH}",
+                    "MY_TARGET_BRANCH": "${CI_COMMIT_BRANCH##stable-}",
                 },
                 "commands": [
                     'export DOC_GIT_TARGET_FOLDER="$$(if [ \"$$MY_TARGET_BRANCH\" = \"main\" ]; then echo \"tmpdocs/docs/dev/_static/env-vars/\"; else echo \"tmpdocs/versioned_docs/version-$${MY_TARGET_BRANCH}/dev/_static/env-vars/\"; fi)"',

@@ -2250,13 +2250,18 @@ def genDocsPr(ctx):
                     "make git-clone",
                     "make all",
                     "make create-docs-pullrequest",
-                ]
+                ],
             },
         ],
         "when": [
             {
                 "event": "push",
-                "path": "services/*/pkg/config/**/*.go",
+                "path": {
+                    "include": [
+                        "services/*/pkg/config/**/*.go",
+                        "pkg/**/*.go",
+                    ],
+                },
                 "branch": "[main, stable-*]",
             },
             {

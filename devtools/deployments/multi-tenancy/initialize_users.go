@@ -90,6 +90,7 @@ func main() {
 	}
 
 	resetAllUserPasswords()
+	setUserRoles()
 }
 
 func createUser(client *libregraph.APIClient, user libregraph.EducationUser) (string, error) {
@@ -110,6 +111,34 @@ func createTenant(client *libregraph.APIClient, tenant libregraph.EducationSchoo
 	}
 	fmt.Printf("Created tenant: %s with id %s\n", newTenant.GetDisplayName(), newTenant.GetId())
 	return newTenant.GetId(), nil
+}
+
+func setUserRoles() {
+	tls := tls.Config{InsecureSkipVerify: true}
+	restyClient := resty.New().SetTLSClientConfig(&tls)
+	client := gocloak.NewClient("https://keycloak.opencloud.test")
+	client.SetRestyClient(restyClient)
+	ctx := context.Background()
+	token, err := client.LoginAdmin(ctx, "kcadmin", "admin", "master")
+	if err != nil {
+		fmt.Printf("Failed to login: %s\n", err)
+		panic("Something wrong with the credentials or url")
+	}
+
+	role, _ := client.GetRealmRole(ctx, token.AccessToken, "openCloud", "opencloudUser")
+	users, err := client.GetUsers(ctx, token.AccessToken, "openCloud", gocloak.GetUsersParams{})
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		panic("Oh no!, failed to list users :(")
+	}
+	for _, user := range users {
+		err := client.AddRealmRoleToUser(ctx, token.AccessToken, "openCloud", *user.ID, []gocloak.Role{
+			*role,
+		})
+		if err != nil {
+			fmt.Printf("Failed to assign role to user %s: %s\n", *user.Username, err)
+		}
+	}
 }
 
 func resetAllUserPasswords() {

@@ -1263,7 +1263,7 @@ def localApiTestPipeline(ctx):
                                 "name": pipeline_name,
                                 "steps": evaluateWorkflowStep() + restoreBuildArtifactCache(ctx, dirs["opencloudBinArtifact"], dirs["opencloudBinPath"]) +
                                          (tikaService() if params["tikaNeeded"] else []) +
-                                         (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
+                                         (waitForWebOffices(["https://collabora:9980", "https://onlyoffice", "http://fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                          (waitForClamavService() if params["antivirusNeeded"] else []) +
                                          (waitForEmailService() if params["emailNeeded"] else []) +
                                          (ldapService() if params["ldapNeeded"] else []) +
@@ -3469,5 +3469,25 @@ def onlyofficeService():
                 "chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key",
                 "/app/ds/run-document-server.sh",
             ],
+        },
+    ]
+
+def waitForWebOffices(services = []):
+    commands = []
+    if not services:
+        return []
+
+    for service in services:
+        commands.append(
+            "timeout 300 bash -c " +
+            "'while [ `curl %s/hosting/discovery" % service +
+            " -w \"%{http_code}\" -o /dev/null -sk` != \"200\" ]; do " +
+            "echo \"Waiting...\" && sleep 2; done'",
+        )
+    return [
+        {
+            "name": "wait-for-weboffices",
+            "image": OC_CI_ALPINE,
+            "commands": commands,
         },
     ]

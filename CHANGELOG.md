@@ -1,5 +1,30 @@
 # Changelog
 
+## [5.0.2](https://github.com/opencloud-eu/opencloud/releases/tag/v5.0.2) - 2026-02-05
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @ScharfViktor, @flimmy, @individual-it, @rhafer, @saw-jan
+
+### 🐛 Bug Fixes
+
+- [full-ci] reva-bump-2.42.3 [[#2276](https://github.com/opencloud-eu/opencloud/pull/2276)]
+
+### ✅ Tests
+
+- adapt test for #514 [[#2255](https://github.com/opencloud-eu/opencloud/pull/2255)]
+- api-test: upload-rename-download file with back slash [[#2239](https://github.com/opencloud-eu/opencloud/pull/2239)]
+- [full-ci][tests-only] test: add hook failures to the test failures list [[#2041](https://github.com/opencloud-eu/opencloud/pull/2041)]
+
+### 📚 Documentation
+
+- docs(proxy): Clarify PROXY_OIDC_USERINFO_CACHE_TTL value [[#2256](https://github.com/opencloud-eu/opencloud/pull/2256)]
+
+### 📦️ Dependencies
+
+- [full-ci] reva-bump-2.42.2 [[#2270](https://github.com/opencloud-eu/opencloud/pull/2270)]
+- build(deps): bump github.com/grpc-ecosystem/grpc-gateway/v2 from 2.27.5 to 2.27.6 [[#2238](https://github.com/opencloud-eu/opencloud/pull/2238)]
+
 ## [5.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v5.0.1) - 2026-01-28
 
 ### ❤️ Thanks to all contributors! ❤️

@@ -22,6 +22,7 @@ var eduUserAttrs = []string{
 	"userTypeAttribute",
 	"openCloudExternalIdentity",
 	"userClass",
+	"openCloudEducationExternalId",
 	"openCloudMemberOfSchool",
 }
 

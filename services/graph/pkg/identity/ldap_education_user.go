@@ -252,6 +252,60 @@ func (i *LDAP) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUs
 	return users, nil
 }
 
+func (i *LDAP) FilterEducationUsersByAttribute(ctx context.Context, attr, value string) ([]*libregraph.EducationUser, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx).With().Str("func", "FilterEducationUsersByAttribute").Logger()
+	logger.Debug().Str("backend", "ldap").Str("attribute", attr).Str("value", value).Msg("")
+
+	var ldapAttr string
+	switch attr {
+	case "displayname":
+		ldapAttr = i.userAttributeMap.displayName
+	case "mail":
+		ldapAttr = i.userAttributeMap.mail
+	case "userType":
+		ldapAttr = i.userAttributeMap.userType
+	case "primaryRole":
+		ldapAttr = i.educationConfig.userAttributeMap.primaryRole
+	case "externalId":
+		ldapAttr = i.educationConfig.userAttributeMap.externalID
+	default:
+		return nil, errorcode.New(errorcode.InvalidRequest, fmt.Sprintf("filtering by attribute '%s' is not supported", attr))
+	}
+	filter := fmt.Sprintf("(&%s(objectClass=%s)(%s=%s))", i.userFilter, i.educationConfig.userObjectClass, ldap.EscapeFilter(ldapAttr), ldap.EscapeFilter(value))
+
+	searchRequest := ldap.NewSearchRequest(
+		i.userBaseDN,
+		i.userScope,
+		ldap.NeverDerefAliases, 0, 0, false,
+		filter,
+		i.getEducationUserAttrTypes(),
+		nil,
+	)
+	logger.Debug().Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("LDAP Search Request")
+
+	res, err := i.conn.Search(searchRequest)
+	if err != nil {
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+
+	users := make([]*libregraph.EducationUser, 0, len(res.Entries))
+
+	for _, e := range res.Entries {
+		u := i.createEducationUserModelFromLDAP(e)
+		// Skip invalid LDAP users
+		if u == nil {
+			continue
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
 func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph.User {
 	user := libregraph.NewUser(*eduUser.DisplayName, *eduUser.OnPremisesSamAccountName)
 	user.Surname = eduUser.Surname

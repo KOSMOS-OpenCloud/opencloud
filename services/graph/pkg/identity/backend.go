@@ -107,6 +107,8 @@ type EducationBackend interface {
 	GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error)
 	// GetEducationUsers lists all education users
 	GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error)
+	// FilterEducationUsersByAttribute list all education users where and attribute matches a value, e.g. all users with a given externalid
+	FilterEducationUsersByAttribute(ctx context.Context, attr, value string) ([]*libregraph.EducationUser, error)
 
 	// GetEducationClassTeachers returns the EducationUser teachers for an EducationClass
 	GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error)

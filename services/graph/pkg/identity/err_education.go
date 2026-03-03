@@ -119,6 +119,11 @@ func (i *ErrEducationBackend) GetEducationUsers(ctx context.Context) ([]*libregr
 	return nil, errNotImplemented
 }
 
+// FilterEducationUsersByAttribute implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) FilterEducationUsersByAttribute(ctx context.Context, attr, value string) ([]*libregraph.EducationUser, error) {
+	return nil, errNotImplemented
+}
+
 // GetEducationClassTeachers implements the EducationBackend interface for the ErrEducationBackend backend.
 func (i *ErrEducationBackend) GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented

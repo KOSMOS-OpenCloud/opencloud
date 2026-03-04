@@ -32,38 +32,12 @@ func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var users []*libregraph.EducationUser
-	if odataReq.Query.Filter != nil {
-		attr, value, err := g.getEqualityFilter(r.Context(), odataReq)
-		if err != nil {
-			logger.Debug().Err(err).Str("filter", odataReq.Query.Filter.RawValue).Msg("failed to parse filter")
-			var errcode errorcode.Error
-			var godataerr *godata.GoDataError
-			switch {
-			case errors.As(err, &errcode):
-				errcode.Render(w, r)
-			case errors.As(err, &godataerr):
-				errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
-			default:
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
-			return
-		}
-		users, err = g.identityEducationBackend.FilterEducationUsersByAttribute(r.Context(), attr, value)
-		if err != nil {
-			logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
-			errorcode.RenderError(w, r, err)
-			return
-		}
-	} else {
-		users, err = g.identityEducationBackend.GetEducationUsers(r.Context())
-		if err != nil {
-			logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
-			errorcode.RenderError(w, r, err)
-			return
-		}
+	users, err := g.getEducationUsersFromBackend(r.Context(), odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users")
+		renderEqualityFilterError(w, r, err)
+		return
 	}
-
 	users, err = sortEducationUsers(odataReq, users)
 	if err != nil {
 		logger.Debug().Interface("query", odataReq).Msg("error while sorting education users according to query")
@@ -413,6 +387,18 @@ func sortEducationUsers(req *godata.GoDataRequest, users []*libregraph.Education
 	return users, nil
 }
 
+// getEducationUsersFromBackend fetches users from the backend, applying an OData $filter if present.
+func (g Graph) getEducationUsersFromBackend(ctx context.Context, odataReq *godata.GoDataRequest) ([]*libregraph.EducationUser, error) {
+	if odataReq.Query.Filter != nil {
+		attr, value, err := g.getEqualityFilter(ctx, odataReq)
+		if err != nil {
+			return nil, err
+		}
+		return g.identityEducationBackend.FilterEducationUsersByAttribute(ctx, attr, value)
+	}
+	return g.identityEducationBackend.GetEducationUsers(ctx)
+}
+
 func (g Graph) getEqualityFilter(ctx context.Context, req *godata.GoDataRequest) (string, string, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 
@@ -438,4 +424,18 @@ func (g Graph) getEqualityFilter(ctx context.Context, req *godata.GoDataRequest)
 	// unquote
 	value := strings.Trim(root.Children[1].Token.Value, "'")
 	return root.Children[0].Token.Value, value, nil
+}
+
+// renderEqualityFilterError writes the appropriate HTTP error response for errors returned by getEqualityFilter.
+func renderEqualityFilterError(w http.ResponseWriter, r *http.Request, err error) {
+	var errcode errorcode.Error
+	var godataerr *godata.GoDataError
+	switch {
+	case errors.As(err, &errcode):
+		errcode.Render(w, r)
+	case errors.As(err, &godataerr):
+		errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+	}
 }

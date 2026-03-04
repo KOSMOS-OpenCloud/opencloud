@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
@@ -496,24 +497,23 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolNumberOrID s
 	}
 
 	for _, userEntry := range userEntries {
-		currentSchools := userEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
-		found := false
-		for _, currentSchool := range currentSchools {
-			if currentSchool == schoolID {
-				found = true
-				break
-			}
-		}
-		if !found {
-			mr := ldap.ModifyRequest{DN: userEntry.DN}
-			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
-			if err := i.conn.Modify(&mr); err != nil {
-				return err
-			}
+		if err := i.addEntryToSchool(userEntry, schoolID); err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+// addEntryToSchool adds the schoolID to the entry's memberOfSchool attribute if not already present.
+func (i *LDAP) addEntryToSchool(entry *ldap.Entry, schoolID string) error {
+	currentSchools := entry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+	if slices.Contains(currentSchools, schoolID) {
+		return nil
+	}
+	mr := ldap.ModifyRequest{DN: entry.DN}
+	mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
+	return i.conn.Modify(&mr)
 }
 
 // RemoveUserFromEducationSchool removes a single member (by ID) from a school
@@ -644,20 +644,8 @@ func (i *LDAP) AddClassesToEducationSchool(ctx context.Context, schoolNumberOrID
 	}
 
 	for _, classEntry := range classEntries {
-		currentSchools := classEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
-		found := false
-		for _, currentSchool := range currentSchools {
-			if currentSchool == schoolID {
-				found = true
-				break
-			}
-		}
-		if !found {
-			mr := ldap.ModifyRequest{DN: classEntry.DN}
-			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
-			if err := i.conn.Modify(&mr); err != nil {
-				return err
-			}
+		if err := i.addEntryToSchool(classEntry, schoolID); err != nil {
+			return err
 		}
 	}
 

@@ -208,48 +208,13 @@ func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string) (*libregra
 
 // GetEducationUsers implements the EducationBackend interface for the LDAP backend.
 func (i *LDAP) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error) {
-	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("GetEducationUsers")
-
-	var userFilter string
-
+	var filter string
 	if i.userFilter == "" {
-		userFilter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.userObjectClass)
+		filter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.userObjectClass)
 	} else {
-		userFilter = fmt.Sprintf("(&%s(objectClass=%s))", i.userFilter, i.educationConfig.userObjectClass)
+		filter = fmt.Sprintf("(&%s(objectClass=%s))", i.userFilter, i.educationConfig.userObjectClass)
 	}
-
-	searchRequest := ldap.NewSearchRequest(
-		i.userBaseDN,
-		i.userScope,
-		ldap.NeverDerefAliases, 0, 0, false,
-		userFilter,
-		i.getEducationUserAttrTypes(),
-		nil,
-	)
-	logger.Debug().Str("backend", "ldap").
-		Str("base", searchRequest.BaseDN).
-		Str("filter", searchRequest.Filter).
-		Int("scope", searchRequest.Scope).
-		Int("sizelimit", searchRequest.SizeLimit).
-		Interface("attributes", searchRequest.Attributes).
-		Msg("GetEducationUsers")
-	res, err := i.conn.Search(searchRequest)
-	if err != nil {
-		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
-	}
-
-	users := make([]*libregraph.EducationUser, 0, len(res.Entries))
-
-	for _, e := range res.Entries {
-		u := i.createEducationUserModelFromLDAP(e)
-		// Skip invalid LDAP users
-		if u == nil {
-			continue
-		}
-		users = append(users, u)
-	}
-	return users, nil
+	return i.searchEducationUsers(ctx, filter)
 }
 
 func (i *LDAP) FilterEducationUsersByAttribute(ctx context.Context, attr, value string) ([]*libregraph.EducationUser, error) {
@@ -272,7 +237,11 @@ func (i *LDAP) FilterEducationUsersByAttribute(ctx context.Context, attr, value 
 		return nil, errorcode.New(errorcode.InvalidRequest, fmt.Sprintf("filtering by attribute '%s' is not supported", attr))
 	}
 	filter := fmt.Sprintf("(&%s(objectClass=%s)(%s=%s))", i.userFilter, i.educationConfig.userObjectClass, ldap.EscapeFilter(ldapAttr), ldap.EscapeFilter(value))
+	return i.searchEducationUsers(ctx, filter)
+}
 
+// searchEducationUsers builds and executes an LDAP search for education users and converts the results to EducationUser models.
+func (i *LDAP) searchEducationUsers(ctx context.Context, filter string) ([]*libregraph.EducationUser, error) {
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN,
 		i.userScope,
@@ -281,12 +250,14 @@ func (i *LDAP) FilterEducationUsersByAttribute(ctx context.Context, attr, value 
 		i.getEducationUserAttrTypes(),
 		nil,
 	)
-	logger.Debug().Str("base", searchRequest.BaseDN).
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
 		Str("filter", searchRequest.Filter).
 		Int("scope", searchRequest.Scope).
 		Int("sizelimit", searchRequest.SizeLimit).
 		Interface("attributes", searchRequest.Attributes).
-		Msg("LDAP Search Request")
+		Msg("searchEducationUsers")
 
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
@@ -294,7 +265,6 @@ func (i *LDAP) FilterEducationUsersByAttribute(ctx context.Context, attr, value 
 	}
 
 	users := make([]*libregraph.EducationUser, 0, len(res.Entries))
-
 	for _, e := range res.Entries {
 		u := i.createEducationUserModelFromLDAP(e)
 		// Skip invalid LDAP users

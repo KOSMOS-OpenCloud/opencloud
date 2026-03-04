@@ -65,10 +65,10 @@ var schoolEntryWithTermination = ldap.NewEntry("ou=Test School",
 	})
 
 var (
-	filterSchoolSearchByIdExisting        = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=abcd-defg)(openCloudEducationSchoolNumber=abcd-defg)(openCloudEducationExternalId=abcd-defg)))"
-	filterSchoolSearchByIdNonexistant     = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=xxxx-xxxx)(openCloudEducationSchoolNumber=xxxx-xxxx)(openCloudEducationExternalId=xxxx-xxxx)))"
-	filterSchoolSearchByNumberExisting    = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=0123)(openCloudEducationSchoolNumber=0123)(openCloudEducationExternalId=0123)))"
-	filterSchoolSearchByNumberNonexistant = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=3210)(openCloudEducationSchoolNumber=3210)(openCloudEducationExternalId=3210)))"
+	filterSchoolSearchByIdExisting        = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=abcd-defg)(openCloudEducationSchoolNumber=abcd-defg)))"
+	filterSchoolSearchByIdNonexistant     = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=xxxx-xxxx)(openCloudEducationSchoolNumber=xxxx-xxxx)))"
+	filterSchoolSearchByNumberExisting    = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=0123)(openCloudEducationSchoolNumber=0123)))"
+	filterSchoolSearchByNumberNonexistant = "(&(objectClass=openCloudEducationSchool)(|(openCloudUUID=3210)(openCloudEducationSchoolNumber=3210)))"
 )
 
 func TestCreateEducationSchool(t *testing.T) {
@@ -128,7 +128,7 @@ func TestCreateEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     "(&(objectClass=openCloudEducationSchool)(openCloudEducationSchoolNumber=0123))",
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		lm.On("Search", schoolNumberSearchRequest).
@@ -142,7 +142,7 @@ func TestCreateEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     "(&(objectClass=openCloudEducationSchool)(openCloudEducationSchoolNumber=0666))",
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		lm.On("Search", existingSchoolNumberSearchRequest).
@@ -156,7 +156,7 @@ func TestCreateEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     "(&(objectClass=openCloudEducationSchool)(openCloudEducationSchoolNumber=1111))",
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		lm.On("Search", schoolNumberSearchRequestError).
@@ -170,7 +170,7 @@ func TestCreateEducationSchool(t *testing.T) {
 			Scope:      0,
 			SizeLimit:  1,
 			Filter:     "(objectClass=openCloudEducationSchool)",
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		lm.On("Search", schoolLookupAfterCreate).
@@ -358,7 +358,7 @@ func TestDeleteEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -427,7 +427,7 @@ func TestGetEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+			Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -461,7 +461,7 @@ func TestGetEducationSchools(t *testing.T) {
 		Scope:      2,
 		SizeLimit:  0,
 		Filter:     "(objectClass=openCloudEducationSchool)",
-		Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+		Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 		Controls:   []ldap.Control(nil),
 	}
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
@@ -478,7 +478,7 @@ var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     filterSchoolSearchByIdExisting,
-	Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+	Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 	Controls:   []ldap.Control(nil),
 }
 
@@ -487,7 +487,7 @@ var schoolByNumberSearch *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     filterSchoolSearchByNumberExisting,
-	Attributes: []string{"ou", "openCloudUUID", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
+	Attributes: []string{"ou", "openCloudUUID", "openCloudEducationExternalId", "openCloudEducationSchoolNumber", "openCloudEducationSchoolTerminationTimestamp"},
 	Controls:   []ldap.Control(nil),
 }
 

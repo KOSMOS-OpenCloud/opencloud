@@ -30,11 +30,36 @@ func (g Graph) GetEducationSchools(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schools, err := g.identityEducationBackend.GetEducationSchools(r.Context())
-	if err != nil {
-		logger.Debug().Err(err).Msg("could not get schools: backend error")
-		errorcode.RenderError(w, r, err)
-		return
+	var schools []*libregraph.EducationSchool
+	if odataReq.Query.Filter != nil {
+		attr, value, err := g.getEqualityFilter(r.Context(), odataReq)
+		if err != nil {
+			logger.Debug().Err(err).Str("filter", odataReq.Query.Filter.RawValue).Msg("failed to parse filter")
+			var errcode errorcode.Error
+			var godataerr *godata.GoDataError
+			switch {
+			case errors.As(err, &errcode):
+				errcode.Render(w, r)
+			case errors.As(err, &godataerr):
+				errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
+			default:
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+		schools, err = g.identityEducationBackend.FilterEducationSchoolsByAttribute(r.Context(), attr, value)
+		if err != nil {
+			logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get schools from backend")
+			errorcode.RenderError(w, r, err)
+			return
+		}
+	} else {
+		schools, err = g.identityEducationBackend.GetEducationSchools(r.Context())
+		if err != nil {
+			logger.Debug().Err(err).Msg("could not get schools: backend error")
+			errorcode.RenderError(w, r, err)
+			return
+		}
 	}
 
 	schools, err = sortEducationSchools(odataReq, schools)

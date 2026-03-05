@@ -2,10 +2,12 @@ package content
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node"
 	"github.com/opencloud-eu/reva/v2/pkg/tags"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
@@ -31,6 +33,9 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 	if m := ri.ArbitraryMetadata.GetMetadata(); m != nil {
 		if t, ok := m["tags"]; ok {
 			doc.Tags = tags.New(t).AsSlice()
+		}
+		if t, ok := m[node.AllFavoritesKey]; ok && len(t) > 0 {
+			doc.Favorites = strings.Split(t, ",")
 		}
 	}
 

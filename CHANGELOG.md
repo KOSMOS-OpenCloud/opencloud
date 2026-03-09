@@ -1,5 +1,48 @@
 # Changelog
 
+## [5.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v5.2.0) - 2026-03-09
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @JammingBen, @MahdiBaghbani, @ScharfViktor, @aduffeck, @butonic, @dragonchaser, @dragotin, @fschade, @pat-s, @rhafer
+
+### 📚 Documentation
+
+- update links and references in CONTRIBUTING.md [[#2411](https://github.com/opencloud-eu/opencloud/pull/2411)]
+- adr(webfinger): Align example config with implementation [[#2353](https://github.com/opencloud-eu/opencloud/pull/2353)]
+
+### 📈 Enhancement
+
+- feat(graph/education): Add support of 'eq' filters on users [[#2421](https://github.com/opencloud-eu/opencloud/pull/2421)]
+- feat(web): change surface colors to more modern ones [[#2377](https://github.com/opencloud-eu/opencloud/pull/2377)]
+- Add openCloudEducationExternalId to user [[#2357](https://github.com/opencloud-eu/opencloud/pull/2357)]
+- feat: app-registry adjust default mime-types [[#2354](https://github.com/opencloud-eu/opencloud/pull/2354)]
+- feat: support desktop and mobile specific  `client_id` and `scopes` [[#2072](https://github.com/opencloud-eu/opencloud/pull/2072)]
+
+### 🐛 Bug Fixes
+
+- [SKIP CI] Fix simple install script, use admin-password switch [[#2413](https://github.com/opencloud-eu/opencloud/pull/2413)]
+- resolve logout token subject:sessions for the idp backchannel logout [[#2328](https://github.com/opencloud-eu/opencloud/pull/2328)]
+- fix(oidc_auth): Fix userinfo cache expiration logic [[#2360](https://github.com/opencloud-eu/opencloud/pull/2360)]
+
+### 📦️ Dependencies
+
+- build(deps): bump github.com/open-policy-agent/opa from 1.13.2 to 1.14.0 [[#2427](https://github.com/opencloud-eu/opencloud/pull/2427)]
+- build(deps): bump go.opentelemetry.io/otel from 1.40.0 to 1.41.0 [[#2425](https://github.com/opencloud-eu/opencloud/pull/2425)]
+- build(deps): bump github.com/davidbyttow/govips/v2 from 2.16.0 to 2.17.0 [[#2420](https://github.com/opencloud-eu/opencloud/pull/2420)]
+- build(deps): bump github.com/nats-io/nats.go from 1.48.0 to 1.49.0 [[#2390](https://github.com/opencloud-eu/opencloud/pull/2390)]
+- build(deps): bump golang.org/x/net from 0.50.0 to 0.51.0 [[#2412](https://github.com/opencloud-eu/opencloud/pull/2412)]
+- build(deps): bump github.com/kovidgoyal/imaging from 1.8.19 to 1.8.20 [[#2391](https://github.com/opencloud-eu/opencloud/pull/2391)]
+- build(deps): bump github.com/grpc-ecosystem/grpc-gateway/v2 from 2.27.7 to 2.28.0 [[#2375](https://github.com/opencloud-eu/opencloud/pull/2375)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.13.1 to 1.13.2 [[#2374](https://github.com/opencloud-eu/opencloud/pull/2374)]
+- build(deps): bump google.golang.org/grpc from 1.78.0 to 1.79.1 [[#2362](https://github.com/opencloud-eu/opencloud/pull/2362)]
+- build(deps): bump github.com/onsi/ginkgo/v2 from 2.28.0 to 2.28.1 [[#2366](https://github.com/opencloud-eu/opencloud/pull/2366)]
+- build(deps): bump go.opentelemetry.io/contrib/zpages from 0.64.0 to 0.65.0 [[#2363](https://github.com/opencloud-eu/opencloud/pull/2363)]
+- build(deps): bump golang.org/x/net from 0.49.0 to 0.50.0 [[#2356](https://github.com/opencloud-eu/opencloud/pull/2356)]
+- build(deps): bump github.com/go-resty/resty/v2 from 2.17.1 to 2.17.2 [[#2355](https://github.com/opencloud-eu/opencloud/pull/2355)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp from 0.64.0 to 0.65.0 [[#2321](https://github.com/opencloud-eu/opencloud/pull/2321)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.12.3 to 1.13.1 [[#2350](https://github.com/opencloud-eu/opencloud/pull/2350)]
+
 ## [5.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v5.1.0) - 2026-02-16
 
 ### ❤️ Thanks to all contributors! ❤️

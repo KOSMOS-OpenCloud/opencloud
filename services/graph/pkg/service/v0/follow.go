@@ -6,7 +6,9 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	revaCtx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 )
 
 // FollowDriveItem marks a drive item as favorite.
@@ -73,6 +75,20 @@ func (g Graph) FollowDriveItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if g.eventsPublisher != nil {
+		ev := events.FavoriteAdded{
+			Ref: &provider.Reference{
+				ResourceId: &itemID,
+				Path:       ".",
+			},
+			UserID:    u.Id,
+			Executant: revaCtx.ContextMustGetUser(r.Context()).Id,
+		}
+		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
+			g.logger.Error().Err(err).Msg("Failed to publish FavoriteAdded event")
+		}
+	}
+
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -123,6 +139,20 @@ func (g Graph) UnfollowDriveItem(w http.ResponseWriter, r *http.Request) {
 	default:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not remove favorite")
 		return
+	}
+
+	if g.eventsPublisher != nil {
+		ev := events.FavoriteRemoved{
+			Ref: &provider.Reference{
+				ResourceId: &itemID,
+				Path:       ".",
+			},
+			UserID:    u.Id,
+			Executant: revaCtx.ContextMustGetUser(r.Context()).Id,
+		}
+		if err := events.Publish(r.Context(), g.eventsPublisher, ev); err != nil {
+			g.logger.Error().Err(err).Msg("Failed to publish FavoriteRemoved event")
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)

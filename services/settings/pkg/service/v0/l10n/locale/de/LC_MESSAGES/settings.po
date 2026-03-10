@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-09 00:09+0000\n"
+"POT-Creation-Date: 2026-03-10 00:08+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Jannick Kuhr, 2026\n"
 "Language-Team: German (https://app.transifex.com/opencloud-eu/teams/204053/de/)\n"
@@ -61,7 +61,8 @@ msgstr ""
 #. description of the notification option 'Space Unshared'
 #: pkg/store/defaults/templates.go:26
 msgid "Notify when I have been removed as member from a space"
-msgstr "Benachrichtigung, wenn ich Mitglied aus einem Space entfernt wurde"
+msgstr ""
+"Benachrichtigung, wenn ich als Mitglied aus einem Space entfernt wurde"
 
 #. description of the notification option 'Share Received'
 #: pkg/store/defaults/templates.go:10

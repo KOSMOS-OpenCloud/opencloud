@@ -5,6 +5,7 @@ import (
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/go-chi/render"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	revaCtx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -89,7 +90,14 @@ func (g Graph) FollowDriveItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	driveItem, err := cs3ResourceToDriveItem(g.logger, statRes.GetInfo())
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, &driveItem)
 }
 
 // UnfollowDriveItem unmarks a drive item as favorite.

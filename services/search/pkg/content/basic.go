@@ -2,12 +2,11 @@ package content
 
 import (
 	"context"
-	"strings"
+	"encoding/json"
 	"time"
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/node"
 	"github.com/opencloud-eu/reva/v2/pkg/tags"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
@@ -34,8 +33,23 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 		if t, ok := m["tags"]; ok {
 			doc.Tags = tags.New(t).AsSlice()
 		}
-		if t, ok := m[node.AllFavoritesKey]; ok && len(t) > 0 {
-			doc.Favorites = strings.Split(t, ",")
+	}
+
+	if m := ri.Opaque.GetMap(); m != nil && m["favorites"] != nil {
+		favEntry := m["favorites"]
+
+		switch favEntry.Decoder {
+		case "json":
+			favorites := []string{}
+			err := json.Unmarshal(favEntry.Value, &favorites)
+			if err != nil {
+				b.logger.Error().Err(err).Msg("failed to unmarshal favorites")
+				break
+			}
+
+			doc.Favorites = favorites
+		default:
+			b.logger.Error().Msgf("unsupported decoder for favorites: %s", favEntry.Decoder)
 		}
 	}
 

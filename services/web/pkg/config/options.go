@@ -7,6 +7,7 @@ type Options struct {
 	FeedbackLink           *FeedbackLink       `json:"feedbackLink,omitempty" yaml:"feedbackLink"`
 	RunningOnEOS           bool                `json:"runningOnEos,omitempty" yaml:"runningOnEos" env:"WEB_OPTION_RUNNING_ON_EOS" desc:"Set this option to 'true' if running on an EOS storage backend (https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'." introductionVersion:"1.0.0"`
 	CernFeatures           bool                `json:"cernFeatures,omitempty" yaml:"cernFeatures"`
+	OpenFilesInNewTab      bool                `json:"openFilesInNewTab,omitempty" yaml:"openFilesInNewTab" env:"WEB_OPTION_OPEN_FILES_IN_NEW_TAB" desc:"Set this option to 'true' to open files in a new browser tab instead of navigating in the same tab. Defaults to 'false'." introductionVersion:"5.3.0"`
 	Upload                 *Upload             `json:"upload,omitempty" yaml:"upload"`
 	Editor                 *Editor             `json:"editor,omitempty" yaml:"editor"`
 	ContextHelpersReadMore bool                `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not." introductionVersion:"1.0.0"`

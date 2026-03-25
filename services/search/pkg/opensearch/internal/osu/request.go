@@ -41,9 +41,39 @@ func (q QueryReqBody[O]) MarshalJSON() ([]byte, error) {
 //----------------------------------------------------------------------------//
 
 type BodyParamHighlight struct {
-	PreTags  []string                      `json:"pre_tags,omitempty"`
-	PostTags []string                      `json:"post_tags,omitempty"`
-	Fields   map[string]BodyParamHighlight `json:"fields,omitempty"`
+	HighlightOptions
+	Fields map[string]HighlightOptions `json:"fields,omitempty"`
+}
+
+type HighlightType string
+
+const (
+	HighlightTypeUnified  HighlightType = "unified"
+	HighlightTypeFvh      HighlightType = "fvh"
+	HighlightTypePlain    HighlightType = "plain"
+	HighlightTypeSemantic HighlightType = "semantic"
+)
+
+type HighlightOptions struct {
+	Type                  HighlightType `json:"type,omitempty"`
+	FragmentSize          int           `json:"fragment_size,omitempty"`
+	NumberOfFragments     int           `json:"number_of_fragments,omitempty"`
+	FragmentOffset        int           `json:"fragment_offset,omitempty"`
+	BoundaryChars         string        `json:"boundary_chars,omitempty"`
+	BoundaryMaxScan       int           `json:"boundary_max_scan,omitempty"`
+	BoundaryScanner       string        `json:"boundary_scanner,omitempty"`
+	BoundaryScannerLocale string        `json:"boundary_scanner_locale,omitempty"`
+	Encoder               string        `json:"encoder,omitempty"`
+	ForceSource           bool          `json:"force_source,omitempty"`
+	Fragmenter            string        `json:"fragmenter,omitempty"`
+	HighlightQuery        Builder       `json:"highlight_query,omitempty"`
+	Order                 string        `json:"order,omitempty"`
+	NoMatchSize           int           `json:"no_match_size,omitempty"`
+	RequireFieldMatch     bool          `json:"require_field_match,omitempty"`
+	MatchedFields         []string      `json:"matched_fields,omitempty"`
+	PhraseLimit           int           `json:"phrase_limit,omitempty"`
+	PreTags               []string      `json:"pre_tags,omitempty"`
+	PostTags              []string      `json:"post_tags,omitempty"`
 }
 
 type BodyParamScript struct {

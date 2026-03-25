@@ -92,7 +92,9 @@ func (b *Backend) Search(ctx context.Context, sir *searchService.SearchIndexRequ
 		)
 	}
 
-	searchParams := opensearchgoAPI.SearchParams{}
+	searchParams := opensearchgoAPI.SearchParams{
+		SourceExcludes: []string{"Content"}, // Do not send back the full content in the search response, as it is only needed for highlighting and can be large. The highlighted snippets will be sent back in the response instead.
+	}
 
 	switch {
 	case sir.PageSize == -1:
@@ -110,10 +112,15 @@ func (b *Backend) Search(ctx context.Context, sir *searchService.SearchIndexRequ
 		boolQuery,
 		osu.SearchBodyParams{
 			Highlight: &osu.BodyParamHighlight{
-				PreTags:  []string{"<mark>"},
-				PostTags: []string{"</mark>"},
-				Fields: map[string]osu.BodyParamHighlight{
-					"Content": {},
+				HighlightOptions: osu.HighlightOptions{
+					NumberOfFragments: 2,
+					PreTags:           []string{"<mark>"},
+					PostTags:          []string{"</mark>"},
+				},
+				Fields: map[string]osu.HighlightOptions{
+					"Content": {
+						Type: osu.HighlightTypeFvh,
+					},
 				},
 			},
 		},

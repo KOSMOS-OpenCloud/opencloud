@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/opencloud-eu/opencloud/services/search/pkg/opensearch/internal/osu"
-	"github.com/opencloud-eu/opencloud/services/search/pkg/opensearch/internal/test"
+	opensearchtest "github.com/opencloud-eu/opencloud/services/search/pkg/opensearch/internal/test"
 )
 
 func TestRequestBody(t *testing.T) {
@@ -46,10 +46,15 @@ func TestBuildSearchReq(t *testing.T) {
 					osu.NewTermQuery[string]("content").Value("content"),
 					osu.SearchBodyParams{
 						Highlight: &osu.BodyParamHighlight{
-							PreTags:  []string{"<b>"},
-							PostTags: []string{"</b>"},
-							Fields: map[string]osu.BodyParamHighlight{
-								"content": {},
+							HighlightOptions: osu.HighlightOptions{
+								PreTags:  []string{"<b>"},
+								PostTags: []string{"</b>"},
+							},
+							Fields: map[string]osu.HighlightOptions{
+								"content": {
+									PreTags:  []string{"<strong>"},
+									PostTags: []string{"</strong>"},
+								},
 							},
 						},
 					},
@@ -69,7 +74,10 @@ func TestBuildSearchReq(t *testing.T) {
 					"pre_tags":  []string{"<b>"},
 					"post_tags": []string{"</b>"},
 					"fields": map[string]any{
-						"content": map[string]any{},
+						"content": map[string]any{
+							"pre_tags":  []string{"<strong>"},
+							"post_tags": []string{"</strong>"},
+						},
 					},
 				},
 			},

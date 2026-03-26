@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-10 00:08+0000\n"
+"POT-Creation-Date: 2026-03-26 00:05+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/opencloud-eu/teams/204053/sv/)\n"
@@ -38,10 +38,6 @@ msgstr ""
 "Observera! Instansen kommer att stängas ned och avprovisioneras den {date}. "
 "Ladda ner alla dina data före det datumet, eftersom det inte går att komma "
 "åt dem efter det datumet."
-
-#: pkg/service/templates.go:14
-msgid "File {resource} was deleted because it violates the policies"
-msgstr "Filen {resource} har raderats eftersom den bryter mot riktlinjerna"
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
@@ -82,6 +78,13 @@ msgstr "Arbetsytan inaktiverad"
 #: pkg/service/templates.go:18
 msgid "Space shared"
 msgstr "Arbetsytan delad"
+
+#: pkg/service/templates.go:14
+msgid ""
+"The file {resource} was deleted because it violates the restrictions of this"
+" cloud. This could be due to an unsupported file type, potentially harmful "
+"or prohibited content, or file size limits."
+msgstr ""
 
 #: pkg/service/templates.go:8
 msgid "Virus found"

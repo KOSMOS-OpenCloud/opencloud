@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-12 00:08+0000\n"
+"POT-Creation-Date: 2026-03-26 00:05+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Efstathios Iosifidis <eiosifidis@gmail.com>, 2026\n"
 "Language-Team: Greek (https://app.transifex.com/opencloud-eu/teams/204053/el/)\n"
@@ -38,10 +38,6 @@ msgstr ""
 "Προσοχή! Η παρουσία (instance) θα απενεργοποιηθεί και θα αποδεσμευτεί στις "
 "{date}. Κατεβάστε όλα τα δεδομένα σας πριν από αυτή την ημερομηνία, καθώς "
 "μετά δεν θα είναι δυνατή η πρόσβαση."
-
-#: pkg/service/templates.go:14
-msgid "File {resource} was deleted because it violates the policies"
-msgstr "Το αρχείο {resource} διαγράφηκε επειδή παραβιάζει τις πολιτικές"
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
@@ -82,6 +78,13 @@ msgstr "Απενεργοποίηση χώρου"
 #: pkg/service/templates.go:18
 msgid "Space shared"
 msgstr "Διαμοιρασμός χώρου"
+
+#: pkg/service/templates.go:14
+msgid ""
+"The file {resource} was deleted because it violates the restrictions of this"
+" cloud. This could be due to an unsupported file type, potentially harmful "
+"or prohibited content, or file size limits."
+msgstr ""
 
 #: pkg/service/templates.go:8
 msgid "Virus found"

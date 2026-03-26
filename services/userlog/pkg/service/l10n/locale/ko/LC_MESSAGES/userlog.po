@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-11 00:08+0000\n"
+"POT-Creation-Date: 2026-03-26 00:05+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: gapho shin, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/opencloud-eu/teams/204053/ko/)\n"
@@ -37,10 +37,6 @@ msgid ""
 msgstr ""
 "주의하세요! 인스턴스는 {date}에 종료되고 프로비저닝이 해제됩니다. 해당 날짜 이후에는 액세스할 수 없으므로 해당 날짜 이전에 모든 "
 "데이터를 다운로드하세요."
-
-#: pkg/service/templates.go:14
-msgid "File {resource} was deleted because it violates the policies"
-msgstr "{resource} 파일이 정책을 위반하여 삭제되었습니다"
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
@@ -81,6 +77,13 @@ msgstr "스페이스 비활성화"
 #: pkg/service/templates.go:18
 msgid "Space shared"
 msgstr "스페이스 공유"
+
+#: pkg/service/templates.go:14
+msgid ""
+"The file {resource} was deleted because it violates the restrictions of this"
+" cloud. This could be due to an unsupported file type, potentially harmful "
+"or prohibited content, or file size limits."
+msgstr ""
 
 #: pkg/service/templates.go:8
 msgid "Virus found"

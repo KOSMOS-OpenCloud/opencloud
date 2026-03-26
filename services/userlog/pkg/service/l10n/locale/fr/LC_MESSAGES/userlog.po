@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-03-11 00:08+0000\n"
+"POT-Creation-Date: 2026-03-26 00:05+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: eric_G <junk.eg@free.fr>, 2025\n"
 "Language-Team: French (https://app.transifex.com/opencloud-eu/teams/204053/fr/)\n"
@@ -38,10 +38,6 @@ msgstr ""
 "Attention ! L'instance sera fermée et déprovisionnée le {date}. Téléchargez "
 "toutes vos données avant cette date car aucun accès ne sera possible après "
 "cette date."
-
-#: pkg/service/templates.go:14
-msgid "File {resource} was deleted because it violates the policies"
-msgstr "Le fichier {resource} a été supprimé car il enfreint les règles."
 
 #: pkg/service/templates.go:58
 msgid "Instance will be shut down and deprovisioned"
@@ -82,6 +78,13 @@ msgstr "Espace désactivé"
 #: pkg/service/templates.go:18
 msgid "Space shared"
 msgstr "Espace partagé"
+
+#: pkg/service/templates.go:14
+msgid ""
+"The file {resource} was deleted because it violates the restrictions of this"
+" cloud. This could be due to an unsupported file type, potentially harmful "
+"or prohibited content, or file size limits."
+msgstr ""
 
 #: pkg/service/templates.go:8
 msgid "Virus found"

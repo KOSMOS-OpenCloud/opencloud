@@ -1,5 +1,50 @@
 # Changelog
 
+## [6.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v6.0.0) - 2026-03-30
+
+### ❤️ Thanks to all contributors! ❤️
+
+@ScharfViktor, @aduffeck, @dragonchaser, @micbar, @pascalwengerter, @smoothscholar
+
+### 💥 Breaking changes
+
+- Improve opensearch highlighting, fix favorites [[#2514](https://github.com/opencloud-eu/opencloud/pull/2514)]
+
+### 📈 Enhancement
+
+- feat: add userid to spans [[#2536](https://github.com/opencloud-eu/opencloud/pull/2536)]
+- feat: add openFilesInNewTab web config option [[#2522](https://github.com/opencloud-eu/opencloud/pull/2522)]
+- Always enable favorites, remove FRONTEND_ENABLE_FAVORITES flag [[#2494](https://github.com/opencloud-eu/opencloud/pull/2494)]
+- Implement favorites [[#2454](https://github.com/opencloud-eu/opencloud/pull/2454)]
+
+### 🐛 Bug Fixes
+
+- Fix bleve batches [[#2524](https://github.com/opencloud-eu/opencloud/pull/2524)]
+
+### ✅ Tests
+
+- api-tests: search for favorites [[#2487](https://github.com/opencloud-eu/opencloud/pull/2487)]
+- [test-only] favorites tests [[#2474](https://github.com/opencloud-eu/opencloud/pull/2474)]
+
+### 📦️ Dependencies
+
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.12.5 to 2.12.6 [[#2525](https://github.com/opencloud-eu/opencloud/pull/2525)]
+- build(deps-dev): bump postcss-preset-env from 10.1.3 to 11.2.0 in /services/idp [[#2392](https://github.com/opencloud-eu/opencloud/pull/2392)]
+- build(deps): bump github.com/tus/tusd/v2 from 2.8.0 to 2.9.2 [[#2485](https://github.com/opencloud-eu/opencloud/pull/2485)]
+- build(deps): bump google.golang.org/grpc from 1.79.2 to 1.79.3 [[#2519](https://github.com/opencloud-eu/opencloud/pull/2519)]
+- build(deps): bump github.com/nats-io/nats-server/v2 from 2.12.4 to 2.12.5 [[#2499](https://github.com/opencloud-eu/opencloud/pull/2499)]
+- build(deps): bump github.com/russellhaering/goxmldsig from 1.5.0 to 1.6.0 [[#2503](https://github.com/opencloud-eu/opencloud/pull/2503)]
+- build(deps): bump golang.org/x/net from 0.51.0 to 0.52.0 [[#2472](https://github.com/opencloud-eu/opencloud/pull/2472)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc from 0.65.0 to 0.67.0 [[#2473](https://github.com/opencloud-eu/opencloud/pull/2473)]
+- build(deps): bump github.com/olekukonko/tablewriter from 1.1.3 to 1.1.4 [[#2468](https://github.com/opencloud-eu/opencloud/pull/2468)]
+- build(deps): bump go.opentelemetry.io/contrib/zpages from 0.65.0 to 0.67.0 [[#2467](https://github.com/opencloud-eu/opencloud/pull/2467)]
+- build(deps): bump github.com/testcontainers/testcontainers-go/modules/opensearch from 0.40.0 to 0.41.0 [[#2458](https://github.com/opencloud-eu/opencloud/pull/2458)]
+- build(deps): bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc from 1.41.0 to 1.42.0 [[#2459](https://github.com/opencloud-eu/opencloud/pull/2459)]
+- build(deps): bump github.com/testcontainers/testcontainers-go from 0.40.0 to 0.41.0 [[#2453](https://github.com/opencloud-eu/opencloud/pull/2453)]
+- build(deps): bump golang.org/x/oauth2 from 0.35.0 to 0.36.0 [[#2452](https://github.com/opencloud-eu/opencloud/pull/2452)]
+- build(deps): bump go.opentelemetry.io/otel/exporters/stdout/stdouttrace from 1.40.0 to 1.42.0 [[#2441](https://github.com/opencloud-eu/opencloud/pull/2441)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp from 0.65.0 to 0.67.0 [[#2442](https://github.com/opencloud-eu/opencloud/pull/2442)]
+
 ## [5.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v5.2.0) - 2026-03-09
 
 ### ❤️ Thanks to all contributors! ❤️

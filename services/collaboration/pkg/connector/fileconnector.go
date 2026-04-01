@@ -1302,6 +1302,18 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	if !isPublicShare && !isAnonymousUser {
+		extraInfo := &fileinfo.UserExtraInfo{
+			Mail: user.GetMail(),
+		}
+		// Build a WOPI-proxied avatar URL so Collabora can load it via img.src
+		// without needing auth headers (the token is in the query string).
+		if avatarURL, err := f.createAvatarURL(wopiContext, collaborationURL, user.GetId().GetOpaqueId()); err == nil {
+			extraInfo.Avatar = avatarURL
+		}
+		infoMap[fileinfo.KeyUserExtraInfo] = extraInfo
+	}
+
 	// if the file content is empty and a template reference is set, add the template source URL
 	if wopiContext.TemplateReference != nil && statRes.GetInfo().GetSize() == 0 {
 		if tu, err := f.createDownloadURL(wopiContext, collaborationURL); err == nil {
@@ -1337,6 +1349,22 @@ func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, co
 	q.Add("access_token", token)
 	downloadURL.RawQuery = q.Encode()
 	return downloadURL.String(), nil
+}
+
+// createAvatarURL builds a WOPI-proxied avatar URL for the given user.
+// The collaboration service's /wopi/avatars/ endpoint will fetch the avatar
+// from the Graph API using the WOPI token for authentication.
+func (f *FileConnector) createAvatarURL(wopiContext middleware.WopiContext, collaborationURL *url.URL, userID string) (string, error) {
+	token, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg, f.store)
+	if err != nil {
+		return "", err
+	}
+	avatarURL := *collaborationURL
+	avatarURL.Path = path.Join(collaborationURL.Path, "wopi/avatars/", userID)
+	q := avatarURL.Query()
+	q.Add("access_token", token)
+	avatarURL.RawQuery = q.Encode()
+	return avatarURL.String(), nil
 }
 
 func createHostUrl(mode string, u *url.URL, appName string, info *providerv1beta1.ResourceInfo) string {

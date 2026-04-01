@@ -9,9 +9,10 @@ import (
 // CS3Api defines the available configuration in order to access to the CS3 gateway.
 type CS3Api struct {
 	Gateway                 Gateway               `yaml:"gateway"`
-	DataGateway             DataGateway           `yaml:"datagateway"`
-	GRPCClientTLS           *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
-	APPRegistrationInterval time.Duration         `yaml:"app_registration_interval" env:"COLLABORATION_CS3API_APP_REGISTRATION_INTERVAL" desc:"The interval at which the app provider registers itself." introductionVersion:"4.0.0"`
+	DataGateway             DataGateway            `yaml:"datagateway"`
+	GraphEndpoint           string                 `yaml:"graph_endpoint" env:"COLLABORATION_CS3API_GRAPH_ENDPOINT" desc:"The internal HTTP endpoint of the Graph service, used to fetch user profile photos for avatars." introductionVersion:"4.0.0"`
+	GRPCClientTLS           *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
+	APPRegistrationInterval time.Duration          `yaml:"app_registration_interval" env:"COLLABORATION_CS3API_APP_REGISTRATION_INTERVAL" desc:"The interval at which the app provider registers itself." introductionVersion:"4.0.0"`
 }
 
 // Gateway defines the available configuration for the CS3 API gateway

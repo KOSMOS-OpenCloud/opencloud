@@ -65,6 +65,7 @@ func DefaultConfig() *config.Config {
 			DataGateway: config.DataGateway{
 				Insecure: false,
 			},
+			GraphEndpoint:           "http://127.0.0.1:9120/graph",
 			APPRegistrationInterval: 30 * time.Second,
 		},
 	}

@@ -3,13 +3,18 @@ package connector
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector/utf7"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/locks"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/rs/zerolog"
 	microstore "go-micro.dev/v4/store"
@@ -41,12 +46,14 @@ const (
 type HttpAdapter struct {
 	con   ConnectorService
 	locks locks.LockParser
+	cfg   *config.Config
 }
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the
 // provided gateway API client and configuration will be used in the adapter
 func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store) *HttpAdapter {
 	httpAdapter := &HttpAdapter{
+		cfg: cfg,
 		con: NewConnector(
 			NewFileConnector(gws, cfg, st),
 			NewContentConnector(gws, cfg),
@@ -299,6 +306,66 @@ func (h *HttpAdapter) RenameFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.writeConnectorResponse(w, r, response)
+}
+
+// GetAvatar proxies the user's avatar from the Graph API.
+// The WOPI token in the query string provides authentication (validated by
+// the WopiContextAuthMiddleware). Collabora loads avatars via img.src which
+// is a plain browser GET — it cannot send auth headers.
+//
+// Internally, the handler calls the Graph service directly (bypassing the
+// proxy) and authenticates with the reva access token via the x-access-token
+// header — the same mechanism the proxy uses when forwarding requests to
+// backend services.
+func (h *HttpAdapter) GetAvatar(w http.ResponseWriter, r *http.Request) {
+	logger := zerolog.Ctx(r.Context())
+	userID := chi.URLParam(r, "userID")
+	if userID == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	wopiContext, err := middleware.WopiContextFromCtx(r.Context())
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: missing WOPI context")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	// Build the internal Graph API URL for the user's photo.
+	// We call the Graph service directly (not through the proxy) so we can
+	// authenticate with the reva token via x-access-token.
+	graphEndpoint := h.cfg.CS3Api.GraphEndpoint
+	avatarURL := graphEndpoint + "/v1.0/users/" + userID + "/photo/$value"
+
+	httpReq, err := http.NewRequestWithContext(r.Context(), http.MethodGet, avatarURL, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: failed to create request")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	httpReq.Header.Set(revactx.TokenHeader, wopiContext.AccessToken)
+
+	httpResp, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: failed to fetch avatar from Graph API")
+		http.Error(w, http.StatusText(http.StatusBadGateway), http.StatusBadGateway)
+		return
+	}
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		logger.Warn().Int("status", httpResp.StatusCode).Msg("GetAvatar: Graph API returned non-200")
+		http.Error(w, http.StatusText(httpResp.StatusCode), httpResp.StatusCode)
+		return
+	}
+
+	if ct := httpResp.Header.Get("Content-Type"); ct != "" {
+		w.Header().Set("Content-Type", ct)
+	}
+	w.Header().Set("Cache-Control", "public, max-age=300")
+	w.WriteHeader(http.StatusOK)
+	io.Copy(w, httpResp.Body)
 }
 
 func (h *HttpAdapter) writeConnectorResponse(w http.ResponseWriter, r *http.Request, response *ConnectorResponse) {

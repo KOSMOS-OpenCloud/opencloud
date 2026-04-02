@@ -1,12 +1,16 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/jellydator/ttlcache/v3"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	tenantpb "github.com/cs3org/go-cs3apis/cs3/identity/tenant/v1beta1"
+	rpcpb "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/router"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/user/backend"
 	"github.com/opencloud-eu/opencloud/services/proxy/pkg/userroles"
@@ -16,8 +20,10 @@ import (
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/oidc"
+	"github.com/opencloud-eu/opencloud/services/proxy/pkg/config"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
@@ -36,33 +42,39 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 
 	return func(next http.Handler) http.Handler {
 		return &accountResolver{
-			next:                  next,
-			logger:                logger,
-			tracer:                tracer,
-			userProvider:          options.UserProvider,
-			userOIDCClaim:         options.UserOIDCClaim,
-			userCS3Claim:          options.UserCS3Claim,
-			tenantOIDCClaim:       options.TenantOIDCClaim,
-			userRoleAssigner:      options.UserRoleAssigner,
-			autoProvisionAccounts: options.AutoprovisionAccounts,
-			multiTenantEnabled:    options.MultiTenantEnabled,
-			lastGroupSyncCache:    lastGroupSyncCache,
-			eventsPublisher:       options.EventsPublisher,
+			next:                   next,
+			logger:                 logger,
+			tracer:                 tracer,
+			userProvider:           options.UserProvider,
+			userOIDCClaim:          options.UserOIDCClaim,
+			userCS3Claim:           options.UserCS3Claim,
+			tenantOIDCClaim:        options.TenantOIDCClaim,
+			tenantIDMappingEnabled: options.TenantIDMappingEnabled,
+			gatewaySelector:        options.RevaGatewaySelector,
+			serviceAccount:         options.ServiceAccount,
+			userRoleAssigner:       options.UserRoleAssigner,
+			autoProvisionAccounts:  options.AutoprovisionAccounts,
+			multiTenantEnabled:     options.MultiTenantEnabled,
+			lastGroupSyncCache:     lastGroupSyncCache,
+			eventsPublisher:        options.EventsPublisher,
 		}
 	}
 }
 
 type accountResolver struct {
-	next                  http.Handler
-	logger                log.Logger
-	tracer                trace.Tracer
-	userProvider          backend.UserBackend
-	userRoleAssigner      userroles.UserRoleAssigner
-	autoProvisionAccounts bool
-	multiTenantEnabled    bool
-	userOIDCClaim         string
-	userCS3Claim          string
-	tenantOIDCClaim       string
+	next                   http.Handler
+	logger                 log.Logger
+	tracer                 trace.Tracer
+	userProvider           backend.UserBackend
+	userRoleAssigner       userroles.UserRoleAssigner
+	autoProvisionAccounts  bool
+	multiTenantEnabled     bool
+	tenantIDMappingEnabled bool
+	gatewaySelector        pool.Selectable[gateway.GatewayAPIClient]
+	serviceAccount         config.ServiceAccount
+	userOIDCClaim          string
+	userCS3Claim           string
+	tenantOIDCClaim        string
 	// lastGroupSyncCache is used to keep track of when the last sync of group
 	// memberships was done for a specific user. This is used to trigger a sync
 	// with every single request.
@@ -173,7 +185,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		// if a tenant claim is configured, verify it matches the tenant id on the resolved user
 		if m.tenantOIDCClaim != "" {
-			if err = m.verifyTenantClaim(user.GetId().GetTenantId(), claims); err != nil {
+			if err = m.verifyTenantClaim(req.Context(), user.GetId().GetTenantId(), claims); err != nil {
 				m.logger.Error().Err(err).Str("userid", user.GetId().GetOpaqueId()).Msg("Tenant claim mismatch")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
@@ -260,13 +272,47 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	m.next.ServeHTTP(w, req)
 }
 
-func (m accountResolver) verifyTenantClaim(userTenantID string, claims map[string]interface{}) error {
+func (m accountResolver) verifyTenantClaim(ctx context.Context, userTenantID string, claims map[string]interface{}) error {
 	claimTenantID, err := readStringClaim(m.tenantOIDCClaim, claims)
 	if err != nil {
 		return fmt.Errorf("could not read tenant claim: %w", err)
 	}
-	if claimTenantID != userTenantID {
+
+	internalTenantID := claimTenantID
+	if m.tenantIDMappingEnabled {
+		internalTenantID, err = m.resolveInternalTenantID(ctx, claimTenantID)
+		if err != nil {
+			return fmt.Errorf("could not resolve internal tenant id for external tenant id %q: %w", claimTenantID, err)
+		}
+	}
+
+	if internalTenantID != userTenantID {
 		return fmt.Errorf("tenant id from claim %q does not match user tenant id %q", claimTenantID, userTenantID)
 	}
 	return nil
+}
+
+// resolveInternalTenantID calls the gateway's TenantAPI to map an external tenant ID (as it
+// appears in OIDC claims) to the internal tenant ID stored on the user object.
+// The call is authenticated using the configured service account.
+func (m accountResolver) resolveInternalTenantID(ctx context.Context, externalTenantID string) (string, error) {
+	gwc, err := m.gatewaySelector.Next()
+	if err != nil {
+		return "", fmt.Errorf("could not get gateway client: %w", err)
+	}
+	authCtx, err := utils.GetServiceUserContextWithContext(ctx, gwc, m.serviceAccount.ServiceAccountID, m.serviceAccount.ServiceAccountSecret)
+	if err != nil {
+		return "", fmt.Errorf("could not authenticate service account: %w", err)
+	}
+	resp, err := gwc.GetTenantByClaim(authCtx, &tenantpb.GetTenantByClaimRequest{
+		Claim: "externalid",
+		Value: externalTenantID,
+	})
+	if err != nil {
+		return "", err
+	}
+	if resp.GetStatus().GetCode() != rpcpb.Code_CODE_OK {
+		return "", fmt.Errorf("TenantAPI returned status %s: %s", resp.GetStatus().GetCode(), resp.GetStatus().GetMessage())
+	}
+	return resp.GetTenant().GetId(), nil
 }

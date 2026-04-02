@@ -40,6 +40,12 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 	)
 	go lastGroupSyncCache.Start()
 
+	tenantIDCache := ttlcache.New(
+		ttlcache.WithTTL[string, string](10*time.Minute),
+		ttlcache.WithDisableTouchOnHit[string, string](),
+	)
+	go tenantIDCache.Start()
+
 	return func(next http.Handler) http.Handler {
 		return &accountResolver{
 			next:                   next,
@@ -56,6 +62,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			autoProvisionAccounts:  options.AutoprovisionAccounts,
 			multiTenantEnabled:     options.MultiTenantEnabled,
 			lastGroupSyncCache:     lastGroupSyncCache,
+			tenantIDCache:          tenantIDCache,
 			eventsPublisher:        options.EventsPublisher,
 		}
 	}
@@ -79,7 +86,9 @@ type accountResolver struct {
 	// memberships was done for a specific user. This is used to trigger a sync
 	// with every single request.
 	lastGroupSyncCache *ttlcache.Cache[string, struct{}]
-	eventsPublisher    events.Publisher
+	// tenantIDCache maps external tenant IDs (from OIDC claims) to internal tenant IDs.
+	tenantIDCache   *ttlcache.Cache[string, string]
+	eventsPublisher events.Publisher
 }
 
 func readStringClaim(path string, claims map[string]interface{}) (string, error) {
@@ -292,10 +301,15 @@ func (m accountResolver) verifyTenantClaim(ctx context.Context, userTenantID str
 	return nil
 }
 
-// resolveInternalTenantID calls the gateway's TenantAPI to map an external tenant ID (as it
-// appears in OIDC claims) to the internal tenant ID stored on the user object.
+// resolveInternalTenantID maps an external tenant ID (as it appears in OIDC claims) to the
+// internal tenant ID stored on the user object by calling the gateway's TenantAPI.
+// Results are cached for 10 minutes to avoid repeated lookups on every request.
 // The call is authenticated using the configured service account.
 func (m accountResolver) resolveInternalTenantID(ctx context.Context, externalTenantID string) (string, error) {
+	if item := m.tenantIDCache.Get(externalTenantID); item != nil {
+		return item.Value(), nil
+	}
+
 	gwc, err := m.gatewaySelector.Next()
 	if err != nil {
 		return "", fmt.Errorf("could not get gateway client: %w", err)
@@ -314,5 +328,8 @@ func (m accountResolver) resolveInternalTenantID(ctx context.Context, externalTe
 	if resp.GetStatus().GetCode() != rpcpb.Code_CODE_OK {
 		return "", fmt.Errorf("TenantAPI returned status %s: %s", resp.GetStatus().GetCode(), resp.GetStatus().GetMessage())
 	}
-	return resp.GetTenant().GetId(), nil
+
+	internalID := resp.GetTenant().GetId()
+	m.tenantIDCache.Set(externalTenantID, internalID, ttlcache.DefaultTTL)
+	return internalID, nil
 }

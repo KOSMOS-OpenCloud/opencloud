@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -94,6 +95,10 @@ type FileConnectorService interface {
 	// In case of conflict, this method will return the actual lockId in
 	// the file as second return value.
 	RenameFile(ctx context.Context, lockID, target string) (*ConnectorResponse, error)
+	// GetAvatar fetches the user's avatar image from the Graph API.
+	// The response Body contains the raw image bytes ([]byte) and the
+	// Headers contain Content-Type and Cache-Control.
+	GetAvatar(ctx context.Context, userID string) (*ConnectorResponse, error)
 }
 
 // FileConnector implements the "File" endpoint.
@@ -1538,4 +1543,62 @@ func (f *FileConnector) getScopeByKeyPrefix(scopes map[string]*auth.Scope, keyPr
 		}
 	}
 	return fmt.Errorf("scope %s not found", keyPrefix)
+}
+
+// GetAvatar fetches the user's avatar image from the Graph API.
+// The returned ConnectorResponse carries the raw image bytes in Body ([]byte)
+// and Content-Type / Cache-Control in Headers.
+func (f *FileConnector) GetAvatar(ctx context.Context, userID string) (*ConnectorResponse, error) {
+	logger := zerolog.Ctx(ctx)
+
+	wopiContext, err := middleware.WopiContextFromCtx(ctx)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: missing WOPI context")
+		return nil, NewConnectorError(http.StatusUnauthorized, "missing WOPI context")
+	}
+
+	avatarURL := f.cfg.CS3Api.GraphEndpoint + "/v1.0/users/" + userID + "/photo/$value"
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: failed to create request")
+		return nil, NewConnectorError(http.StatusInternalServerError, "failed to create request")
+	}
+	httpReq.Header.Set(ctxpkg.TokenHeader, wopiContext.AccessToken)
+
+	httpResp, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: failed to fetch avatar from Graph API")
+		return nil, NewConnectorError(http.StatusBadGateway, "failed to fetch avatar")
+	}
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		logger.Warn().Int("status", httpResp.StatusCode).Msg("GetAvatar: Graph API returned non-200")
+		return nil, NewConnectorError(httpResp.StatusCode, http.StatusText(httpResp.StatusCode))
+	}
+
+	data, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		logger.Error().Err(err).Msg("GetAvatar: failed to read avatar body")
+		return nil, NewConnectorError(http.StatusInternalServerError, "failed to read avatar body")
+	}
+
+	headers := map[string]string{
+		"Cache-Control": "public, max-age=300",
+	}
+
+	if ct := httpResp.Header.Get("Content-Type"); ct != "" {
+		headers["Content-Type"] = ct
+	}
+
+	if cl := httpResp.Header.Get("Content-Length"); cl != "" {
+		headers["Content-Length"] = cl
+	}
+
+	return &ConnectorResponse{
+		Status:  http.StatusOK,
+		Headers: headers,
+		Body:    data,
+	}, nil
 }

@@ -14,6 +14,9 @@ import (
 	"strings"
 	"time"
 
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	"go-micro.dev/v4/selector"
+
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	auth "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -105,17 +108,19 @@ type FileConnectorService interface {
 // Currently, it handles file locks and getting the file info.
 // Note that operations might return any kind of error, not just ConnectorError
 type FileConnector struct {
-	gws   pool.Selectable[gatewayv1beta1.GatewayAPIClient]
-	cfg   *config.Config
-	store microstore.Store
+	gws           pool.Selectable[gatewayv1beta1.GatewayAPIClient]
+	cfg           *config.Config
+	store         microstore.Store
+	graphSelector selector.Selector
 }
 
 // NewFileConnector creates a new file connector
-func NewFileConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store) *FileConnector {
+func NewFileConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store, graphSelector selector.Selector) *FileConnector {
 	return &FileConnector{
-		gws:   gws,
-		cfg:   cfg,
-		store: st,
+		gws:           gws,
+		cfg:           cfg,
+		store:         st,
+		graphSelector: graphSelector,
 	}
 }
 
@@ -1557,28 +1562,23 @@ func (f *FileConnector) GetAvatar(ctx context.Context, userID string) (*Connecto
 		return nil, NewConnectorError(http.StatusUnauthorized, "missing WOPI context")
 	}
 
-	avatarURL := f.cfg.CS3Api.GraphEndpoint + "/v1.0/users/" + userID + "/photo/$value"
-
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
+	lgClient, err := f.setupLibregraphClient(ctx, wopiContext.AccessToken)
 	if err != nil {
-		logger.Error().Err(err).Msg("GetAvatar: failed to create request")
-		return nil, NewConnectorError(http.StatusInternalServerError, "failed to create request")
+		logger.Error().Err(err).Msg("GetAvatar: failed to setup libregraph client")
+		return nil, NewConnectorError(http.StatusInternalServerError, "failed to setup libregraph client")
 	}
-	httpReq.Header.Set(ctxpkg.TokenHeader, wopiContext.AccessToken)
 
-	httpResp, err := http.DefaultClient.Do(httpReq)
+	photoFile, httpResp, err := lgClient.UserPhotoApi.GetUserPhoto(ctx, userID).Execute()
 	if err != nil {
 		logger.Error().Err(err).Msg("GetAvatar: failed to fetch avatar from Graph API")
+		if httpResp != nil {
+			return nil, NewConnectorError(httpResp.StatusCode, http.StatusText(httpResp.StatusCode))
+		}
 		return nil, NewConnectorError(http.StatusBadGateway, "failed to fetch avatar")
 	}
-	defer httpResp.Body.Close()
+	defer photoFile.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		logger.Warn().Int("status", httpResp.StatusCode).Msg("GetAvatar: Graph API returned non-200")
-		return nil, NewConnectorError(httpResp.StatusCode, http.StatusText(httpResp.StatusCode))
-	}
-
-	data, err := io.ReadAll(httpResp.Body)
+	data, err := io.ReadAll(photoFile)
 	if err != nil {
 		logger.Error().Err(err).Msg("GetAvatar: failed to read avatar body")
 		return nil, NewConnectorError(http.StatusInternalServerError, "failed to read avatar body")
@@ -1587,13 +1587,8 @@ func (f *FileConnector) GetAvatar(ctx context.Context, userID string) (*Connecto
 	headers := map[string]string{
 		"Cache-Control": "public, max-age=300",
 	}
-
 	if ct := httpResp.Header.Get("Content-Type"); ct != "" {
 		headers["Content-Type"] = ct
-	}
-
-	if cl := httpResp.Header.Get("Content-Length"); cl != "" {
-		headers["Content-Length"] = cl
 	}
 
 	return &ConnectorResponse{
@@ -1601,4 +1596,23 @@ func (f *FileConnector) GetAvatar(ctx context.Context, userID string) (*Connecto
 		Headers: headers,
 		Body:    data,
 	}, nil
+}
+
+func (f *FileConnector) setupLibregraphClient(_ context.Context, cs3token string) (*libregraph.APIClient, error) {
+	next, err := f.graphSelector.Select("eu.opencloud.web.graph")
+	if err != nil {
+		return nil, err
+	}
+	node, err := next()
+	if err != nil {
+		return nil, err
+	}
+	lgconf := libregraph.NewConfiguration()
+	lgconf.Servers = libregraph.ServerConfigurations{
+		{
+			URL: fmt.Sprintf("%s://%s/graph", node.Metadata["protocol"], node.Address),
+		},
+	}
+	lgconf.DefaultHeader = map[string]string{ctxpkg.TokenHeader: cs3token}
+	return libregraph.NewAPIClient(lgconf), nil
 }

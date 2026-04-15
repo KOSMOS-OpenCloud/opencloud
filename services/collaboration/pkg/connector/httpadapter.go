@@ -14,6 +14,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/locks"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/rs/zerolog"
+	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -47,10 +48,10 @@ type HttpAdapter struct {
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the
 // provided gateway API client and configuration will be used in the adapter
-func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store) *HttpAdapter {
+func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store, graphSelector selector.Selector) *HttpAdapter {
 	httpAdapter := &HttpAdapter{
 		con: NewConnector(
-			NewFileConnector(gws, cfg, st),
+			NewFileConnector(gws, cfg, st, graphSelector),
 			NewContentConnector(gws, cfg),
 		),
 	}

@@ -2106,4 +2106,18 @@ var _ = Describe("FileConnector", func() {
 			Expect(templateSource).To(HavePrefix(expectedTemplateSource))
 		})
 	})
+
+	Describe("GetAvatar", func() {
+		It("No valid context returns Unauthorized error", func() {
+			// GetAvatar returns before touching the gateway selector.
+			gatewaySelector.EXPECT().Next().Unset()
+			ctx := context.Background()
+			response, err := fc.GetAvatar(ctx, "user-123")
+			Expect(response).To(BeNil())
+			Expect(err).To(HaveOccurred())
+			var connErr *connector.ConnectorError
+			Expect(errors.As(err, &connErr)).To(BeTrue())
+			Expect(connErr.HttpCodeOut).To(Equal(401))
+		})
+	})
 })

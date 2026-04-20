@@ -29,7 +29,7 @@ Node <-
 ////////////////////////////////////////////////////////
 
 GroupNode <-
-    k:(Char+)? (OperatorColonNode / OperatorEqualNode)? "(" v:Nodes ")" {
+    k:Key? (OperatorColonNode / OperatorEqualNode)? "(" v:Nodes ")" {
         return buildGroupNode(k, v, c.text, c.pos)
     }
 
@@ -43,12 +43,12 @@ PropertyRestrictionNodes <-
     TextPropertyRestrictionNode
 
 YesNoPropertyRestrictionNode <-
-    k:Char+ (OperatorColonNode / OperatorEqualNode) v:("true" / "false"){
+    k:Key (OperatorColonNode / OperatorEqualNode) v:("true" / "false"){
         return buildBooleanNode(k, v, c.text, c.pos)
     }
 
 DateTimeRestrictionNode <-
-    k:Char+ o:(
+    k:Key o:(
         OperatorGreaterOrEqualNode /
         OperatorLessOrEqualNode /
         OperatorGreaterNode /
@@ -62,7 +62,7 @@ DateTimeRestrictionNode <-
     ) '"'? {
         return buildDateTimeNode(k, o, v, c.text, c.pos)
     } /
-    k:Char+ (
+    k:Key (
         OperatorEqualNode /
         OperatorColonNode
     ) '"'? v:NaturalLanguageDateTime '"'? {
@@ -70,7 +70,7 @@ DateTimeRestrictionNode <-
     }
 
 TextPropertyRestrictionNode <-
-    k:Char+ (OperatorColonNode / OperatorEqualNode) v:(String / [^ ()]+){
+    k:Key (OperatorColonNode / OperatorEqualNode) v:(String / [^ ()]+){
         return buildStringNode(k, v, c.text, c.pos)
     }
 
@@ -216,6 +216,11 @@ NaturalLanguageDateTime  <-
 
 Char <-
     [A-Za-z] {
+        return c.text, nil
+    }
+
+Key <-
+    Char+ ("." Char+)* {
         return c.text, nil
     }
 

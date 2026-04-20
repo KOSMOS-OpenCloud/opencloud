@@ -1,5 +1,39 @@
 # Changelog
 
+## [6.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v6.1.0) - 2026-04-20
+
+### ❤️ Thanks to all contributors! ❤️
+
+@JammingBen, @ScharfViktor, @aduffeck, @dragonchaser, @pedropintosilva, @rhafer
+
+### 📚 Documentation
+
+- Update CI badge URL in README.md [[#2614](https://github.com/opencloud-eu/opencloud/pull/2614)]
+
+### 🐛 Bug Fixes
+
+- Add a flag to the reindex command to force a full reindex [[#2606](https://github.com/opencloud-eu/opencloud/pull/2606)]
+
+### 📈 Enhancement
+
+- proxy: Allow mapping from an external tenant id to the internal id [[#2569](https://github.com/opencloud-eu/opencloud/pull/2569)]
+- feat: enable EnableInsertRemoteFile WOPI flag for Collabora [[#2555](https://github.com/opencloud-eu/opencloud/pull/2555)]
+- feat(multi-tenancy): verify tenant via OIDC claim [[#2559](https://github.com/opencloud-eu/opencloud/pull/2559)]
+
+### 📦️ Dependencies
+
+- Bump reva  [[#2611](https://github.com/opencloud-eu/opencloud/pull/2611)]
+- chore(idp): clean up js dependencies [[#2607](https://github.com/opencloud-eu/opencloud/pull/2607)]
+- build(deps-dev): bump dotenv from 16.4.7 to 17.4.2 in /services/idp [[#2603](https://github.com/opencloud-eu/opencloud/pull/2603)]
+- chore: bump IDP javascript dependencies [[#2600](https://github.com/opencloud-eu/opencloud/pull/2600)]
+- build(deps): bump github.com/nats-io/nats.go from 1.49.0 to 1.50.0 [[#2587](https://github.com/opencloud-eu/opencloud/pull/2587)]
+- build(deps): bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc from 1.42.0 to 1.43.0 [[#2586](https://github.com/opencloud-eu/opencloud/pull/2586)]
+- chore: bump reva to latest main [[#2584](https://github.com/opencloud-eu/opencloud/pull/2584)]
+- build(deps): bump golang.org/x/image from 0.36.0 to 0.38.0 [[#2581](https://github.com/opencloud-eu/opencloud/pull/2581)]
+- build(deps-dev): bump css-minimizer-webpack-plugin from 7.0.4 to 8.0.0 in /services/idp [[#2551](https://github.com/opencloud-eu/opencloud/pull/2551)]
+- build(deps): bump github.com/go-ldap/ldap/v3 from 3.4.12 to 3.4.13 [[#2526](https://github.com/opencloud-eu/opencloud/pull/2526)]
+- build(deps): bump github.com/open-policy-agent/opa from 1.14.1 to 1.15.0 [[#2535](https://github.com/opencloud-eu/opencloud/pull/2535)]
+
 ## [6.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v6.0.0) - 2026-03-30
 
 ### ❤️ Thanks to all contributors! ❤️

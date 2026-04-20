@@ -916,6 +916,61 @@ func TestParse_Errors(t *testing.T) {
 	}
 }
 
+func TestParse_DottedKey(t *testing.T) {
+	tests := []testCase{
+		// TextPropertyRestrictionNode with a dotted key.
+		{
+			name: `audio.artist:Motörhead`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "audio.artist", Value: "Motörhead"},
+				},
+			},
+		},
+		// Multi-level key exercises the ("." Char+)* kleene in the Key rule.
+		{
+			name: `foo.bar.baz:qux`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "foo.bar.baz", Value: "qux"},
+				},
+			},
+		},
+		// GroupNode also uses the Key rule via k:Key?.
+		{
+			name: `audio.artist:("Motörhead" OR Beatles)`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "audio.artist",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "Motörhead"},
+							&ast.OperatorNode{Value: kql.BoolOR},
+							&ast.StringNode{Value: "Beatles"},
+						},
+					},
+				},
+			},
+		},
+		// A dot on the value side is still a literal character.
+		{
+			name: `name:foo.bar`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "name", Value: "foo.bar"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
+		})
+	}
+}
+
 func TestParse_Stress(t *testing.T) {
 	tests := []testCase{
 		{

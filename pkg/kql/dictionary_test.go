@@ -927,7 +927,7 @@ func TestParse_DottedKey(t *testing.T) {
 				},
 			},
 		},
-		// Multi-level key exercises the ("." Char+)* kleene in the Key rule.
+		// Multi-level key exercises the ("." Char+)* Kleene in the Key rule.
 		{
 			name: `foo.bar.baz:qux`,
 			ast: &ast.Ast{

@@ -123,6 +123,44 @@ func TestSort(t *testing.T) {
 	}
 }
 
+// TestSortNameNatural verifies that sorting drives by name uses a natural
+// (numeric-aware) order, so "Project 10" sorts after "Project 2".
+func TestSortNameNatural(t *testing.T) {
+	input := []*libregraph.Drive{
+		drive("a", "project", "Project 10", nil),
+		drive("b", "project", "Project 2", nil),
+		drive("c", "project", "Project 1", nil),
+		drive("d", "project", "Project 10a", nil),
+	}
+	want := []string{"Project 1", "Project 2", "Project 10", "Project 10a"}
+	query := godata.GoDataRequest{
+		Query: &godata.GoDataQuery{
+			OrderBy: &godata.GoDataOrderByQuery{
+				OrderByItems: []*godata.OrderByItem{
+					{Field: &godata.Token{Value: "name"}, Order: "asc"},
+				},
+			},
+		},
+	}
+	sorted, err := sortSpaces(&query, input)
+	require.NoError(t, err)
+	got := make([]string, 0, len(sorted))
+	for _, d := range sorted {
+		got = append(got, d.GetName())
+	}
+	assert.Equal(t, want, got)
+
+	// Descending must invert the natural order.
+	query.Query.OrderBy.OrderByItems[0].Order = _sortDescending
+	sortedDesc, err := sortSpaces(&query, input)
+	require.NoError(t, err)
+	gotDesc := make([]string, 0, len(sortedDesc))
+	for _, d := range sortedDesc {
+		gotDesc = append(gotDesc, d.GetName())
+	}
+	assert.Equal(t, []string{"Project 10a", "Project 10", "Project 2", "Project 1"}, gotDesc)
+}
+
 func TestSpaceNameValidation(t *testing.T) {
 	// set max length
 	_maxSpaceNameLength = 10

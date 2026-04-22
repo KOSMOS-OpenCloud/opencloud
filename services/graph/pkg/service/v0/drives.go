@@ -27,6 +27,8 @@ import (
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/text/collate"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
@@ -1143,8 +1145,10 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case "name":
+		// Natural / numeric-aware ordering so e.g. "Project 2" < "Project 10".
+		c := collate.New(language.Und, collate.Numeric, collate.IgnoreCase)
 		less = func(i, j int) bool {
-			return strings.ToLower(spaces[i].GetName()) < strings.ToLower(spaces[j].GetName())
+			return c.CompareString(spaces[i].GetName(), spaces[j].GetName()) < 0
 		}
 	case "lastModifiedDateTime":
 		less = func(i, j int) bool {

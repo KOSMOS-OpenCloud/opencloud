@@ -236,8 +236,8 @@ github.com/cenkalti/backoff/v4
 # github.com/cenkalti/backoff/v5 v5.0.3
 ## explicit; go 1.23
 github.com/cenkalti/backoff/v5
-# github.com/ceph/go-ceph v0.38.0
-## explicit; go 1.24.0
+# github.com/ceph/go-ceph v0.39.0
+## explicit; go 1.25.0
 github.com/ceph/go-ceph/cephfs
 github.com/ceph/go-ceph/cephfs/admin
 github.com/ceph/go-ceph/common/admin/manager
@@ -316,7 +316,7 @@ github.com/crewjam/saml
 github.com/crewjam/saml/logger
 github.com/crewjam/saml/samlsp
 github.com/crewjam/saml/xmlenc
-# github.com/cs3org/go-cs3apis v0.0.0-20260407125717-5d69ba49048b
+# github.com/cs3org/go-cs3apis v0.0.0-20260424072047-8d9ef7076ae9
 ## explicit; go 1.21
 github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1
@@ -1031,8 +1031,8 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.19
 ## explicit; go 1.20
 github.com/mattn/go-runewidth
-# github.com/mattn/go-sqlite3 v1.14.37
-## explicit; go 1.19
+# github.com/mattn/go-sqlite3 v1.14.42
+## explicit; go 1.21
 github.com/mattn/go-sqlite3
 # github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b
 ## explicit
@@ -1371,7 +1371,7 @@ github.com/opencloud-eu/icap-client
 # github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d
 ## explicit; go 1.18
 github.com/opencloud-eu/libre-graph-api-go
-# github.com/opencloud-eu/reva/v2 v2.43.0
+# github.com/opencloud-eu/reva/v2 v2.43.1-0.20260427134526-f55e0775a1a4
 ## explicit; go 1.25.0
 github.com/opencloud-eu/reva/v2/cmd/revad/internal/grace
 github.com/opencloud-eu/reva/v2/cmd/revad/runtime
@@ -1657,6 +1657,7 @@ github.com/opencloud-eu/reva/v2/pkg/storage/fs/owncloudsql
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/owncloudsql/filecache
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/blobstore
+github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/idcache
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/lookup
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/options
 github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/timemanager
@@ -2503,7 +2504,7 @@ golang.org/x/oauth2/internal
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.42.0
+# golang.org/x/sys v0.43.0
 ## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs

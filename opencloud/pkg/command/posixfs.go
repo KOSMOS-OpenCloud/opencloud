@@ -10,6 +10,13 @@ import (
 
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/config/parser"
+	storageUsersParser "github.com/opencloud-eu/opencloud/services/storage-users/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/event"
+	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/revaconfig"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/registry"
 
 	"github.com/pkg/xattr"
 	"github.com/spf13/cobra"
@@ -30,6 +37,10 @@ var (
 	restartRequired = false
 )
 
+type IDCacher interface {
+	WarmupIDCache(root string, assimilate, onlyDirty bool) error
+}
+
 // EntryInfo holds information about a directory entry.
 type EntryInfo struct {
 	Path     string
@@ -46,12 +57,80 @@ func PosixfsCommand(cfg *config.Config) *cobra.Command {
 	}
 
 	posixCmd.AddCommand(consistencyCmd(cfg))
+	posixCmd.AddCommand(scanCmd(cfg))
 
 	return posixCmd
 }
 
 func init() {
 	register.AddCommand(PosixfsCommand)
+}
+
+// scanCmd performs a posixfs id cache warmup scan
+func scanCmd(ocCfg *config.Config) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "scan",
+		Short: "Perform a filesystem scan and update the ID and filemetadata cache",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+
+			if err := parser.ParseConfig(ocCfg, true); err != nil {
+				return configlog.ReturnError(err)
+			}
+
+			// Parse storage users config
+			ocCfg.StorageUsers.Commons = ocCfg.Commons
+
+			return configlog.ReturnFatal(storageUsersParser.ParseConfig(ocCfg.StorageUsers))
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg := ocCfg.StorageUsers
+			if cfg.Driver != "posix" {
+				fmt.Fprintf(os.Stderr, "This command is only available when using the 'posix' driver. Current driver: '%s'\n", cfg.Driver)
+				os.Exit(1)
+			}
+
+			// We want to initialize the driver but disable scanfs on boot, so we can trigger it manually afterwards
+			drivers := revaconfig.StorageProviderDrivers(cfg)
+			drivers["posix"] = revaconfig.Posix(cfg, false, false)
+
+			var fsStream events.Stream
+			var err error
+			fsStream, err = event.NewStream(cfg)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to create event stream for posix driver: %v\n", err)
+				os.Exit(1)
+			}
+
+			f, ok := registry.NewFuncs["posix"]
+			if !ok {
+				fmt.Fprintf(os.Stderr, "posix driver not found in registry\n")
+				os.Exit(1)
+			}
+
+			fs, err := f(drivers["posix"].(map[string]any), fsStream, nil)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s': %v\n", cfg.Driver, err)
+				return err
+			}
+
+			cacher, ok := fs.(IDCacher)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "The posix driver does not expose WarmupIDCache.\n")
+				os.Exit(1)
+			}
+
+			fmt.Println("Starting posixfs scan...")
+			err = cacher.WarmupIDCache(cfg.Drivers.Posix.Root, true, false)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
+				return err
+			}
+
+			fmt.Println("Scan completed successfully.")
+			return nil
+		},
+	}
+	return cmd
 }
 
 // consistencyCmd returns a command to check the consistency of the posixfs storage.

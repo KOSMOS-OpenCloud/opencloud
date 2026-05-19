@@ -18,11 +18,10 @@ import (
 	graphMiddleware "github.com/opencloud-eu/opencloud/services/graph/pkg/middleware"
 )
 
-var handleProbe = func(mux *http.ServeMux, pattern string, h http.Handler, name string, logger log.Logger) {
+var handleProbe = func(mux *http.ServeMux, pattern string, h http.Handler, logger log.Logger) {
 	if h == nil {
 		h = handlers.NewCheckHandler(handlers.NewCheckHandlerConfiguration())
 		logger.Info().
-			Str("service", name).
 			Str("endpoint", pattern).
 			Msg("no probe provided, reverting to default (OK)")
 	}
@@ -45,8 +44,8 @@ func NewService(opts ...Option) *http.Server {
 		promhttp.Handler(),
 	))
 
-	handleProbe(mux, "/healthz", dopts.Health, dopts.Name, dopts.Logger) // healthiness check
-	handleProbe(mux, "/readyz", dopts.Ready, dopts.Name, dopts.Logger)   // readiness check
+	handleProbe(mux, "/healthz", dopts.Health, dopts.Logger) // healthiness check
+	handleProbe(mux, "/readyz", dopts.Ready, dopts.Logger)   // readiness check
 
 	if dopts.ConfigDump != nil {
 		mux.Handle("/config", dopts.ConfigDump)

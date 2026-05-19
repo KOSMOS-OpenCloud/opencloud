@@ -29,8 +29,6 @@ var handleProbe = func(mux *http.ServeMux, pattern string, h http.Handler, logge
 	mux.Handle(pattern, h)
 }
 
-//var probeHandler = func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }
-
 // NewService initializes a new debug service.
 func NewService(opts ...Option) *http.Server {
 	dopts := newOptions(opts...)

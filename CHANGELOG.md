@@ -1,5 +1,45 @@
 # Changelog
 
+## [7.0.0-rc.0](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.0-rc.0) - 2026-05-20
+
+### ❤️ Thanks to all contributors! ❤️
+
+@AlexAndBear, @SAY-5, @ScharfViktor, @Svanvith, @butonic, @dschmidt, @micbar, @rhafer
+
+### 💥 Breaking changes
+
+- Persist space memberships in share manager [[#2760](https://github.com/opencloud-eu/opencloud/pull/2760)]
+- [feature/guest-links] bump reva, add service user config to "sharing" service [[#2735](https://github.com/opencloud-eu/opencloud/pull/2735)]
+
+### 🐛 Bug Fixes
+
+- fix(debug): drop duplicate service field from probe fallback log [[#2786](https://github.com/opencloud-eu/opencloud/pull/2786)]
+- No registry lookup in cli [[#2755](https://github.com/opencloud-eu/opencloud/pull/2755)]
+- fix(webdav): register chi REPORT method in init to avoid race with settings [[#2712](https://github.com/opencloud-eu/opencloud/pull/2712)]
+- fix: use runner to start activitylog service [[#2748](https://github.com/opencloud-eu/opencloud/pull/2748)]
+- docs(search): fix force-rescan flag name in README [[#2747](https://github.com/opencloud-eu/opencloud/pull/2747)]
+
+### ✅ Tests
+
+- [full-ci] preview-tests. update fixtures for different processors [[#2767](https://github.com/opencloud-eu/opencloud/pull/2767)]
+- test: modify exclude list and add coverage upload [[#2762](https://github.com/opencloud-eu/opencloud/pull/2762)]
+- fix: cleaner debounce timer test [[#2743](https://github.com/opencloud-eu/opencloud/pull/2743)]
+
+### 📚 Documentation
+
+- Update README with LDAP certificate details [[#2759](https://github.com/opencloud-eu/opencloud/pull/2759)]
+
+### 📈 Enhancement
+
+- feat(graph): populate driveItem.webUrl per Libre Graph spec [[#2744](https://github.com/opencloud-eu/opencloud/pull/2744)]
+
+### 📦️ Dependencies
+
+- build(deps): bump golang.org/x/image from 0.38.0 to 0.40.0 [[#2740](https://github.com/opencloud-eu/opencloud/pull/2740)]
+- build(deps): bump github.com/tidwall/gjson from 1.18.0 to 1.19.0 [[#2750](https://github.com/opencloud-eu/opencloud/pull/2750)]
+- build(deps-dev): bump dotenv-expand from 12.0.3 to 13.0.0 in /services/idp [[#2710](https://github.com/opencloud-eu/opencloud/pull/2710)]
+- build(deps): bump github.com/onsi/ginkgo/v2 from 2.28.1 to 2.28.3 [[#2739](https://github.com/opencloud-eu/opencloud/pull/2739)]
+
 ## [6.2.0](https://github.com/opencloud-eu/opencloud/releases/tag/v6.2.0) - 2026-05-11
 
 ### ❤️ Thanks to all contributors! ❤️

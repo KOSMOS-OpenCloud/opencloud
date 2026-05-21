@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.12.3] - 2026-05-03
+
+### Added
+
+- Add OpenTelemetry semantic-convention compliant HTTP server metric middleware for `http.server.request.duration`, `http.server.active_requests`, `http.server.request.body.size`, and `http.server.response.body.size`.
+
+### Deprecated
+
+- Deprecate legacy metric middleware for `request_duration_millis`, `requests_inflight`, and `response_size_bytes`. These remain available for backward compatibility.
+
 ## [0.12.2] - 2025-09-02
 
 ### Fixed
@@ -269,7 +279,8 @@ It contains instrumentation for trace and depends on:
 [#2]: https://github.com/riandyrn/otelchi/pull/2
 [#1]: https://github.com/riandyrn/otelchi/pull/1
 
-[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.12.3...HEAD
+[0.12.3]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.3
 [0.12.2]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.2
 [0.12.1]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.1
 [0.12.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.0

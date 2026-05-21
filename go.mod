@@ -71,7 +71,7 @@ require (
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.23.2
 	github.com/r3labs/sse/v2 v2.10.0
-	github.com/riandyrn/otelchi v0.12.2
+	github.com/riandyrn/otelchi v0.12.3
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.35.0

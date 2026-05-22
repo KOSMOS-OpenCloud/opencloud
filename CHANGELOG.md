@@ -1,5 +1,15 @@
 # Changelog
 
+## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-22
+
+### ❤️ Thanks to all contributors! ❤️
+
+@aduffeck, @rhafer
+
+### 📦️ Dependencies
+
+- build(deps-dev): bump workbox-webpack-plugin from 7.4.0 to 7.4.1 in /services/idp [[#2781](https://github.com/opencloud-eu/opencloud/pull/2781)]
+
 ## [7.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.0) - 2026-05-21
 
 ### ❤️ Thanks to all contributors! ❤️

@@ -1,10 +1,14 @@
 # Changelog
 
-## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-22
+## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-26
 
 ### ❤️ Thanks to all contributors! ❤️
 
-@aduffeck, @rhafer
+@ScharfViktor, @aduffeck, @rhafer
+
+### 🐛 Bug Fixes
+
+- fix-2824. run tests without remote.php [[#2826](https://github.com/opencloud-eu/opencloud/pull/2826)]
 
 ### 📦️ Dependencies
 

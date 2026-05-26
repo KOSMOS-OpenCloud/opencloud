@@ -16,9 +16,12 @@ import (
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/event"
 	"github.com/opencloud-eu/opencloud/services/storage-users/pkg/revaconfig"
 	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/ignore"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/posix/options"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/fs/registry"
 
 	"github.com/pkg/xattr"
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/theckman/yacspin"
 	"github.com/vmihailenco/msgpack/v5"
@@ -35,6 +38,7 @@ const (
 var (
 	spinner         *yacspin.Spinner
 	restartRequired = false
+	ignorer         *ignore.Ignorer
 )
 
 type IDCacher interface {
@@ -153,6 +157,12 @@ func checkPosixfsConsistency(cmd *cobra.Command, cfg *config.Config) error {
 	rootPath, _ := cmd.Flags().GetString("root")
 	indexesPath := filepath.Join(rootPath, "indexes")
 
+	opt, _ := options.New(map[string]interface{}{
+		"root": rootPath,
+	})
+	log := zerolog.Nop()
+	ignorer = ignore.NewIgnorer(opt, &log)
+
 	_, err := os.Stat(indexesPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -209,6 +219,7 @@ func checkSpaces(basePath string) {
 }
 
 func checkSpace(spacePath string) {
+	spinner.Message("")
 	spinner.Suffix(fmt.Sprintf(" Checking space '%s'", spacePath))
 
 	info, err := os.Stat(spacePath)
@@ -228,10 +239,11 @@ func checkSpace(spacePath string) {
 	}
 
 	checkSpaceID(spacePath)
+	checkNodeIDs(spacePath)
 }
 
 func checkSpaceID(spacePath string) {
-	spinner.Message("checking space ID uniqueness")
+	spinner.Message(" - checking space ID uniqueness")
 
 	entries, uniqueIDs, oldestEntry, err := gatherAttributes(spacePath)
 	if err != nil {
@@ -240,7 +252,6 @@ func checkSpaceID(spacePath string) {
 	}
 
 	if len(entries) == 0 {
-		logSuccess("(empty space)")
 		return
 	}
 
@@ -278,8 +289,65 @@ func checkSpaceID(spacePath string) {
 		}
 		fixSpaceID(spacePath, obsoleteIDs, targetID, entries)
 		spinner.Unpause()
-	} else {
-		logSuccess("")
+	}
+}
+
+func walkParentIDs(dir string, parentID string) int {
+	fixes := 0
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		logFailure("Error reading directory '%s': %v", dir, err)
+		return 0
+	}
+
+	for _, entry := range entries {
+		fullPath := filepath.Join(dir, entry.Name())
+
+		if ignorer.IsIgnored(fullPath) {
+			continue
+		}
+
+		actualParentID, err := xattr.Get(fullPath, parentIDAttrName)
+		if err != nil || string(actualParentID) != parentID {
+			err = xattr.Set(fullPath, parentIDAttrName, []byte(parentID))
+			if err != nil {
+				logFailure("Failed to fix parent ID for '%s': %v", fullPath, err)
+			} else {
+				spinner.Pause()
+				fmt.Printf("\n  + Fixed parent ID for '%s'\n", fullPath)
+				spinner.Unpause()
+				fixes++
+				restartRequired = true
+			}
+		}
+
+		if entry.IsDir() {
+			nodeID, err := xattr.Get(fullPath, idAttrName)
+			if err != nil || len(nodeID) == 0 {
+				logFailure("Directory '%s' missing '%s', skipping its children", fullPath, idAttrName)
+				continue
+			}
+			walkParentIDs(fullPath, string(nodeID))
+		}
+	}
+	return fixes
+}
+
+func checkNodeIDs(spacePath string) {
+	spinner.Message(" - checking parent IDs")
+
+	rootID, err := xattr.Get(spacePath, idAttrName)
+	if err != nil || len(rootID) == 0 {
+		logFailure("Space root '%s' missing '%s' attribute", spacePath, idAttrName)
+		return
+	}
+
+	fixes := walkParentIDs(spacePath, string(rootID))
+
+	if fixes > 0 {
+		spinner.Pause()
+		fmt.Printf("\n  ✓ Fixed %d incorrect parent IDs in %s\n", fixes, filepath.Base(spacePath))
+		spinner.Unpause()
 	}
 }
 
@@ -324,6 +392,9 @@ func gatherAttributes(path string) ([]EntryInfo, map[string]struct{}, EntryInfo,
 
 	for _, entry := range dirEntries {
 		fullPath := filepath.Join(path, entry.Name())
+		if ignorer.IsIgnored(fullPath) {
+			continue
+		}
 		info, err := os.Stat(fullPath)
 		if err != nil {
 			fmt.Printf("  - Warning: could not stat %s: %v\n", entry.Name(), err)
@@ -428,7 +499,7 @@ func updateOwnerIndexFile(basePath string, obsoleteIDs []string) error {
 		return fmt.Errorf("failed to write updated index file: %w", err)
 	}
 
-	logSuccess("Successfully removed %d item(s) and saved index file.\n", itemsRemoved)
+	fmt.Printf("  ✓ Successfully removed %d item(s) and saved index file.\n", itemsRemoved)
 	return nil
 }
 
@@ -447,13 +518,7 @@ func removeAttributes(path string) error {
 }
 
 func logFailure(message string, args ...any) {
-	spinner.StopFailMessage(fmt.Sprintf(message, args...))
+	spinner.StopFailMessage(fmt.Sprintf("\n"+message, args...))
 	spinner.StopFail()
-	spinner.Start()
-}
-
-func logSuccess(message string, args ...any) {
-	spinner.StopMessage(fmt.Sprintf(message, args...))
-	spinner.Stop()
 	spinner.Start()
 }

@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"slices"
 	"strconv"
-	"strings"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -35,6 +35,8 @@ const (
 	elementNameSearchFiles = "search-files"
 	// TODO elementNameFilterFiles = "filter-files"
 )
+
+var spacesSearchRegex = regexp.MustCompile(`^/(?:remote\.php/)?dav/spaces/([^/]+)`)
 
 // Search is the endpoint for retrieving search results for REPORT requests
 func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
@@ -76,9 +78,9 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		PageSize: int32(rep.SearchFiles.Search.Limit),
 	}
 
-	// Limit search to the according space when searching /dav/spaces/
-	if strings.HasPrefix(r.URL.Path, "/dav/spaces") {
-		space := strings.TrimPrefix(r.URL.Path, "/dav/spaces/")
+	// Limit search to the according space when searching /dav/spaces/<spaceid>
+	if matches := spacesSearchRegex.FindStringSubmatch(r.URL.Path); matches != nil {
+		space := matches[1]
 		rid, err := storagespace.ParseID(space)
 		if err != nil {
 			logger.Debug().Err(err).Msg("error parsing the space id for filtering")

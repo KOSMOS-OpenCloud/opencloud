@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"slices"
 	"strconv"
+	"strings"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -94,6 +95,10 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	davPrefix := ""
+	if strings.HasPrefix(r.URL.Path, "/remote.php") {
+		davPrefix = "/remote.php"
+	}
 
 	rsp, err := g.searchClient.Search(ctx, req)
 	if err != nil {
@@ -107,12 +112,12 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		logger.Error().Err(err).Msg("could not get search results")
 		return
 	}
-	g.sendSearchResponse(rsp, w, r, user)
+	g.sendSearchResponse(davPrefix, rsp, w, r, user)
 }
 
-func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request, user *userv1beta1.User) {
+func (g Webdav) sendSearchResponse(davPrefix string, rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request, user *userv1beta1.User) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
-	responsesXML, err := multistatusResponse(r.Context(), g.config.OpenCloudPublicURL, rsp.Matches, user)
+	responsesXML, err := multistatusResponse(r.Context(), davPrefix, g.config.OpenCloudPublicURL, rsp.Matches, user)
 	if err != nil {
 		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -130,10 +135,10 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 }
 
 // multistatusResponse converts a list of matches into a multistatus response string
-func multistatusResponse(ctx context.Context, publicURL string, matches []*searchmsg.Match, user *userv1beta1.User) ([]byte, error) {
+func multistatusResponse(ctx context.Context, davPrefix, publicURL string, matches []*searchmsg.Match, user *userv1beta1.User) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(matches))
 	for i := range matches {
-		res, err := matchToPropResponse(ctx, publicURL, matches[i], user)
+		res, err := matchToPropResponse(ctx, davPrefix, publicURL, matches[i], user)
 		if err != nil {
 			return nil, err
 		}
@@ -149,7 +154,7 @@ func multistatusResponse(ctx context.Context, publicURL string, matches []*searc
 	return msg, nil
 }
 
-func matchToPropResponse(ctx context.Context, publicURL string, match *searchmsg.Match, user *userv1beta1.User) (*propfind.ResponseXML, error) {
+func matchToPropResponse(ctx context.Context, davPrefix, publicURL string, match *searchmsg.Match, user *userv1beta1.User) (*propfind.ResponseXML, error) {
 	// unfortunately, search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
 		ref string
@@ -182,7 +187,7 @@ func matchToPropResponse(ctx context.Context, publicURL string, match *searchmsg
 		return nil, err
 	}
 	response := propfind.ResponseXML{
-		Href:     net.EncodePath(path.Join("/remote.php/dav/spaces/", ref)),
+		Href:     net.EncodePath(path.Join(davPrefix, "/dav/spaces/", ref)),
 		Propstat: []propfind.PropstatXML{},
 	}
 

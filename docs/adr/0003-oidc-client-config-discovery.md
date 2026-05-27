@@ -18,7 +18,7 @@ OpenCloud with various existing identity providers. For example:
 - Authentik basically creates a different issuer URL for each client. As OpenCloud
   can only work with a single issuer URL, all OpenCloud clients need to use the
   same client id to work with Authentik.
-- Some IDPs (kanidm) are not able to work with user-supplied client ids. They generate
+- Some IDPs are not able to work with user-supplied client ids. They generate
   client ids automatically and do not allow to specify them manually.
 - To make features like automatic role assignment work, clients need to request
   specific scopes, depending on which exact IDP is used.

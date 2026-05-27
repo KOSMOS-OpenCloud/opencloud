@@ -54,7 +54,7 @@ func NewTranslatorFromCommonConfig(defaultLocale string, domain string, path str
 
 // Translate translates a string to the locale
 func (t Translator) Translate(str, locale string) string {
-	return t.Locale(locale).Get("%s", str)
+	return t.Locale(locale).Get(str)
 }
 
 // Locale returns the gotext.Locale, use `.Get` method to translate strings

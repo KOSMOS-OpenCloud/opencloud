@@ -11,6 +11,7 @@ protoc-deps: $(BINGO)
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/owncloud/protoc-gen-microweb
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/favadi/protoc-go-inject-tag
+	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
 .PHONY: buf-generate
 buf-generate: $(SHA1_LOCK_FILE)

@@ -22,7 +22,7 @@ var (
 )
 
 // CreateConfig creates a config file with random passwords at configPath
-func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword string) error {
+func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword string, quiet bool) error {
 	if diff && forceOverwrite {
 		return fmt.Errorf("diff and force-overwrite flags are mutually exclusive")
 	}
@@ -69,6 +69,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		idmServicePassword, idpServicePassword, ocAdminServicePassword, revaServicePassword  string
 		tokenManagerJwtSecret, collaborationWOPISecret, machineAuthAPIKey, systemUserAPIKey  string
 		revaTransferSecret, thumbnailsTransferSecret, serviceAccountSecret, urlSigningSecret string
+		adminPasswdwordGenerated                                                             bool
 	)
 
 	if diff {
@@ -123,6 +124,7 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 			if err != nil {
 				return fmt.Errorf("could not generate random password for opencloud admin: %s", err)
 			}
+			adminPasswdwordGenerated = true
 		}
 
 		revaServicePassword, err = generators.GenerateRandomPassword(passwordLength)
@@ -311,5 +313,5 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 	if diff {
 		return writePatch(configPath, yamlOutput)
 	}
-	return writeConfig(configPath, ocAdminServicePassword, targetBackupConfig, yamlOutput)
+	return writeConfig(configPath, ocAdminServicePassword, targetBackupConfig, yamlOutput, adminPasswdwordGenerated, quiet)
 }

@@ -109,10 +109,10 @@ config = {
         },
         "basic2": {
             "suites": [
-                "apiDownloads",
-                "apiDepthInfinity",
-                "apiLocks",
-                "apiActivities",
+                "apiArchiver",
+                "apiContract",
+                "apiCors",
+                "apiAsyncUpload",
             ],
             "skip": False,
         },

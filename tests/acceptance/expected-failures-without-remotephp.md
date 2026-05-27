@@ -1,19 +1,5 @@
 ## Scenarios that are expected to fail when remote.php is not used
 
-#### [REPORT request without remote.php returns empty result (only with dav/spaces path)](https://github.com/owncloud/ocis/issues/10329)
-
-- [apiContract/sharesReport.feature:43](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/sharesReport.feature#L43)
-- [apiContract/sharesReport.feature:84](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/sharesReport.feature#L84)
-- [apiContract/sharesReport.feature:150](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/sharesReport.feature#L150)
-- [apiContract/sharesReport.feature:180](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/sharesReport.feature#L180)
-- [apiContract/spacesReport.feature:16](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesReport.feature#L16)
-- [apiContract/spacesReport.feature:35](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesReport.feature#L35)
-- [apiContract/spacesReport.feature:55](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesReport.feature#L55)
-- [apiContract/spacesReport.feature:74](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesReport.feature#L74)
-- [apiContract/spacesSharesReport.feature:46](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesSharesReport.feature#L46)
-- [apiContract/spacesSharesReport.feature:77](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiContract/spacesSharesReport.feature#L77)
-- [apiSearch1/search.feature:176](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L176)
-
 #### [Most (if not all) requests to public link share without remote.php returns 401 Unauthorized error](https://github.com/owncloud/ocis/issues/10331)
 
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:377](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L377)

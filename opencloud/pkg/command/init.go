@@ -35,9 +35,10 @@ func InitCommand(_ *config.Config) *cobra.Command {
 			}
 			forceOverwriteFlag := viper.GetBool("force-overwrite")
 			diffFlag, _ := cmd.Flags().GetBool("diff")
+			quietFlag, _ := cmd.Flags().GetBool("quiet")
 			configPathFlag := viper.GetString("config-path")
 			adminPasswordFlag := viper.GetString("admin-password")
-			err := ocinit.CreateConfig(insecure, forceOverwriteFlag, diffFlag, configPathFlag, adminPasswordFlag)
+			err := ocinit.CreateConfig(insecure, forceOverwriteFlag, diffFlag, configPathFlag, adminPasswordFlag, quietFlag)
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}
@@ -49,6 +50,7 @@ func InitCommand(_ *config.Config) *cobra.Command {
 	_ = viper.BindPFlag("insecure", initCmd.Flags().Lookup("insecure"))
 
 	initCmd.Flags().BoolP("diff", "d", false, "Show the difference between the current config and the new one")
+	initCmd.Flags().BoolP("quiet", "q", false, "Work quietly. Surpresses and non-error message")
 
 	initCmd.Flags().BoolP("force-overwrite", "f", false, "Force overwrite existing config file")
 	_ = viper.BindEnv("force-overwrite", "OC_FORCE_CONFIG_OVERWRITE")

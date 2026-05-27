@@ -47,15 +47,22 @@ func backupOpenCloudConfigFile(configPath string) (string, error) {
 }
 
 // printBanner prints the generated opencloud config banner.
-func printBanner(targetPath, ocAdminServicePassword, targetBackupConfig string) {
+func printBanner(targetPath, ocAdminServicePassword string, adminPWgenerated bool, targetBackupConfig string) {
 	fmt.Printf(
 		"\n=========================================\n"+
 			" generated OpenCloud Config\n"+
 			"=========================================\n"+
-			" configpath : %s\n"+
-			" user       : admin\n"+
-			" password   : %s\n\n",
-		targetPath, ocAdminServicePassword)
+			" configpath : %s\n",
+		targetPath,
+	)
+	if adminPWgenerated {
+		fmt.Printf(" user       : admin\n"+
+			" password   : %s\n",
+			ocAdminServicePassword,
+		)
+	}
+	fmt.Println()
+
 	if targetBackupConfig != "" {
 		fmt.Printf("\n=========================================\n"+
 			"An older config file has been backed up to\n %s\n\n",
@@ -64,13 +71,15 @@ func printBanner(targetPath, ocAdminServicePassword, targetBackupConfig string) 
 }
 
 // writeConfig writes the config to the target path and prints a banner
-func writeConfig(configPath, ocAdminServicePassword, targetBackupConfig string, yamlOutput []byte) error {
+func writeConfig(configPath, ocAdminServicePassword, targetBackupConfig string, yamlOutput []byte, adminPWgenerated, quiet bool) error {
 	targetPath := path.Join(configPath, configFilename)
 	err := os.WriteFile(targetPath, yamlOutput, 0600)
 	if err != nil {
 		return err
 	}
-	printBanner(targetPath, ocAdminServicePassword, targetBackupConfig)
+	if !quiet {
+		printBanner(targetPath, ocAdminServicePassword, adminPWgenerated, targetBackupConfig)
+	}
 	return nil
 }
 

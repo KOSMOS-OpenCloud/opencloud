@@ -6,6 +6,10 @@
 
 @ScharfViktor, @aduffeck, @rhafer
 
+### 📚 Documentation
+
+- docs(adr): Remove erroneous mention of kanidm [[#2783](https://github.com/opencloud-eu/opencloud/pull/2783)]
+
 ### 🐛 Bug Fixes
 
 - fix: translations for activities and others [[#2836](https://github.com/opencloud-eu/opencloud/pull/2836)]

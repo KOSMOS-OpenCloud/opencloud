@@ -12,6 +12,7 @@
 
 ### 📦️ Dependencies
 
+- build(deps-dev): bump postcss-loader from 4.3.0 to 8.2.1 in /services/idp [[#2830](https://github.com/opencloud-eu/opencloud/pull/2830)]
 - build(deps): bump github.com/riandyrn/otelchi from 0.12.2 to 0.12.3 [[#2814](https://github.com/opencloud-eu/opencloud/pull/2814)]
 - build(deps-dev): bump workbox-webpack-plugin from 7.4.0 to 7.4.1 in /services/idp [[#2781](https://github.com/opencloud-eu/opencloud/pull/2781)]
 

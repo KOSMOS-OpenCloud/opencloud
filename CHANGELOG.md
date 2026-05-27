@@ -1,6 +1,6 @@
 # Changelog
 
-## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-26
+## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-27
 
 ### ❤️ Thanks to all contributors! ❤️
 
@@ -12,6 +12,7 @@
 
 ### 📦️ Dependencies
 
+- build(deps): bump github.com/riandyrn/otelchi from 0.12.2 to 0.12.3 [[#2814](https://github.com/opencloud-eu/opencloud/pull/2814)]
 - build(deps-dev): bump workbox-webpack-plugin from 7.4.0 to 7.4.1 in /services/idp [[#2781](https://github.com/opencloud-eu/opencloud/pull/2781)]
 
 ## [7.0.0](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.0) - 2026-05-21

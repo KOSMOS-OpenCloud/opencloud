@@ -6,14 +6,15 @@
 
 @ScharfViktor, @aduffeck, @rhafer
 
+### 🐛 Bug Fixes
+
+- fix(init): Only log admin password if it was generated [[#2839](https://github.com/opencloud-eu/opencloud/pull/2839)]
+- fix: translations for activities and others [[#2836](https://github.com/opencloud-eu/opencloud/pull/2836)]
+- fix-2824. run tests without remote.php [[#2826](https://github.com/opencloud-eu/opencloud/pull/2826)]
+
 ### 📚 Documentation
 
 - docs(adr): Remove erroneous mention of kanidm [[#2783](https://github.com/opencloud-eu/opencloud/pull/2783)]
-
-### 🐛 Bug Fixes
-
-- fix: translations for activities and others [[#2836](https://github.com/opencloud-eu/opencloud/pull/2836)]
-- fix-2824. run tests without remote.php [[#2826](https://github.com/opencloud-eu/opencloud/pull/2826)]
 
 ### 📦️ Dependencies
 

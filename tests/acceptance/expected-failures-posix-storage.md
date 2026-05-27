@@ -190,10 +190,6 @@
 
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:123](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L123)
 
-#### [Skip tests for different languages](https://github.com/opencloud-eu/opencloud/issues/183)
-
-- [apiActivities/activities.feature:2598](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiActivities/activities.feature#L2598)
-
 #### [Missing properties in REPORT response](https://github.com/owncloud/ocis/issues/9780), [d:getetag property has empty value in REPORT response](https://github.com/owncloud/ocis/issues/9783)
 
 - [apiSearch1/search.feature:437](https://github.com/opencloud-eu/opencloud/blob/main/tests/acceptance/features/apiSearch1/search.feature#L437)

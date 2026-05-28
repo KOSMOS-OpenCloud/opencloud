@@ -19,6 +19,7 @@
 
 ### 📦️ Dependencies
 
+- build(deps): bump i18next from 26.1.0 to 26.3.0 in /services/idp [[#2849](https://github.com/opencloud-eu/opencloud/pull/2849)]
 - build(deps-dev): bump sass-loader from 16.0.8 to 17.0.0 in /services/idp [[#2845](https://github.com/opencloud-eu/opencloud/pull/2845)]
 - build(deps): bump google.golang.org/grpc from 1.80.0 to 1.81.1 [[#2848](https://github.com/opencloud-eu/opencloud/pull/2848)]
 - build(deps): bump go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc from 0.68.0 to 0.69.0 [[#2847](https://github.com/opencloud-eu/opencloud/pull/2847)]

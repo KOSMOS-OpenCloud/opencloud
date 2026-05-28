@@ -131,6 +131,11 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		users, data, err = processShareEvent(ctx, ref, gwc, event.InitiatorID, uid, gid)
 	}
 
+	spaceEv := func(typ string, id *provider.StorageSpaceId, uids []string) {
+		evType = typ
+		users, data, err = processSpaceEvent(ctx, id, gwc, event.InitiatorID, uids)
+	}
+
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
@@ -160,6 +165,16 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		fileEv("file-unlocked", e.Ref)
 	case events.FileTouched:
 		fileEv("file-touched", e.Ref)
+	case events.SpaceCreated:
+		spaceEv("space-created", e.ID, []string{e.Executant.GetOpaqueId()})
+	case events.SpaceDisabled:
+		spaceEv("space-disabled", e.ID, []string{e.Executant.GetOpaqueId()})
+	case events.SpaceDeleted:
+		uids := []string{}
+		for k := range e.FinalMembers {
+			uids = append(uids, k)
+		}
+		spaceEv("space-deleted", e.ID, uids)
 	case events.SpaceShared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
 		shareEv("space-member-added", &r, e.GranteeUserID, e.GranteeGroupID)
@@ -237,6 +252,14 @@ func processShareEvent(ctx context.Context, ref *provider.Reference, gwc gateway
 	}
 
 	return addShareeData(ctx, gwc, data, users, shareeID, shareeGroupID)
+}
+
+func processSpaceEvent(ctx context.Context, id *provider.StorageSpaceId, gwc gateway.GatewayAPIClient, initiatorid string, uids []string) ([]string, FileEvent, error) {
+	data := FileEvent{
+		SpaceID:     id.GetOpaqueId(),
+		InitiatorID: initiatorid,
+	}
+	return uids, data, nil
 }
 
 // custom logic for item trashed event

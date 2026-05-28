@@ -19,6 +19,8 @@
 
 ### 📦️ Dependencies
 
+- build(deps): bump google.golang.org/grpc from 1.80.0 to 1.81.1 [[#2848](https://github.com/opencloud-eu/opencloud/pull/2848)]
+- build(deps): bump go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc from 0.68.0 to 0.69.0 [[#2847](https://github.com/opencloud-eu/opencloud/pull/2847)]
 - build(deps-dev): bump typescript from 5.9.3 to 6.0.3 in /services/idp [[#2846](https://github.com/opencloud-eu/opencloud/pull/2846)]
 - build(deps-dev): bump postcss-loader from 4.3.0 to 8.2.1 in /services/idp [[#2830](https://github.com/opencloud-eu/opencloud/pull/2830)]
 - build(deps): bump github.com/riandyrn/otelchi from 0.12.2 to 0.12.3 [[#2814](https://github.com/opencloud-eu/opencloud/pull/2814)]

@@ -1,6 +1,6 @@
 # Changelog
 
-## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-05-28
+## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-06-01
 
 ### ❤️ Thanks to all contributors! ❤️
 
@@ -20,6 +20,8 @@
 
 ### 📦️ Dependencies
 
+- build(deps-dev): bump license-checker-rseidelsohn from 4.4.2 to 5.0.1 in /services/idp [[#2854](https://github.com/opencloud-eu/opencloud/pull/2854)]
+- build(deps-dev): bump cldr from 7.9.0 to 8.0.0 in /services/idp [[#2853](https://github.com/opencloud-eu/opencloud/pull/2853)]
 - build(deps): bump i18next from 26.1.0 to 26.3.0 in /services/idp [[#2849](https://github.com/opencloud-eu/opencloud/pull/2849)]
 - build(deps-dev): bump sass-loader from 16.0.8 to 17.0.0 in /services/idp [[#2845](https://github.com/opencloud-eu/opencloud/pull/2845)]
 - build(deps): bump google.golang.org/grpc from 1.80.0 to 1.81.1 [[#2848](https://github.com/opencloud-eu/opencloud/pull/2848)]

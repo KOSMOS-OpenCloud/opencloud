@@ -12,6 +12,7 @@
 
 ### 🐛 Bug Fixes
 
+- chore: bump reva to 2.46.1 [[#2869](https://github.com/opencloud-eu/opencloud/pull/2869)]
 - fix: Send SSE events for SpaceCreated/-Disabled/-Deleted [[#2851](https://github.com/opencloud-eu/opencloud/pull/2851)]
 - Only try to limit search to spaces if there's a space id to limit to [[#2834](https://github.com/opencloud-eu/opencloud/pull/2834)]
 - fix(init): Only log admin password if it was generated [[#2839](https://github.com/opencloud-eu/opencloud/pull/2839)]

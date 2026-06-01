@@ -20,6 +20,7 @@
 
 ### 📦️ Dependencies
 
+- build(deps): bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc from 1.43.0 to 1.44.0 [[#2855](https://github.com/opencloud-eu/opencloud/pull/2855)]
 - build(deps-dev): bump license-checker-rseidelsohn from 4.4.2 to 5.0.1 in /services/idp [[#2854](https://github.com/opencloud-eu/opencloud/pull/2854)]
 - build(deps-dev): bump cldr from 7.9.0 to 8.0.0 in /services/idp [[#2853](https://github.com/opencloud-eu/opencloud/pull/2853)]
 - build(deps): bump i18next from 26.1.0 to 26.3.0 in /services/idp [[#2849](https://github.com/opencloud-eu/opencloud/pull/2849)]

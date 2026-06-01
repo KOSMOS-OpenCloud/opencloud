@@ -1,10 +1,14 @@
 # Changelog
 
-## [7.0.1](https://github.com/opencloud-eu/opencloud/releases/tag/v7.0.1) - 2026-06-01
+## [7.1.0](https://github.com/opencloud-eu/opencloud/releases/tag/v7.1.0) - 2026-06-01
 
 ### ❤️ Thanks to all contributors! ❤️
 
-@ScharfViktor, @aduffeck, @rhafer
+@ScharfViktor, @aduffeck, @kulmann, @rhafer
+
+### 📈 Enhancement
+
+- chore: bump web to v7.1.0 [[#2870](https://github.com/opencloud-eu/opencloud/pull/2870)]
 
 ### 🐛 Bug Fixes
 

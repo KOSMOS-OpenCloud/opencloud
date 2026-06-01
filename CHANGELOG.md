@@ -4,7 +4,7 @@
 
 ### ❤️ Thanks to all contributors! ❤️
 
-@ScharfViktor, @aduffeck, @kulmann, @rhafer
+@ScharfViktor, @aduffeck, @kulmann, @micbar, @rhafer
 
 ### 📈 Enhancement
 

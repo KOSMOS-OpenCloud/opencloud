@@ -3,6 +3,22 @@ autoInstallPeers: true
 publicHoistPattern:
   - "*"
 
+# Ensure platform-specific optional dependencies (e.g. Rollup's native
+# binaries pulled in via workbox) are fetched for every architecture we
+# build/package for, not just the host that runs `pnpm install`. Without
+# this, cross-arch RPM/OBS builds fail with "Cannot find module
+# @rollup/rollup-linux-arm64-gnu" on aarch64.
+supportedArchitectures:
+  os:
+    - current
+    - linux
+  cpu:
+    - x64
+    - arm64
+  libc:
+    - glibc
+    - musl
+
 overrides:
   fast-uri: ">=3.1.2"
   postcss: ">=8.5.10"

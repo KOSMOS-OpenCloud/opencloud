@@ -161,8 +161,8 @@ importers:
         specifier: 5.105.2
         version: 5.105.2
       webpack-manifest-plugin:
-        specifier: 5.0.0
-        version: 5.0.0(webpack@5.105.2)
+        specifier: 6.0.1
+        version: 6.0.1(webpack@5.105.2)
       workbox-webpack-plugin:
         specifier: 7.4.1
         version: 7.4.1(webpack@5.105.2)
@@ -5074,21 +5074,21 @@ packages:
   webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
 
-  webpack-manifest-plugin@5.0.0:
-    resolution: {integrity: sha512-8RQfMAdc5Uw3QbCQ/CBV/AXqOR8mt03B6GJmRbhWopE8GzRfEpn+k0ZuWywxW+5QZsffhmFDY1J6ohqJo+eMuw==}
-    engines: {node: '>=12.22.0'}
+  webpack-manifest-plugin@6.0.1:
+    resolution: {integrity: sha512-R0p/8/IJVY5hIhQtkeWUQugalVpIwojc09eb14zGq+oiZOCmN5paAz2NBJfd+6v9eBbxAS3YMjc2ov8UMlCDLQ==}
+    engines: {node: '>=20.19.0'}
     peerDependencies:
-      webpack: ^5.47.0
+      webpack: ^5.75.0
 
   webpack-sources@1.4.3:
     resolution: {integrity: sha512-lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ==}
 
-  webpack-sources@2.3.1:
-    resolution: {integrity: sha512-y9EI9AO42JjEcrTJFOYmVywVZdKVUfOvDUPsJea5GIr1JOEGFVqwlY2K098fFoIjOkDzHn2AjRvM8dsBZu+gCA==}
-    engines: {node: '>=10.13.0'}
-
   webpack-sources@3.3.4:
     resolution: {integrity: sha512-7tP1PdV4vF+lYPnkMR0jMY5/la2ub5Fc/8VQrrU+lXkiM6C4TjVfGw7iKfyhnTQOsD+6Q/iKw0eFciziRgD58Q==}
+    engines: {node: '>=10.13.0'}
+
+  webpack-sources@3.5.0:
+    resolution: {integrity: sha512-HPuy+uuoTCaaoEoI1LQ3JN9+vrPBvEesnnX1jADHy728cHSMlq4wUc4afYqahq2B1mhQVZxCXOkNTnXltr+2vQ==}
     engines: {node: '>=10.13.0'}
 
   webpack@5.105.2:
@@ -10770,23 +10770,20 @@ snapshots:
 
   webidl-conversions@4.0.2: {}
 
-  webpack-manifest-plugin@5.0.0(webpack@5.105.2):
+  webpack-manifest-plugin@6.0.1(webpack@5.105.2):
     dependencies:
       tapable: 2.3.3
       webpack: 5.105.2
-      webpack-sources: 2.3.1
+      webpack-sources: 3.5.0
 
   webpack-sources@1.4.3:
     dependencies:
       source-list-map: 2.0.1
       source-map: 0.6.1
 
-  webpack-sources@2.3.1:
-    dependencies:
-      source-list-map: 2.0.1
-      source-map: 0.6.1
-
   webpack-sources@3.3.4: {}
+
+  webpack-sources@3.5.0: {}
 
   webpack@5.105.2:
     dependencies:

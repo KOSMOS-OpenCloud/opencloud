@@ -4,6 +4,7 @@ ARG TARGETARCH
 ARG VERSION
 ARG STRING
 ARG EDITION="dev"
+ARG SRCDIR
 
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
 
@@ -12,7 +13,7 @@ RUN --mount=type=bind,target=/build,rw \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache \
     GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH:-amd64}" ; \
-    make -C opencloud/opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true DIST=/dist
+    make -C ${SRCDIR:-.}/opencloud release-linux-docker-${TARGETARCH} ENABLE_VIPS=true DIST=/dist
 
 FROM alpine:3.23
 ARG VERSION

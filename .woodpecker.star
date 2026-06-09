@@ -503,7 +503,7 @@ def main(ctx):
       none
     """
 
-    if ctx.build.event == "cron" and ctx.build.sender == "translation-sync":
+    if ctx.build.event == "cron" and ctx.build.cron == "translation-sync":
         return translation_sync(ctx)
 
     is_release_pr = (ctx.build.event == "pull_request" and "🎉 release" in ctx.build.title.lower())

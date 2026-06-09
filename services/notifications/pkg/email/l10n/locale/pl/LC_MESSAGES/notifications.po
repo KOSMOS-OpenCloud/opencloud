@@ -4,7 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# eric_G <junk.eg@free.fr>, 2025
+# skrzat <skrzacikus@gmail.com>, 2025
+# Matt, 2026
 # 
 #, fuzzy
 msgid ""
@@ -13,34 +14,34 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 "POT-Creation-Date: 2026-06-09 09:30+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
-"Last-Translator: eric_G <junk.eg@free.fr>, 2025\n"
-"Language-Team: French (https://app.transifex.com/opencloud-eu/teams/204053/fr/)\n"
+"Last-Translator: Matt, 2026\n"
+"Language-Team: Polish (https://app.transifex.com/opencloud-eu/teams/204053/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #. UnsharedSpace email template, resolves via {{ .CallToAction }}
 #: pkg/email/templates.go:65
 msgid "Click here to check it: {ShareLink}"
-msgstr "Cliquez ici pour le consulter : {ShareLink}"
+msgstr "Kliknij tutaj, aby to sprawdzić: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .CallToAction }}
 #. SharedSpace email template, resolves via {{ .CallToAction }}
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
-msgstr "Cliquez ici pour le voir : {ShareLink}"
+msgstr "Kliknij tutaj, aby wyświetlić: {ShareLink}"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
 msgid "Hello {ShareGrantee}"
-msgstr "Bonjour {ShareGrantee}"
+msgstr "Witaj {ShareGrantee}"
 
 #. ShareExpired email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:32
 msgid "Hello {ShareGrantee},"
-msgstr "Bonjour {ShareGrantee},"
+msgstr "Witaj {ShareGrantee},"
 
 #. SharedSpace email template, resolves via {{ .Greeting }}
 #. UnsharedSpace email template, resolves via {{ .Greeting }}
@@ -48,12 +49,12 @@ msgstr "Bonjour {ShareGrantee},"
 #: pkg/email/templates.go:46 pkg/email/templates.go:59
 #: pkg/email/templates.go:74
 msgid "Hello {SpaceGrantee},"
-msgstr "Bonjour {SpaceGrantee}"
+msgstr "Witaj {SpaceGrantee},"
 
 #. Grouped email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:118
 msgid "Hi {DisplayName},"
-msgstr "Bonjour {DisplayName},"
+msgstr "Cześć {DisplayName},"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
 #. }}
@@ -61,17 +62,17 @@ msgstr "Bonjour {DisplayName},"
 #. via {{ .Greeting }}
 #: pkg/email/templates.go:87 pkg/email/templates.go:104
 msgid "Hi,"
-msgstr "Bonjour,"
+msgstr "Cześć,"
 
 #. MembershipExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:72
 msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
-msgstr "L'affiliation à '{SpaceName}' a expiré à {ExpiredAt}"
+msgstr "Członkostwo w '{SpaceName}' wygasło o {ExpiredAt}"
 
 #. Grouped email template, Subject field (resolves directly)
 #: pkg/email/templates.go:116
 msgid "Report"
-msgstr "Rapport"
+msgstr "Zgłoś"
 
 #. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
 #. directly)
@@ -79,12 +80,12 @@ msgstr "Rapport"
 #. field (resolves directly)
 #: pkg/email/templates.go:85 pkg/email/templates.go:102
 msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
-msgstr "ScienceMesh : {InitiatorName} souhaite collaborer avec vous"
+msgstr "ScienceMesh: {InitiatorName} chce podjąć z Tobą współpracę"
 
 #. ShareExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:30
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
-msgstr "Le partage avec '{ShareFolder}' a expiré le {ExpiredAt}"
+msgstr "Udostępnienie dla '{ShareFolder}' wygasło o {ExpiredAt}"
 
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
@@ -93,9 +94,9 @@ msgid ""
 "\n"
 "Even though this membership has expired you still might have access through other shares and/or space memberships"
 msgstr ""
-"Votre adhésion à l'espace {SpaceName} a expiré à {ExpiredAt}\n"
+"Twoje członkostwo w przestrzeni {SpaceName} wygasło o {ExpiredAt}\n"
 "\n"
-"Même si cette adhésion a expiré, vous pouvez encore avoir accès à d'autres parts et/ou adhésions à l'espace."
+"Mimo wygaśnięcia, nadal możesz mieć dostęp poprzez inne udostępnienia."
 
 #. ShareExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:34
@@ -104,9 +105,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
-"Votre partage sur {ShareFolder} a expiré à {ExpiredAt}\n"
+"Twoje udostępnienie do {ShareFolder} wygasło o {ExpiredAt}\n"
 "\n"
-"Même si ce partage a été révoqué, vous pouvez toujours y avoir accès par le biais d'autres partages et/ou adhésions à l'espace."
+"Mimo to, nadal możesz mieć dostęp poprzez inne przestrzenie lub udostępnienia."
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}
@@ -117,10 +118,10 @@ msgid ""
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""
-"{ShareSharer} ({ShareSharerMail}) souhaite commencer à partager des ressources de collaboration avec vous.\n"
-"Veuillez consulter les paramètres de votre fédération et utiliser les informations suivantes :\n"
-"Jeton : {Token}\n"
-"Domaine du fournisseur : {ProviderDomain}"
+"{ShareSharer} ({ShareSharerMail}) chce udostępniać zasoby.\n"
+"Odwiedź ustawienia federacji i użyj danych:\n"
+"  Token: {Token}\n"
+"  Domena: {ProviderDomain}"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{
 #. .MessageBody }}
@@ -134,28 +135,28 @@ msgid ""
 "  Token: {Token}\n"
 "  ProviderDomain: {ProviderDomain}"
 msgstr ""
-"{ShareSharer} ({ShareSharerMail}) souhaite commencer à partager des ressources de collaboration avec vous.\n"
-"Pour accepter l'invitation, veuillez visiter l'URL suivante :\n"
+"{ShareSharer} ({ShareSharerMail}) chce udostępniać Ci zasoby.\n"
+"Aby zaakceptować zaproszenie, przejdź do:\n"
 "{ShareLink}\n"
 "\n"
-"Vous pouvez également consulter les paramètres de votre fédération et utiliser les informations suivantes :\n"
-"Jeton : {Token}\n"
-"Domaine du fournisseur : {ProviderDomain}"
+"Alternatywnie w ustawieniach użyj:\n"
+"  Token: {Token}\n"
+"  Domena: {ProviderDomain}"
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:21
 msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
-msgstr "{ShareSharer} a partagé « {ShareFolder} » avec vous."
+msgstr "{ShareSharer} udostępnił Ci \"{ShareFolder}\"."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
 msgid "{ShareSharer} shared '{ShareFolder}' with you"
-msgstr "{ShareSharer} a partagé « {ShareFolder} » avec vous"
+msgstr "{ShareSharer} udostępnił Ci '{ShareFolder}'"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:48
 msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
-msgstr "{SpaceSharer} vous a invité à rejoindre « {SpaceName} »."
+msgstr "{SpaceSharer} zaprosił Cię do dołączenia do \"{SpaceName}\"."
 
 #. UnsharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61
@@ -164,16 +165,16 @@ msgid ""
 "\n"
 "You might still have access through your other groups or direct membership."
 msgstr ""
-"{SpaceSharer} vous a retiré de « {SpaceName} ».\n"
+"{SpaceSharer} usunął Cię z \"{SpaceName}\".\n"
 "\n"
-"Il se peut que vous y ayez encore accès par l'intermédiaire de vos autres groupes ou de votre adhésion directe."
+"Nadal możesz mieć dostęp poprzez inne członkostwa."
 
 #. SharedSpace email template, Subject field (resolves directly)
 #: pkg/email/templates.go:44
 msgid "{SpaceSharer} invited you to join {SpaceName}"
-msgstr "{SpaceSharer} vous a invité à rejoindre {SpaceName}"
+msgstr "{SpaceSharer} zaprosił Cię do {SpaceName}"
 
 #. UnsharedSpace email template, Subject field (resolves directly)
 #: pkg/email/templates.go:57
 msgid "{SpaceSharer} removed you from {SpaceName}"
-msgstr "{SpaceSharer} vous a retiré de {SpaceName}"
+msgstr "{SpaceSharer} usunął Cię z {SpaceName}"

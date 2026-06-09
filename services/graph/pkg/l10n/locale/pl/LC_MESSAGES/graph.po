@@ -8,15 +8,16 @@
 # Maksymilian Styżej, 2025
 # Xiaomi Box, 2025
 # Radoslaw Posim, 2025
+# Matt, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-05-06 00:01+0000\n"
+"POT-Creation-Date: 2026-06-09 09:30+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
-"Last-Translator: Radoslaw Posim, 2025\n"
+"Last-Translator: Matt, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/opencloud-eu/teams/204053/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,7 +40,7 @@ msgstr "Może edytować"
 #. directly)
 #: pkg/unifiedrole/roles.go:134
 msgid "Can edit without versions"
-msgstr ""
+msgstr "Może edytować bez wersji"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:158
@@ -89,6 +90,7 @@ msgstr "Zobacz i pobierz"
 #: pkg/unifiedrole/roles.go:161
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr ""
+"Wyświetlanie tylko dokumentów, obrazów i PDF. Zostaną nałożone znaki wodne."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:137
@@ -98,7 +100,7 @@ msgstr "Wyświetl , Pobierz i edytuj "
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:101
 msgid "View, download and show all invited people."
-msgstr ""
+msgstr "Wyświetlanie, pobieranie i pokazywanie wszystkich zaproszonych."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:149
@@ -109,6 +111,7 @@ msgstr "Wyświetlanie, pobieranie i przesyłanie."
 #: pkg/unifiedrole/roles.go:143
 msgid "View, download, edit and show all invited people."
 msgstr ""
+"Wyświetlanie, pobieranie, edycja i pokazywanie wszystkich zaproszonych."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves

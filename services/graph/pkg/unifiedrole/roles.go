@@ -16,12 +16,16 @@ import (
 const (
 	// UnifiedRoleViewerID Unified role viewer id.
 	UnifiedRoleViewerID = "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
+	// UnifiedRoleViewerWithVersionsID Unified role viewer with versions id.
+	UnifiedRoleViewerWithVersionsID = "d1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
 	// UnifiedRoleViewerListGrantsID Unified role viewer id.
 	UnifiedRoleViewerListGrantsID = "d5041006-ebb3-4b4a-b6a4-7c180ecfb17d"
 	// UnifiedRoleSpaceViewerID Unified role space viewer id.
 	UnifiedRoleSpaceViewerID = "a8d5fe5e-96e3-418d-825b-534dbdf22b99"
 	// UnifiedRoleEditorID Unified role editor id.
 	UnifiedRoleEditorID = "fb6c3e19-e378-47e5-b277-9732f9de6e21"
+	// UnifiedRoleEditorWithVersionsID
+	UnifiedRoleEditorWithVersionsID = "b8c6e1c9-5d2a-4f0e-9c3b-1a2b3c4d5e6f"
 	// UnifiedRoleEditorListGrantsID Unified role editor id.
 	UnifiedRoleEditorListGrantsID = "e8ea8b21-abd4-45d2-b893-8d1546378e9e"
 	// UnifiedRoleSpaceEditorID Unified role space editor id.
@@ -30,6 +34,8 @@ const (
 	UnifiedRoleSpaceEditorWithoutVersionsID = "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
+	// UnifiedRoleFileEditorWithVersionsID Unified role file editor id.
+	UnifiedRoleFileEditorWithVersionsID = "3d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
 	// UnifiedRoleFileEditorListGrantsID Unified role file editor id.
 	UnifiedRoleFileEditorListGrantsID = "c1235aea-d106-42db-8458-7d5610fb0a67"
 	// UnifiedRoleEditorLiteID Unified role editor-lite id.
@@ -97,6 +103,12 @@ var (
 	// UnifiedRole Viewer, Role DisplayName (resolves directly)
 	_viewerUnifiedRoleDisplayName = l10n.Template("Can view")
 
+	// UnifiedRole ViewerWithVersions, Role Description (resolves directly)
+	_viewerWithVersionsUnifiedRoleDescription = l10n.Template("View and download including the history.")
+
+	// UnifiedRole ViewerWithVersions, Role DisplayName (resolves directly)
+	_viewerWithVersionsUnifiedRoleDisplayName = l10n.Template("Can view")
+
 	// UnifiedRole ViewerListGrants, Role Description (resolves directly)
 	_viewerListGrantsUnifiedRoleDescription = l10n.Template("View, download and show all invited people.")
 
@@ -114,6 +126,12 @@ var (
 
 	// UnifiedRole Editor, Role DisplayName (resolves directly)
 	_editorUnifiedRoleDisplayName = l10n.Template("Can edit")
+
+	// UnifiedRole Editor, Role Description (resolves directly)
+	_editorWithVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete including the history.")
+
+	// UnifiedRole Editor, Role DisplayName (resolves directly)
+	_editorWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit")
 
 	// UnifiedRoleListGrants Editor, Role Description (resolves directly)
 	_editorListGrantsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and show all invited people.")
@@ -141,6 +159,12 @@ var (
 
 	// UnifiedRole FileEditorListGrants, Role Description (resolves directly)
 	_fileEditorListGrantsUnifiedRoleDescription = l10n.Template("View, download, edit and show all invited people.")
+
+	// UnifiedRole FileEditorWithVersions, Role DisplayName (resolves directly)
+	_fileEditorWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit")
+
+	// UnifiedRole FileEditorWithVErsions, Role Description (resolves directly)
+	_fileEditorWithVersionsUnifiedRoleDescription = l10n.Template("View, download and edit including the history.")
 
 	// UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
 	_fileEditorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
@@ -187,13 +211,16 @@ var (
 	// buildInRoles contains the built-in roles.
 	buildInRoles = []*libregraph.UnifiedRoleDefinition{
 		roleViewer,
+		roleViewerWithVersions,
 		roleViewerListGrants,
 		roleSpaceViewer,
 		roleEditor,
 		roleEditorListGrants,
+		roleEditorWithVersions,
 		roleSpaceEditor,
 		roleSpaceEditorWithoutVersions,
 		roleFileEditor,
+		roleFileEditorWithVersions,
 		roleFileEditorListGrants,
 		roleEditorLite,
 		roleManager,
@@ -227,6 +254,27 @@ var (
 				},
 			},
 			LibreGraphWeight: proto.Int32(10),
+		}
+	}()
+
+	// roleViewerWithVersions creates a viewer role.
+	roleViewerWithVersions = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewViewerWithVersionsRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleViewerWithVersionsID),
+			Description: proto.String(_viewerWithVersionsUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFile),
+				},
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(11),
 		}
 	}()
 
@@ -356,6 +404,22 @@ var (
 		}
 	}()
 
+	roleEditorWithVersions = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewEditorWithVersionsRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleEditorWithVersionsID),
+			Description: proto.String(_editorWithVersionsUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(71),
+		}
+	}()
+
 	// roleSpaceEditorWithoutVersions creates an editor without versions role
 	roleSpaceEditorWithoutVersions = func() *libregraph.UnifiedRoleDefinition {
 		r := conversions.NewSpaceEditorWithoutVersionsRole()
@@ -408,6 +472,23 @@ var (
 				},
 			},
 			LibreGraphWeight: proto.Int32(100),
+		}
+	}()
+
+	// roleFileEditorWithVersions creates a file-editor role
+	roleFileEditorWithVersions = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewFileEditorWithVersionsRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleFileEditorWithVersionsID),
+			Description: proto.String(_fileEditorWithVersionsUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFile),
+				},
+			},
+			LibreGraphWeight: proto.Int32(101),
 		}
 	}()
 

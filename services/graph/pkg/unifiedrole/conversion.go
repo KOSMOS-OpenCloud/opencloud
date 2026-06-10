@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/opencloud-eu/reva/v2/pkg/conversions"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
+	"github.com/opencloud-eu/reva/v2/pkg/conversions"
 )
 
 // PermissionsToCS3ResourcePermissions converts the provided libregraph UnifiedRolePermissions to a cs3 ResourcePermissions
@@ -204,12 +204,16 @@ func cs3RoleToDisplayName(role *conversions.Role) string {
 	switch role.Name {
 	case conversions.RoleViewer:
 		return _viewerUnifiedRoleDisplayName
+	case conversions.RoleViewerWithVersions:
+		return _viewerWithVersionsUnifiedRoleDisplayName
 	case conversions.RoleViewerListGrants:
 		return _viewerListGrantsUnifiedRoleDisplayName
 	case conversions.RoleSpaceViewer:
 		return _spaceViewerUnifiedRoleDisplayName
 	case conversions.RoleEditor:
 		return _editorUnifiedRoleDisplayName
+	case conversions.RoleEditorWithVersions:
+		return _editorWithVersionsUnifiedRoleDisplayName
 	case conversions.RoleEditorListGrants:
 		return _editorListGrantsUnifiedRoleDisplayName
 	case conversions.RoleSpaceEditor:
@@ -218,6 +222,8 @@ func cs3RoleToDisplayName(role *conversions.Role) string {
 		return _spaceEditorWithoutVersionsUnifiedRoleDisplayName
 	case conversions.RoleFileEditor:
 		return _fileEditorUnifiedRoleDisplayName
+	case conversions.RoleFileEditorWithVersions:
+		return _fileEditorWithVersionsUnifiedRoleDisplayName
 	case conversions.RoleFileEditorListGrants:
 		return _fileEditorListGrantsUnifiedRoleDisplayName
 	case conversions.RoleEditorLite:

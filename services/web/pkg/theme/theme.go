@@ -21,6 +21,10 @@ var themeDefaults = KV{
 				"name":     "UnifiedRoleViewer",
 				"iconName": "eye",
 			},
+			unifiedrole.UnifiedRoleViewerWithVersionsID: KV{
+				"name":     "UnifiedRoleViewerWithVersions",
+				"iconName": "eye",
+			},
 			unifiedrole.UnifiedRoleViewerListGrantsID: KV{
 				"name":     "UnifiedRoleViewerListGrants",
 				"iconName": "eye",
@@ -33,12 +37,20 @@ var themeDefaults = KV{
 				"label":    "UnifiedRoleFileEditor",
 				"iconName": "pencil",
 			},
+			unifiedrole.UnifiedRoleFileEditorWithVersionsID: KV{
+				"label":    "UnifiedRoleFileEditorWithVersions",
+				"iconName": "pencil",
+			},
 			unifiedrole.UnifiedRoleFileEditorListGrantsID: KV{
 				"label":    "UnifiedRoleFileEditorListGrants",
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorID: KV{
 				"label":    "UnifiedRoleEditor",
+				"iconName": "pencil",
+			},
+			unifiedrole.UnifiedRoleEditorWithVersionsID: KV{
+				"label":    "UnifiedRoleEditorWithVersions",
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorListGrantsID: KV{

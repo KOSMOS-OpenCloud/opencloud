@@ -19,6 +19,9 @@ var (
 		unifiedrole.UnifiedRoleViewerListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsID,
 		unifiedrole.UnifiedRoleFileEditorListGrantsID,
+		unifiedrole.UnifiedRoleViewerWithVersionsID,
+		unifiedrole.UnifiedRoleEditorWithVersionsID,
+		unifiedrole.UnifiedRoleFileEditorWithVersionsID,
 		unifiedrole.UnifiedRoleDeniedID,
 	}
 )

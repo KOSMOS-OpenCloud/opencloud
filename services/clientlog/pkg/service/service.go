@@ -168,13 +168,23 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.SpaceCreated:
 		spaceEv("space-created", e.ID, []string{e.Executant.GetOpaqueId()})
 	case events.SpaceDisabled:
-		spaceEv("space-disabled", e.ID, []string{e.Executant.GetOpaqueId()})
+		uids := []string{}
+		for k := range e.Members {
+			uids = append(uids, k)
+		}
+		spaceEv("space-disabled", e.ID, uids)
 	case events.SpaceDeleted:
 		uids := []string{}
 		for k := range e.FinalMembers {
 			uids = append(uids, k)
 		}
 		spaceEv("space-deleted", e.ID, uids)
+	case events.SpaceEnabled:
+		uids := []string{}
+		for k := range e.Members {
+			uids = append(uids, k)
+		}
+		spaceEv("space-enabled", e.ID, uids)
 	case events.SpaceShared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
 		shareEv("space-member-added", &r, e.GranteeUserID, e.GranteeGroupID)

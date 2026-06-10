@@ -32,6 +32,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/pkg/xattr"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -54,6 +56,7 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/permissions"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/tree/propagator"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/pkg/decomposedfs/usermapper"
+	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/templates"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 )
 
@@ -177,12 +180,65 @@ func New(lu node.PathLookup, bs node.Blobstore, um usermapper.Mapper, trashbin *
 		go t.workScanQueue()
 	}
 	if o.ScanFS {
+		// warmup the cache for all space roots right away so clients and migrations don't get confused when starting with a cold cache
+		err := t.warmupSpaceRootCache(o)
+		if err != nil {
+			return nil, errors.Wrap(err, "error warming up space root cache")
+		}
+
+		// scan the whole tree asynchronously to pick up new nodes
 		go func() {
-			_ = t.WarmupIDCache(o.Root, true, false)
+			start := time.Now()
+			err := t.WarmupIDCache(o.Root, true, false)
+			if err != nil {
+				t.log.Error().Err(err).Msg("error during initial fs scan")
+			}
+			duration := time.Since(start)
+
+			scanDurationGauge := promauto.NewGauge(prometheus.GaugeOpts{
+				Name: "reva_fs_scan_duration_seconds",
+				Help: "Duration of the initial filesystem scan in seconds",
+			})
+			scanDurationGauge.Set(duration.Seconds())
+			t.log.Info().Dur("duration", duration).Msg("initial fs scan finished")
 		}()
 	}
 
 	return t, nil
+}
+
+func (t *Tree) warmupSpaceRootCache(options *options.Options) error {
+	personalRoot := filepath.Clean(filepath.Join(options.Root, templates.Base(options.PersonalSpacePathTemplate)))
+	projectRoot := filepath.Clean(filepath.Join(options.Root, templates.Base(options.GeneralSpacePathTemplate)))
+
+	var paths []string
+	personalEntries, err := os.ReadDir(personalRoot)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return errors.Wrap(err, "could not read personal space root directory")
+	}
+	for _, entry := range personalEntries {
+		paths = append(paths, filepath.Join(personalRoot, entry.Name()))
+	}
+	projectEntries, err := os.ReadDir(projectRoot)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return errors.Wrap(err, "could not read project space root directory")
+	}
+	for _, entry := range projectEntries {
+		paths = append(paths, filepath.Join(projectRoot, entry.Name()))
+	}
+
+	for _, path := range paths {
+		spaceID, _, _, _, err := t.lookup.MetadataBackend().IdentifyPath(context.TODO(), path)
+		if err != nil {
+			t.log.Error().Err(err).Str("path", path).Msg("could not identify space root path")
+			continue
+		}
+		err = t.idCache.Set(context.TODO(), spaceID, spaceID, path)
+		if err != nil {
+			return errors.Wrap(err, "could not cache space root path")
+		}
+	}
+	return nil
 }
 
 func (t *Tree) checkStorage() error {

@@ -154,7 +154,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				}
 
 				fontServiceRootURI, err := url.JoinPath(cfg.Commons.OpenCloudURL, "/collaboration/fonts")
-				if err := fontFS.MkdirAll("/", 0o755); err != nil {
+				if err != nil {
 					logger.Error().Err(err).Msg("Failed to build font service root uri")
 					return err
 				}

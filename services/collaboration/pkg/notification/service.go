@@ -72,6 +72,7 @@ func (s Service) HandleNotification(w http.ResponseWriter, r *http.Request) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	requestUser, canManage, err := collaboration.CheckPermissions(gatewayClient, r.Context(), collaboration.PermissionCollaborationPublishNotification)

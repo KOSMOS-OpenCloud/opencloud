@@ -19,7 +19,6 @@ func (s eventsNotifier) handleResourceMention(e ocEvents.ResourceMention, eventI
 		Str("event", "Mention").
 		Str("resourceid", e.Ref.GetResourceId().GetOpaqueId()).
 		Logger()
-	_ = logger
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		return

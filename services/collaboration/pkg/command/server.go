@@ -159,7 +159,7 @@ func Server(cfg *config.Config) *cobra.Command {
 					return err
 				}
 
-				service, err := font.NewService(
+				fontService, err = font.NewService(
 					font.ServiceOptions{}.
 						WithFontFS(fontFS).
 						WithRootURI(fontServiceRootURI).
@@ -170,8 +170,6 @@ func Server(cfg *config.Config) *cobra.Command {
 				if err != nil {
 					return err
 				}
-
-				fontService = service
 			}
 
 			var notificationService notification.Service
@@ -181,15 +179,16 @@ func Server(cfg *config.Config) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				service, err := notification.NewService(
+				notificationService, err = notification.NewService(
 					notification.ServiceOptions{}.
 						WithLogger(logger).
 						WithGatewaySelector(gatewaySelector).
 						WithEventPublisher(natsStream).
 						WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 				)
-
-				notificationService = service
+				if err != nil {
+					return err
+				}
 			}
 
 			// start HTTP server

@@ -89,6 +89,7 @@ func (s Service) DeleteFont(w http.ResponseWriter, r *http.Request) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	_, canManage, err := collaboration.CheckPermissions(gatewayClient, r.Context(), collaboration.PermissionCollaborationManageFonts)
@@ -282,6 +283,7 @@ func (s Service) UploadFont(w http.ResponseWriter, r *http.Request) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	_, canManage, err := collaboration.CheckPermissions(gatewayClient, r.Context(), collaboration.PermissionCollaborationManageFonts)

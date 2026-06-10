@@ -86,7 +86,7 @@ func CollaborationManageFontsPermission(c settingsmsg.Permission_Constraint) *se
 	}
 }
 
-// CollaborationPublishNotificationPermission is the permission to manage fonts
+// CollaborationPublishNotificationPermission is the permission to publish collaboration notifications
 func CollaborationPublishNotificationPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{
 		Id:          "43e5948e-8238-41d6-9ef1-f259f00591db",

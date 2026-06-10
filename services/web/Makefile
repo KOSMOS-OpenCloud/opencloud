@@ -13,10 +13,11 @@ include ../../.make/release.mk
 include ../../.make/docs.mk
 
 .PHONY: node-generate-dev
-node-generate-dev: pull-assets build-apps
+node-generate-dev: pull-assets
 
 .PHONY: node-generate-prod
-node-generate-prod: download-assets build-apps
+node-generate-prod: download-assets
+
 
 .PHONY: pull-assets
 pull-assets:
@@ -41,13 +42,6 @@ pull-assets:
 download-assets:
 	git clean -xfd assets
 	curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
-
-.PHONY: build-apps
-build-apps:
-	@for dir in ./assets/apps/*; do \
-		echo "📦 Installing in $$dir"; \
-		(cd "$$dir" && pnpm install && pnpm build) || exit 1; \
-		done
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:

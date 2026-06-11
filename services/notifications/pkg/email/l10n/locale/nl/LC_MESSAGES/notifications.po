@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-11 09:50+0000\n"
+"POT-Creation-Date: 2026-06-11 23:16+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Stephan Paternotte <stephan@paternottes.net>, 2026\n"
 "Language-Team: Dutch (https://app.transifex.com/opencloud-eu/teams/204053/nl/)\n"
@@ -34,7 +34,7 @@ msgstr "Klik hier om het te bekijken: {ShareLink}"
 
 #: pkg/email/templates.go:126
 msgid "Hello {RecipientName},"
-msgstr ""
+msgstr "Hallo {RecipientName},"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -92,11 +92,11 @@ msgstr "Share '{ShareFolder}' is verlopen op {ExpiredAt}"
 
 #: pkg/email/templates.go:128
 msgid "You can view the mention here: {ResourceLink}"
-msgstr ""
+msgstr "De vermelding kunt u bekijken: {ResourceLink}"
 
 #: pkg/email/templates.go:125
 msgid "You were mentioned in '{ResourceName}'"
-msgstr ""
+msgstr "U werd vermeld in '{ResourceName}'"
 
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
@@ -122,7 +122,7 @@ msgstr ""
 
 #: pkg/email/templates.go:127
 msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
-msgstr ""
+msgstr "{AuthorName} heeft u vermeld in \"{ResourceName}\"."
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

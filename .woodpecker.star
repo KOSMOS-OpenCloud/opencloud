@@ -71,6 +71,7 @@ OC_DOMAIN = "%s:9200" % OC_SERVER_NAME
 FED_OC_SERVER_NAME = "federation-opencloud-server"
 OC_FED_URL = "https://%s:10200" % FED_OC_SERVER_NAME
 OC_FED_DOMAIN = "%s:10200" % FED_OC_SERVER_NAME
+MACHINE_AUTH_API_KEY = "fjsdlfgkjsdlktgersoiulersiltjlekir5[345;lesirtuwe542345wert"
 
 event = {
     "base": {
@@ -2337,6 +2338,7 @@ def opencloudServer(storage = "decomposed", depends_on = [], deploy_type = "", e
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
         "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
         "STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY": 0,
+        "OC_MACHINE_AUTH_API_KEY": MACHINE_AUTH_API_KEY,
     }
 
     if storage == "posix":
@@ -3216,6 +3218,7 @@ def wopiCollaborationService(name):
         "OC_JWT_SECRET": "some-opencloud-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
         "COLLABORATION_EVENTS_ENDPOINT": "%s:9233" % OC_SERVER_NAME,
+        "OC_MACHINE_AUTH_API_KEY": MACHINE_AUTH_API_KEY,
     }
 
     if name == "collabora":

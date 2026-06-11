@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Lulufox, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/opencloud-eu/teams/204053/ru/)\n"
@@ -32,6 +32,10 @@ msgstr "Нажмите для проверки: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Нажмите для просмотра: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -87,6 +91,14 @@ msgstr "ScienceMesh: {InitiatorName} хочет сотрудничать с ва
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Совместный доступ к '{ShareFolder}' истек {ExpiredAt}"
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr ""
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -108,6 +120,10 @@ msgstr ""
 "Ваш совместный доступ к {ShareFolder} истек {ExpiredAt}\n"
 "\n"
 "Не смотря на это, у вас может сохраняться доступ через другие ресурсы совместного доступа и/или членство в пространствах."
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
+msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

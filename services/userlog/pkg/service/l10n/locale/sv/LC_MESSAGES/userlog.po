@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/opencloud-eu/teams/204053/sv/)\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Access to Space {space} lost"
 msgstr "Tillgång till arbetsytan {space} förlorades"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "Åtkomst till {resource} har gått ut"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -39,7 +39,7 @@ msgstr ""
 "Ladda ner alla dina data före det datumet, eftersom det inte går att komma "
 "åt dem efter det datumet."
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "Instansen kommer att stängas av och avprovisioneras"
 
@@ -63,7 +63,7 @@ msgstr "Resurs delad"
 msgid "Resource unshared"
 msgstr "Resursen delas inte"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "Delning har löpt ut"
 
@@ -94,6 +94,10 @@ msgstr "Virus hittades"
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr "Virus hittades i {resource}. Uppladdning omöjlig. Virus: {virus}"
 
+#: pkg/service/templates.go:53
+msgid "You have been mentioned"
+msgstr ""
+
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
 msgstr "{user} har lagt till dig i arbetsytan {space}"
@@ -105,6 +109,10 @@ msgstr "{user} tog bort arbetsytan {space}"
 #: pkg/service/templates.go:29
 msgid "{user} disabled Space {space}"
 msgstr "{user} inaktiverade arbetsytan {space}"
+
+#: pkg/service/templates.go:54
+msgid "{user} mentioned you in {resource}"
+msgstr ""
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"

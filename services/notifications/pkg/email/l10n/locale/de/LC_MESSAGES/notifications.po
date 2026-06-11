@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Jonas, 2025\n"
 "Language-Team: German (https://app.transifex.com/opencloud-eu/teams/204053/de/)\n"
@@ -32,6 +32,10 @@ msgstr "Zum Überprüfen hier klicken: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Zum Ansehen hier klicken: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -87,6 +91,14 @@ msgstr "ScienceMesh: {InitiatorName} möchte mir Ihnen gerne zusammenarbeiten"
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Die Freigabe für '{ShareFolder}' ist am {ExpiredAt} abgelaufen."
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr ""
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -107,6 +119,10 @@ msgstr ""
 "Ihre Freigabe für {ShareFolder} ist am {ExpiredAt} abgelaufen.\n"
 "\n"
 "Über eventuelle weitere Freigaben oder Space-Mitgliedschaften kann der Zugriff trotzdem weiterhin möglich sein."
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
+msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

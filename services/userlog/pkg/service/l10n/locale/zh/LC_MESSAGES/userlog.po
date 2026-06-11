@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: YQS Yang, 2025\n"
 "Language-Team: Chinese (https://app.transifex.com/opencloud-eu/teams/204053/zh/)\n"
@@ -25,18 +25,18 @@ msgstr ""
 msgid "Access to Space {space} lost"
 msgstr "无法访问空间{space}"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "对{resource}的访问权限已过期"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
 "possible."
 msgstr "请注意！实例将于{date}关闭并解除配置。请在此日期前下载所有数据，之后将无法访问。"
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "实例将被关闭并解除配置"
 
@@ -60,7 +60,7 @@ msgstr "资源已共享"
 msgid "Resource unshared"
 msgstr "资源已取消共享"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "共享已过期"
 
@@ -91,6 +91,10 @@ msgstr "发现病毒"
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr "在{resource}中发现病毒。无法上传。病毒名称：{virus}"
 
+#: pkg/service/templates.go:53
+msgid "You have been mentioned"
+msgstr ""
+
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
 msgstr "{user}已将您添加到空间{space}"
@@ -102,6 +106,10 @@ msgstr "{user}已删除空间{space}"
 #: pkg/service/templates.go:29
 msgid "{user} disabled Space {space}"
 msgstr "{user}已禁用空间{space}"
+
+#: pkg/service/templates.go:54
+msgid "{user} mentioned you in {resource}"
+msgstr ""
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"

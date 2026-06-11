@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (https://app.transifex.com/opencloud-eu/teams/204053/sv/)\n"
@@ -32,6 +32,10 @@ msgstr "Klicka här för att kontrollera det: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Klicka här för att visa det: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -87,6 +91,14 @@ msgstr "ScienceMesh: {InitiatorName} vill samarbeta med dig"
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Delning till '{ShareFolder}' löpte ut {ExpiredAt}"
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr ""
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -108,6 +120,10 @@ msgstr ""
 "Din delning till {ShareFolder} har löpt ut {ExpiredAt}\n"
 "\n"
 "Även om denna delning har löpt ut kan du fortfarande ha tillgång via andra delningar och/eller medlemskap i arbetsytor."
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
+msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

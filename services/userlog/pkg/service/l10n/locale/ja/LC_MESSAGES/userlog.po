@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: iikaka88, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/opencloud-eu/teams/204053/ja/)\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Access to Space {space} lost"
 msgstr "スペース {space} へのアクセス権が失われました"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "{resource} へのアクセス期限が切れました"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -38,7 +38,7 @@ msgstr ""
 "【重要】このインスタンスは {date} "
 "に停止および削除されます。その日以降はアクセスできなくなるため、期日までにすべてのデータをダウンロードしてください。"
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "インスタンスは停止および削除されます"
 
@@ -62,7 +62,7 @@ msgstr "リソースが共有されました"
 msgid "Resource unshared"
 msgstr "リソースの共有が解除されました"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "共有期限が切れました"
 
@@ -93,6 +93,10 @@ msgstr "ウイルスが検出されました"
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr "{resource} 内にウイルスが検出されました。アップロードできません。ウイルス名: {virus}"
 
+#: pkg/service/templates.go:53
+msgid "You have been mentioned"
+msgstr ""
+
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
 msgstr "{user} があなたをスペース「{space}」に追加しました"
@@ -104,6 +108,10 @@ msgstr "{user} がスペース「{space}」を削除しました"
 #: pkg/service/templates.go:29
 msgid "{user} disabled Space {space}"
 msgstr "{user} がスペース「{space}」を無効にしました"
+
+#: pkg/service/templates.go:54
+msgid "{user} mentioned you in {resource}"
+msgstr ""
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"

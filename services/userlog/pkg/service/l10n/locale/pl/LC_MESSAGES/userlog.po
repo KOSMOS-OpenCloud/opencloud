@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Matt, 2026\n"
 "Language-Team: Polish (https://app.transifex.com/opencloud-eu/teams/204053/pl/)\n"
@@ -28,11 +28,11 @@ msgstr ""
 msgid "Access to Space {space} lost"
 msgstr "Dostęp do Przestrzeni {space} utracony"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "Dostęp do {resource} wygasł"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -42,7 +42,7 @@ msgstr ""
 "wszystkie swoje dane przed tym terminem, ponieważ po upływie tej daty dostęp"
 " nie będzie możliwy."
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "Instancja zostanie wyłączona i usunięta."
 
@@ -66,7 +66,7 @@ msgstr "Zasób udostępniony"
 msgid "Resource unshared"
 msgstr "Udostępnianie zasobu zostało zakończone"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "Udostępnienie wygasło"
 
@@ -101,6 +101,10 @@ msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr ""
 "Znaleziono wirusa w {resource}. Przesłanie jest niemożliwe. Wirus: {virus}"
 
+#: pkg/service/templates.go:53
+msgid "You have been mentioned"
+msgstr ""
+
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
 msgstr "{user} dodał Ciebie do Przestrzeni {space}"
@@ -112,6 +116,10 @@ msgstr "{user} usunął Przestrzeń {space}"
 #: pkg/service/templates.go:29
 msgid "{user} disabled Space {space}"
 msgstr "{user} wyłączył Przestrzeń {space}"
+
+#: pkg/service/templates.go:54
+msgid "{user} mentioned you in {resource}"
+msgstr ""
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"

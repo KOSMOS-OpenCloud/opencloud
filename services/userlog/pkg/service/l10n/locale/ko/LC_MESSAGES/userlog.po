@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: gapho shin, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/opencloud-eu/teams/204053/ko/)\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Access to Space {space} lost"
 msgstr "{space}에 대한 액세스가 손실되었습니다"
 
-#: pkg/service/templates.go:54
+#: pkg/service/templates.go:59
 msgid "Access to {resource} expired"
 msgstr "{resource}에 대한 액세스가 만료되었습니다"
 
-#: pkg/service/templates.go:59
+#: pkg/service/templates.go:64
 msgid ""
 "Attention! The instance will be shut down and deprovisioned on {date}. "
 "Download all your data before that date as no access past that date is "
@@ -38,7 +38,7 @@ msgstr ""
 "주의하세요! 인스턴스는 {date}에 종료되고 프로비저닝이 해제됩니다. 해당 날짜 이후에는 액세스할 수 없으므로 해당 날짜 이전에 모든 "
 "데이터를 다운로드하세요."
 
-#: pkg/service/templates.go:58
+#: pkg/service/templates.go:63
 msgid "Instance will be shut down and deprovisioned"
 msgstr "인스턴스가 종료되고 프로비저닝 해제됩니다"
 
@@ -62,7 +62,7 @@ msgstr "자원 공유"
 msgid "Resource unshared"
 msgstr "리소스 비공유"
 
-#: pkg/service/templates.go:53
+#: pkg/service/templates.go:58
 msgid "Share expired"
 msgstr "공유 만료"
 
@@ -93,6 +93,10 @@ msgstr "바이러스 발견"
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
 msgstr "{resource}에서 바이러스를 발견했습니다. 업로드할 수 없습니다. 바이러스: {virus}"
 
+#: pkg/service/templates.go:53
+msgid "You have been mentioned"
+msgstr ""
+
 #: pkg/service/templates.go:19
 msgid "{user} added you to Space {space}"
 msgstr "{user}가 스페이스 {space}를 추가했습니다"
@@ -104,6 +108,10 @@ msgstr "{user} 가 스페이스 {space} 삭제했습니다"
 #: pkg/service/templates.go:29
 msgid "{user} disabled Space {space}"
 msgstr "{user}가 스페이스 {space} 비활성화했습니다"
+
+#: pkg/service/templates.go:54
+msgid "{user} mentioned you in {resource}"
+msgstr ""
 
 #: pkg/service/templates.go:24
 msgid "{user} removed you from Space {space}"

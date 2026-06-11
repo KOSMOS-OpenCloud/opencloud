@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Ivan Fustero, 2025\n"
 "Language-Team: Catalan (https://app.transifex.com/opencloud-eu/teams/204053/ca/)\n"
@@ -31,6 +31,10 @@ msgstr "Clica aquí per verificar: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Clica aquí per visualitzar: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -86,6 +90,14 @@ msgstr "ScienceMesh: {InitiatorName} vol col·laborar amb vós"
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Compartir a '{ShareFolder}' caducat el {ExpiredAt}"
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr ""
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -107,6 +119,10 @@ msgstr ""
 "La teva compartició a {ShareFolder} ha caducat el {ExpiredAt}\n"
 "\n"
 "Encara que aquesta compartició ha estat cancel·lada, podria seguir tenint accés a través d'altres comparticions i/o espais inscrits."
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
+msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

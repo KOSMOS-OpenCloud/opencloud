@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Simone Pagano, 2025\n"
 "Language-Team: Italian (https://app.transifex.com/opencloud-eu/teams/204053/it/)\n"
@@ -22,42 +22,47 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #. name of the notification option 'Space Shared'
-#: pkg/store/defaults/templates.go:20
+#: pkg/store/defaults/templates.go:24
 msgid "Added as space member"
 msgstr "Aggiunto come membro di uno spazio"
 
 #. translation for the 'daily' email interval option
-#: pkg/store/defaults/templates.go:50
+#: pkg/store/defaults/templates.go:54
 msgid "Daily"
 msgstr "Giornaliero"
 
 #. name of the notification option 'Email Interval'
-#: pkg/store/defaults/templates.go:44
+#: pkg/store/defaults/templates.go:48
 msgid "Email sending interval"
 msgstr "Intervallo di invio delle e-mail"
 
 #. name of the notification option 'File Rejected'
-#: pkg/store/defaults/templates.go:40
+#: pkg/store/defaults/templates.go:44
 msgid "File rejected"
 msgstr "File rifiutato"
 
 #. translation for the 'instant' email interval option
-#: pkg/store/defaults/templates.go:48
+#: pkg/store/defaults/templates.go:52
 msgid "Instant"
 msgstr "Istantaneo"
 
 #. translation for the 'never' email interval option
-#: pkg/store/defaults/templates.go:54
+#: pkg/store/defaults/templates.go:58
 msgid "Never"
 msgstr "Mai"
 
+#. description of the notification option 'Resource Mention'
+#: pkg/store/defaults/templates.go:18
+msgid "Notify on resource mentions"
+msgstr ""
+
 #. description of the notification option 'Space Shared'
-#: pkg/store/defaults/templates.go:22
+#: pkg/store/defaults/templates.go:26
 msgid "Notify when I have been added as a member to a space"
 msgstr "Inviami una notifica quando vengo aggiunto come membro di uno spazio"
 
 #. description of the notification option 'Space Unshared'
-#: pkg/store/defaults/templates.go:26
+#: pkg/store/defaults/templates.go:30
 msgid "Notify when I have been removed as member from a space"
 msgstr "Inviami una notifica quando vengo rimosso come membro di uno spazio"
 
@@ -67,7 +72,7 @@ msgid "Notify when I have received a share"
 msgstr "Inviami una notifica quando ricevo una condivisione"
 
 #. description of the notification option 'File Rejected'
-#: pkg/store/defaults/templates.go:42
+#: pkg/store/defaults/templates.go:46
 msgid ""
 "Notify when a file I uploaded was rejected because of a virus infection or "
 "policy violation"
@@ -81,39 +86,44 @@ msgid "Notify when a received share has been removed"
 msgstr "Inviami una notifica quando una condivisione viene rimossa"
 
 #. description of the notification option 'Share Expired'
-#: pkg/store/defaults/templates.go:18
+#: pkg/store/defaults/templates.go:22
 msgid "Notify when a received share has expired"
 msgstr "Inviami una notifica quando una condivisione ricevuta scade"
 
 #. description of the notification option 'Space Deleted'
-#: pkg/store/defaults/templates.go:38
+#: pkg/store/defaults/templates.go:42
 msgid "Notify when a space I am member of has been deleted"
 msgstr ""
 "Inviami una notifica quando uno spazio di cui sono membro viene eliminato"
 
 #. description of the notification option 'Space Disabled'
-#: pkg/store/defaults/templates.go:34
+#: pkg/store/defaults/templates.go:38
 msgid "Notify when a space I am member of has been disabled"
 msgstr ""
 "Inviami una notifica quando uno spazio di cui sono membro viene disattivato"
 
 #. description of the notification option 'Space Membership Expired'
-#: pkg/store/defaults/templates.go:30
+#: pkg/store/defaults/templates.go:34
 msgid "Notify when a space membership has expired"
 msgstr "Inviami una notifica quando uno spazio di cui sono membro scade"
 
 #. name of the notification option 'Space Unshared'
-#: pkg/store/defaults/templates.go:24
+#: pkg/store/defaults/templates.go:28
 msgid "Removed as space member"
 msgstr "Non più un membro dello spazio"
 
+#. name of the notification option 'Resource Mention'
+#: pkg/store/defaults/templates.go:16
+msgid "Resource Mention"
+msgstr ""
+
 #. description of the notification option 'Email Interval'
-#: pkg/store/defaults/templates.go:46
+#: pkg/store/defaults/templates.go:50
 msgid "Selected value:"
 msgstr "Valore selezionato: "
 
 #. name of the notification option 'Share Expired'
-#: pkg/store/defaults/templates.go:16
+#: pkg/store/defaults/templates.go:20
 msgid "Share Expired"
 msgstr "Condivisione scaduta"
 
@@ -128,21 +138,21 @@ msgid "Share Removed"
 msgstr "Condivisione rimossa"
 
 #. name of the notification option 'Space Deleted'
-#: pkg/store/defaults/templates.go:36
+#: pkg/store/defaults/templates.go:40
 msgid "Space deleted"
 msgstr "Spazio eliminato"
 
 #. name of the notification option 'Space Disabled'
-#: pkg/store/defaults/templates.go:32
+#: pkg/store/defaults/templates.go:36
 msgid "Space disabled"
 msgstr "Spazio disattivato"
 
 #. name of the notification option 'Space Membership Expired'
-#: pkg/store/defaults/templates.go:28
+#: pkg/store/defaults/templates.go:32
 msgid "Space membership expired"
 msgstr "Partecipazione ad uno spazio scaduta"
 
 #. translation for the 'weekly' email interval option
-#: pkg/store/defaults/templates.go:52
+#: pkg/store/defaults/templates.go:56
 msgid "Weekly"
 msgstr "Settimanale"

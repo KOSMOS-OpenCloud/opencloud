@@ -4,27 +4,35 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/url"
 	"os/signal"
 	"time"
 
-	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
-	"github.com/opencloud-eu/opencloud/pkg/log"
-	"github.com/opencloud-eu/opencloud/pkg/registry"
-	"github.com/opencloud-eu/opencloud/pkg/runner"
-	"github.com/opencloud-eu/opencloud/pkg/tracing"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config/parser"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/debug"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/grpc"
-	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/http"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
+	"github.com/spf13/afero"
 
 	"github.com/spf13/cobra"
 	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
+
+	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	"github.com/opencloud-eu/opencloud/pkg/generators"
+	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/runner"
+	"github.com/opencloud-eu/opencloud/pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config/parser"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/connector"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/font"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/helpers"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/notification"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/debug"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/grpc"
+	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/server/http"
 )
 
 // Server is the entrypoint for the server command.
@@ -137,6 +145,52 @@ func Server(cfg *config.Config) *cobra.Command {
 			}
 			gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".debug", debugServer))
 
+			var fontService font.Service
+			{
+				fontFS := afero.NewBasePathFs(fsx.NewOsFs(), cfg.Font.AssetPath)
+				if err := fontFS.MkdirAll("/", 0o755); err != nil {
+					logger.Error().Err(err).Msg("Failed to initialize the fonts directory")
+					return err
+				}
+
+				fontServiceRootURI, err := url.JoinPath(cfg.Commons.OpenCloudURL, "/collaboration/fonts")
+				if err != nil {
+					logger.Error().Err(err).Msg("Failed to build font service root uri")
+					return err
+				}
+
+				fontService, err = font.NewService(
+					font.ServiceOptions{}.
+						WithFontFS(fontFS).
+						WithRootURI(fontServiceRootURI).
+						WithGatewaySelector(gatewaySelector).
+						WithLogger(logger).
+						WithPreviewText(cfg.Font.PreviewText),
+				)
+				if err != nil {
+					return err
+				}
+			}
+
+			var notificationService notification.Service
+			{
+				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+				natsStream, err := stream.NatsFromConfig(connName, true, stream.NatsConfig(cfg.Events))
+				if err != nil {
+					return err
+				}
+				notificationService, err = notification.NewService(
+					notification.ServiceOptions{}.
+						WithLogger(logger).
+						WithGatewaySelector(gatewaySelector).
+						WithEventPublisher(natsStream).
+						WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
+				)
+				if err != nil {
+					return err
+				}
+			}
+
 			// start HTTP server
 			httpServer, err := http.Server(
 				http.Adapter(connector.NewHttpAdapter(gatewaySelector, cfg, st, selector.NewSelector(selector.Registry(registry.GetRegistry())))),
@@ -145,6 +199,8 @@ func Server(cfg *config.Config) *cobra.Command {
 				http.Context(ctx),
 				http.TracerProvider(traceProvider),
 				http.Store(st),
+				http.FontService(fontService),
+				http.NotificationService(notificationService),
 			)
 			if err != nil {
 				logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")

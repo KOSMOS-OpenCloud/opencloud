@@ -1,8 +1,10 @@
 package defaults
 
 import (
+	"path/filepath"
 	"time"
 
+	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/collaboration/pkg/config"
@@ -32,6 +34,14 @@ func DefaultConfig() *config.Config {
 				// they'll be enabled by default
 				Duration: "12h",
 			},
+		},
+		Font: config.Font{
+			AssetPath:   filepath.Join(defaults.BaseDataPath(), "collaboration/fonts"),
+			PreviewText: "OpenCloud",
+		},
+		Events: config.Events{
+			Endpoint: "127.0.0.1:9233",
+			Cluster:  "opencloud-cluster",
 		},
 		Store: config.Store{
 			Store:    "nats-js-kv",
@@ -85,6 +95,10 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 	if cfg.CS3Api.GRPCClientTLS == nil && cfg.Commons != nil {
 		cfg.CS3Api.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

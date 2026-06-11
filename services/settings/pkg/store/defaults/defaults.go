@@ -47,6 +47,8 @@ const (
 	SettingUUIDProfileEventSpaceDeleted = "094ceca9-5a00-40ba-bb1a-bbc7bccd39ee"
 	// SettingUUIDProfileEventPostprocessingStepFinished is the hardcoded setting UUID for the send in mail setting
 	SettingUUIDProfileEventPostprocessingStepFinished = "fe0a3011-d886-49c8-b797-33d02fa426ef"
+	// SettingUUIDProfileEventResourceMention is the hardcoded setting UUID for the send in mail setting
+	SettingUUIDProfileEventResourceMention = "08aaa973-a622-449d-97dc-3857160d1e97"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -79,6 +81,8 @@ func ServiceAccountBundle() *settingsmsg.Bundle {
 		Settings: []*settingsmsg.Setting{
 			AccountManagementPermission(All),
 			ChangeLogoPermission(All),
+			CollaborationPublishNotificationPermission(All),
+			CollaborationManageFontsPermission(All),
 			CreatePublicLinkPermission(All),
 			CreateSharePermission(All),
 			CreateSpacesPermission(All),
@@ -115,6 +119,8 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			AccountManagementPermission(All),
 			AutoAcceptSharesPermission(Own),
 			ChangeLogoPermission(All),
+			CollaborationPublishNotificationPermission(All),
+			CollaborationManageFontsPermission(All),
 			CreatePublicLinkPermission(All),
 			CreateSharePermission(All),
 			CreateSpacesPermission(All),
@@ -178,6 +184,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			ProfileEventPostprocessingStepFinishedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
+			CollaborationPublishNotificationPermission(All),
 			ListSpacesPermission(All),
 			ManageSpacePropertiesPermission(All),
 			SelfManagementPermission(Own),
@@ -216,6 +223,7 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			ProfileEventPostprocessingStepFinishedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
+			CollaborationPublishNotificationPermission(All),
 			SelfManagementPermission(Own),
 			WriteFavoritesPermission(Own),
 		},
@@ -331,6 +339,23 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Name:        "event-share-expired-options",
 				DisplayName: TemplateShareExpired,
 				Description: TemplateShareExpiredDescription,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventResourceMention,
+				Name:        "event-resource-mention-options",
+				DisplayName: TemplateResourceMention,
+				Description: TemplateResourceMentionDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},

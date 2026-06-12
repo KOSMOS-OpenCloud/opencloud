@@ -2,13 +2,16 @@ package unifiedrole
 
 var (
 	RoleViewer                     = roleViewer
+	RoleViewerWithVersions         = roleViewerWithVersions
 	RoleViewerListGrants           = roleViewerListGrants
 	RoleSpaceViewer                = roleSpaceViewer
 	RoleEditor                     = roleEditor
+	RoleEditorWithVersions         = roleEditorWithVersions
 	RoleEditorListGrants           = roleEditorListGrants
 	RoleSpaceEditor                = roleSpaceEditor
 	RoleSpaceEditorWithoutVersions = roleSpaceEditorWithoutVersions
 	RoleFileEditor                 = roleFileEditor
+	RoleFileEditorWithVersions     = roleFileEditorWithVersions
 	RoleFileEditorListGrants       = roleFileEditorListGrants
 	RoleEditorLite                 = roleEditorLite
 	RoleManager                    = roleManager

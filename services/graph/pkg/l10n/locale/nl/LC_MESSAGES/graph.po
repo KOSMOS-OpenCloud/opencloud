@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-12 12:13+0000\n"
+"POT-Creation-Date: 2026-06-12 23:16+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Stephan Paternotte <stephan@paternottes.net>, 2026\n"
 "Language-Team: Dutch (https://app.transifex.com/opencloud-eu/teams/204053/nl/)\n"
@@ -83,7 +83,7 @@ msgstr "Hier kunt u een beschrijving voor deze ruimte toevoegen."
 #. UnifiedRole ViewerWithVersions, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:107
 msgid "View and download including the history."
-msgstr ""
+msgstr "Incl. geschiedenis weergeven en downloaden."
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
@@ -101,7 +101,7 @@ msgstr ""
 #. UnifiedRole FileEditorWithVErsions, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:167
 msgid "View, download and edit including the history."
-msgstr ""
+msgstr "Incl. geschiedenis weergeven, downloaden en bewerken."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:155
@@ -127,6 +127,8 @@ msgstr "Weergeven, downloaden, bewerken en alle genodigde personen zien."
 #: pkg/unifiedrole/roles.go:131
 msgid "View, download, upload, edit, add and delete including the history."
 msgstr ""
+"Incl. geschiedenis weergeven, downloaden, uploaden, bewerken, toevoegen en "
+"verwijderen."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves

@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2025
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-06-09 09:30+0000\n"
+"POT-Creation-Date: 2026-06-14 23:16+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2025\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2026\n"
 "Language-Team: Finnish (https://app.transifex.com/opencloud-eu/teams/204053/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,6 +31,10 @@ msgstr "Napsauta tästä tarkistaaksesi sen: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Napsauta tästä nähdäksesi sen: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr "Hei {RecipientName}"
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -86,6 +90,14 @@ msgstr "ScienceMesh: {InitiatorName} haluaa tehdä yhteistyötä kanssasi"
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Jako kansioon '{ShareFolder}' vanheni {ExpiredAt}"
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr "Näet maininnan täältä: {ResourceLink}"
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -100,6 +112,10 @@ msgid ""
 "Your share to {ShareFolder} has expired at {ExpiredAt}\n"
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
 msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves

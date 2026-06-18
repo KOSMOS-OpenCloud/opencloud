@@ -102,7 +102,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 	for i := 0; i < ul.cfg.MaxConcurrency; i++ {
 		go func(ch <-chan events.Event) {
 			for event := range ch {
-				ul.processEvent(event)
+				go ul.processEvent(event)
 			}
 		}(ch)
 	}

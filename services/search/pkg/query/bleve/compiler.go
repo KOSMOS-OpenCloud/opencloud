@@ -97,6 +97,7 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
 			k := getField(n.Key)
+			isFreetextSearch := n.Key == ""
 			v := n.Value
 			if k != "ID" && k != "Size" {
 				v = bleveEscaper.Replace(n.Value)
@@ -115,7 +116,18 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 					isGroup = group
 				}
 			default:
-				q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+				if isFreetextSearch {
+					// Search Name + _all (includes dynamic Metadata fields)
+					nameQuery := bleveQuery.NewQueryStringQuery(k + ":" + v)
+					allQuery := bleveQuery.NewMatchQuery(strings.ToLower(v))
+					q = bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{nameQuery, allQuery})
+					group = true
+					if prev == nil {
+						isGroup = true
+					}
+				} else {
+					q = bleveQuery.NewQueryStringQuery(k + ":" + v)
+				}
 			}
 
 			if prev == nil {

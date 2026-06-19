@@ -120,6 +120,15 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 			default:
 				if k == "" {
 					q = bleveQuery.NewQueryStringQuery(v)
+				} else if k == "Name" {
+					// Also search Metadata fields when searching by name
+					nameQ := bleveQuery.NewQueryStringQuery(k + ":" + v)
+					metaQ := bleveQuery.NewQueryStringQuery(strings.ToLower(strings.Trim(v, `*\"`)))
+					q = bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{nameQ, metaQ})
+					group = true
+					if prev == nil {
+						isGroup = true
+					}
 				} else {
 					q = bleveQuery.NewQueryStringQuery(k + ":" + v)
 				}

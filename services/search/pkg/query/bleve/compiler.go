@@ -97,13 +97,15 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 		switch n := nodes[i].(type) {
 		case *ast.StringNode:
 			k := getField(n.Key)
-			isFreetextSearch := n.Key == ""
 			v := n.Value
 			if k != "ID" && k != "Size" {
 				v = bleveEscaper.Replace(n.Value)
 			}
 
-			if _, ok := lowercaseFields[k]; ok {
+			if k == "" {
+				// Freetext: lowercase for _all field matching
+				v = strings.ToLower(v)
+			} else if _, ok := lowercaseFields[k]; ok {
 				v = strings.ToLower(v)
 			}
 
@@ -116,15 +118,8 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 					isGroup = group
 				}
 			default:
-				if isFreetextSearch {
-					// Search Name + _all (includes dynamic Metadata fields)
-					nameQuery := bleveQuery.NewQueryStringQuery(k + ":" + v)
-					allQuery := bleveQuery.NewMatchQuery(strings.ToLower(v))
-					q = bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{nameQuery, allQuery})
-					group = true
-					if prev == nil {
-						isGroup = true
-					}
+				if k == "" {
+					q = bleveQuery.NewQueryStringQuery(v)
 				} else {
 					q = bleveQuery.NewQueryStringQuery(k + ":" + v)
 				}
@@ -291,7 +286,7 @@ func mapBinary(operator *ast.OperatorNode, ln, rn bleveQuery.Query, leftIsGroup 
 
 func getField(name string) string {
 	if name == "" {
-		return "Name"
+		return ""
 	}
 	if _, ok := _fields[strings.ToLower(name)]; ok {
 		return _fields[strings.ToLower(name)]

@@ -1,0 +1,1 @@
+import{Y as e,Z as t}from"./design-system-components-MOtqYLvn.mjs";var n=e({"&":`&amp;`,"<":`&lt;`,">":`&gt;`,'"':`&quot;`,"'":`&#39;`}),r=/[&<>"']/g,i=RegExp(r.source);function a(e){return e=t(e),e&&i.test(e)?e.replace(r,n):e}export{a as t};

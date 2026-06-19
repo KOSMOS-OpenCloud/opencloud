@@ -1,0 +1,1 @@
+import{Et as e,Lt as t,St as n,Tt as r,Vt as i,st as a}from"./design-system-components-MOtqYLvn.mjs";var o=e({name:`LayoutContainer`}),s={id:`activities`,class:`p-4 overflow-auto`};function c(e,a,o,c,l,u){let d=i(`router-view`);return t(),n(`main`,s,[r(d)])}var l=a(o,[[`render`,c]]);export{l as default};

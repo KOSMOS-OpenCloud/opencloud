@@ -1,0 +1,4 @@
+HOST=cloud.brandis.eu
+APP=opencloud-kosmos
+INSTANCE=opencloud_full-opencloud-1
+DATAPATH=/data/opencloud_podman

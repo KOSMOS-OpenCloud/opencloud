@@ -1,0 +1,1 @@
+var e=(e,t)=>{t!==void 0&&document.querySelector(`:root`).style.setProperty(`--oc-`+e,t)};export{e as t};

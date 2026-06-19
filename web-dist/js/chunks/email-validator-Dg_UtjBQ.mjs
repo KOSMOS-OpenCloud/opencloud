@@ -1,0 +1,1 @@
+import{t as e}from"./rolldown-runtime-CMxvf4Kt.mjs";var t=e((e=>{var t=/^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;e.validate=function(e){if(!e||e.length>254||!t.test(e))return!1;var n=e.split(`@`);return!(n[0].length>64||n[1].split(`.`).some(function(e){return e.length>63}))}}));export{t};

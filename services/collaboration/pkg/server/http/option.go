@@ -25,7 +25,7 @@ type Options struct {
 	TracerProvider      trace.TracerProvider
 	Store               microstore.Store
 	FontService         font.Service
-	NotificationService notification.Service
+	NotificationService *notification.Service
 }
 
 // newOptions initializes the available default options.
@@ -89,7 +89,7 @@ func FontService(val font.Service) Option {
 }
 
 // NotificationService provides a function to set the NotificationService option
-func NotificationService(val notification.Service) Option {
+func NotificationService(val *notification.Service) Option {
 	return func(o *Options) {
 		o.NotificationService = val
 	}

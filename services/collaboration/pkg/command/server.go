@@ -12,7 +12,6 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/opencloud-eu/reva/v2/pkg/store"
 	"github.com/spf13/afero"
-
 	"github.com/spf13/cobra"
 	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
@@ -175,8 +174,9 @@ func Server(cfg *config.Config) *cobra.Command {
 				}
 			}
 
+			var optionalHTTPServerOptions []http.Option
 			var notificationService notification.Service
-			{
+			if cfg.Events.Endpoint != "" { // notifications are optional
 				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 				natsStream, err := stream.NatsFromConfig(connName, true, stream.NatsConfig(cfg.Events))
 				if err != nil {
@@ -192,10 +192,12 @@ func Server(cfg *config.Config) *cobra.Command {
 				if err != nil {
 					return err
 				}
+
+				optionalHTTPServerOptions = append(optionalHTTPServerOptions, http.NotificationService(&notificationService))
 			}
 
 			// start HTTP server
-			httpServer, err := http.Server(
+			httpServer, err := http.Server(append([]http.Option{
 				http.Adapter(connector.NewHttpAdapter(gatewaySelector, cfg, st, selector.NewSelector(selector.Registry(registry.GetRegistry())))),
 				http.Logger(logger),
 				http.Config(cfg),
@@ -203,8 +205,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				http.TracerProvider(traceProvider),
 				http.Store(st),
 				http.FontService(fontService),
-				http.NotificationService(notificationService),
-			)
+			}, optionalHTTPServerOptions...)...)
 			if err != nil {
 				logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")
 				return err

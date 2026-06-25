@@ -176,7 +176,9 @@ func Server(cfg *config.Config) *cobra.Command {
 
 			var optionalHTTPServerOptions []http.Option
 			var notificationService notification.Service
-			if cfg.Events.Endpoint != "" { // notifications are optional
+			if cfg.Events.Endpoint == "" {
+				logger.Warn().Msg("Events endpoint is not configured, notifications from the collaboration service will not work")
+			} else {
 				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 				natsStream, err := stream.NatsFromConfig(connName, true, stream.NatsConfig(cfg.Events))
 				if err != nil {

@@ -64,7 +64,7 @@ require (
 	github.com/open-policy-agent/opa v1.17.1
 	github.com/opencloud-eu/icap-client v0.0.0-20250930132611-28a2afe62d89
 	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d
-	github.com/opencloud-eu/reva/v2 v2.46.4-0.20260618143111-1bf72cb76394
+	github.com/opencloud-eu/reva/v2 v2.46.4-0.20260625152426-8cff2a7032ec
 	github.com/opensearch-project/opensearch-go/v4 v4.6.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/pkg/errors v0.9.1
@@ -412,5 +412,3 @@ replace go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.202411151126
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a
-
-replace github.com/opencloud-eu/reva/v2 => github.com/michaelstingl/opencloud-eu-reva/v2 v2.46.1-0.20260625115217-4e671c0ed52f

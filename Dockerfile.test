@@ -14,8 +14,7 @@ RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools
 COPY --from=generate /opencloud /opencloud
 COPY reva-src /data/source/gitapps/reva
 COPY go-cs3apis-src /data/source/gitapps/cs3org/go-cs3apis
-COPY warmup-robustness.patch /tmp/warmup-robustness.patch
-RUN cd /data/source/gitapps/reva && git init && git add -A && git apply /tmp/warmup-robustness.patch
+RUN cd /data/source/gitapps/reva && git init && git add -A
 WORKDIR /opencloud
 RUN echo 'replace github.com/opencloud-eu/reva/v2 => /data/source/gitapps/reva' >> go.mod && \
     echo 'replace github.com/cs3org/go-cs3apis => /data/source/gitapps/cs3org/go-cs3apis' >> go.mod && \

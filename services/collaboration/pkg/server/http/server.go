@@ -6,6 +6,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/riandyrn/otelchi"
+	"go-micro.dev/v4"
+
 	"github.com/opencloud-eu/opencloud/pkg/account"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
@@ -13,13 +16,15 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/pkg/version"
 	colabmiddleware "github.com/opencloud-eu/opencloud/services/collaboration/pkg/middleware"
-	"github.com/riandyrn/otelchi"
-	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
+
+	if options.NotificationService == nil {
+		options.Logger.Warn().Msg("running without notification service: no notifications will be sent, set the events endpoint to enable them")
+	}
 
 	service, err := http.NewService(
 		http.TLSConfig(options.Config.HTTP.TLS),
@@ -94,6 +99,8 @@ func Server(opts ...Option) (http.Service, error) {
 
 // prepareRoutes will prepare all the implemented routes
 func prepareRoutes(r *chi.Mux, options Options) {
+	fontService := options.FontService
+	notificationService := options.NotificationService
 	adapter := options.Adapter
 	logger := options.Logger
 	// prepare basic logger for the request
@@ -209,5 +216,27 @@ func prepareRoutes(r *chi.Mux, options Options) {
 				adapter.GetAvatar(w, r)
 			})
 		})
+
+	})
+	r.Route("/collaboration", func(r chi.Router) {
+		auth := middleware.ExtractAccountUUID(
+			account.Logger(options.Logger),
+			account.JWTSecret(options.Config.TokenManager.JWTSecret),
+		)
+		r.Route("/fonts", func(r chi.Router) {
+			r.Get("/", fontService.ListFonts)
+			r.Get("/{id}", fontService.GetFont)
+			r.Get("/preview/{id}", fontService.PreviewFont)
+			r.With(auth).Route("/manage", func(r chi.Router) {
+				r.Post("/", fontService.UploadFont)
+				r.Delete("/{id}", fontService.DeleteFont)
+			})
+		})
+
+		if notificationService != nil { // optional
+			r.With(auth).Route("/notify", func(r chi.Router) {
+				r.Post("/", notificationService.HandleNotification)
+			})
+		}
 	})
 }

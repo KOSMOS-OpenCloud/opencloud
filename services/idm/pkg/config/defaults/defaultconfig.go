@@ -30,9 +30,7 @@ func DefaultConfig() *config.Config {
 		CreateDemoUsers:    false,
 		DemoUsersIssuerUrl: "https://localhost:9200",
 		IDM: config.Settings{
-			LDAPSAddr:    "127.0.0.1:9235",
-			Cert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
-			Key:          path.Join(defaults.BaseDataPath(), "idm", "ldap.key"),
+			LDAPAddr:     "127.0.0.1:9236",
 			DatabasePath: path.Join(defaults.BaseDataPath(), "idm", "idm.boltdb"),
 		},
 	}
@@ -51,5 +49,5 @@ func EnsureDefaults(cfg *config.Config) {
 
 // Sanitize sanitizes the configuration
 func Sanitize(cfg *config.Config) {
-	// nothing to sanitize here
+	// nothing to do yet
 }

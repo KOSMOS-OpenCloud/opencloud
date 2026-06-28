@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-04-23 00:03+0000\n"
+"POT-Creation-Date: 2026-06-11 09:50+0000\n"
 "PO-Revision-Date: 2025-01-27 10:17+0000\n"
 "Last-Translator: Efstathios Iosifidis <eiosifidis@gmail.com>, 2026\n"
 "Language-Team: Greek (https://app.transifex.com/opencloud-eu/teams/204053/el/)\n"
@@ -31,6 +31,10 @@ msgstr "Κάντε κλικ εδώ για έλεγχο: {ShareLink}"
 #: pkg/email/templates.go:23 pkg/email/templates.go:50
 msgid "Click here to view it: {ShareLink}"
 msgstr "Κάντε κλικ εδώ για προβολή: {ShareLink}"
+
+#: pkg/email/templates.go:126
+msgid "Hello {RecipientName},"
+msgstr ""
 
 #. ShareCreated email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:19
@@ -86,6 +90,14 @@ msgstr "ScienceMesh: Ο/Η {InitiatorName} θέλει να συνεργαστε�
 msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
 msgstr "Ο διαμοιρασμός του '{ShareFolder}' έληξε στις {ExpiredAt}"
 
+#: pkg/email/templates.go:128
+msgid "You can view the mention here: {ResourceLink}"
+msgstr ""
+
+#: pkg/email/templates.go:125
+msgid "You were mentioned in '{ResourceName}'"
+msgstr ""
+
 #. MembershipExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:76
 msgid ""
@@ -107,6 +119,10 @@ msgstr ""
 "Ο διαμοιρασμός σας στο {ShareFolder} έληξε στις {ExpiredAt}\n"
 "\n"
 "Παρόλο που αυτός ο διαμοιρασμός έχει ανακληθεί, ενδέχεται να εξακολουθείτε να έχετε πρόσβαση μέσω άλλων κοινόχρηστων στοιχείων ή/και συμμετοχών σε χώρους."
+
+#: pkg/email/templates.go:127
+msgid "{AuthorName} mentioned you in \"{ResourceName}\"."
+msgstr ""
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}

@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	ocEvents "github.com/opencloud-eu/opencloud/pkg/events"
 	"github.com/opencloud-eu/opencloud/pkg/generators"
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
@@ -45,6 +46,9 @@ var _registeredEvents = []events.Unmarshaller{
 	events.ShareCreated{},
 	events.ShareRemoved{},
 	events.ShareExpired{},
+
+	// misc
+	ocEvents.ResourceMention{},
 }
 
 // Server is the entrypoint for the server command.
@@ -92,6 +96,9 @@ func Server(cfg *config.Config) *cobra.Command {
 				microstore.Database(cfg.Persistence.Database),
 				microstore.Table(cfg.Persistence.Table),
 				store.Authentication(cfg.Persistence.AuthUsername, cfg.Persistence.AuthPassword),
+				store.TLSEnabled(cfg.Persistence.EnableTLS),
+				store.TLSInsecure(cfg.Persistence.TLSInsecure),
+				store.TLSRootCA(cfg.Persistence.TLSRootCACertificate),
 			)
 
 			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)

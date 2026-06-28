@@ -1,11 +1,9 @@
 package defaults
 
 import (
-	"path"
 	"strings"
 	"time"
 
-	"github.com/opencloud-eu/opencloud/pkg/config/defaults"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/pkg/structs"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
@@ -21,6 +19,9 @@ var (
 		unifiedrole.UnifiedRoleViewerListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsID,
 		unifiedrole.UnifiedRoleFileEditorListGrantsID,
+		unifiedrole.UnifiedRoleViewerWithVersionsID,
+		unifiedrole.UnifiedRoleEditorWithVersionsID,
+		unifiedrole.UnifiedRoleFileEditorWithVersionsID,
 		unifiedrole.UnifiedRoleDeniedID,
 	}
 )
@@ -79,9 +80,8 @@ func DefaultConfig() *config.Config {
 		Identity: config.Identity{
 			Backend: "ldap",
 			LDAP: config.LDAP{
-				URI:                      "ldaps://localhost:9235",
+				URI:                      "ldap://localhost:9236",
 				Insecure:                 false,
-				CACert:                   path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
 				UseServerUUID:            false,
 				UsePasswordModExOp:       true,

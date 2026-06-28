@@ -37,6 +37,7 @@ var _registeredEvents = []events.Unmarshaller{
 	events.SpaceCreated{},
 	events.SpaceDeleted{},
 	events.SpaceDisabled{},
+	events.SpaceEnabled{},
 	events.SpaceShared{},
 	events.SpaceShareUpdated{},
 	events.SpaceUnshared{},

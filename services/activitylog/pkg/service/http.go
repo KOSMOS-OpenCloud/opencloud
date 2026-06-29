@@ -447,23 +447,23 @@ func (s *ActivitylogService) groupActivities(activities []libregraph.Activity, g
 				}
 			}
 		case "container":
-			// Group by the folder (parent container) the activity happened in
+			// Group by folder name (not ID) — same logical folder may have different IDs across hierarchy levels
 			if folder, ok := vars["folder"]; ok {
 				switch f := folder.(type) {
 				case Resource:
-					key = fmt.Sprintf("folder:%s", f.ID)
+					key = fmt.Sprintf("folder:%s", f.Name)
 					label = f.Name
 				case map[string]any:
-					key = fmt.Sprintf("folder:%v", f["id"])
+					key = fmt.Sprintf("folder:%v", f["name"])
 					label = fmt.Sprintf("%v", f["name"])
 				}
 			} else if res, ok := vars["resource"]; ok {
 				switch r := res.(type) {
 				case Resource:
-					key = fmt.Sprintf("resource:%s", r.ID)
+					key = fmt.Sprintf("resource:%s", r.Name)
 					label = r.Name
 				case map[string]any:
-					key = fmt.Sprintf("resource:%v", r["id"])
+					key = fmt.Sprintf("resource:%v", r["name"])
 					label = fmt.Sprintf("%v", r["name"])
 				}
 			}

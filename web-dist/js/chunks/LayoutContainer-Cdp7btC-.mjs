@@ -1,0 +1,1 @@
+import{Ct as e,Dt as t,Et as n,Ht as r,Rt as i,ct as a}from"./design-system-components-E_91uCSc.mjs";var o=t({name:`LayoutContainer`}),s={id:`activities`,class:`p-4 overflow-auto`};function c(t,a,o,c,l,u){let d=r(`router-view`);return i(),e(`main`,s,[n(d)])}var l=a(o,[[`render`,c]]);export{l as default};

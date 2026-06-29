@@ -447,23 +447,28 @@ func (s *ActivitylogService) groupActivities(activities []libregraph.Activity, g
 				}
 			}
 		case "container":
-			// Group by folder name (not ID) — same logical folder may have different IDs across hierarchy levels
+			// Group by folder ID, include parent name for disambiguation
 			if folder, ok := vars["folder"]; ok {
+				var folderID, folderName string
 				switch f := folder.(type) {
 				case Resource:
-					key = fmt.Sprintf("folder:%s", f.Name)
-					label = f.Name
+					folderID = f.ID
+					folderName = f.Name
 				case map[string]any:
-					key = fmt.Sprintf("folder:%v", f["name"])
-					label = fmt.Sprintf("%v", f["name"])
+					folderID = fmt.Sprintf("%v", f["id"])
+					folderName = fmt.Sprintf("%v", f["name"])
+				}
+				if folderID != "" {
+					key = fmt.Sprintf("folder:%s", folderID)
+					label = folderName
 				}
 			} else if res, ok := vars["resource"]; ok {
 				switch r := res.(type) {
 				case Resource:
-					key = fmt.Sprintf("resource:%s", r.Name)
+					key = fmt.Sprintf("resource:%s", r.ID)
 					label = r.Name
 				case map[string]any:
-					key = fmt.Sprintf("resource:%v", r["name"])
+					key = fmt.Sprintf("resource:%v", r["id"])
 					label = fmt.Sprintf("%v", r["name"])
 				}
 			}
@@ -486,6 +491,32 @@ func (s *ActivitylogService) groupActivities(activities []libregraph.Activity, g
 	groups := make([]ActivityGroup, 0, len(order))
 	for _, k := range order {
 		groups = append(groups, *grouped[k])
+	}
+
+	// Disambiguate: if multiple groups share the same label, append parent context
+	if groupBy == "container" {
+		labelCount := map[string]int{}
+		for _, g := range groups {
+			labelCount[g.Label]++
+		}
+		for i := range groups {
+			if labelCount[groups[i].Label] > 1 && len(groups[i].Activities) > 0 {
+				// Find a parent name from the first activity's resource
+				vars := groups[i].Activities[0].Template.Variables
+				var parentName string
+				if res, ok := vars["resource"]; ok {
+					switch r := res.(type) {
+					case Resource:
+						parentName = r.Name
+					case map[string]any:
+						parentName = fmt.Sprintf("%v", r["name"])
+					}
+				}
+				if parentName != "" && parentName != groups[i].Label {
+					groups[i].Label = fmt.Sprintf("%s → %s", groups[i].Label, parentName)
+				}
+			}
+		}
 	}
 
 	return GroupedActivitiesResponse{

@@ -48,6 +48,7 @@ type Job struct {
 	resources  []string
 	targetPath string
 	createDirs bool
+	ctx        context.Context
 	cancel     context.CancelFunc
 }
 
@@ -106,6 +107,8 @@ func (e *JobEngine) Submit(pipelineID string, resources []string, userID string,
 		return nil, fmt.Errorf("pipeline %s does not support batch", pipelineID)
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	job := &Job{
 		ID:         uuid.New().String(),
 		Pipeline:   pipelineID,
@@ -117,6 +120,8 @@ func (e *JobEngine) Submit(pipelineID string, resources []string, userID string,
 		resources:  resources,
 		targetPath: targetPath,
 		createDirs: createDirs,
+		ctx:        ctx,
+		cancel:     cancel,
 	}
 
 	for i, res := range resources {
@@ -205,6 +210,11 @@ func (e *JobEngine) processWork(work *jobWork) {
 	job := work.job
 	pipeline := work.pipeline
 
+	// Skip if job already cancelled
+	if job.Status == StatusCancelled {
+		return
+	}
+
 	e.mu.Lock()
 	if job.Status == StatusQueued {
 		job.Status = StatusRunning
@@ -248,16 +258,18 @@ func (e *JobEngine) processWork(work *jobWork) {
 		}
 	}
 
-	// Execute
-	ctx := context.Background()
-	if pipeline.Executor.Timeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, pipeline.Executor.Timeout)
-		defer cancel()
+	// Check if job was cancelled before starting
+	if job.ctx.Err() != nil {
+		e.failWorkItem(job, work.index, fmt.Errorf("job cancelled"))
+		return
+	}
 
-		e.mu.Lock()
-		job.cancel = cancel
-		e.mu.Unlock()
+	// Execute with job context + optional timeout
+	ctx := job.ctx
+	if pipeline.Executor.Timeout > 0 {
+		var timeoutCancel context.CancelFunc
+		ctx, timeoutCancel = context.WithTimeout(ctx, pipeline.Executor.Timeout)
+		defer timeoutCancel()
 	}
 
 	item := &JobItem{

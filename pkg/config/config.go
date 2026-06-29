@@ -20,6 +20,7 @@ import (
 	graph "github.com/opencloud-eu/opencloud/services/graph/pkg/config"
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/config"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/config"
+	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/config"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/config"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/config"
@@ -100,6 +101,7 @@ type Config struct {
 	Graph             *graph.Config          `yaml:"graph"`
 	Groups            *groups.Config         `yaml:"groups"`
 	IDM               *idm.Config            `yaml:"idm"`
+	Jobengine         *jobengine.OCConfig    `yaml:"jobengine"`
 	IDP               *idp.Config            `yaml:"idp"`
 	Invitations       *invitations.Config    `yaml:"invitations"`
 	Nats              *nats.Config           `yaml:"nats"`

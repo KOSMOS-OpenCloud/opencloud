@@ -36,6 +36,7 @@ import (
 	graph "github.com/opencloud-eu/opencloud/services/graph/pkg/command"
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/command"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/command"
+	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/command"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/command"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/command"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/command"
@@ -202,6 +203,11 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.IDM.Context = ctx
 		cfg.IDM.Commons = cfg.Commons
 		return idm.Execute(cfg.IDM)
+	})
+	reg(3, opts.Config.Jobengine.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
+		cfg.Jobengine.Context = ctx
+		cfg.Jobengine.Commons = cfg.Commons
+		return jobengine.Execute(cfg.Jobengine)
 	})
 	reg(3, opts.Config.OCS.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.OCS.Context = ctx

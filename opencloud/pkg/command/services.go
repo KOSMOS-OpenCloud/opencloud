@@ -25,6 +25,7 @@ import (
 	graph "github.com/opencloud-eu/opencloud/services/graph/pkg/command"
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/command"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/command"
+	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/command"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/command"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/command"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/command"
@@ -141,6 +142,11 @@ var serviceCommands = []register.Command{
 	func(cfg *config.Config) *cobra.Command {
 		return ServiceCommand(cfg, cfg.IDM.Service.Name, idm.GetCommands(cfg.IDM), func(c *config.Config) {
 			cfg.IDM.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cobra.Command {
+		return ServiceCommand(cfg, cfg.Jobengine.Service.Name, jobengine.GetCommands(cfg.Jobengine), func(c *config.Config) {
+			cfg.Jobengine.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cobra.Command {

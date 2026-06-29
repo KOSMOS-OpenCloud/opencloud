@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 )

@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"slices"
@@ -59,7 +60,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
-	rid, limit, rawActivityAccepted, activityAccepted, sort, err := s.getFilters(r.URL.Query().Get("kql"))
+	filters, err := s.getFilters(r.URL.Query().Get("kql"))
 	if err != nil {
 		s.log.Info().Str("query", r.URL.Query().Get("kql")).Err(err).Msg("error getting filters")
 		_, _ = w.Write([]byte(err.Error()))
@@ -67,6 +68,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
+	rid := filters.rid
 	info, err := utils.GetResourceByID(ctx, rid, gwc)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
@@ -89,7 +91,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	ids := make([]string, 0, len(raw))
 	toDelete := make(map[string]struct{}, len(raw))
 	for _, a := range raw {
-		if !rawActivityAccepted(a) {
+		if !filters.rawFilter(a) {
 			continue
 		}
 		ids = append(ids, a.EventID)
@@ -104,17 +106,20 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 	}
 
 	evs := evRes.GetEvents()
-	sort(evs)
+	filters.sortFunc(evs)
 
-	resp := GetActivitiesResponse{Activities: make([]libregraph.Activity, 0, len(evRes.GetEvents()))}
+	loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
+	t := l10n.NewTranslatorFromCommonConfig(s.cfg.DefaultLanguage, _domain, s.cfg.TranslationPath, _localeFS, _localeSubPath)
+
+	activities := make([]libregraph.Activity, 0, len(evs))
 	for _, e := range evs {
 		delete(toDelete, e.GetId())
 
-		if limit > 0 && limit <= len(resp.Activities) {
+		if filters.limit > 0 && filters.limit <= len(activities) {
 			continue
 		}
 
-		if !activityAccepted(e) {
+		if !filters.eventFilter(e) {
 			continue
 		}
 
@@ -123,9 +128,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			ts      time.Time
 			vars    map[string]any
 		)
-
-		loc := l10n.MustGetUserLocale(r.Context(), activeUser.GetId().GetOpaqueId(), r.Header.Get(l10n.HeaderAcceptLanguage), s.valService)
-		t := l10n.NewTranslatorFromCommonConfig(s.cfg.DefaultLanguage, _domain, s.cfg.TranslationPath, _localeFS, _localeSubPath)
 
 		switch ev := s.unwrapEvent(e).(type) {
 		case nil:
@@ -224,7 +226,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			continue
 		}
 
-		resp.Activities = append(resp.Activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
+		activities = append(activities, NewActivity(t.Translate(message, loc), ts, e.GetId(), vars))
 	}
 
 	// delete activities in separate go routine
@@ -237,7 +239,15 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		}()
 	}
 
-	b, err := json.Marshal(resp)
+	// Build response: grouped or flat
+	var responseBody any
+	if filters.groupBy != "" {
+		responseBody = s.groupActivities(activities, filters.groupBy)
+	} else {
+		responseBody = GetActivitiesResponse{Activities: activities}
+	}
+
+	b, err := json.Marshal(responseBody)
 	if err != nil {
 		s.log.Error().Err(err).Msg("error marshalling activities")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -268,10 +278,19 @@ func (s *ActivitylogService) unwrapEvent(e *ehmsg.Event) any {
 	return einterface
 }
 
-func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, func([]*ehmsg.Event), error) {
+type filterResult struct {
+	rid              *provider.ResourceId
+	limit            int
+	groupBy          string // "", "user", "container"
+	rawFilter        func(RawActivity) bool
+	eventFilter      func(*ehmsg.Event) bool
+	sortFunc         func([]*ehmsg.Event)
+}
+
+func (s *ActivitylogService) getFilters(query string) (*filterResult, error) {
 	qast, err := kql.Builder{}.Build(query)
 	if err != nil {
-		return nil, 0, nil, nil, nil, err
+		return nil, err
 	}
 
 	prefilters := make([]func(RawActivity) bool, 0)
@@ -280,8 +299,9 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 	sortby := func(_ []*ehmsg.Event) {}
 
 	var (
-		itemID string
-		limit  int
+		itemID  string
+		limit   int
+		groupBy string
 	)
 
 	for _, n := range qast.Nodes {
@@ -293,7 +313,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			case "depth":
 				depth, err := strconv.Atoi(v.Value)
 				if err != nil {
-					return nil, limit, nil, nil, sortby, err
+					return nil, err
 				}
 				if depth == -1 {
 					break
@@ -305,7 +325,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			case "limit":
 				l, err := strconv.Atoi(v.Value)
 				if err != nil {
-					return nil, limit, nil, nil, sortby, err
+					return nil, err
 				}
 
 				limit = l
@@ -317,6 +337,21 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 					sortby = func(activities []*ehmsg.Event) {
 						slices.Reverse(activities)
 					}
+				}
+			case "timerange":
+				cutoff, err := parseTimeRange(v.Value)
+				if err != nil {
+					return nil, err
+				}
+				prefilters = append(prefilters, func(a RawActivity) bool {
+					return a.Timestamp.After(cutoff)
+				})
+			case "groupby":
+				switch v.Value {
+				case "user", "container":
+					groupBy = v.Value
+				default:
+					return nil, fmt.Errorf("unsupported groupby value: %s (use 'user' or 'container')", v.Value)
 				}
 			}
 		case *ast.DateTimeNode:
@@ -332,14 +367,14 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 			}
 		case *ast.OperatorNode:
 			if v.Value != "AND" {
-				return nil, limit, nil, nil, sortby, errors.New("only AND operator is supported")
+				return nil, errors.New("only AND operator is supported")
 			}
 		}
 	}
 
 	rid, err := storagespace.ParseID(itemID)
 	if err != nil {
-		return nil, limit, nil, nil, sortby, err
+		return nil, err
 	}
 	if rid.GetOpaqueId() == "" {
 		// space root requested - fix format
@@ -361,7 +396,84 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 		}
 		return true
 	}
-	return &rid, limit, pref, postf, sortby, nil
+	return &filterResult{
+		rid:         &rid,
+		limit:       limit,
+		groupBy:     groupBy,
+		rawFilter:   pref,
+		eventFilter: postf,
+		sortFunc:    sortby,
+	}, nil
+}
+
+// parseTimeRange converts shorthand time ranges to a cutoff time
+func parseTimeRange(val string) (time.Time, error) {
+	now := time.Now()
+	switch val {
+	case "7d":
+		return now.AddDate(0, 0, -7), nil
+	case "1m":
+		return now.AddDate(0, -1, 0), nil
+	case "3m":
+		return now.AddDate(0, -3, 0), nil
+	case "6m":
+		return now.AddDate(0, -6, 0), nil
+	case "1y":
+		return now.AddDate(-1, 0, 0), nil
+	default:
+		return time.Time{}, fmt.Errorf("unsupported timerange: %s (use 7d, 1m, 3m, 6m, 1y)", val)
+	}
+}
+
+// groupActivities groups activities by user or container based on their template variables
+func (s *ActivitylogService) groupActivities(activities []libregraph.Activity, groupBy string) GroupedActivitiesResponse {
+	grouped := make(map[string]*ActivityGroup)
+	var order []string
+
+	for _, a := range activities {
+		var key, label string
+		vars := a.Template.Variables
+
+		switch groupBy {
+		case "user":
+			if user, ok := vars["user"]; ok {
+				if userMap, ok := user.(map[string]any); ok {
+					key = fmt.Sprintf("user:%v", userMap["id"])
+					label = fmt.Sprintf("%v", userMap["displayName"])
+				}
+			}
+		case "container":
+			if res, ok := vars["resource"]; ok {
+				if resMap, ok := res.(map[string]any); ok {
+					key = fmt.Sprintf("resource:%v", resMap["id"])
+					label = fmt.Sprintf("%v", resMap["name"])
+				}
+			}
+		}
+
+		if key == "" {
+			key = "other"
+			label = "Other"
+		}
+
+		if _, exists := grouped[key]; !exists {
+			grouped[key] = &ActivityGroup{Key: key, Label: label}
+			order = append(order, key)
+		}
+		g := grouped[key]
+		g.Activities = append(g.Activities, a)
+		g.Count = len(g.Activities)
+	}
+
+	groups := make([]ActivityGroup, 0, len(order))
+	for _, k := range order {
+		groups = append(groups, *grouped[k])
+	}
+
+	return GroupedActivitiesResponse{
+		GroupBy: groupBy,
+		Groups:  groups,
+	}
 }
 
 // returns true if this is just a rename

@@ -49,6 +49,20 @@ type GetActivitiesResponse struct {
 	Activities []libregraph.Activity `json:"value"`
 }
 
+// ActivityGroup represents a group of activities (by user or container)
+type ActivityGroup struct {
+	Key        string                `json:"key"`
+	Label      string                `json:"label"`
+	Count      int                   `json:"count"`
+	Activities []libregraph.Activity `json:"activities"`
+}
+
+// GroupedActivitiesResponse is the response when groupby is requested
+type GroupedActivitiesResponse struct {
+	GroupBy string          `json:"groupBy"`
+	Groups  []ActivityGroup `json:"groups"`
+}
+
 // Resource represents an item such as a file or folder
 type Resource struct {
 	ID   string `json:"id"`

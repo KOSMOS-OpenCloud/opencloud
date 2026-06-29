@@ -437,16 +437,34 @@ func (s *ActivitylogService) groupActivities(activities []libregraph.Activity, g
 		switch groupBy {
 		case "user":
 			if user, ok := vars["user"]; ok {
-				if userMap, ok := user.(map[string]any); ok {
-					key = fmt.Sprintf("user:%v", userMap["id"])
-					label = fmt.Sprintf("%v", userMap["displayName"])
+				switch u := user.(type) {
+				case Actor:
+					key = fmt.Sprintf("user:%s", u.ID)
+					label = u.DisplayName
+				case map[string]any:
+					key = fmt.Sprintf("user:%v", u["id"])
+					label = fmt.Sprintf("%v", u["displayName"])
 				}
 			}
 		case "container":
-			if res, ok := vars["resource"]; ok {
-				if resMap, ok := res.(map[string]any); ok {
-					key = fmt.Sprintf("resource:%v", resMap["id"])
-					label = fmt.Sprintf("%v", resMap["name"])
+			// Group by the folder (parent container) the activity happened in
+			if folder, ok := vars["folder"]; ok {
+				switch f := folder.(type) {
+				case Resource:
+					key = fmt.Sprintf("folder:%s", f.ID)
+					label = f.Name
+				case map[string]any:
+					key = fmt.Sprintf("folder:%v", f["id"])
+					label = fmt.Sprintf("%v", f["name"])
+				}
+			} else if res, ok := vars["resource"]; ok {
+				switch r := res.(type) {
+				case Resource:
+					key = fmt.Sprintf("resource:%s", r.ID)
+					label = r.Name
+				case map[string]any:
+					key = fmt.Sprintf("resource:%v", r["id"])
+					label = fmt.Sprintf("%v", r["name"])
 				}
 			}
 		}

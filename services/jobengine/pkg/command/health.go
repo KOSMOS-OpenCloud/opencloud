@@ -7,7 +7,6 @@ import (
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
-	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +23,7 @@ func Health(cfg *config.OCConfig) *cobra.Command {
 	}
 }
 
-func serveHTTP(ctx context.Context, addr string, handler http.Handler, logger zerolog.Logger) error {
+func serveHTTP(ctx context.Context, addr string, handler http.Handler, logger log.Logger) error {
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: handler,

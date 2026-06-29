@@ -30,6 +30,10 @@ fi
 echo "  Syncing reva-src from ${REVA_DIR} ..."
 rsync -a --delete --exclude='.git' "$REVA_DIR/" reva-src/
 
+# Build web-dist from opencloud_web kosmos
+echo "  Building web-dist from ${WEB_DIR} ..."
+"$SCRIPT_DIR/build_web.sh" build
+
 # Generate kosmos revision from all three repos
 OC_REV="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
 REVA_REV="$(cd "$REVA_DIR" && git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"

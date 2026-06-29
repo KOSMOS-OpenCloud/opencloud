@@ -49,7 +49,7 @@ GOEOF
 echo "  Revision: ${KOSMOS_REV}"
 
 # Build with date tag — never overwrite :latest directly
-podman build -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+TMPDIR=/data3/tmp podman build --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
 
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="

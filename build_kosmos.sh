@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
 TAG="$(date +%Y%m%d-%H%M)"
 DOCKERFILE="Dockerfile.test"

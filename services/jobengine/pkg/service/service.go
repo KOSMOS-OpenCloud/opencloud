@@ -67,7 +67,11 @@ type JobEngine struct {
 	mu       sync.RWMutex
 	workCh   chan *jobWork
 	wg       sync.WaitGroup
+	stopCleanup chan struct{}
 }
+
+// cleanupInterval removes completed/failed jobs older than 1 hour
+const jobRetention = 1 * time.Hour
 
 type jobWork struct {
 	job      *Job
@@ -79,19 +83,29 @@ type jobWork struct {
 // New creates a new JobEngine
 func New(cfg *config.Config) *JobEngine {
 	e := &JobEngine{
-		cfg:    cfg,
-		jobs:   make(map[string]*Job),
-		workCh: make(chan *jobWork, cfg.Service.QueueSize),
+		cfg:         cfg,
+		jobs:        make(map[string]*Job),
+		workCh:      make(chan *jobWork, cfg.Service.QueueSize),
+		stopCleanup: make(chan struct{}),
 	}
 
-	// ensure temp dir
-	os.MkdirAll(cfg.Service.TempDir, 0750)
+	// ensure temp dir with restrictive permissions
+	os.MkdirAll(cfg.Service.TempDir, 0700)
+
+	// clean stale temp dirs from previous runs
+	entries, _ := os.ReadDir(cfg.Service.TempDir)
+	for _, entry := range entries {
+		os.RemoveAll(fmt.Sprintf("%s/%s", cfg.Service.TempDir, entry.Name()))
+	}
 
 	// start workers
 	for i := 0; i < cfg.Service.MaxWorkers; i++ {
 		e.wg.Add(1)
 		go e.worker(i)
 	}
+
+	// start cleanup goroutine
+	go e.cleanupLoop()
 
 	return e
 }
@@ -194,8 +208,31 @@ func (e *JobEngine) Pipelines() map[string]config.Pipeline {
 
 // Shutdown stops workers and waits for completion
 func (e *JobEngine) Shutdown() {
+	close(e.stopCleanup)
 	close(e.workCh)
 	e.wg.Wait()
+}
+
+func (e *JobEngine) cleanupLoop() {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			e.mu.Lock()
+			now := time.Now()
+			for id, job := range e.jobs {
+				if (job.Status == StatusCompleted || job.Status == StatusFailed || job.Status == StatusCancelled) &&
+					now.Sub(job.CreatedAt) > jobRetention {
+					delete(e.jobs, id)
+				}
+			}
+			e.mu.Unlock()
+		case <-e.stopCleanup:
+			return
+		}
+	}
 }
 
 func (e *JobEngine) worker(id int) {

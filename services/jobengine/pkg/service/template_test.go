@@ -64,6 +64,57 @@ func TestResolveEnvVars(t *testing.T) {
 	}
 }
 
+func TestSanitizeValue(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"normal", "normal"},
+		{"file.txt", "file.txt"},
+		{"hello world", "hello world"},
+		{"; rm -rf /", "_ rm -rf /"},
+		{"$(whoami)", "_whoami_"},
+		{"`id`", "_id_"},
+		{"foo|bar", "foo_bar"},
+		{"a&b", "a_b"},
+		{"a\\b", "a_b"},
+		{"test\ninjection", "test_injection"},
+		{"a{b}c", "a_b_c"},
+	}
+
+	for _, tt := range tests {
+		result := SanitizeValue(tt.input)
+		if result != tt.expected {
+			t.Errorf("SanitizeValue(%q) = %q, want %q", tt.input, result, tt.expected)
+		}
+	}
+}
+
+func TestResolveUserInputSanitized(t *testing.T) {
+	vars := &TemplateVars{
+		Source:     "/tmp/safe",
+		Target:     "/tmp/out",
+		SourceName: "; rm -rf /",
+		User:       UserInfo{DisplayName: "$(whoami)"},
+	}
+
+	result := Resolve("--author={{user.displayName}}", vars)
+	if result != "--author=_whoami_" {
+		t.Errorf("got %q, want --author=_whoami_", result)
+	}
+
+	result = Resolve("{{source.name}}", vars)
+	if result != "_ rm -rf /" {
+		t.Errorf("got %q, want sanitized", result)
+	}
+
+	// Internal paths should NOT be sanitized
+	result = Resolve("{{source}}", vars)
+	if result != "/tmp/safe" {
+		t.Errorf("source path should not be sanitized, got %q", result)
+	}
+}
+
 func TestResolveArgs(t *testing.T) {
 	vars := &TemplateVars{
 		Source: "/tmp/in.md",

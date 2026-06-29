@@ -9,9 +9,16 @@ import (
 )
 
 var (
-	templateRe = regexp.MustCompile(`\{\{([^}]+)\}\}`)
-	envRe      = regexp.MustCompile(`\$\{([^}]+)\}`)
+	templateRe    = regexp.MustCompile(`\{\{([^}]+)\}\}`)
+	envRe         = regexp.MustCompile(`\$\{([^}]+)\}`)
+	unsafeCharsRe = regexp.MustCompile(`[;&|$` + "`" + `\\\n\r!{}()<>]`)
 )
+
+// SanitizeValue removes characters that could be used for shell injection.
+// Only applied to user-supplied values (names, paths), not to internal paths.
+func SanitizeValue(val string) string {
+	return unsafeCharsRe.ReplaceAllString(val, "_")
+}
 
 // TemplateVars holds all available variables for template resolution
 type TemplateVars struct {
@@ -82,28 +89,28 @@ func resolveKey(key string, vars *TemplateVars) string {
 	case "target_dir":
 		return vars.TargetDir
 	case "source.name":
-		return vars.SourceName
+		return SanitizeValue(vars.SourceName)
 	case "source.nameWithoutExt":
 		if vars.SourceExt != "" {
-			return strings.TrimSuffix(vars.SourceName, vars.SourceExt)
+			return SanitizeValue(strings.TrimSuffix(vars.SourceName, vars.SourceExt))
 		}
-		return vars.SourceName
+		return SanitizeValue(vars.SourceName)
 	case "source.ext":
-		return vars.SourceExt
+		return SanitizeValue(vars.SourceExt)
 	case "user.id":
-		return vars.User.ID
+		return SanitizeValue(vars.User.ID)
 	case "user.displayName":
-		return vars.User.DisplayName
+		return SanitizeValue(vars.User.DisplayName)
 	case "user.email":
-		return vars.User.Email
+		return SanitizeValue(vars.User.Email)
 	case "space.id":
-		return vars.Space.ID
+		return SanitizeValue(vars.Space.ID)
 	case "space.name":
-		return vars.Space.Name
+		return SanitizeValue(vars.Space.Name)
 	case "resource.name":
-		return vars.Resource.Name
+		return SanitizeValue(vars.Resource.Name)
 	case "resource.path":
-		return vars.Resource.Path
+		return SanitizeValue(vars.Resource.Path)
 	case "now":
 		return time.Now().Format(time.RFC3339)
 	case "now.date":

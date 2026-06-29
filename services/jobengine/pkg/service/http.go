@@ -3,9 +3,16 @@ package service
 import (
 	"encoding/json"
 	"net/http"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
+
+var validIDRe = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 // RegisterRoutes sets up the HTTP API routes
 func (e *JobEngine) RegisterRoutes(r chi.Router) {
@@ -63,20 +70,50 @@ func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
 
 func (e *JobEngine) handleSubmitJob(w http.ResponseWriter, r *http.Request) {
 	var req SubmitRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 64*1024)).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
 		return
 	}
 
-	if req.Pipeline == "" || len(req.Resources) == 0 {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "pipeline and resources required"})
+	// Validate pipeline ID — only alphanumeric, dash, underscore
+	if req.Pipeline == "" || !validIDRe.MatchString(req.Pipeline) {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid pipeline id"})
 		return
 	}
 
-	// TODO: extract user ID from auth context
+	if len(req.Resources) == 0 || len(req.Resources) > 1000 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "1-1000 resources required"})
+		return
+	}
+
+	// Validate target path — prevent path traversal
+	if req.TargetPath != "" {
+		cleaned := filepath.Clean(req.TargetPath)
+		if strings.Contains(cleaned, "..") {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid target path"})
+			return
+		}
+		req.TargetPath = cleaned
+	}
+
+	// User ID from OpenCloud proxy (x-access-token is validated by proxy)
 	userID := r.Header.Get("X-User-Id")
 	if userID == "" {
-		userID = "anonymous"
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "authentication required"})
+		return
+	}
+
+	// Rate limit: max 10 active jobs per user
+	activeJobs := e.GetUserJobs(userID, "")
+	activeCount := 0
+	for _, j := range activeJobs {
+		if j.Status == StatusQueued || j.Status == StatusRunning {
+			activeCount++
+		}
+	}
+	if activeCount >= 10 {
+		writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": "max 10 active jobs per user"})
+		return
 	}
 
 	job, err := e.Submit(req.Pipeline, req.Resources, userID, req.TargetPath, req.CreateTarget)

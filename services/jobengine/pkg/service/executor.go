@@ -135,10 +135,10 @@ func (e *ScriptExecutor) Execute(ctx context.Context, item *JobItem, cfg config.
 		"JOB_SOURCE="+item.SourcePath,
 		"JOB_TARGET="+item.TargetPath,
 		"JOB_TARGET_DIR="+item.TargetDir,
-		"JOB_USER_ID="+item.Vars.User.ID,
-		"JOB_USER_NAME="+item.Vars.User.DisplayName,
-		"JOB_SPACE_NAME="+item.Vars.Space.Name,
-		"JOB_RESOURCE_NAME="+item.Vars.Resource.Name,
+		"JOB_USER_ID="+SanitizeValue(item.Vars.User.ID),
+		"JOB_USER_NAME="+SanitizeValue(item.Vars.User.DisplayName),
+		"JOB_SPACE_NAME="+SanitizeValue(item.Vars.Space.Name),
+		"JOB_RESOURCE_NAME="+SanitizeValue(item.Vars.Resource.Name),
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

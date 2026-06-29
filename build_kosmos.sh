@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-IMAGE="codeberg.org/kosmos-eu/opencloud-kosmos"
+IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
 TAG="$(date +%Y%m%d-%H%M)"
 DOCKERFILE="Dockerfile.test"
 

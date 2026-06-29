@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/DIST" 2>/dev/null || { echo "ERROR: DIST not found"; exit 1; }
 
-IMAGE="codeberg.org/kosmos-eu/opencloud-kosmos"
+IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
 TAG="${1:-latest}"
 
 echo "=== Deploy kosmos:${TAG} to ${HOST} ==="

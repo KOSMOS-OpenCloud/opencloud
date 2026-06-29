@@ -7,10 +7,10 @@ func DefaultOCConfig() *OCConfig {
 			Name: "jobengine",
 		},
 		HTTP: HTTP{
-			Addr: "0.0.0.0:9260",
+			Addr: "0.0.0.0:9310",
 		},
 		Debug: Debug{
-			Addr: "0.0.0.0:9261",
+			Addr: "0.0.0.0:9311",
 		},
 		MaxWorkers: 4,
 		QueueSize:  100,

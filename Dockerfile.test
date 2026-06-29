@@ -29,7 +29,8 @@ FROM docker.io/amd64/alpine:3.23
 RUN apk add --no-cache attr bash ca-certificates curl imagemagick \
                        inotify-tools libc6-compat mailcap tree vips \
                        vips-magick patch && \
-    echo 'hosts: files dns' >| /etc/nsswitch.conf
+    echo 'hosts: files dns' >| /etc/nsswitch.conf && \
+    sed -i 's|audio/x-flac|audio/flac|' /etc/mime.types
 
 RUN addgroup -g 1000 -S opencloud-group && \
     adduser -S --ingroup opencloud-group --uid 1000 opencloud-user --home /var/lib/opencloud

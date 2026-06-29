@@ -1,0 +1,47 @@
+pipelines:
+  doc-to-pdf:
+    label: "Als PDF exportieren"
+    icon: "file-pdf"
+    source_types:
+      - "application/msword"
+      - "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      - "application/vnd.oasis.opendocument.text"
+      - "application/vnd.oasis.opendocument.spreadsheet"
+      - "application/vnd.oasis.opendocument.presentation"
+    target:
+      extension: ".pdf"
+      location: "same"
+      create_dirs: true
+    user_choosable_target: false
+    batch: true
+    executor:
+      type: http
+      url: "${COLLABORA_URL}/cool/convert-to/pdf"
+      method: POST
+      upload_field: "file"
+      timeout: 120s
+
+  md-to-pdf:
+    label: "Markdown als PDF"
+    icon: "file-pdf"
+    source_types:
+      - "text/markdown"
+      - "text/x-markdown"
+    target:
+      extension: ".pdf"
+      location: "same"
+      create_dirs: true
+    user_choosable_target: true
+    batch: true
+    executor:
+      type: exec
+      command: "pandoc"
+      args:
+        - "{{source}}"
+        - "-o"
+        - "{{target}}"
+        - "--pdf-engine=xelatex"
+        - "--variable=author:{{user.displayName}}"
+        - "--variable=date:{{now.date}}"
+        - "--variable=title:{{source.nameWithoutExt}}"
+      timeout: 60s

@@ -93,7 +93,7 @@ func Load(path string) (*Config, error) {
 
 	// Scan pipeline dirs for addon YAMLs
 	for _, dir := range cfg.Service.PipelineDirs {
-		if err := cfg.loadPipelineDir(dir); err != nil {
+		if err := cfg.LoadPipelineDir(dir); err != nil {
 			// non-fatal: dir might not exist yet
 			continue
 		}
@@ -102,7 +102,7 @@ func Load(path string) (*Config, error) {
 	return cfg, nil
 }
 
-func (c *Config) loadPipelineDir(dir string) error {
+func (c *Config) LoadPipelineDir(dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err

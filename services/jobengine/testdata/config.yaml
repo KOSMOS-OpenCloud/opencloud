@@ -1,0 +1,7 @@
+service:
+  max_workers: 4
+  queue_size: 100
+  temp_dir: /tmp/jobengine
+  pipeline_dirs:
+    - ./testdata/pipelines.d
+  listen_addr: ":9260"

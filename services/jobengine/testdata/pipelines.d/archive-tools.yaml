@@ -1,0 +1,55 @@
+pipelines:
+  unzip:
+    label: "Hier entpacken"
+    icon: "folder-zip"
+    source_types:
+      - "application/zip"
+      - "application/x-zip-compressed"
+    target:
+      extension: ""
+      location: "subfolder:{{source.nameWithoutExt}}"
+      create_dirs: true
+    user_choosable_target: false
+    batch: false
+    executor:
+      type: exec
+      command: "unzip"
+      args: ["-o", "{{source}}", "-d", "{{target_dir}}"]
+      timeout: 300s
+
+  zip-create:
+    label: "Als ZIP komprimieren"
+    icon: "file-zip"
+    source_types:
+      - "*"
+    target:
+      extension: ".zip"
+      location: "same"
+      create_dirs: false
+    user_choosable_target: false
+    batch: true
+    executor:
+      type: exec
+      command: "zip"
+      args: ["-r", "{{target}}", "{{source}}"]
+      timeout: 300s
+
+  tar-extract:
+    label: "Archiv entpacken"
+    icon: "folder-zip"
+    source_types:
+      - "application/x-tar"
+      - "application/gzip"
+      - "application/x-bzip2"
+      - "application/x-xz"
+    target:
+      extension: ""
+      location: "subfolder:{{source.nameWithoutExt}}"
+      create_dirs: true
+    user_choosable_target: false
+    batch: false
+    executor:
+      type: exec
+      command: "tar"
+      args: ["xf", "{{source}}", "-C", "{{target_dir}}"]
+      timeout: 300s

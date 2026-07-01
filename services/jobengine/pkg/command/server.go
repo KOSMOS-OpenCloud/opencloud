@@ -64,6 +64,15 @@ func Server(cfg *config.Config) *cobra.Command {
 			engine := svc.New(engineCfg)
 			defer engine.Shutdown()
 
+			// Load pipe matrix
+			if cfg.MatrixFile != "" {
+				if err := engine.LoadMatrix(cfg.MatrixFile); err != nil {
+					logger.Warn().Err(err).Str("file", cfg.MatrixFile).Msg("could not load pipe matrix")
+				} else {
+					logger.Info().Str("file", cfg.MatrixFile).Msg("pipe matrix loaded")
+				}
+			}
+
 			logger.Info().
 				Int("pipelines", len(engineCfg.Pipelines)).
 				Int("workers", engineCfg.Service.MaxWorkers).

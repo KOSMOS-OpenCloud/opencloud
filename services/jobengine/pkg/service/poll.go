@@ -197,6 +197,11 @@ func (e *JobEngine) recordHeartbeat(workerID string) {
 
 // getWorkerSlots checks the pipe matrix and returns allowed slots + denied types
 func (e *JobEngine) getWorkerSlots(workerID string, pick []string) (slots map[string]int, denied []string) {
+	// Use persistent matrix if available, otherwise fall back to in-memory map
+	if e.matrix != nil {
+		return e.matrix.GetWorkerSlots(workerID, pick)
+	}
+
 	slots = make(map[string]int)
 	denied = make([]string, 0)
 

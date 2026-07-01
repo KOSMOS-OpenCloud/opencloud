@@ -77,6 +77,7 @@ type JobEngine struct {
 	// Worker polling state
 	heartbeats map[string]time.Time    // workerID → last poll time
 	pipeMatrix map[string]map[string]int // workerID → { jobType → slots }
+	matrix     *PipeMatrix               // persistent matrix (if loaded from file)
 }
 
 // cleanupInterval removes completed/failed jobs older than 1 hour
@@ -229,6 +230,19 @@ func (e *JobEngine) SetWorkerSlots(workerID string, slots map[string]int) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.pipeMatrix[workerID] = slots
+}
+
+// LoadMatrix loads the pipe matrix from a YAML file and applies it
+func (e *JobEngine) LoadMatrix(path string) error {
+	m, err := LoadPipeMatrix(path)
+	if err != nil {
+		return err
+	}
+	e.mu.Lock()
+	e.matrix = m
+	e.pipeMatrix = m.ToEngineFormat()
+	e.mu.Unlock()
+	return nil
 }
 
 // Shutdown stops workers and waits for completion

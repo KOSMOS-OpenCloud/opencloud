@@ -26,6 +26,7 @@ type Config struct {
 	TempDir      string   `yaml:"temp_dir" env:"JOBENGINE_TEMP_DIR"`
 	PipelineDirs []string `yaml:"pipeline_dirs" env:"JOBENGINE_PIPELINE_DIRS"`
 	ConfigFile   string   `yaml:"config_file" env:"JOBENGINE_CONFIG_FILE"`
+	MatrixFile   string   `yaml:"matrix_file" env:"JOBENGINE_MATRIX_FILE"`
 }
 
 // Service defines the service name.

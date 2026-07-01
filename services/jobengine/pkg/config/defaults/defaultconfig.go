@@ -41,6 +41,7 @@ func DefaultConfig() *config.Config {
 		PipelineDirs: []string{
 			"/etc/opencloud/jobs/pipelines.d",
 		},
+		MatrixFile: "/etc/opencloud/jobs/matrix.yaml",
 	}
 }
 

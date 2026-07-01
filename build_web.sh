@@ -8,6 +8,7 @@ set -euo pipefail
 #   ./build_web.sh              # Build + deploy
 #   ./build_web.sh build        # Build only
 #   ./build_web.sh deploy       # Deploy only
+#   BRANCH=openworks ./build_web.sh build  # Build from feature branch
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/DIST" 2>/dev/null || { echo "ERROR: DIST not found"; exit 1; }
@@ -16,13 +17,22 @@ WEB_SRC="${SCRIPT_DIR}/../opencloud_web"
 WEB_DIST="${SCRIPT_DIR}/web-dist"
 CONTAINER="${INSTANCE:-opencloud_full-opencloud-1}"
 
+# Override expected branch (default: kosmos)
+EXPECT_BRANCH="${BRANCH:-kosmos}"
+
 if [ ! -d "$WEB_SRC" ]; then
     echo "ERROR: opencloud_web not found at $WEB_SRC"
     exit 1
 fi
 
 build_web() {
-    echo "=== Building web UI ==="
+    WEB_BRANCH="$(cd "$WEB_SRC" && git branch --show-current 2>/dev/null || echo '?')"
+    echo "=== Building web UI (branch: ${WEB_BRANCH}, expected: ${EXPECT_BRANCH}) ==="
+
+    if [ "$WEB_BRANCH" != "$EXPECT_BRANCH" ] && [ "$WEB_BRANCH" != "kosmos" ]; then
+        echo "ERROR: opencloud_web is on '${WEB_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
+        exit 1
+    fi
 
     # Build in container via Dockerfile (same approach as build_kosmos.sh)
     cat > /tmp/Dockerfile.web << 'DEOF'
@@ -71,6 +81,9 @@ deploy_web() {
 case "${1:-}" in
     build)  build_web ;;
     deploy) deploy_web ;;
-    -h|--help|help) echo "Usage: $0 [build|deploy]  (default: both)" ;;
+    -h|--help|help)
+        echo "Usage: $0 [build|deploy]  (default: both)"
+        echo "  BRANCH=openworks $0 build  — build from feature branch"
+        ;;
     *)      build_web; deploy_web ;;
 esac

@@ -6,32 +6,37 @@ IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
 TAG="$(date +%Y%m%d-%H%M)"
 DOCKERFILE="Dockerfile.test"
 
-echo "=== Build kosmos: ${IMAGE}:${TAG} ==="
+# Override expected branch for all repos (default: kosmos)
+EXPECT_BRANCH="${BRANCH:-kosmos}"
 
-# Verify kosmos branches are active in all repos
+echo "=== Build kosmos: ${IMAGE}:${TAG} (branch: ${EXPECT_BRANCH}) ==="
+
+# Verify branches are active in all repos
 REVA_DIR="/data/source/gitapps/opencloud_reva"
 WEB_DIR="/data/source/gitapps/opencloud_web"
 
+OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"
 REVA_BRANCH="$(cd "$REVA_DIR" && git branch --show-current 2>/dev/null || echo '?')"
 WEB_BRANCH="$(cd "$WEB_DIR" && git branch --show-current 2>/dev/null || echo '?')"
 
-echo "  reva branch:  ${REVA_BRANCH}"
-echo "  web branch:   ${WEB_BRANCH}"
+echo "  opencloud branch: ${OC_BRANCH}"
+echo "  reva branch:      ${REVA_BRANCH}"
+echo "  web branch:       ${WEB_BRANCH}"
 
-if [ "$REVA_BRANCH" != "kosmos" ]; then
-    echo "ERROR: opencloud_reva is on '${REVA_BRANCH}', expected 'kosmos'. Aborting."
+if [ "$REVA_BRANCH" != "$EXPECT_BRANCH" ] && [ "$REVA_BRANCH" != "kosmos" ]; then
+    echo "ERROR: opencloud_reva is on '${REVA_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
     exit 1
 fi
-if [ "$WEB_BRANCH" != "kosmos" ]; then
-    echo "ERROR: opencloud_web is on '${WEB_BRANCH}', expected 'kosmos'. Aborting."
+if [ "$WEB_BRANCH" != "$EXPECT_BRANCH" ] && [ "$WEB_BRANCH" != "kosmos" ]; then
+    echo "ERROR: opencloud_web is on '${WEB_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
     exit 1
 fi
 
-# Sync reva-src from opencloud_reva kosmos
+# Sync reva-src from opencloud_reva
 echo "  Syncing reva-src from ${REVA_DIR} ..."
 rsync -a --delete --exclude='.git' "$REVA_DIR/" reva-src/
 
-# Build web-dist from opencloud_web kosmos
+# Build web-dist from opencloud_web
 echo "  Building web-dist from ${WEB_DIR} ..."
 "$SCRIPT_DIR/build_web.sh" build
 

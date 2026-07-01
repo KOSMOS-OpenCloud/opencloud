@@ -17,11 +17,15 @@ var validIDRe = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 // RegisterRoutes sets up the HTTP API routes
 func (e *JobEngine) RegisterRoutes(r chi.Router) {
 	r.Route("/api/v0/jobs", func(r chi.Router) {
+		// User-facing API
 		r.Get("/pipelines", e.handleGetPipelines)
 		r.Post("/", e.handleSubmitJob)
 		r.Get("/{jobId}", e.handleGetJob)
 		r.Delete("/{jobId}", e.handleCancelJob)
 		r.Get("/", e.handleListJobs)
+
+		// Worker-facing API (OpenWorks protocol)
+		r.Post("/workers/poll", e.handleWorkerPoll)
 	})
 }
 

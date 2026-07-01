@@ -21,6 +21,7 @@ const (
 	StatusCompleted JobStatus = "completed"
 	StatusFailed    JobStatus = "failed"
 	StatusCancelled JobStatus = "cancelled"
+	StatusExpired   JobStatus = "expired"
 )
 
 // JobResult is the outcome of a single resource in a batch job
@@ -40,9 +41,13 @@ type Job struct {
 	Completed int         `json:"completed"`
 	Total     int         `json:"total"`
 	Results   []JobResult `json:"results,omitempty"`
-	Error     string      `json:"error,omitempty"`
-	UserID    string      `json:"userId"`
-	CreatedAt time.Time   `json:"createdAt"`
+	Error       string      `json:"error,omitempty"`
+	UserID      string      `json:"userId"`
+	CreatedAt   time.Time   `json:"createdAt"`
+	ValidTill   time.Time   `json:"validTill,omitempty"`
+	WorkerID    string      `json:"workerId,omitempty"`
+	PickedAt    time.Time   `json:"pickedAt,omitempty"`
+	CompletedAt time.Time   `json:"completedAt,omitempty"`
 
 	// internal
 	resources  []string
@@ -68,6 +73,10 @@ type JobEngine struct {
 	workCh      chan *jobWork
 	wg          sync.WaitGroup
 	stopCleanup chan struct{}
+
+	// Worker polling state
+	heartbeats map[string]time.Time    // workerID → last poll time
+	pipeMatrix map[string]map[string]int // workerID → { jobType → slots }
 }
 
 // cleanupInterval removes completed/failed jobs older than 1 hour
@@ -87,6 +96,8 @@ func New(cfg *config.PipelineConfig) *JobEngine {
 		jobs:        make(map[string]*Job),
 		workCh:      make(chan *jobWork, cfg.Service.QueueSize),
 		stopCleanup: make(chan struct{}),
+		heartbeats:  make(map[string]time.Time),
+		pipeMatrix:  make(map[string]map[string]int),
 	}
 
 	// ensure temp dir with restrictive permissions
@@ -202,9 +213,22 @@ func (e *JobEngine) CancelJob(jobID string) error {
 }
 
 // Pipelines returns all registered pipelines
-// Pipelines returns all registered pipelines
 func (e *JobEngine) Pipelines() map[string]config.Pipeline {
 	return e.cfg.Pipelines
+}
+
+// SetPipeMatrix sets the capability matrix for workers
+func (e *JobEngine) SetPipeMatrix(matrix map[string]map[string]int) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.pipeMatrix = matrix
+}
+
+// SetWorkerSlots sets the slots for a single worker in the pipe matrix
+func (e *JobEngine) SetWorkerSlots(workerID string, slots map[string]int) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.pipeMatrix[workerID] = slots
 }
 
 // Shutdown stops workers and waits for completion

@@ -17,10 +17,12 @@ type PipelineConfig struct {
 
 // PipelineServiceConfig holds runtime settings for the pipeline engine
 type PipelineServiceConfig struct {
-	MaxWorkers   int      `yaml:"max_workers"`
-	QueueSize    int      `yaml:"queue_size"`
-	TempDir      string   `yaml:"temp_dir"`
-	PipelineDirs []string `yaml:"pipeline_dirs"`
+	MaxWorkers      int      `yaml:"max_workers"`
+	QueueSize       int      `yaml:"queue_size"`
+	TempDir         string   `yaml:"temp_dir"`
+	PipelineDirs    []string `yaml:"pipeline_dirs"`
+	PollIntervalMin int      `yaml:"poll_interval_min"` // seconds, minimum poll frequency
+	PollIntervalMax int      `yaml:"poll_interval_max"` // seconds, maximum poll frequency (heartbeat timeout)
 }
 
 // Pipeline defines a conversion/processing pipeline
@@ -129,10 +131,12 @@ func (p *Pipeline) MigrateExecutorToJob() {
 func PipelineDefaults() *PipelineConfig {
 	return &PipelineConfig{
 		Service: PipelineServiceConfig{
-			MaxWorkers:   4,
-			QueueSize:    100,
-			TempDir:      "/tmp/jobengine",
-			PipelineDirs: []string{"/etc/opencloud/jobs/pipelines.d"},
+			MaxWorkers:      4,
+			QueueSize:       100,
+			TempDir:         "/tmp/jobengine",
+			PipelineDirs:    []string{"/etc/opencloud/jobs/pipelines.d"},
+			PollIntervalMin: 2,
+			PollIntervalMax: 30,
 		},
 		Pipelines: make(map[string]Pipeline),
 	}

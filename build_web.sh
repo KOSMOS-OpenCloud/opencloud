@@ -53,7 +53,7 @@ DEOF
     podman cp "$CID:/build/dist/." "$WEB_DIST/"
     podman rm "$CID" > /dev/null
 
-    rm /tmp/Dockerfile.web
+    rm -f /tmp/Dockerfile.web
     echo ""
     echo "=== Built: $WEB_DIST ==="
     echo "Files: $(find "$WEB_DIST" -type f | wc -l)"

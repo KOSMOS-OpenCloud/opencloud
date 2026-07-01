@@ -25,14 +25,45 @@ type PipelineServiceConfig struct {
 
 // Pipeline defines a conversion/processing pipeline
 type Pipeline struct {
-	Label               string            `yaml:"label"`
-	Icon                string            `yaml:"icon"`
-	SourceTypes         []string          `yaml:"source_types"`
-	Target              TargetConfig      `yaml:"target"`
-	UserChoosableTarget bool              `yaml:"user_choosable_target"`
-	Batch               bool              `yaml:"batch"`
+	Label       string       `yaml:"label"`
+	Icon        string       `yaml:"icon"`
+	SourceTypes []string     `yaml:"source_types"`
+	Target      TargetConfig `yaml:"target"`
+	Menu        string       `yaml:"menu"`         // "context" | "index" | "back"
+	Dialog      *DialogSpec  `yaml:"dialog"`        // optional user input dialog
+	Job         JobConfig    `yaml:"job"`           // opaque job description for workers
+	Notification string     `yaml:"notification"`  // "toast" | "none"
+
+	// Deprecated: kept for backward compatibility with existing YAMLs.
+	// Use Job.Params instead. Will be migrated on load.
 	Executor            ExecutorConfig    `yaml:"executor"`
+	Batch               bool              `yaml:"batch"`
+	UserChoosableTarget bool              `yaml:"user_choosable_target"`
 	Options             map[string]string `yaml:"options"`
+}
+
+// JobConfig is the opaque job description passed to workers.
+// The engine only reads Type and Timeout. Params is passed through uninterpreted.
+type JobConfig struct {
+	Type    string                 `yaml:"type" json:"type"`
+	Timeout time.Duration         `yaml:"timeout" json:"timeout"`
+	Params  map[string]any        `yaml:"params" json:"params"`
+}
+
+// DialogSpec defines an optional user input dialog shown before job submission
+type DialogSpec struct {
+	Title  string        `yaml:"title" json:"title"`
+	Fields []DialogField `yaml:"fields" json:"fields"`
+}
+
+// DialogField is a single input field in a dialog
+type DialogField struct {
+	Key      string   `yaml:"key" json:"key"`
+	Type     string   `yaml:"type" json:"type"`         // "text" | "select" | "checkbox"
+	Label    string   `yaml:"label" json:"label"`
+	Default  any      `yaml:"default" json:"default"`
+	Options  []string `yaml:"options,omitempty" json:"options,omitempty"`
+	Multiline bool   `yaml:"multiline,omitempty" json:"multiline,omitempty"`
 }
 
 // TargetConfig defines where the result goes
@@ -42,7 +73,8 @@ type TargetConfig struct {
 	CreateDirs bool   `yaml:"create_dirs"`
 }
 
-// ExecutorConfig defines how the pipeline step is executed
+// ExecutorConfig is deprecated — use JobConfig instead.
+// Kept for backward compatibility with existing pipeline YAMLs.
 type ExecutorConfig struct {
 	Type        string        `yaml:"type"`
 	Command     string        `yaml:"command"`
@@ -52,6 +84,45 @@ type ExecutorConfig struct {
 	UploadField string        `yaml:"upload_field"`
 	Path        string        `yaml:"path"`
 	Timeout     time.Duration `yaml:"timeout"`
+}
+
+// MigrateExecutorToJob converts a legacy executor block into a JobConfig.
+// Called after YAML loading to ensure all pipelines use the new format.
+func (p *Pipeline) MigrateExecutorToJob() {
+	if p.Job.Type != "" {
+		return // already has job config
+	}
+	if p.Executor.Type == "" {
+		return // nothing to migrate
+	}
+
+	p.Job.Type = p.Executor.Type
+	p.Job.Timeout = p.Executor.Timeout
+	p.Job.Params = map[string]any{}
+
+	if p.Executor.Command != "" {
+		p.Job.Params["command"] = p.Executor.Command
+	}
+	if len(p.Executor.Args) > 0 {
+		p.Job.Params["args"] = p.Executor.Args
+	}
+	if p.Executor.URL != "" {
+		p.Job.Params["url"] = p.Executor.URL
+	}
+	if p.Executor.Method != "" {
+		p.Job.Params["method"] = p.Executor.Method
+	}
+	if p.Executor.UploadField != "" {
+		p.Job.Params["upload_field"] = p.Executor.UploadField
+	}
+	if p.Executor.Path != "" {
+		p.Job.Params["path"] = p.Executor.Path
+	}
+
+	// merge legacy options into params
+	for k, v := range p.Options {
+		p.Job.Params[k] = v
+	}
 }
 
 // PipelineDefaults returns a PipelineConfig with sane defaults
@@ -94,6 +165,9 @@ func LoadPipelineConfig(path string) (*PipelineConfig, error) {
 		}
 	}
 
+	// migrate legacy executor blocks to job config
+	cfg.migratePipelines()
+
 	return cfg, nil
 }
 
@@ -130,4 +204,11 @@ func (c *PipelineConfig) LoadPipelineDir(dir string) error {
 	}
 
 	return nil
+}
+
+func (c *PipelineConfig) migratePipelines() {
+	for id, p := range c.Pipelines {
+		p.MigrateExecutorToJob()
+		c.Pipelines[id] = p
+	}
 }

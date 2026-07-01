@@ -71,7 +71,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				Msg("jobengine starting")
 
 			for id, p := range engineCfg.Pipelines {
-				logger.Info().Str("id", id).Str("label", p.Label).Str("type", p.Executor.Type).Msg("pipeline registered")
+				logger.Info().Str("id", id).Str("label", p.Label).Str("jobType", p.Job.Type).Msg("pipeline registered")
 			}
 
 			// HTTP Server

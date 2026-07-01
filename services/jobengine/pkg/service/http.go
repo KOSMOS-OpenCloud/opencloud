@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 )
 
@@ -26,13 +27,15 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 
 // PipelineInfo is the public representation of a pipeline
 type PipelineInfo struct {
-	ID                  string   `json:"id"`
-	Label               string   `json:"label"`
-	Icon                string   `json:"icon"`
-	SourceTypes         []string `json:"sourceTypes"`
-	TargetLocation      string   `json:"targetLocation"`
-	UserChoosableTarget bool     `json:"userChoosableTarget"`
-	Batch               bool     `json:"batch"`
+	ID             string             `json:"id"`
+	Label          string             `json:"label"`
+	Icon           string             `json:"icon"`
+	SourceTypes    []string           `json:"sourceTypes"`
+	TargetLocation string             `json:"targetLocation"`
+	Menu           string             `json:"menu,omitempty"`
+	Dialog         *config.DialogSpec `json:"dialog,omitempty"`
+	JobType        string             `json:"jobType"`
+	Notification   string             `json:"notification,omitempty"`
 }
 
 type PipelinesResponse struct {
@@ -54,13 +57,15 @@ func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
 
 	for id, p := range pipelines {
 		resp.Pipelines = append(resp.Pipelines, PipelineInfo{
-			ID:                  id,
-			Label:               p.Label,
-			Icon:                p.Icon,
-			SourceTypes:         p.SourceTypes,
-			TargetLocation:      p.Target.Location,
-			UserChoosableTarget: p.UserChoosableTarget,
-			Batch:               p.Batch,
+			ID:             id,
+			Label:          p.Label,
+			Icon:           p.Icon,
+			SourceTypes:    p.SourceTypes,
+			TargetLocation: p.Target.Location,
+			Menu:           p.Menu,
+			Dialog:         p.Dialog,
+			JobType:        p.Job.Type,
+			Notification:   p.Notification,
 		})
 	}
 

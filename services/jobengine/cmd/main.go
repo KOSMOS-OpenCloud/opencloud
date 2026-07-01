@@ -39,7 +39,7 @@ func main() {
 	fmt.Printf("jobengine: %d pipelines, %d workers, listening on %s\n",
 		len(cfg.Pipelines), cfg.Service.MaxWorkers, listenAddr)
 	for id, p := range cfg.Pipelines {
-		fmt.Printf("  pipeline: %s (%s) → %s\n", id, p.Label, p.Executor.Type)
+		fmt.Printf("  pipeline: %s (%s) → job:%s\n", id, p.Label, p.Job.Type)
 	}
 
 	if err := http.ListenAndServe(listenAddr, r); err != nil {

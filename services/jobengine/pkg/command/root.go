@@ -9,7 +9,7 @@ import (
 )
 
 // GetCommands provides all commands for this service
-func GetCommands(cfg *config.OCConfig) []*cobra.Command {
+func GetCommands(cfg *config.Config) []*cobra.Command {
 	return []*cobra.Command{
 		Server(cfg),
 		Health(cfg),
@@ -17,7 +17,7 @@ func GetCommands(cfg *config.OCConfig) []*cobra.Command {
 }
 
 // Execute is the entry point for the jobengine command.
-func Execute(cfg *config.OCConfig) error {
+func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cobra.Command{
 		Use:   "jobengine",
 		Short: "starts jobengine service",

@@ -18,12 +18,12 @@ func main() {
 		cfgPath = "/etc/opencloud/jobs/pipelines.yaml"
 	}
 
-	cfg, err := config.Load(cfgPath)
+	cfg, err := config.LoadPipelineConfig(cfgPath)
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
 
-	listenAddr := cfg.Service.ListenAddr
+	listenAddr := ":9310"
 	if addr := os.Getenv("JOBENGINE_ADDR"); addr != "" {
 		listenAddr = addr
 	}

@@ -13,7 +13,7 @@ import (
 )
 
 func setupTestEngine() (*JobEngine, *chi.Mux) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["test-echo"] = config.Pipeline{
 		Label:       "Test Echo",
 		SourceTypes: []string{"text/plain"},
@@ -147,7 +147,7 @@ func TestSubmitJobTooManyResources(t *testing.T) {
 }
 
 func TestRateLimiting(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["slow"] = config.Pipeline{
 		Batch: true,
 		Executor: config.ExecutorConfig{
@@ -201,7 +201,7 @@ func TestGetJobNotFound(t *testing.T) {
 }
 
 func TestCancelJobAPI(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["slow"] = config.Pipeline{
 		Batch: true,
 		Executor: config.ExecutorConfig{

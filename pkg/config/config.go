@@ -101,7 +101,7 @@ type Config struct {
 	Graph             *graph.Config          `yaml:"graph"`
 	Groups            *groups.Config         `yaml:"groups"`
 	IDM               *idm.Config            `yaml:"idm"`
-	Jobengine         *jobengine.OCConfig    `yaml:"jobengine"`
+	Jobengine         *jobengine.Config      `yaml:"jobengine"`
 	IDP               *idp.Config            `yaml:"idp"`
 	Invitations       *invitations.Config    `yaml:"invitations"`
 	Nats              *nats.Config           `yaml:"nats"`

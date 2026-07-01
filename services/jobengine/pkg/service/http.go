@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 )
 
 var validIDRe = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
@@ -94,12 +95,13 @@ func (e *JobEngine) handleSubmitJob(w http.ResponseWriter, r *http.Request) {
 		req.TargetPath = cleaned
 	}
 
-	// User ID from OpenCloud proxy (x-access-token is validated by proxy)
-	userID := r.Header.Get("X-User-Id")
-	if userID == "" {
+	// User ID from context (set by ExtractAccountUUID middleware)
+	user, ok := revactx.ContextGetUser(r.Context())
+	if !ok || user.GetId() == nil {
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "authentication required"})
 		return
 	}
+	userID := user.GetId().GetOpaqueId()
 
 	// Rate limit: max 10 active jobs per user
 	activeJobs := e.GetUserJobs(userID, "")
@@ -145,7 +147,10 @@ func (e *JobEngine) handleCancelJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e *JobEngine) handleListJobs(w http.ResponseWriter, r *http.Request) {
-	userID := r.Header.Get("X-User-Id")
+	userID := ""
+	if user, ok := revactx.ContextGetUser(r.Context()); ok && user.GetId() != nil {
+		userID = user.GetId().GetOpaqueId()
+	}
 	status := JobStatus(r.URL.Query().Get("status"))
 
 	jobs := e.GetUserJobs(userID, status)

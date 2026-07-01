@@ -20,7 +20,7 @@ import (
 	graph "github.com/opencloud-eu/opencloud/services/graph/pkg/config/defaults"
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/config/defaults"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/config/defaults"
-	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
+	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/config/defaults"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/config/defaults"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/config/defaults"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/config/defaults"
@@ -76,7 +76,7 @@ func DefaultConfig() *Config {
 		Graph:             graph.DefaultConfig(),
 		Groups:            groups.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
-		Jobengine:         jobengineDefaults(),
+		Jobengine:         jobengine.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
 		Invitations:       invitations.DefaultConfig(),
 		Nats:              nats.DefaultConfig(),
@@ -103,6 +103,3 @@ func DefaultConfig() *Config {
 	}
 }
 
-func jobengineDefaults() *jobengine.OCConfig {
-	return jobengine.DefaultOCConfig()
-}

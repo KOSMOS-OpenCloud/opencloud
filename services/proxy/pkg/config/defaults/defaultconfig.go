@@ -282,6 +282,10 @@ func DefaultPolicies() []config.Policy {
 					Service:  "eu.opencloud.web.settings",
 				},
 				{
+					Endpoint: "/api/v0/jobs",
+					Service:  "eu.opencloud.web.jobengine",
+				},
+				{
 					Endpoint: "/auth-app/tokens",
 					Service:  "eu.opencloud.web.auth-app",
 				},

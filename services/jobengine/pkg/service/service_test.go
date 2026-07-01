@@ -8,7 +8,7 @@ import (
 )
 
 func TestSubmitAndGetJob(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["test-echo"] = config.Pipeline{
 		Label:       "Test Echo",
 		SourceTypes: []string{"text/plain"},
@@ -56,7 +56,7 @@ func TestSubmitAndGetJob(t *testing.T) {
 }
 
 func TestSubmitUnknownPipeline(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	engine := New(cfg)
 	defer engine.Shutdown()
 
@@ -67,7 +67,7 @@ func TestSubmitUnknownPipeline(t *testing.T) {
 }
 
 func TestBatchNotAllowed(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["single-only"] = config.Pipeline{
 		Batch: false,
 		Executor: config.ExecutorConfig{Type: "exec", Command: "echo"},
@@ -83,7 +83,7 @@ func TestBatchNotAllowed(t *testing.T) {
 }
 
 func TestCancelJob(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["slow"] = config.Pipeline{
 		Batch: true,
 		Executor: config.ExecutorConfig{
@@ -112,7 +112,7 @@ func TestCancelJob(t *testing.T) {
 }
 
 func TestGetUserJobs(t *testing.T) {
-	cfg := config.Defaults()
+	cfg := config.PipelineDefaults()
 	cfg.Pipelines["test"] = config.Pipeline{
 		Batch:    true,
 		Executor: config.ExecutorConfig{Type: "exec", Command: "echo"},

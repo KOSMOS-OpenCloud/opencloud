@@ -62,11 +62,11 @@ type JobItem struct {
 
 // JobEngine is the core service
 type JobEngine struct {
-	cfg      *config.Config
-	jobs     map[string]*Job
-	mu       sync.RWMutex
-	workCh   chan *jobWork
-	wg       sync.WaitGroup
+	cfg         *config.PipelineConfig
+	jobs        map[string]*Job
+	mu          sync.RWMutex
+	workCh      chan *jobWork
+	wg          sync.WaitGroup
 	stopCleanup chan struct{}
 }
 
@@ -81,7 +81,7 @@ type jobWork struct {
 }
 
 // New creates a new JobEngine
-func New(cfg *config.Config) *JobEngine {
+func New(cfg *config.PipelineConfig) *JobEngine {
 	e := &JobEngine{
 		cfg:         cfg,
 		jobs:        make(map[string]*Job),
@@ -201,6 +201,7 @@ func (e *JobEngine) CancelJob(jobID string) error {
 	return nil
 }
 
+// Pipelines returns all registered pipelines
 // Pipelines returns all registered pipelines
 func (e *JobEngine) Pipelines() map[string]config.Pipeline {
 	return e.cfg.Pipelines

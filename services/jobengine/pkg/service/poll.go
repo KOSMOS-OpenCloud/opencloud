@@ -70,7 +70,17 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "authentication required"})
 		return
 	}
+
+	// Use app-token-label as worker ID if available (set by reva appauth manager).
+	// Falls back to user UUID if no token label is present.
 	workerID := user.GetId().GetOpaqueId()
+	if user.GetOpaque() != nil {
+		if entry, ok := user.GetOpaque().GetMap()["app-token-label"]; ok {
+			if label := string(entry.GetValue()); label != "" {
+				workerID = label
+			}
+		}
+	}
 
 	var req PollRequest
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 64*1024)).Decode(&req); err != nil {

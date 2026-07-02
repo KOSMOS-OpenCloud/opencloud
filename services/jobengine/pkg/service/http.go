@@ -25,15 +25,14 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 		r.Get("/", e.handleListJobs)
 
 		// Worker-facing API (OpenWorks protocol)
-		r.Post("/workers/poll", e.handleWorkerPoll)
+		r.Route("/workers", func(r chi.Router) {
+			r.Post("/poll", e.handleWorkerPoll)
+			r.Get("/", e.handleListWorkers)
+		})
 	})
 
-	// Admin API for Pipe-Matrix + Workers
+	// Admin API for Pipe-Matrix
 	e.RegisterMatrixRoutes(r)
-
-	r.Route("/api/v0/jobs/workers", func(r chi.Router) {
-		r.Get("/", e.handleListWorkers)
-	})
 }
 
 // PipelineInfo is the public representation of a pipeline

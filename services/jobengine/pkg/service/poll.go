@@ -226,8 +226,15 @@ func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
 		job.Error = s.Error
 		job.Result = s.Result
 		job.Retries++
-		// Re-queue if not expired and retries not exhausted
-		if job.ValidTill.After(time.Now()) {
+
+		// Check max retries from pipeline config
+		maxRetries := 0
+		if p, ok := e.cfg.Pipelines[job.Pipeline]; ok {
+			maxRetries = p.Job.MaxRetries
+		}
+
+		// Re-queue only if not expired AND retries not exhausted
+		if job.ValidTill.After(time.Now()) && (maxRetries == 0 || job.Retries < maxRetries) {
 			job.Status = StatusQueued
 			job.WorkerID = ""
 			job.PickedAt = time.Time{}

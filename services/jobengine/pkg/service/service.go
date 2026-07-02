@@ -231,10 +231,10 @@ func (e *JobEngine) cleanupLoop() {
 			e.mu.Lock()
 			now := time.Now()
 			for id, job := range e.jobs {
-				// Clean up finished jobs after retention period
+				// Clean up finished jobs 1h after completion
 				if (job.Status == StatusCompleted || job.Status == StatusFailed ||
 					job.Status == StatusCancelled || job.Status == StatusExpired) &&
-					now.Sub(job.CreatedAt) > jobRetention {
+					!job.CompletedAt.IsZero() && now.Sub(job.CompletedAt) > jobRetention {
 					delete(e.jobs, id)
 				}
 				// Expire jobs past validTill

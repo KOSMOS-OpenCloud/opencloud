@@ -103,8 +103,8 @@ func (e *JobEngine) handleSubmitJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(req.Resources) == 0 || len(req.Resources) > 1000 {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "1-1000 resources required"})
+	if len(req.Resources) > 1000 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "max 1000 resources"})
 		return
 	}
 

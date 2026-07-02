@@ -29,6 +29,8 @@ type Job struct {
 	Progress    int       `json:"progress"`
 	Total       int       `json:"total"`
 	Error       string    `json:"error,omitempty"`
+	Params      any       `json:"params,omitempty"`
+	Result      any       `json:"result,omitempty"`
 	UserID      string    `json:"userId"`
 	CreatedAt   time.Time `json:"createdAt"`
 	ValidTill   time.Time `json:"validTill,omitempty"`
@@ -72,7 +74,7 @@ func New(cfg *config.PipelineConfig) *JobEngine {
 
 // Submit creates and queues a new job. The job sits in the queue
 // until a worker picks it via the poll endpoint.
-func (e *JobEngine) Submit(pipelineID string, resources []string, userID string, targetPath string, createDirs bool) (*Job, error) {
+func (e *JobEngine) Submit(pipelineID string, resources []string, userID string, targetPath string, createDirs bool, params any) (*Job, error) {
 	pipeline, ok := e.cfg.Pipelines[pipelineID]
 	if !ok {
 		return nil, fmt.Errorf("unknown pipeline: %s", pipelineID)
@@ -94,6 +96,7 @@ func (e *JobEngine) Submit(pipelineID string, resources []string, userID string,
 		Pipeline:  pipelineID,
 		Status:    StatusQueued,
 		Total:     len(resources),
+		Params:    params,
 		UserID:    userID,
 		CreatedAt: time.Now(),
 		ValidTill: validTill,

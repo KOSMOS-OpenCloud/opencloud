@@ -26,7 +26,7 @@ func TestSubmitAndGetJob(t *testing.T) {
 	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	job, err := engine.Submit("test-echo", []string{"file1.txt", "file2.txt"}, "user1", "", false)
+	job, err := engine.Submit("test-echo", []string{"file1.txt", "file2.txt"}, "user1", "", false, nil)
 	if err != nil {
 		t.Fatalf("Submit: %v", err)
 	}
@@ -52,7 +52,7 @@ func TestSubmitUnknownPipeline(t *testing.T) {
 	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	_, err := engine.Submit("nonexistent", []string{"file.txt"}, "user1", "", false)
+	_, err := engine.Submit("nonexistent", []string{"file.txt"}, "user1", "", false, nil)
 	if err == nil {
 		t.Error("expected error for unknown pipeline")
 	}
@@ -62,7 +62,7 @@ func TestCancelJob(t *testing.T) {
 	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false)
+	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false, nil)
 
 	err := engine.CancelJob(job.ID)
 	if err != nil {
@@ -79,9 +79,9 @@ func TestGetUserJobs(t *testing.T) {
 	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	engine.Submit("test-echo", []string{"a.txt"}, "alice", "", false)
-	engine.Submit("test-echo", []string{"b.txt"}, "bob", "", false)
-	engine.Submit("test-echo", []string{"c.txt"}, "alice", "", false)
+	engine.Submit("test-echo", []string{"a.txt"}, "alice", "", false, nil)
+	engine.Submit("test-echo", []string{"b.txt"}, "bob", "", false, nil)
+	engine.Submit("test-echo", []string{"c.txt"}, "alice", "", false, nil)
 
 	aliceJobs := engine.GetUserJobs("alice", "")
 	if len(aliceJobs) != 2 {
@@ -98,7 +98,7 @@ func TestJobStaysQueued(t *testing.T) {
 	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false)
+	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false, nil)
 
 	// Job should stay queued — no internal workers, only external poll can pick it
 	got, _ := engine.GetJob(job.ID)

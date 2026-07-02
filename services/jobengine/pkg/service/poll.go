@@ -212,12 +212,14 @@ func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
 	if s.Status == StatusCompleted {
 		job.Status = StatusCompleted
 		job.Progress = 100
+		job.Result = s.Result
 		job.CompletedAt = time.Now()
 	}
 
 	if s.Status == StatusFailed {
 		job.Status = StatusFailed
 		job.Error = s.Error
+		job.Result = s.Result
 		job.CompletedAt = time.Now()
 		// Job goes back to queue for re-picking (if not expired)
 		if job.ValidTill.After(time.Now()) {
@@ -361,11 +363,22 @@ func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int
 			jobType = pipeline.Job.Type
 		}
 
+		// Merge params: pipeline defaults + job-specific params (job wins)
+		mergedParams := make(map[string]any)
+		for k, v := range pipeline.Job.Params {
+			mergedParams[k] = v
+		}
+		if jobParams, ok := job.Params.(map[string]any); ok {
+			for k, v := range jobParams {
+				mergedParams[k] = v
+			}
+		}
+
 		assignment := JobAssignment{
 			JobID: job.ID,
 			Job: JobDescription{
 				Type:   jobType,
-				Params: pipeline.Job.Params,
+				Params: mergedParams,
 			},
 			Timeout:   int(pipeline.Job.Timeout.Seconds()),
 			ValidTill: job.ValidTill.Format(time.RFC3339),

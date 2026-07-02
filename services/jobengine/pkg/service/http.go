@@ -29,6 +29,9 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 			r.Post("/poll", e.handleWorkerPoll)
 			r.Get("/", e.handleListWorkers)
 		})
+
+		// Pipeline stats
+		r.Get("/stats", e.handleJobStats)
 	})
 
 	// Admin API for Pipe-Matrix
@@ -57,6 +60,7 @@ type SubmitRequest struct {
 	Resources    []string `json:"resources"`
 	TargetPath   string   `json:"targetPath"`
 	CreateTarget bool     `json:"createTarget"`
+	Params       any      `json:"params,omitempty"`
 }
 
 func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +135,7 @@ func (e *JobEngine) handleSubmitJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	job, err := e.Submit(req.Pipeline, req.Resources, userID, req.TargetPath, req.CreateTarget)
+	job, err := e.Submit(req.Pipeline, req.Resources, userID, req.TargetPath, req.CreateTarget, req.Params)
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
@@ -170,6 +174,21 @@ func (e *JobEngine) handleListJobs(w http.ResponseWriter, r *http.Request) {
 
 	jobs := e.GetUserJobs(userID, status)
 	writeJSON(w, http.StatusOK, map[string]any{"jobs": jobs})
+}
+
+func (e *JobEngine) handleJobStats(w http.ResponseWriter, r *http.Request) {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	stats := make(map[string]map[string]int) // pipeline → { status → count }
+	for _, job := range e.jobs {
+		if stats[job.Pipeline] == nil {
+			stats[job.Pipeline] = make(map[string]int)
+		}
+		stats[job.Pipeline][string(job.Status)]++
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"stats": stats})
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

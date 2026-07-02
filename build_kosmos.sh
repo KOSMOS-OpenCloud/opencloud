@@ -49,10 +49,18 @@ echo "=== Stage: prepare ==="
 echo "  Syncing reva-src from ${REVA_DIR} ..."
 rsync -a --delete --exclude='.git' "$REVA_DIR/" reva-src/
 
-# Build web-dist
+# Build or fetch web-dist
 echo "=== Stage: build-web ==="
-echo "  Building web-dist from ${WEB_DIR} ..."
-"$SCRIPT_DIR/build_web.sh" build
+WEB_ZIP="${WEB_ZIP:-}"
+if [ -n "$WEB_ZIP" ]; then
+    echo "  Fetching pre-built web-dist: ${WEB_ZIP}"
+    rm -rf web-dist && mkdir -p web-dist
+    curl -sfL "$WEB_ZIP" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
+    echo "  Unpacked: $(find web-dist -type f | wc -l) files"
+else
+    echo "  Building web-dist from ${WEB_DIR} ..."
+    "$SCRIPT_DIR/build_web.sh" build
+fi
 
 # Generate kosmos revision
 OC_REV="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"

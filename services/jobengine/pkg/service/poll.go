@@ -355,10 +355,16 @@ func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int
 
 		pipeline, _ := e.cfg.Pipelines[job.Pipeline]
 
+		// Use pipeline ID as job type (e.g. "md-to-pdf"), not executor type
+		jobType := job.Pipeline
+		if pipeline.Job.Type != "" {
+			jobType = pipeline.Job.Type
+		}
+
 		assignment := JobAssignment{
 			JobID: job.ID,
 			Job: JobDescription{
-				Type:   pipeline.Job.Type,
+				Type:   jobType,
 				Params: pipeline.Job.Params,
 			},
 			Timeout:   int(pipeline.Job.Timeout.Seconds()),

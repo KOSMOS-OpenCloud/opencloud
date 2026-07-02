@@ -18,11 +18,13 @@ type PollRequest struct {
 
 // WorkerJobStatus is a progress/completion report from the worker
 type WorkerJobStatus struct {
-	JobID    string    `json:"jobId"`
-	Progress int       `json:"progress,omitempty"`
-	Status   JobStatus `json:"status,omitempty"`
-	Result   any       `json:"result,omitempty"`
-	Error    string    `json:"error,omitempty"`
+	JobID     string    `json:"jobId"`
+	Progress  int       `json:"progress,omitempty"`
+	Stage     string    `json:"stage,omitempty"`
+	StageData any       `json:"stageData,omitempty"`
+	Status    JobStatus `json:"status,omitempty"`
+	Result    any       `json:"result,omitempty"`
+	Error     string    `json:"error,omitempty"`
 }
 
 // PollResponse is the cloud → worker message in each poll tick
@@ -208,6 +210,10 @@ func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
 	if s.Progress > 0 {
 		job.Progress = s.Progress
 	}
+	if s.Stage != "" {
+		job.Stage = s.Stage
+		job.StageData = s.StageData
+	}
 
 	if s.Status == StatusCompleted {
 		job.Status = StatusCompleted
@@ -217,15 +223,17 @@ func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
 	}
 
 	if s.Status == StatusFailed {
-		job.Status = StatusFailed
 		job.Error = s.Error
 		job.Result = s.Result
-		job.CompletedAt = time.Now()
-		// Job goes back to queue for re-picking (if not expired)
+		job.Retries++
+		// Re-queue if not expired and retries not exhausted
 		if job.ValidTill.After(time.Now()) {
 			job.Status = StatusQueued
 			job.WorkerID = ""
 			job.PickedAt = time.Time{}
+		} else {
+			job.Status = StatusFailed
+			job.CompletedAt = time.Now()
 		}
 	}
 }
@@ -321,13 +329,15 @@ func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int
 		}
 	}
 
-	var assignments []JobAssignment
+	// Collect eligible jobs and sort by priority (higher first)
+	type candidate struct {
+		job *Job
+		idx int
+	}
+	var candidates []candidate
+	now := time.Now()
 
 	for _, job := range e.jobs {
-		if len(assignments) >= available {
-			break
-		}
-
 		if job.Status != StatusQueued {
 			continue
 		}
@@ -344,13 +354,62 @@ func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int
 		}
 
 		// Check if job is still valid
-		if !job.ValidTill.IsZero() && job.ValidTill.Before(time.Now()) {
+		if !job.ValidTill.IsZero() && job.ValidTill.Before(now) {
 			job.Status = StatusExpired
 			continue
 		}
 
+		// Check ETA — don't pick before scheduled time
+		if !job.ETA.IsZero() && job.ETA.After(now) {
+			continue
+		}
+
+		// Check dependencies — all must be completed
+		if len(job.DependsOn) > 0 {
+			allDone := true
+			for _, depID := range job.DependsOn {
+				dep, exists := e.jobs[depID]
+				if !exists || dep.Status != StatusCompleted {
+					allDone = false
+					break
+				}
+			}
+			if !allDone {
+				continue
+			}
+		}
+
+		// Check max retries
+		if pipeline, ok := e.cfg.Pipelines[job.Pipeline]; ok {
+			if pipeline.Job.MaxRetries > 0 && job.Retries >= pipeline.Job.MaxRetries {
+				job.Status = StatusFailed
+				job.Error = "max retries exceeded"
+				continue
+			}
+		}
+
+		candidates = append(candidates, candidate{job: job})
+	}
+
+	// Sort by priority (descending), then by creation time (ascending)
+	for i := 1; i < len(candidates); i++ {
+		for j := i; j > 0; j-- {
+			a, b := candidates[j], candidates[j-1]
+			if a.job.Priority > b.job.Priority || (a.job.Priority == b.job.Priority && a.job.CreatedAt.Before(b.job.CreatedAt)) {
+				candidates[j], candidates[j-1] = candidates[j-1], candidates[j]
+			}
+		}
+	}
+
+	var assignments []JobAssignment
+
+	for _, c := range candidates {
+		if len(assignments) >= available {
+			break
+		}
+		job := c.job
+
 		// Atomic pick
-		now := time.Now()
 		job.Status = StatusRunning
 		job.WorkerID = workerID
 		job.PickedAt = now

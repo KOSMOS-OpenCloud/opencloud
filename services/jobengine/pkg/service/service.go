@@ -27,16 +27,22 @@ type Job struct {
 	Pipeline    string    `json:"pipeline"`
 	Status      JobStatus `json:"status"`
 	Progress    int       `json:"progress"`
+	Stage       string    `json:"stage,omitempty"`
+	StageData   any       `json:"stageData,omitempty"`
 	Total       int       `json:"total"`
+	Priority    int       `json:"priority,omitempty"`
 	Error       string    `json:"error,omitempty"`
 	Params      any       `json:"params,omitempty"`
 	Result      any       `json:"result,omitempty"`
+	DependsOn   []string  `json:"dependsOn,omitempty"`
+	ETA         time.Time `json:"eta,omitempty"`
 	UserID      string    `json:"userId"`
 	CreatedAt   time.Time `json:"createdAt"`
 	ValidTill   time.Time `json:"validTill,omitempty"`
 	WorkerID    string    `json:"workerId,omitempty"`
 	PickedAt    time.Time `json:"pickedAt,omitempty"`
 	CompletedAt time.Time `json:"completedAt,omitempty"`
+	Retries     int       `json:"retries,omitempty"`
 }
 
 // JobEngine is the core dispatcher service.
@@ -74,7 +80,15 @@ func New(cfg *config.PipelineConfig) *JobEngine {
 
 // Submit creates and queues a new job. The job sits in the queue
 // until a worker picks it via the poll endpoint.
-func (e *JobEngine) Submit(pipelineID string, resources []string, userID string, targetPath string, createDirs bool, params any) (*Job, error) {
+// SubmitOpts holds optional fields for job submission
+type SubmitOpts struct {
+	Params    any       `json:"params,omitempty"`
+	Priority  int       `json:"priority,omitempty"`
+	ETA       time.Time `json:"eta,omitempty"`
+	DependsOn []string  `json:"dependsOn,omitempty"`
+}
+
+func (e *JobEngine) Submit(pipelineID string, resources []string, userID string, targetPath string, createDirs bool, opts *SubmitOpts) (*Job, error) {
 	pipeline, ok := e.cfg.Pipelines[pipelineID]
 	if !ok {
 		return nil, fmt.Errorf("unknown pipeline: %s", pipelineID)
@@ -91,12 +105,34 @@ func (e *JobEngine) Submit(pipelineID string, resources []string, userID string,
 		validTill = time.Now().Add(1 * time.Hour) // default 1h
 	}
 
+	if opts == nil {
+		opts = &SubmitOpts{}
+	}
+
+	// Rate limit: check concurrent jobs for this pipeline
+	if pipeline.Job.RateLimit > 0 {
+		e.mu.RLock()
+		active := 0
+		for _, j := range e.jobs {
+			if j.Pipeline == pipelineID && (j.Status == StatusQueued || j.Status == StatusRunning) {
+				active++
+			}
+		}
+		e.mu.RUnlock()
+		if active >= pipeline.Job.RateLimit {
+			return nil, fmt.Errorf("rate limit exceeded: %d/%d active jobs for pipeline %s", active, pipeline.Job.RateLimit, pipelineID)
+		}
+	}
+
 	job := &Job{
 		ID:        uuid.New().String(),
 		Pipeline:  pipelineID,
 		Status:    StatusQueued,
 		Total:     len(resources),
-		Params:    params,
+		Params:    opts.Params,
+		Priority:  opts.Priority,
+		ETA:       opts.ETA,
+		DependsOn: opts.DependsOn,
 		UserID:    userID,
 		CreatedAt: time.Now(),
 		ValidTill: validTill,

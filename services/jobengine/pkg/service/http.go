@@ -61,6 +61,9 @@ type SubmitRequest struct {
 	TargetPath   string   `json:"targetPath"`
 	CreateTarget bool     `json:"createTarget"`
 	Params       any      `json:"params,omitempty"`
+	Priority     int      `json:"priority,omitempty"`
+	ETA          string   `json:"eta,omitempty"`
+	DependsOn    []string `json:"dependsOn,omitempty"`
 }
 
 func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +138,17 @@ func (e *JobEngine) handleSubmitJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	job, err := e.Submit(req.Pipeline, req.Resources, userID, req.TargetPath, req.CreateTarget, req.Params)
+	var eta time.Time
+	if req.ETA != "" {
+		eta, _ = time.Parse(time.RFC3339, req.ETA)
+	}
+
+	job, err := e.Submit(req.Pipeline, req.Resources, userID, req.TargetPath, req.CreateTarget, &SubmitOpts{
+		Params:    req.Params,
+		Priority:  req.Priority,
+		ETA:       eta,
+		DependsOn: req.DependsOn,
+	})
 	if err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return

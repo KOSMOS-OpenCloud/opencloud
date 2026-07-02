@@ -47,9 +47,11 @@ type Pipeline struct {
 // JobConfig is the opaque job description passed to workers.
 // The engine only reads Type and Timeout. Params is passed through uninterpreted.
 type JobConfig struct {
-	Type    string                 `yaml:"type" json:"type"`
-	Timeout time.Duration         `yaml:"timeout" json:"timeout"`
-	Params  map[string]any        `yaml:"params" json:"params"`
+	Type         string         `yaml:"type" json:"type"`
+	Timeout      time.Duration  `yaml:"timeout" json:"timeout"`
+	Params       map[string]any `yaml:"params" json:"params"`
+	RateLimit    int            `yaml:"rate_limit" json:"rateLimit,omitempty"`       // max concurrent jobs for this pipeline (0=unlimited)
+	MaxRetries   int            `yaml:"max_retries" json:"maxRetries,omitempty"`     // max re-picks on failure (0=no retry)
 }
 
 // DialogSpec defines an optional user input dialog shown before job submission

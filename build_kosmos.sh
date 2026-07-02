@@ -3,17 +3,39 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
-TAG="$(date +%Y%m%d-%H%M)"
+TAG="${TAG:-$(date +%Y%m%d-%H%M)}"
 DOCKERFILE="Dockerfile.test"
 
-# Override expected branch for all repos (default: kosmos)
+# Override expected branch (default: kosmos)
 EXPECT_BRANCH="${BRANCH:-kosmos}"
+GIT_BASE="${GIT_BASE:-https://codeberg.org/kosmos-opencloud}"
 
 echo "=== Build kosmos: ${IMAGE}:${TAG} (branch: ${EXPECT_BRANCH}) ==="
 
-# Verify branches are active in all repos
-REVA_DIR="/data/source/gitapps/opencloud_reva"
-WEB_DIR="/data/source/gitapps/opencloud_web"
+# Repo directories — use local if available, clone from git otherwise
+REVA_DIR="${SCRIPT_DIR}/../opencloud_reva"
+WEB_DIR="${SCRIPT_DIR}/../opencloud_web"
+CS3_DIR="${SCRIPT_DIR}/go-cs3apis-src"
+
+# Clone repos if not present (build-worker mode)
+echo "=== Stage: clone ==="
+if [ ! -d "$REVA_DIR" ]; then
+    echo "  Cloning opencloud_reva (kosmos)..."
+    git clone --depth 1 -b kosmos "${GIT_BASE}/opencloud_reva.git" "$REVA_DIR" 2>&1 | tail -2
+fi
+
+if [ ! -d "$WEB_DIR" ]; then
+    echo "  Cloning opencloud_web (${EXPECT_BRANCH})..."
+    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>/dev/null || \
+    git clone --depth 1 -b kosmos "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>&1 | tail -2
+fi
+
+if [ ! -d "$CS3_DIR" ] || [ ! -f "$CS3_DIR/go.mod" ]; then
+    echo "  Cloning go-cs3apis..."
+    rm -rf "$CS3_DIR"
+    git clone --depth 1 "${GIT_BASE}/../cs3org/go-cs3apis.git" "$CS3_DIR" 2>/dev/null || \
+    git clone --depth 1 "https://github.com/cs3org/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
+fi
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"
 REVA_BRANCH="$(cd "$REVA_DIR" && git branch --show-current 2>/dev/null || echo '?')"
@@ -23,24 +45,17 @@ echo "  opencloud branch: ${OC_BRANCH}"
 echo "  reva branch:      ${REVA_BRANCH}"
 echo "  web branch:       ${WEB_BRANCH}"
 
-if [ "$REVA_BRANCH" != "$EXPECT_BRANCH" ] && [ "$REVA_BRANCH" != "kosmos" ]; then
-    echo "ERROR: opencloud_reva is on '${REVA_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
-    exit 1
-fi
-if [ "$WEB_BRANCH" != "$EXPECT_BRANCH" ] && [ "$WEB_BRANCH" != "kosmos" ]; then
-    echo "ERROR: opencloud_web is on '${WEB_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
-    exit 1
-fi
-
-# Sync reva-src from opencloud_reva
+# Sync reva-src
+echo "=== Stage: prepare ==="
 echo "  Syncing reva-src from ${REVA_DIR} ..."
 rsync -a --delete --exclude='.git' "$REVA_DIR/" reva-src/
 
-# Build web-dist from opencloud_web
+# Build web-dist
+echo "=== Stage: build-web ==="
 echo "  Building web-dist from ${WEB_DIR} ..."
 "$SCRIPT_DIR/build_web.sh" build
 
-# Generate kosmos revision from all three repos
+# Generate kosmos revision
 OC_REV="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
 REVA_REV="$(cd "$REVA_DIR" && git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
 WEB_REV="$(cd "$WEB_DIR" && git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
@@ -58,8 +73,9 @@ func init() {
 GOEOF
 echo "  Revision: ${KOSMOS_REV}"
 
-# Build with date tag — never overwrite :latest directly
-TMPDIR=/data3/tmp podman build --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+# Build container image
+echo "=== Stage: build-image ==="
+TMPDIR=${TMPDIR:-/tmp} podman build --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
 
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="

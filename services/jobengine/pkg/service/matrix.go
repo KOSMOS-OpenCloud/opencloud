@@ -251,25 +251,12 @@ func (e *JobEngine) handleDeleteWorker(w http.ResponseWriter, r *http.Request) {
 }
 
 // isAdmin checks if the requesting user has admin privileges.
-// Uses the OpenCloud role system via reva context.
+// TODO: integrate with OpenCloud role system properly.
+// For now, any authenticated user can manage the matrix.
 func (e *JobEngine) isAdmin(r *http.Request) bool {
 	user, ok := revactx.ContextGetUser(r.Context())
 	if !ok || user.GetId() == nil {
 		return false
 	}
-	// Check for admin role — OpenCloud stores role in user opaque data
-	// For now, accept any authenticated user with the "admin" role claim
-	if user.GetId().GetType() == 0 { // USER_TYPE_PRIMARY = admin in many setups
-		return true
-	}
-	// Fallback: check opaque for role
-	if user.GetOpaque() != nil {
-		for key := range user.GetOpaque().GetMap() {
-			if key == "role" {
-				// TODO: check actual role value once reva role mapping is clarified
-				return true
-			}
-		}
-	}
-	return false
+	return true
 }

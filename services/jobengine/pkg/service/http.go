@@ -186,6 +186,11 @@ func (e *JobEngine) handleListJobs(w http.ResponseWriter, r *http.Request) {
 	}
 	status := JobStatus(r.URL.Query().Get("status"))
 
+	// Admin users see all jobs
+	if r.URL.Query().Get("all") == "true" && e.isAdmin(r) {
+		userID = ""
+	}
+
 	jobs := e.GetUserJobs(userID, status)
 	writeJSON(w, http.StatusOK, map[string]any{"jobs": jobs})
 }

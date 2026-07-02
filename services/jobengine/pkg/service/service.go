@@ -160,7 +160,7 @@ func (e *JobEngine) GetUserJobs(userID string, statusFilter JobStatus) []*Job {
 
 	var result []*Job
 	for _, job := range e.jobs {
-		if job.UserID != userID {
+		if userID != "" && job.UserID != userID {
 			continue
 		}
 		if statusFilter != "" && job.Status != statusFilter {

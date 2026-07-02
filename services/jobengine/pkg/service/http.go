@@ -24,6 +24,7 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 		r.Get("/{jobId}", e.handleGetJob)
 		r.Delete("/{jobId}", e.handleCancelJob)
 		r.Get("/", e.handleListJobs)
+		r.Get("/all", e.handleListAllJobs)
 
 		// Worker-facing API (OpenWorks protocol)
 		r.Route("/workers", func(r chi.Router) {
@@ -186,12 +187,17 @@ func (e *JobEngine) handleListJobs(w http.ResponseWriter, r *http.Request) {
 	}
 	status := JobStatus(r.URL.Query().Get("status"))
 
-	// Admin users see all jobs
-	if r.URL.Query().Get("all") == "true" && e.isAdmin(r) {
-		userID = ""
-	}
-
 	jobs := e.GetUserJobs(userID, status)
+	writeJSON(w, http.StatusOK, map[string]any{"jobs": jobs})
+}
+
+func (e *JobEngine) handleListAllJobs(w http.ResponseWriter, r *http.Request) {
+	if !e.isAdmin(r) {
+		http.Error(w, "admin required", http.StatusForbidden)
+		return
+	}
+	status := JobStatus(r.URL.Query().Get("status"))
+	jobs := e.GetUserJobs("", status)
 	writeJSON(w, http.StatusOK, map[string]any{"jobs": jobs})
 }
 

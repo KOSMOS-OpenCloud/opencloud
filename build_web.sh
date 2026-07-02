@@ -44,7 +44,7 @@ RUN pnpm install && pnpm build
 DEOF
 
     # Build context = parent dir containing opencloud_web
-    TMPDIR=/data3/tmp podman build --no-cache --security-opt label=disable -f /tmp/Dockerfile.web -t opencloud-web-builder "$(dirname "$WEB_SRC")" 2>&1 | tail -5
+    TMPDIR=${TMPDIR:-/tmp} podman build --network=host --no-cache --security-opt label=disable -f /tmp/Dockerfile.web -t opencloud-web-builder "$(dirname "$WEB_SRC")" 2>&1 | tail -5
 
     # Extract dist
     rm -rf "$WEB_DIST"

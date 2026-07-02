@@ -28,8 +28,12 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 		r.Post("/workers/poll", e.handleWorkerPoll)
 	})
 
-	// Admin API for Pipe-Matrix
+	// Admin API for Pipe-Matrix + Workers
 	e.RegisterMatrixRoutes(r)
+
+	r.Route("/api/v0/jobs/workers", func(r chi.Router) {
+		r.Get("/", e.handleListWorkers)
+	})
 }
 
 // PipelineInfo is the public representation of a pipeline

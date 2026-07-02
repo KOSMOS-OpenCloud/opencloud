@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"math"
 	"net/http"
 	"time"
 
@@ -140,6 +141,53 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, resp)
+}
+
+// WorkerInfo represents a known worker for the admin API
+type WorkerInfo struct {
+	ID       string  `json:"id"`
+	LastSeen string  `json:"lastSeen"`
+	OnlineH  float64 `json:"onlineHours"`
+	Online   bool    `json:"online"`
+}
+
+// handleListWorkers returns all known workers with heartbeat info
+func (e *JobEngine) handleListWorkers(w http.ResponseWriter, r *http.Request) {
+	if !e.isAdmin(r) {
+		writeJSON(w, http.StatusForbidden, map[string]string{"error": "admin required"})
+		return
+	}
+
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	// Collect all known worker IDs from heartbeats + matrix
+	known := make(map[string]bool)
+	for id := range e.heartbeats {
+		known[id] = true
+	}
+	for id := range e.pipeMatrix {
+		known[id] = true
+	}
+
+	now := time.Now()
+	maxInterval := time.Duration(e.cfg.Service.PollIntervalMax) * time.Second
+	if maxInterval == 0 {
+		maxInterval = 30 * time.Second
+	}
+
+	workers := make([]WorkerInfo, 0, len(known))
+	for id := range known {
+		info := WorkerInfo{ID: id}
+		if last, ok := e.heartbeats[id]; ok {
+			info.LastSeen = last.Format(time.RFC3339)
+			info.Online = now.Sub(last) < maxInterval*2
+			info.OnlineH = math.Round(now.Sub(last).Hours()*10) / 10
+		}
+		workers = append(workers, info)
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"workers": workers})
 }
 
 // processWorkerStatus applies a worker's status report to the job

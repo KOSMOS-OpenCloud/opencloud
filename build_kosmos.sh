@@ -75,7 +75,7 @@ echo "  Revision: ${KOSMOS_REV}"
 
 # Build container image
 echo "=== Stage: build-image ==="
-TMPDIR=${TMPDIR:-/tmp} podman build --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+TMPDIR=${TMPDIR:-/tmp} podman build --network=host --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
 
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="

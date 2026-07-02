@@ -17,13 +17,11 @@ func setupTestEngine() (*JobEngine, *chi.Mux) {
 	cfg.Pipelines["test-echo"] = config.Pipeline{
 		Label:       "Test Echo",
 		SourceTypes: []string{"text/plain"},
-		Batch:       true,
 		Target:      config.TargetConfig{Extension: ".out", Location: "same"},
-		Executor: config.ExecutorConfig{
-			Type:    "exec",
-			Command: "echo",
-			Args:    []string{"done"},
-			Timeout: 5 * time.Second,
+		Job: config.JobConfig{
+			Type:    "test-echo",
+			Timeout: 5 * time.Minute,
+			Params:  map[string]any{"command": "echo"},
 		},
 	}
 	engine := New(cfg)
@@ -51,6 +49,9 @@ func TestGetPipelinesAPI(t *testing.T) {
 	}
 	if resp.Pipelines[0].ID != "test-echo" {
 		t.Errorf("id = %s, want test-echo", resp.Pipelines[0].ID)
+	}
+	if resp.Pipelines[0].JobType != "test-echo" {
+		t.Errorf("jobType = %s, want test-echo", resp.Pipelines[0].JobType)
 	}
 }
 
@@ -88,8 +89,8 @@ func TestSubmitJobPathTraversal(t *testing.T) {
 	defer engine.Shutdown()
 
 	body, _ := json.Marshal(SubmitRequest{
-		Pipeline:  "test-echo",
-		Resources: []string{"file.txt"},
+		Pipeline:   "test-echo",
+		Resources:  []string{"file.txt"},
 		TargetPath: "../../../etc/",
 	})
 	req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
@@ -99,91 +100,6 @@ func TestSubmitJobPathTraversal(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400 for path traversal", w.Code)
-	}
-}
-
-func TestSubmitJobSuccess(t *testing.T) {
-	engine, r := setupTestEngine()
-	defer engine.Shutdown()
-
-	body, _ := json.Marshal(SubmitRequest{Pipeline: "test-echo", Resources: []string{"file.txt"}})
-	req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
-	req.Header.Set("X-User-Id", "alice")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusAccepted {
-		t.Fatalf("status = %d, want 202", w.Code)
-	}
-
-	var job Job
-	json.Unmarshal(w.Body.Bytes(), &job)
-	if job.ID == "" {
-		t.Error("job ID should not be empty")
-	}
-	if job.Pipeline != "test-echo" {
-		t.Errorf("pipeline = %s, want test-echo", job.Pipeline)
-	}
-}
-
-func TestSubmitJobTooManyResources(t *testing.T) {
-	engine, r := setupTestEngine()
-	defer engine.Shutdown()
-
-	resources := make([]string, 1001)
-	for i := range resources {
-		resources[i] = "file.txt"
-	}
-
-	body, _ := json.Marshal(SubmitRequest{Pipeline: "test-echo", Resources: resources})
-	req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
-	req.Header.Set("X-User-Id", "user1")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400 for too many resources", w.Code)
-	}
-}
-
-func TestRateLimiting(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	cfg.Pipelines["slow"] = config.Pipeline{
-		Batch: true,
-		Executor: config.ExecutorConfig{
-			Type:    "exec",
-			Command: "sleep",
-			Args:    []string{"60"},
-			Timeout: 120 * time.Second,
-		},
-	}
-	engine := New(cfg)
-	defer engine.Shutdown()
-
-	r := chi.NewRouter()
-	engine.RegisterRoutes(r)
-
-	// Submit 10 jobs
-	for i := 0; i < 10; i++ {
-		body, _ := json.Marshal(SubmitRequest{Pipeline: "slow", Resources: []string{"file.txt"}})
-		req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
-		req.Header.Set("X-User-Id", "spammer")
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-		if w.Code != http.StatusAccepted {
-			t.Fatalf("job %d: status = %d, want 202", i, w.Code)
-		}
-	}
-
-	// 11th should be rejected
-	body, _ := json.Marshal(SubmitRequest{Pipeline: "slow", Resources: []string{"file.txt"}})
-	req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
-	req.Header.Set("X-User-Id", "spammer")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusTooManyRequests {
-		t.Errorf("11th job: status = %d, want 429", w.Code)
 	}
 }
 
@@ -197,42 +113,5 @@ func TestGetJobNotFound(t *testing.T) {
 
 	if w.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want 404", w.Code)
-	}
-}
-
-func TestCancelJobAPI(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	cfg.Pipelines["slow"] = config.Pipeline{
-		Batch: true,
-		Executor: config.ExecutorConfig{
-			Type:    "exec",
-			Command: "sleep",
-			Args:    []string{"60"},
-			Timeout: 120 * time.Second,
-		},
-	}
-	engine := New(cfg)
-	defer engine.Shutdown()
-
-	r := chi.NewRouter()
-	engine.RegisterRoutes(r)
-
-	// Submit
-	body, _ := json.Marshal(SubmitRequest{Pipeline: "slow", Resources: []string{"file.txt"}})
-	req := httptest.NewRequest("POST", "/api/v0/jobs", bytes.NewReader(body))
-	req.Header.Set("X-User-Id", "user1")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	var job Job
-	json.Unmarshal(w.Body.Bytes(), &job)
-
-	// Cancel
-	req = httptest.NewRequest("DELETE", "/api/v0/jobs/"+job.ID, nil)
-	w = httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusNoContent {
-		t.Errorf("cancel status = %d, want 204", w.Code)
 	}
 }

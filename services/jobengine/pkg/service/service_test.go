@@ -7,22 +7,23 @@ import (
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 )
 
-func TestSubmitAndGetJob(t *testing.T) {
+func testConfig() *config.PipelineConfig {
 	cfg := config.PipelineDefaults()
 	cfg.Pipelines["test-echo"] = config.Pipeline{
 		Label:       "Test Echo",
 		SourceTypes: []string{"text/plain"},
-		Batch:       true,
 		Target:      config.TargetConfig{Extension: ".out", Location: "same"},
-		Executor: config.ExecutorConfig{
-			Type:    "exec",
-			Command: "echo",
-			Args:    []string{"done"},
-			Timeout: 5 * time.Second,
+		Job: config.JobConfig{
+			Type:    "test-echo",
+			Timeout: 5 * time.Minute,
+			Params:  map[string]any{"command": "echo", "args": []any{"done"}},
 		},
 	}
+	return cfg
+}
 
-	engine := New(cfg)
+func TestSubmitAndGetJob(t *testing.T) {
+	engine := New(testConfig())
 	defer engine.Shutdown()
 
 	job, err := engine.Submit("test-echo", []string{"file1.txt", "file2.txt"}, "user1", "", false)
@@ -39,25 +40,16 @@ func TestSubmitAndGetJob(t *testing.T) {
 	if job.Pipeline != "test-echo" {
 		t.Errorf("pipeline = %s, want test-echo", job.Pipeline)
 	}
-
-	// Wait for completion
-	time.Sleep(time.Second)
-
-	got, ok := engine.GetJob(job.ID)
-	if !ok {
-		t.Fatal("job not found")
+	if job.Status != StatusQueued {
+		t.Errorf("status = %s, want queued (dispatcher does not execute)", job.Status)
 	}
-	if got.Status != StatusCompleted {
-		t.Errorf("status = %s, want completed", got.Status)
-	}
-	if got.Progress != 100 {
-		t.Errorf("progress = %d, want 100", got.Progress)
+	if job.ValidTill.IsZero() {
+		t.Error("validTill should be set")
 	}
 }
 
 func TestSubmitUnknownPipeline(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	engine := New(cfg)
+	engine := New(testConfig())
 	defer engine.Shutdown()
 
 	_, err := engine.Submit("nonexistent", []string{"file.txt"}, "user1", "", false)
@@ -66,40 +58,12 @@ func TestSubmitUnknownPipeline(t *testing.T) {
 	}
 }
 
-func TestBatchNotAllowed(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	cfg.Pipelines["single-only"] = config.Pipeline{
-		Batch: false,
-		Executor: config.ExecutorConfig{Type: "exec", Command: "echo"},
-	}
-
-	engine := New(cfg)
-	defer engine.Shutdown()
-
-	_, err := engine.Submit("single-only", []string{"a.txt", "b.txt"}, "user1", "", false)
-	if err == nil {
-		t.Error("expected error for batch on non-batch pipeline")
-	}
-}
-
 func TestCancelJob(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	cfg.Pipelines["slow"] = config.Pipeline{
-		Batch: true,
-		Executor: config.ExecutorConfig{
-			Type:    "exec",
-			Command: "sleep",
-			Args:    []string{"10"},
-			Timeout: 30 * time.Second,
-		},
-	}
-
-	engine := New(cfg)
+	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	job, _ := engine.Submit("slow", []string{"file.txt"}, "user1", "", false)
+	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false)
 
-	time.Sleep(100 * time.Millisecond)
 	err := engine.CancelJob(job.ID)
 	if err != nil {
 		t.Fatalf("CancelJob: %v", err)
@@ -112,18 +76,12 @@ func TestCancelJob(t *testing.T) {
 }
 
 func TestGetUserJobs(t *testing.T) {
-	cfg := config.PipelineDefaults()
-	cfg.Pipelines["test"] = config.Pipeline{
-		Batch:    true,
-		Executor: config.ExecutorConfig{Type: "exec", Command: "echo"},
-	}
-
-	engine := New(cfg)
+	engine := New(testConfig())
 	defer engine.Shutdown()
 
-	engine.Submit("test", []string{"a.txt"}, "alice", "", false)
-	engine.Submit("test", []string{"b.txt"}, "bob", "", false)
-	engine.Submit("test", []string{"c.txt"}, "alice", "", false)
+	engine.Submit("test-echo", []string{"a.txt"}, "alice", "", false)
+	engine.Submit("test-echo", []string{"b.txt"}, "bob", "", false)
+	engine.Submit("test-echo", []string{"c.txt"}, "alice", "", false)
 
 	aliceJobs := engine.GetUserJobs("alice", "")
 	if len(aliceJobs) != 2 {
@@ -133,5 +91,33 @@ func TestGetUserJobs(t *testing.T) {
 	bobJobs := engine.GetUserJobs("bob", "")
 	if len(bobJobs) != 1 {
 		t.Errorf("bob jobs = %d, want 1", len(bobJobs))
+	}
+}
+
+func TestJobStaysQueued(t *testing.T) {
+	engine := New(testConfig())
+	defer engine.Shutdown()
+
+	job, _ := engine.Submit("test-echo", []string{"file.txt"}, "user1", "", false)
+
+	// Job should stay queued — no internal workers, only external poll can pick it
+	got, _ := engine.GetJob(job.ID)
+	if got.Status != StatusQueued {
+		t.Errorf("status = %s, want queued (no internal execution)", got.Status)
+	}
+}
+
+func TestPipeMatrix(t *testing.T) {
+	engine := New(testConfig())
+	defer engine.Shutdown()
+
+	engine.SetWorkerSlots("worker-1", map[string]int{"test-echo": 3})
+
+	slots, denied := engine.getWorkerSlots("worker-1", []string{"test-echo", "unknown"})
+	if slots["test-echo"] != 3 {
+		t.Errorf("slots[test-echo] = %d, want 3", slots["test-echo"])
+	}
+	if len(denied) != 1 || denied[0] != "unknown" {
+		t.Errorf("denied = %v, want [unknown]", denied)
 	}
 }

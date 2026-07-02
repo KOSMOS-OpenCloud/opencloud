@@ -31,13 +31,22 @@ func main() {
 	engine := service.New(cfg)
 	defer engine.Shutdown()
 
+	// Load pipe matrix
+	matrixFile := os.Getenv("JOBENGINE_MATRIX_FILE")
+	if matrixFile == "" {
+		matrixFile = "/etc/opencloud/jobs/matrix.yaml"
+	}
+	if err := engine.LoadMatrix(matrixFile); err != nil {
+		log.Printf("matrix: %v (continuing without matrix)", err)
+	}
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	engine.RegisterRoutes(r)
 
-	fmt.Printf("jobengine: %d pipelines, %d workers, listening on %s\n",
-		len(cfg.Pipelines), cfg.Service.MaxWorkers, listenAddr)
+	fmt.Printf("jobengine: %d pipelines, dispatcher mode, listening on %s\n",
+		len(cfg.Pipelines), listenAddr)
 	for id, p := range cfg.Pipelines {
 		fmt.Printf("  pipeline: %s (%s) → job:%s\n", id, p.Label, p.Job.Type)
 	}

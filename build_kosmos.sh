@@ -33,8 +33,7 @@ fi
 if [ ! -d "$CS3_DIR" ] || [ ! -f "$CS3_DIR/go.mod" ]; then
     echo "  Cloning go-cs3apis..."
     rm -rf "$CS3_DIR"
-    git clone --depth 1 "${GIT_BASE}/../cs3org/go-cs3apis.git" "$CS3_DIR" 2>/dev/null || \
-    git clone --depth 1 "https://github.com/cs3org/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
+    git clone --depth 1 -b feat/gateway-immutable "https://github.com/flash7777/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
 fi
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"

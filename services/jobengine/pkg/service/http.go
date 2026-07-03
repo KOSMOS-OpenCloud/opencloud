@@ -51,6 +51,7 @@ type PipelineInfo struct {
 	Dialog         *config.DialogSpec `json:"dialog,omitempty"`
 	JobType        string             `json:"jobType"`
 	Notification   string             `json:"notification,omitempty"`
+	DesignedBy     string             `json:"designedBy,omitempty"`
 }
 
 type PipelinesResponse struct {
@@ -85,6 +86,7 @@ func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
 			Dialog:         p.Dialog,
 			JobType:        p.Job.Type,
 			Notification:   p.Notification,
+			DesignedBy:     p.DesignedBy,
 		})
 	}
 

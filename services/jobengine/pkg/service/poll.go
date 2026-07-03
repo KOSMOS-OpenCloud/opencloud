@@ -14,6 +14,7 @@ type PollRequest struct {
 	Pick     []string           `json:"pick"`
 	Capacity int                `json:"capacity"`
 	Status   []WorkerJobStatus  `json:"status,omitempty"`
+	Data     map[string]any     `json:"data,omitempty"`
 }
 
 // WorkerJobStatus is a progress/completion report from the worker
@@ -112,6 +113,11 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 	// Process status reports from the worker
 	for _, s := range req.Status {
 		e.processWorkerStatus(workerID, s)
+	}
+
+	// Process worker data (pipelines, logs, etc.)
+	if req.Data != nil {
+		e.processWorkerData(workerID, req.Data)
 	}
 
 	// Determine allowed types from pipe matrix
@@ -242,6 +248,63 @@ func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
 			job.Status = StatusFailed
 			job.CompletedAt = time.Now()
 		}
+	}
+}
+
+// processWorkerData handles opaque data from the worker (pipelines, logs, etc.)
+func (e *JobEngine) processWorkerData(workerID string, data map[string]any) {
+	// data.pipelines: worker-defined pipeline definitions
+	if rawPipelines, ok := data["pipelines"]; ok {
+		if pipelines, ok := rawPipelines.(map[string]any); ok {
+			e.registerWorkerPipelines(workerID, pipelines)
+		}
+	}
+}
+
+// registerWorkerPipelines merges worker-provided pipeline definitions into the config.
+// Each pipeline gets DesignedBy set to the worker ID.
+func (e *JobEngine) registerWorkerPipelines(workerID string, pipelines map[string]any) {
+	for id, raw := range pipelines {
+		def, ok := raw.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		p := config.Pipeline{
+			DesignedBy: workerID,
+		}
+		if v, ok := def["label"].(string); ok {
+			p.Label = v
+		}
+		if v, ok := def["icon"].(string); ok {
+			p.Icon = v
+		}
+		if v, ok := def["menu"].(string); ok {
+			p.Menu = v
+		}
+		if v, ok := def["notification"].(string); ok {
+			p.Notification = v
+		}
+		if types, ok := def["source_types"].([]any); ok {
+			for _, t := range types {
+				if s, ok := t.(string); ok {
+					p.SourceTypes = append(p.SourceTypes, s)
+				}
+			}
+		}
+		if job, ok := def["job"].(map[string]any); ok {
+			if v, ok := job["type"].(string); ok {
+				p.Job.Type = v
+			}
+			if params, ok := job["params"].(map[string]any); ok {
+				p.Job.Params = params
+			}
+		}
+		if p.Job.Type == "" {
+			p.Job.Type = id
+		}
+
+		e.cfg.Pipelines[id] = p
 	}
 }
 

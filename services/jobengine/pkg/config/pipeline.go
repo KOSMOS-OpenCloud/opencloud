@@ -35,6 +35,7 @@ type Pipeline struct {
 	Dialog      *DialogSpec  `yaml:"dialog"`        // optional user input dialog
 	Job         JobConfig    `yaml:"job"`           // opaque job description for workers
 	Notification string     `yaml:"notification"`  // "toast" | "none"
+	DesignedBy  string       `yaml:"designed_by" json:"designedBy,omitempty"` // worker ID or "" for internal
 
 	// Deprecated: kept for backward compatibility with existing YAMLs.
 	// Use Job.Params instead. Will be migrated on load.

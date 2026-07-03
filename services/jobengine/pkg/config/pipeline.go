@@ -25,10 +25,17 @@ type PipelineServiceConfig struct {
 	PollIntervalMax int      `yaml:"poll_interval_max"` // seconds, maximum poll frequency (heartbeat timeout)
 }
 
-// SharesConfig defines how the UI handles file sharing for a pipeline
+// SharesConfig defines how the UI handles file sharing for a pipeline.
+// Type controls what gets shared and with what permissions:
+//   srcFile    — source file, read-only
+//   srcDir     — source folder, read-only
+//   parentDir  — parent folder of source, read+write (result goes next to source)
+//   sameFile   — source file, read+write (in-place conversion)
+//   sameDir    — source folder, read+write (batch processing)
+//   srcDstFile — source + separate destination (needs picker)
+//   srcDstDir  — source folder + destination folder (needs picker)
 type SharesConfig struct {
-	Origin      bool   `yaml:"origin" json:"origin"`                          // create read share for source file(s)
-	Destination string `yaml:"destination,omitempty" json:"destination,omitempty"` // "picker" | "same" | "" (none)
+	Type string `yaml:"type" json:"type"` // srcFile | srcDir | parentDir | sameFile | sameDir | srcDstFile | srcDstDir
 }
 
 // Pipeline defines a conversion/processing pipeline

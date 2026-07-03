@@ -302,14 +302,9 @@ func (e *JobEngine) registerWorkerPipelines(workerID string, pipelines map[strin
 			}
 		}
 		if shares, ok := def["shares"].(map[string]any); ok {
-			sc := &config.SharesConfig{}
-			if v, ok := shares["origin"].(bool); ok {
-				sc.Origin = v
+			if v, ok := shares["type"].(string); ok {
+				p.Shares = &config.SharesConfig{Type: v}
 			}
-			if v, ok := shares["destination"].(string); ok {
-				sc.Destination = v
-			}
-			p.Shares = sc
 		}
 		if p.Job.Type == "" {
 			p.Job.Type = id

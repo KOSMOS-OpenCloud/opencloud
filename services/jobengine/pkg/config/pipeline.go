@@ -25,17 +25,24 @@ type PipelineServiceConfig struct {
 	PollIntervalMax int      `yaml:"poll_interval_max"` // seconds, maximum poll frequency (heartbeat timeout)
 }
 
+// SharesConfig defines how the UI handles file sharing for a pipeline
+type SharesConfig struct {
+	Origin      bool   `yaml:"origin" json:"origin"`                          // create read share for source file(s)
+	Destination string `yaml:"destination,omitempty" json:"destination,omitempty"` // "picker" | "same" | "" (none)
+}
+
 // Pipeline defines a conversion/processing pipeline
 type Pipeline struct {
-	Label       string       `yaml:"label"`
-	Icon        string       `yaml:"icon"`
-	SourceTypes []string     `yaml:"source_types"`
-	Target      TargetConfig `yaml:"target"`
-	Menu        string       `yaml:"menu"`         // "context" | "index" | "back"
-	Dialog      *DialogSpec  `yaml:"dialog"`        // optional user input dialog
-	Job         JobConfig    `yaml:"job"`           // opaque job description for workers
-	Notification string     `yaml:"notification"`  // "toast" | "none"
-	DesignedBy  string       `yaml:"designed_by" json:"designedBy,omitempty"` // worker ID or "" for internal
+	Label       string        `yaml:"label"`
+	Icon        string        `yaml:"icon"`
+	SourceTypes []string      `yaml:"source_types"`
+	Target      TargetConfig  `yaml:"target"`
+	Menu        string        `yaml:"menu"`         // "context" | "index" | "back"
+	Dialog      *DialogSpec   `yaml:"dialog"`        // optional user input dialog
+	Shares      *SharesConfig `yaml:"shares"`        // origin/destination share behavior
+	Job         JobConfig     `yaml:"job"`           // opaque job description for workers
+	Notification string      `yaml:"notification"`  // "toast" | "none"
+	DesignedBy  string        `yaml:"designed_by" json:"designedBy,omitempty"` // worker ID or "" for internal
 
 	// Deprecated: kept for backward compatibility with existing YAMLs.
 	// Use Job.Params instead. Will be migrated on load.

@@ -42,16 +42,17 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 
 // PipelineInfo is the public representation of a pipeline
 type PipelineInfo struct {
-	ID             string             `json:"id"`
-	Label          string             `json:"label"`
-	Icon           string             `json:"icon"`
-	SourceTypes    []string           `json:"sourceTypes"`
-	TargetLocation string             `json:"targetLocation"`
-	Menu           string             `json:"menu,omitempty"`
-	Dialog         *config.DialogSpec `json:"dialog,omitempty"`
-	JobType        string             `json:"jobType"`
-	Notification   string             `json:"notification,omitempty"`
-	DesignedBy     string             `json:"designedBy,omitempty"`
+	ID             string               `json:"id"`
+	Label          string               `json:"label"`
+	Icon           string               `json:"icon"`
+	SourceTypes    []string             `json:"sourceTypes"`
+	TargetLocation string               `json:"targetLocation"`
+	Menu           string               `json:"menu,omitempty"`
+	Dialog         *config.DialogSpec   `json:"dialog,omitempty"`
+	Shares         *config.SharesConfig `json:"shares,omitempty"`
+	JobType        string               `json:"jobType"`
+	Notification   string               `json:"notification,omitempty"`
+	DesignedBy     string               `json:"designedBy,omitempty"`
 }
 
 type PipelinesResponse struct {
@@ -84,6 +85,7 @@ func (e *JobEngine) handleGetPipelines(w http.ResponseWriter, r *http.Request) {
 			TargetLocation: p.Target.Location,
 			Menu:           p.Menu,
 			Dialog:         p.Dialog,
+			Shares:         p.Shares,
 			JobType:        p.Job.Type,
 			Notification:   p.Notification,
 			DesignedBy:     p.DesignedBy,

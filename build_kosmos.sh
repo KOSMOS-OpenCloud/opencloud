@@ -20,20 +20,19 @@ CS3_DIR="${SCRIPT_DIR}/go-cs3apis-src"
 # Clone repos if not present (build-worker mode)
 echo "=== Stage: clone ==="
 if [ ! -d "$REVA_DIR" ]; then
-    echo "  Cloning opencloud_reva (kosmos)..."
-    git clone --depth 1 -b kosmos "${GIT_BASE}/opencloud_reva.git" "$REVA_DIR" 2>&1 | tail -2
+    echo "  Cloning opencloud_reva (${EXPECT_BRANCH})..."
+    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_reva.git" "$REVA_DIR" 2>&1 | tail -2
 fi
 
 if [ ! -d "$WEB_DIR" ]; then
     echo "  Cloning opencloud_web (${EXPECT_BRANCH})..."
-    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>/dev/null || \
-    git clone --depth 1 -b kosmos "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>&1 | tail -2
+    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>&1 | tail -2
 fi
 
 if [ ! -d "$CS3_DIR" ] || [ ! -f "$CS3_DIR/go.mod" ]; then
-    echo "  Cloning go-cs3apis..."
+    echo "  Cloning go-cs3apis (${EXPECT_BRANCH})..."
     rm -rf "$CS3_DIR"
-    git clone --depth 1 -b kosmos "${GIT_BASE}/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
+    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
 fi
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"

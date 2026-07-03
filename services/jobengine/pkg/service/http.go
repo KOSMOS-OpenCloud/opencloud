@@ -21,10 +21,10 @@ func (e *JobEngine) RegisterRoutes(r chi.Router) {
 		// User-facing API
 		r.Get("/pipelines", e.handleGetPipelines)
 		r.Post("/", e.handleSubmitJob)
+		r.Get("/all", e.handleListAllJobs)
 		r.Get("/{jobId}", e.handleGetJob)
 		r.Delete("/{jobId}", e.handleCancelJob)
 		r.Get("/", e.handleListJobs)
-		r.Get("/all", e.handleListAllJobs)
 
 		// Worker-facing API (OpenWorks protocol)
 		r.Route("/workers", func(r chi.Router) {

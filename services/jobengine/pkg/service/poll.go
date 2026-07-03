@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 )
 

@@ -17,23 +17,23 @@ REVA_DIR="${SCRIPT_DIR}/../opencloud_reva"
 WEB_DIR="${SCRIPT_DIR}/../opencloud_web"
 CS3_DIR="${SCRIPT_DIR}/go-cs3apis-src"
 
-# Clone repos if not present (build-worker mode)
+# Clone or update repos (build-worker mode)
 echo "=== Stage: clone ==="
-if [ ! -d "$REVA_DIR" ]; then
-    echo "  Cloning opencloud_reva (${EXPECT_BRANCH})..."
-    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_reva.git" "$REVA_DIR" 2>&1 | tail -2
-fi
+clone_or_update() {
+    local dir="$1" repo="$2" branch="$3"
+    if [ -d "$dir/.git" ]; then
+        echo "  Updating ${repo} (${branch})..."
+        (cd "$dir" && git fetch origin && git reset --hard "origin/${branch}") 2>&1 | tail -2
+    else
+        echo "  Cloning ${repo} (${branch})..."
+        rm -rf "$dir"
+        git clone --depth 1 -b "${branch}" "${GIT_BASE}/${repo}.git" "$dir" 2>&1 | tail -2
+    fi
+}
 
-if [ ! -d "$WEB_DIR" ]; then
-    echo "  Cloning opencloud_web (${EXPECT_BRANCH})..."
-    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/opencloud_web.git" "$WEB_DIR" 2>&1 | tail -2
-fi
-
-if [ ! -d "$CS3_DIR" ] || [ ! -f "$CS3_DIR/go.mod" ]; then
-    echo "  Cloning go-cs3apis (${EXPECT_BRANCH})..."
-    rm -rf "$CS3_DIR"
-    git clone --depth 1 -b "${EXPECT_BRANCH}" "${GIT_BASE}/go-cs3apis.git" "$CS3_DIR" 2>&1 | tail -2
-fi
+clone_or_update "$REVA_DIR" "opencloud_reva" "${EXPECT_BRANCH}"
+clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
+clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"
 REVA_BRANCH="$(cd "$REVA_DIR" && git branch --show-current 2>/dev/null || echo '?')"

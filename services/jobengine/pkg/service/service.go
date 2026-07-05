@@ -55,6 +55,7 @@ type JobEngine struct {
 
 	// Worker polling state
 	heartbeats map[string]time.Time       // workerID → last poll time
+	workerPick map[string][]string        // workerID → offered job types
 	pipeMatrix map[string]map[string]int   // workerID → { jobType → slots }
 	matrix     *PipeMatrix                 // persistent matrix (if loaded from file)
 }
@@ -69,6 +70,7 @@ func New(cfg *config.PipelineConfig) *JobEngine {
 		jobs:        make(map[string]*Job),
 		stopCleanup: make(chan struct{}),
 		heartbeats:  make(map[string]time.Time),
+		workerPick:  make(map[string][]string),
 		pipeMatrix:  make(map[string]map[string]int),
 	}
 

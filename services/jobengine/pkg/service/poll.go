@@ -108,8 +108,9 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 		return // no body — backpressure signal
 	}
 
-	// Record heartbeat
+	// Record heartbeat + offered types
 	e.recordHeartbeat(workerID)
+	e.recordPick(workerID, req.Pick)
 
 	// Process status reports from the worker
 	for _, s := range req.Status {
@@ -154,10 +155,11 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 
 // WorkerInfo represents a known worker for the admin API
 type WorkerInfo struct {
-	ID       string  `json:"id"`
-	LastSeen string  `json:"lastSeen"`
-	OnlineH  float64 `json:"onlineHours"`
-	Online   bool    `json:"online"`
+	ID       string   `json:"id"`
+	LastSeen string   `json:"lastSeen"`
+	OnlineH  float64  `json:"onlineHours"`
+	Online   bool     `json:"online"`
+	Pick     []string `json:"pick,omitempty"`
 }
 
 // handleListWorkers returns all known workers with heartbeat info
@@ -192,6 +194,9 @@ func (e *JobEngine) handleListWorkers(w http.ResponseWriter, r *http.Request) {
 			info.LastSeen = last.Format(time.RFC3339)
 			info.Online = now.Sub(last) < maxInterval*2
 			info.OnlineH = math.Round(now.Sub(last).Hours()*10) / 10
+		}
+		if pick, ok := e.workerPick[id]; ok {
+			info.Pick = pick
 		}
 		workers = append(workers, info)
 	}
@@ -337,6 +342,17 @@ func (e *JobEngine) recordHeartbeat(workerID string) {
 		e.heartbeats = make(map[string]time.Time)
 	}
 	e.heartbeats[workerID] = time.Now()
+}
+
+// recordPick stores the job types offered by a worker
+func (e *JobEngine) recordPick(workerID string, pick []string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if e.workerPick == nil {
+		e.workerPick = make(map[string][]string)
+	}
+	e.workerPick[workerID] = pick
 }
 
 // getWorkerSlots checks the pipe matrix and returns allowed slots + denied types

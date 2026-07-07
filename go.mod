@@ -3,6 +3,7 @@ module github.com/opencloud-eu/opencloud
 go 1.25.8
 
 require (
+	codeberg.org/kosmos-openworks/openworks-pipeworx v0.0.0
 	dario.cat/mergo v1.0.2
 	github.com/CiscoM31/godata v1.0.11
 	github.com/KimMachineGun/automemlimit v0.7.5

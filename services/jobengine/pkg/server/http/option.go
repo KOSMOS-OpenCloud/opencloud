@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
+	pipeengine "codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/engine"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/metrics"
-	svc "github.com/opencloud-eu/opencloud/services/jobengine/pkg/service"
 
 	"github.com/spf13/pflag"
 	"go.opentelemetry.io/otel/trace"
@@ -23,7 +23,7 @@ type Options struct {
 	Metrics       *metrics.Metrics
 	Flags         []pflag.Flag
 	TraceProvider trace.TracerProvider
-	JobEngine     *svc.JobEngine
+	JobEngine     *pipeengine.JobEngine
 }
 
 // newOptions initializes the available default options.
@@ -66,6 +66,6 @@ func TraceProvider(val trace.TracerProvider) Option {
 }
 
 // JobEngine provides a function to set the JobEngine option.
-func JobEngine(val *svc.JobEngine) Option {
+func JobEngine(val *pipeengine.JobEngine) Option {
 	return func(o *Options) { o.JobEngine = val }
 }

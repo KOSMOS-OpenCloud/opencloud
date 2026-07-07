@@ -8,8 +8,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
-	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/service"
+
+	pipeconfig "codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/config"
+	pipeengine "codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/engine"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 		cfgPath = "/etc/opencloud/jobs/pipelines.yaml"
 	}
 
-	cfg, err := config.LoadPipelineConfig(cfgPath)
+	cfg, err := pipeconfig.LoadPipelineConfig(cfgPath)
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
@@ -28,7 +29,16 @@ func main() {
 		listenAddr = addr
 	}
 
-	engine := service.New(cfg)
+	// Simple auth: any authenticated user is admin (standalone mode)
+	auth := pipeengine.AuthExtractorFunc(func(r *http.Request) (*pipeengine.UserInfo, bool) {
+		user, _, ok := r.BasicAuth()
+		if !ok || user == "" {
+			return nil, false
+		}
+		return &pipeengine.UserInfo{ID: user, IsAdmin: true}, true
+	})
+
+	engine := pipeengine.New(cfg, auth)
 	defer engine.Shutdown()
 
 	// Load pipe matrix

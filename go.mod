@@ -14,7 +14,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.6.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.19.0
-	github.com/cs3org/go-cs3apis v0.0.0-20260424072047-8d9ef7076ae9
+	github.com/cs3org/go-cs3apis v0.0.0-20260622103902-4ac4450680d6
 	github.com/davidbyttow/govips/v2 v2.18.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -412,3 +412,5 @@ replace go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.202411151126
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a
+replace codeberg.org/kosmos-openworks/openworks-pipeworx => ./pipeworx-src
+

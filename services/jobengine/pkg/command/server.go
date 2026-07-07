@@ -9,12 +9,14 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/runner"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/pkg/version"
+	pipeconfig "codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/config"
+	pipeengine "codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/engine"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config/parser"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/metrics"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/server/http"
-	svc "github.com/opencloud-eu/opencloud/services/jobengine/pkg/service"
+	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/service"
 	"github.com/spf13/cobra"
 )
 
@@ -42,14 +44,14 @@ func Server(cfg *config.Config) *cobra.Command {
 			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			// Load pipeline configuration
-			engineCfg := config.PipelineDefaults()
+			engineCfg := pipeconfig.PipelineDefaults()
 			engineCfg.Service.MaxWorkers = cfg.MaxWorkers
 			engineCfg.Service.QueueSize = cfg.QueueSize
 			engineCfg.Service.TempDir = cfg.TempDir
 			engineCfg.Service.PipelineDirs = cfg.PipelineDirs
 
 			if cfg.ConfigFile != "" {
-				loaded, err := config.LoadPipelineConfig(cfg.ConfigFile)
+				loaded, err := pipeconfig.LoadPipelineConfig(cfg.ConfigFile)
 				if err != nil {
 					logger.Warn().Err(err).Str("file", cfg.ConfigFile).Msg("could not load pipeline config, using defaults")
 				} else {
@@ -61,7 +63,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				}
 			}
 
-			engine := svc.New(engineCfg)
+			engine := pipeengine.New(engineCfg, &service.RevaAuthExtractor{})
 			defer engine.Shutdown()
 
 			// Load pipe matrix

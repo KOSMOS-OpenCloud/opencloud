@@ -306,6 +306,9 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Get("/", svc.GetRoleDefinitions)
 				r.Get("/{roleID}", svc.GetRoleDefinition)
 			})
+			r.Route("/extensions", func(r chi.Router) {
+				r.Get("/apps", svc.GetSpaceApps)
+			})
 		})
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/extensions/org.libregraph", func(r chi.Router) {

@@ -33,12 +33,14 @@ type AppMenuItem struct {
 
 // SpaceApp is the response for a single space app.
 type SpaceApp struct {
-	SpaceID   string        `json:"spaceId"`
-	SpaceName string        `json:"spaceName"`
-	Name      string        `json:"name"`
-	Icon      string        `json:"icon,omitempty"`
-	Color     string        `json:"color,omitempty"`
-	Menu      []AppMenuItem `json:"menu,omitempty"`
+	SpaceID    string        `json:"spaceId"`
+	SpaceName  string        `json:"spaceName"`
+	DriveAlias string        `json:"driveAlias"`
+	DriveType  string        `json:"driveType"`
+	Name       string        `json:"name"`
+	Icon       string        `json:"icon,omitempty"`
+	Color      string        `json:"color,omitempty"`
+	Menu       []AppMenuItem `json:"menu,omitempty"`
 }
 
 // SpaceAppsResponse is the response for the apps endpoint.
@@ -158,12 +160,26 @@ func (g Graph) readSpaceApp(ctx context.Context, gw gateway.GatewayAPIClient, sp
 		return nil
 	}
 
+	// Extract drive alias from space opaque data
+	driveAlias := ""
+	driveType := ""
+	if space.GetSpaceType() != "" {
+		driveType = space.GetSpaceType()
+	}
+	if space.GetOpaque() != nil {
+		if alias, ok := space.GetOpaque().GetMap()["spaceAlias"]; ok {
+			driveAlias = string(alias.GetValue())
+		}
+	}
+
 	return &SpaceApp{
-		SpaceID:   space.GetId().GetOpaqueId(),
-		SpaceName: space.GetName(),
-		Name:      config.Name,
-		Icon:      config.Icon,
-		Color:     config.Color,
-		Menu:      config.Menu,
+		SpaceID:    space.GetId().GetOpaqueId(),
+		SpaceName:  space.GetName(),
+		DriveAlias: driveAlias,
+		DriveType:  driveType,
+		Name:       config.Name,
+		Icon:       config.Icon,
+		Color:      config.Color,
+		Menu:       config.Menu,
 	}
 }

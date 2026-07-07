@@ -1,89 +1,45 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build only the web UI and deploy to brandis
-# without rebuilding the entire OpenCloud image.
+# Build OpenCloud Web UI via job.py and deploy to brandis.eu.
 #
 # Usage:
-#   ./build_web.sh              # Build + deploy
-#   ./build_web.sh build        # Build only
-#   ./build_web.sh deploy       # Deploy only
-#   BRANCH=openworks ./build_web.sh build  # Build from feature branch
+#   ./build_web.sh              # Build + Push + Deploy
+#   ./build_web.sh build        # Build + Push only (via job.py)
+#   ./build_web.sh deploy       # Deploy only (latest from Codeberg)
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$SCRIPT_DIR/DIST" 2>/dev/null || { echo "ERROR: DIST not found"; exit 1; }
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DEPLOY_DIR="$(cd "$SCRIPT_DIR/../kosmos-cloud-deploy" && pwd)"
+. "$SCRIPT_DIR/DIST" 2>/dev/null || true
 
-WEB_SRC="${SCRIPT_DIR}/../opencloud_web"
-WEB_DIST="${SCRIPT_DIR}/web-dist"
-CONTAINER="${INSTANCE:-opencloud_full-opencloud-1}"
-
-# Override expected branch (default: kosmos)
-EXPECT_BRANCH="${BRANCH:-kosmos}"
-
-if [ ! -d "$WEB_SRC" ]; then
-    echo "ERROR: opencloud_web not found at $WEB_SRC"
-    exit 1
+# Load tokens from kosmos-cloud-deploy/DIST
+if [ -f "$DEPLOY_DIR/DIST" ]; then
+    eval "$(grep '^OPENWORKS_TOKEN=' "$DEPLOY_DIR/DIST")"
+    eval "$(grep '^CODEBERG_TOKEN=' "$DEPLOY_DIR/DIST")"
 fi
 
+: "${OPENWORKS_TOKEN:?Set OPENWORKS_TOKEN}"
+
 build_web() {
-    WEB_BRANCH="$(cd "$WEB_SRC" && git branch --show-current 2>/dev/null || echo '?')"
-    echo "=== Building web UI (branch: ${WEB_BRANCH}, expected: ${EXPECT_BRANCH}) ==="
-
-    if [ "$WEB_BRANCH" != "$EXPECT_BRANCH" ] && [ "$WEB_BRANCH" != "kosmos" ]; then
-        echo "ERROR: opencloud_web is on '${WEB_BRANCH}', expected '${EXPECT_BRANCH}' or 'kosmos'. Aborting."
-        exit 1
-    fi
-
-    # Build in container via Dockerfile (same approach as build_kosmos.sh)
-    cat > /tmp/Dockerfile.web << 'DEOF'
-FROM quay.io/opencloudeu/nodejs-ci:24
-ENV CI=true
-COPY opencloud_web/ /build/
-WORKDIR /build
-RUN pnpm install && pnpm build
-DEOF
-
-    # Build context = parent dir containing opencloud_web
-    TMPDIR=${TMPDIR:-/tmp} podman build --network=host --no-cache --security-opt label=disable -f /tmp/Dockerfile.web -t opencloud-web-builder "$(dirname "$WEB_SRC")"
-
-    # Extract dist
-    rm -rf "$WEB_DIST"
-    mkdir -p "$WEB_DIST"
-    CID=$(podman create opencloud-web-builder)
-    podman cp "$CID:/build/dist/." "$WEB_DIST/"
-    podman rm "$CID" > /dev/null
-
-    rm -f /tmp/Dockerfile.web
+    echo "=== Building Web UI via job.py build-oc-web ==="
+    cd "$DEPLOY_DIR"
+    OPENWORKS_TOKEN="$OPENWORKS_TOKEN" \
+    OPENWORKS_PUSH="${CODEBERG_TOKEN:-}" \
+    python3 job.py build-oc-web
     echo ""
-    echo "=== Built: $WEB_DIST ==="
-    echo "Files: $(find "$WEB_DIST" -type f | wc -l)"
+    echo "=== Web built and pushed to Codeberg ==="
 }
 
 deploy_web() {
-    echo "=== Deploying web UI to $HOST ==="
-
-    if [ ! -f "$WEB_DIST/index.html" ]; then
-        echo "ERROR: web-dist not built. Run: ./build_web.sh build"
-        exit 1
-    fi
-
-    rsync -az --delete "$WEB_DIST/" "root@${HOST}:/tmp/web-dist-new/"
-
-    ssh "root@${HOST}" "
-        podman cp /tmp/web-dist-new/. ${CONTAINER}:/var/lib/opencloud/web/assets/core/
-        rm -rf /tmp/web-dist-new
-        echo 'Web deployed. Reload browser.'
-    "
-
-    echo "=== Done ==="
+    echo "=== Deploying Web UI ==="
+    "$SCRIPT_DIR/deploy_web.sh" "$@"
 }
 
 case "${1:-}" in
     build)  build_web ;;
-    deploy) deploy_web ;;
+    deploy) shift; deploy_web "$@" ;;
     -h|--help|help)
         echo "Usage: $0 [build|deploy]  (default: both)"
-        echo "  BRANCH=openworks $0 build  — build from feature branch"
         ;;
     *)      build_web; deploy_web ;;
 esac

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/config"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 )
@@ -16,6 +17,7 @@ type PollRequest struct {
 	Capacity int                `json:"capacity"`
 	Status   []WorkerJobStatus  `json:"status,omitempty"`
 	Data     map[string]any     `json:"data,omitempty"`
+	RegToken string             `json:"regToken,omitempty"`
 }
 
 // WorkerJobStatus is a progress/completion report from the worker
@@ -31,11 +33,12 @@ type WorkerJobStatus struct {
 
 // PollResponse is the cloud → worker message in each poll tick
 type PollResponse struct {
-	Assign []JobAssignment    `json:"assign"`
-	Cancel []string           `json:"cancel"`
-	Slots  map[string]int     `json:"slots"`
-	Denied []string           `json:"denied"`
-	Config PollConfig         `json:"config"`
+	Assign   []JobAssignment    `json:"assign"`
+	Cancel   []string           `json:"cancel"`
+	Slots    map[string]int     `json:"slots,omitempty"`
+	Denied   []string           `json:"denied,omitempty"`
+	RegToken *string            `json:"regToken"`
+	Config   PollConfig         `json:"config"`
 }
 
 // JobAssignment is a single job assigned to a worker
@@ -117,9 +120,37 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 		e.processWorkerStatus(workerID, s)
 	}
 
+	// regToken validation:
+	// - Worker sends regToken → validate it
+	// - Worker sends pipeline data (no token or invalid token) → register + issue new token
+	// - regToken is in-memory, lost on engine restart → worker re-registers
+	var regToken *string
+	registeredNow := false
+
+	if req.RegToken != "" {
+		// Validate existing token
+		e.mu.RLock()
+		stored, ok := e.regTokens[workerID]
+		e.mu.RUnlock()
+		if ok && stored == req.RegToken {
+			regToken = &req.RegToken
+		}
+		// If not ok → regToken stays nil → worker will re-register
+	}
+
 	// Process worker data (pipelines, logs, etc.)
 	if req.Data != nil {
 		e.processWorkerData(workerID, req.Data)
+
+		// If pipelines were sent, issue a new regToken
+		if _, hasPipelines := req.Data["pipelines"]; hasPipelines {
+			newToken := uuid.New().String()
+			e.mu.Lock()
+			e.regTokens[workerID] = newToken
+			e.mu.Unlock()
+			regToken = &newToken
+			registeredNow = true
+		}
 	}
 
 	// Determine allowed types from pipe matrix
@@ -128,7 +159,8 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 	// If nothing is allowed, return 403
 	if len(slots) == 0 {
 		writeJSON(w, http.StatusForbidden, map[string]any{
-			"denied": denied,
+			"denied":   denied,
+			"regToken": regToken,
 		})
 		return
 	}
@@ -140,14 +172,19 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 	assignments := e.pickJobs(workerID, slots, req.Capacity)
 
 	resp := PollResponse{
-		Assign: assignments,
-		Cancel: cancellations,
-		Slots:  slots,
-		Denied: denied,
+		Assign:   assignments,
+		Cancel:   cancellations,
+		RegToken: regToken,
 		Config: PollConfig{
 			PollIntervalMin: e.cfg.Service.PollIntervalMin,
 			PollIntervalMax: e.cfg.Service.PollIntervalMax,
 		},
+	}
+
+	// Only include slots/denied on registration, not every poll
+	if registeredNow {
+		resp.Slots = slots
+		resp.Denied = denied
 	}
 
 	writeJSON(w, http.StatusOK, resp)

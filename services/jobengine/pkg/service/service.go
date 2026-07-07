@@ -58,6 +58,7 @@ type JobEngine struct {
 	workerPick map[string][]string        // workerID → offered job types
 	pipeMatrix map[string]map[string]int   // workerID → { jobType → slots }
 	matrix     *PipeMatrix                 // persistent matrix (if loaded from file)
+	regTokens  map[string]string           // workerID → regToken (pipeline registration receipt)
 }
 
 // cleanupInterval removes completed/failed jobs older than 1 hour
@@ -72,6 +73,7 @@ func New(cfg *config.PipelineConfig) *JobEngine {
 		heartbeats:  make(map[string]time.Time),
 		workerPick:  make(map[string][]string),
 		pipeMatrix:  make(map[string]map[string]int),
+		regTokens:   make(map[string]string),
 	}
 
 	// start cleanup goroutine

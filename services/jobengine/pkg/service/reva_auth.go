@@ -1,13 +1,16 @@
 package service
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 
 	"codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/engine"
 )
+
+// BundleUUIDRoleAdmin is the OpenCloud admin role UUID (from settings service defaults).
+const BundleUUIDRoleAdmin = "71881883-1768-46bd-a24d-a356a2afdf7f"
 
 // RevaAuthExtractor extracts user identity from reva context (set by ExtractAccountUUID middleware).
 type RevaAuthExtractor struct{}
@@ -18,30 +21,33 @@ func (a *RevaAuthExtractor) ExtractUser(r *http.Request) (*engine.UserInfo, bool
 		return nil, false
 	}
 
-	// Use app-token-label as worker ID if available (set by reva appauth manager).
-	// Falls back to user UUID if no token label is present.
 	id := user.GetId().GetOpaqueId()
+	isAdmin := false
+
 	if user.GetOpaque() != nil {
-		opaqueKeys := make([]string, 0, len(user.GetOpaque().GetMap()))
-		for k := range user.GetOpaque().GetMap() {
-			opaqueKeys = append(opaqueKeys, k)
-		}
-		fmt.Printf("[reva_auth] user=%s opaque_keys=%v\n", id, opaqueKeys)
+		// Use app-token-label as worker ID if available (set by reva appauth manager).
 		if entry, ok := user.GetOpaque().GetMap()["app-token-label"]; ok {
-			label := string(entry.GetValue())
-			fmt.Printf("[reva_auth] app-token-label found: %q decoder=%s\n", label, entry.GetDecoder())
-			if label != "" {
+			if label := string(entry.GetValue()); label != "" {
 				id = label
 			}
-		} else {
-			fmt.Printf("[reva_auth] app-token-label NOT in opaque\n")
 		}
-	} else {
-		fmt.Printf("[reva_auth] user=%s opaque=nil\n", id)
+
+		// Check if user has admin role (set by proxy role assigner).
+		if entry, ok := user.GetOpaque().GetMap()["roles"]; ok {
+			var roles []string
+			if json.Unmarshal(entry.GetValue(), &roles) == nil {
+				for _, r := range roles {
+					if r == BundleUUIDRoleAdmin {
+						isAdmin = true
+						break
+					}
+				}
+			}
+		}
 	}
 
 	return &engine.UserInfo{
 		ID:      id,
-		IsAdmin: true, // TODO: integrate with OpenCloud role system
+		IsAdmin: isAdmin,
 	}, true
 }

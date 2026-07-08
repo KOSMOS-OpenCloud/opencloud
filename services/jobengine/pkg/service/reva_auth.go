@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -21,11 +22,22 @@ func (a *RevaAuthExtractor) ExtractUser(r *http.Request) (*engine.UserInfo, bool
 	// Falls back to user UUID if no token label is present.
 	id := user.GetId().GetOpaqueId()
 	if user.GetOpaque() != nil {
+		opaqueKeys := make([]string, 0, len(user.GetOpaque().GetMap()))
+		for k := range user.GetOpaque().GetMap() {
+			opaqueKeys = append(opaqueKeys, k)
+		}
+		fmt.Printf("[reva_auth] user=%s opaque_keys=%v\n", id, opaqueKeys)
 		if entry, ok := user.GetOpaque().GetMap()["app-token-label"]; ok {
-			if label := string(entry.GetValue()); label != "" {
+			label := string(entry.GetValue())
+			fmt.Printf("[reva_auth] app-token-label found: %q decoder=%s\n", label, entry.GetDecoder())
+			if label != "" {
 				id = label
 			}
+		} else {
+			fmt.Printf("[reva_auth] app-token-label NOT in opaque\n")
 		}
+	} else {
+		fmt.Printf("[reva_auth] user=%s opaque=nil\n", id)
 	}
 
 	return &engine.UserInfo{

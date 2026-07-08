@@ -101,7 +101,11 @@ echo "  Revision: ${KOSMOS_REV}"
 
 # Build container image
 echo "=== Stage: build-image ==="
-TMPDIR=${TMPDIR:-/tmp} podman build --network=host --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+if command -v buildah &>/dev/null; then
+    TMPDIR=${TMPDIR:-/tmp} buildah bud --network=host --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+else
+    TMPDIR=${TMPDIR:-/tmp} podman build --network=host --security-opt label=disable -f "$DOCKERFILE" -t "${IMAGE}:${TAG}" .
+fi
 
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="

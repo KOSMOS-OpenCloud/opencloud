@@ -63,9 +63,22 @@ if [ -n "$WEB_ZIP" ]; then
     rm -rf web-dist && mkdir -p web-dist
     curl -sfL "$WEB_ZIP" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
     echo "  Unpacked: $(find web-dist -type f | wc -l) files"
-else
+elif [ -f "$SCRIPT_DIR/build_web.sh" ]; then
     echo "  Building web-dist from ${WEB_DIR} ..."
     "$SCRIPT_DIR/build_web.sh" build
+else
+    # Fetch latest from Codeberg Generic Packages
+    echo "  Fetching latest web-dist from Codeberg..."
+    WEB_PKG_VERSION=$(curl -sf "https://codeberg.org/api/v1/packages/kosmos-opencloud?type=generic&q=opencloud-web" \
+        | python3 -c "import json,sys; pkgs=[p for p in json.load(sys.stdin) if p['name']=='opencloud-web']; print(pkgs[0]['version'])" 2>/dev/null)
+    if [ -z "$WEB_PKG_VERSION" ]; then
+        echo "  ERROR: no opencloud-web package found on Codeberg" >&2; exit 1
+    fi
+    WEB_ZIP_URL="https://codeberg.org/api/packages/kosmos-opencloud/generic/opencloud-web/${WEB_PKG_VERSION}/opencloud-web.zip"
+    echo "  Downloading: ${WEB_ZIP_URL}"
+    rm -rf web-dist && mkdir -p web-dist
+    curl -sfL "$WEB_ZIP_URL" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
+    echo "  Unpacked: $(find web-dist -type f | wc -l) files (version: ${WEB_PKG_VERSION})"
 fi
 
 # Generate kosmos revision

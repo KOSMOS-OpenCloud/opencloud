@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -23,6 +24,20 @@ func (a *RevaAuthExtractor) ExtractUser(r *http.Request) (*engine.UserInfo, bool
 
 	id := user.GetId().GetOpaqueId()
 	isAdmin := false
+
+	// Debug: log opaque keys and roles
+	if user.GetOpaque() != nil {
+		keys := make([]string, 0)
+		for k := range user.GetOpaque().GetMap() {
+			keys = append(keys, k)
+		}
+		fmt.Printf("[reva_auth] user=%s opaque_keys=%v\n", id, keys)
+		if entry, ok := user.GetOpaque().GetMap()["roles"]; ok {
+			fmt.Printf("[reva_auth] roles raw=%q decoder=%s\n", string(entry.GetValue()), entry.GetDecoder())
+		}
+	} else {
+		fmt.Printf("[reva_auth] user=%s opaque=nil\n", id)
+	}
 
 	if user.GetOpaque() != nil {
 		// Use app-token-label as worker ID if available (set by reva appauth manager).

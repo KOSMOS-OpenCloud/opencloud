@@ -14,34 +14,9 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/rhttp"
 )
 
-// AppConfig represents a .app/config.json from a space root.
-type AppConfig struct {
-	Name  string        `json:"name"`
-	Icon  string        `json:"icon,omitempty"`
-	Color string        `json:"color,omitempty"`
-	Menu  []AppMenuItem `json:"menu,omitempty"`
-}
-
-// AppMenuItem represents a menu entry in the app config.
-type AppMenuItem struct {
-	Label    string        `json:"label"`
-	Icon     string        `json:"icon,omitempty"`
-	Path     string        `json:"path,omitempty"`
-	URL      string        `json:"url,omitempty"`
-	Children []AppMenuItem `json:"children,omitempty"`
-}
-
 // SpaceApp is the response for a single space app.
-type SpaceApp struct {
-	SpaceID    string        `json:"spaceId"`
-	SpaceName  string        `json:"spaceName"`
-	DriveAlias string        `json:"driveAlias"`
-	DriveType  string        `json:"driveType"`
-	Name       string        `json:"name"`
-	Icon       string        `json:"icon,omitempty"`
-	Color      string        `json:"color,omitempty"`
-	Menu       []AppMenuItem `json:"menu,omitempty"`
-}
+// Config fields from .app/config.json are passed through as-is (raw JSON).
+type SpaceApp map[string]interface{}
 
 // SpaceAppsResponse is the response for the apps endpoint.
 type SpaceAppsResponse struct {
@@ -154,32 +129,24 @@ func (g Graph) readSpaceApp(ctx context.Context, gw gateway.GatewayAPIClient, sp
 		return nil
 	}
 
-	var config AppConfig
+	// Parse config.json as raw map — pass through all fields as-is
+	var config SpaceApp
 	if err := json.Unmarshal(body, &config); err != nil {
 		g.logger.Warn().Err(err).Str("space", space.GetName()).Msg("invalid .app/config.json")
 		return nil
 	}
 
-	// Extract drive alias from space opaque data
-	driveAlias := ""
-	driveType := ""
+	// Merge space metadata (server-side, not from config.json)
+	config["spaceId"] = space.GetId().GetOpaqueId()
+	config["spaceName"] = space.GetName()
 	if space.GetSpaceType() != "" {
-		driveType = space.GetSpaceType()
+		config["driveType"] = space.GetSpaceType()
 	}
 	if space.GetOpaque() != nil {
 		if alias, ok := space.GetOpaque().GetMap()["spaceAlias"]; ok {
-			driveAlias = string(alias.GetValue())
+			config["driveAlias"] = string(alias.GetValue())
 		}
 	}
 
-	return &SpaceApp{
-		SpaceID:    space.GetId().GetOpaqueId(),
-		SpaceName:  space.GetName(),
-		DriveAlias: driveAlias,
-		DriveType:  driveType,
-		Name:       config.Name,
-		Icon:       config.Icon,
-		Color:      config.Color,
-		Menu:       config.Menu,
-	}
+	return &config
 }

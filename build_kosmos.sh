@@ -21,14 +21,14 @@ PIPEWORX_DIR="${SCRIPT_DIR}/../openworks-pipeworx"
 # Clone or update repos (build-worker mode)
 echo "=== Stage: clone ==="
 clone_or_update() {
-    local dir="$1" repo="$2" branch="$3"
+    local dir="$1" repo="$2" branch="$3" base="${4:-$GIT_BASE}"
     if [ -d "$dir/.git" ]; then
         echo "  Updating ${repo} (${branch})..."
         (cd "$dir" && git fetch origin && git reset --hard "origin/${branch}") 2>&1 | tail -2
     else
         echo "  Cloning ${repo} (${branch})..."
         rm -rf "$dir"
-        git clone --depth 1 -b "${branch}" "${GIT_BASE}/${repo}.git" "$dir" 2>&1 | tail -2
+        git clone --depth 1 -b "${branch}" "${base}/${repo}.git" "$dir" 2>&1 | tail -2
     fi
 }
 
@@ -38,7 +38,7 @@ clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 
 # Pipeworx — from kosmos-openworks org, main branch
 PIPEWORX_GIT="${PIPEWORX_GIT:-https://codeberg.org/kosmos-openworks}"
-clone_or_update "$PIPEWORX_DIR" "openworks-pipeworx" "main"
+clone_or_update "$PIPEWORX_DIR" "openworks-pipeworx" "main" "$PIPEWORX_GIT"
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"
 REVA_BRANCH="$(cd "$REVA_DIR" && git branch --show-current 2>/dev/null || echo '?')"

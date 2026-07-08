@@ -63,7 +63,7 @@ if [ -n "$WEB_ZIP" ]; then
     rm -rf web-dist && mkdir -p web-dist
     curl -sfL "$WEB_ZIP" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
     echo "  Unpacked: $(find web-dist -type f | wc -l) files"
-elif [ -f "$SCRIPT_DIR/build_web.sh" ]; then
+elif [ -f "$SCRIPT_DIR/build_web.sh" ] && [ -d "$SCRIPT_DIR/../kosmos-cloud-deploy" ]; then
     echo "  Building web-dist from ${WEB_DIR} ..."
     "$SCRIPT_DIR/build_web.sh" build
 else

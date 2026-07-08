@@ -2,7 +2,9 @@ package bleve
 
 import (
 	"errors"
+	"fmt"
 	"math"
+	"os"
 	"path/filepath"
 
 	"github.com/blevesearch/bleve/v2"
@@ -21,20 +23,27 @@ import (
 func NewIndex(root string) (bleve.Index, error) {
 	destination := filepath.Join(root, "bleve")
 	index, err := bleve.Open(destination)
-	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
-		indexMapping, err := NewMapping()
-		if err != nil {
-			return nil, err
-		}
-		index, err = bleve.New(destination, indexMapping)
-		if err != nil {
-			return nil, err
-		}
-
+	if err == nil {
 		return index, nil
 	}
 
-	return index, err
+	if !errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
+		// Index exists but is corrupt (e.g. empty mapping after crash).
+		// Remove and recreate.
+		fmt.Fprintf(os.Stderr, "search: corrupt bleve index at %s, recreating: %v\n", destination, err)
+		os.RemoveAll(destination)
+	}
+
+	indexMapping, err := NewMapping()
+	if err != nil {
+		return nil, err
+	}
+	index, err = bleve.New(destination, indexMapping)
+	if err != nil {
+		return nil, err
+	}
+
+	return index, nil
 }
 
 func NewMapping() (mapping.IndexMapping, error) {

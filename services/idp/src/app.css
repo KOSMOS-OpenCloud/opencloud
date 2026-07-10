@@ -40,7 +40,7 @@ strong {
 }
 
 .oc-login-bg {
-    background: #20434F;
+    background: #000000;
     display: flex;
     width: 100%;
 }
@@ -144,9 +144,9 @@ strong {
 .oc-button-primary {
     /* Needs to be important to overwrite material-ui */
     width: 100%;
-    background: #e2baff !important;
+    background: #666666 !important;
     border-radius: 100px !important;
-    color: #20434f !important;
+    color: #ffffff !important;
     box-shadow: none !important;
     font-weight: 700 !important;
 }

@@ -1,7 +1,7 @@
-/* minimal background */
+/* minimal background — dark, no image */
 
 #bg {
-  background-color: #f8f9fa;
+  background-color: #20434F;
 }
 
 #bg > div {

@@ -15,13 +15,13 @@ node-generate-prod: assets
 
 .PHONY: assets
 assets: pnpm-build \
-		assets/identifier/static/favicon.svg \
+		assets/identifier/static/favicon.png \
 		assets/identifier/static/icon-lilac.svg
 
-.PHONY: assets/identifier/static/favicon.svg # force overwrite
-assets/identifier/static/favicon.svg: pnpm-build
-	cp src/images/favicon.svg assets/identifier/static/favicon.svg
-	rm assets/identifier/static/favicon.ico
+.PHONY: assets/identifier/static/favicon.png # force overwrite
+assets/identifier/static/favicon.png: pnpm-build
+	cp src/images/favicon.png assets/identifier/static/favicon.png
+	rm -f assets/identifier/static/favicon.ico assets/identifier/static/favicon.svg
 
 .PHONY: assets/identifier/static/icon-lilac.svg
 assets/identifier/static/icon-lilac.svg: pnpm-build

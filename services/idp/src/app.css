@@ -40,17 +40,13 @@ strong {
 }
 
 .oc-login-bg {
-    background: #20434F;
+    background: #f8f9fa;
     display: flex;
     width: 100%;
 }
 
 .oc-login-bg-icon {
-    position: fixed;
-    right: -3vw;
-    bottom: -3vh;
-    height: 50vh;
-    z-index: 0;
+    display: none;
 }
 
 .oc-login-bg-image {
@@ -66,12 +62,12 @@ strong {
 }
 
 .oc-logo {
-    height: 80px;
+    height: 56px;
     z-index: 0;
 }
 
 .oc-logo-container {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
 }
 
 .oc-progress {
@@ -127,11 +123,13 @@ strong {
 .oc-card {
     background: white;
     display: inline-flex;
-    width: 500px;
+    width: 360px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .oc-card-body {
-    padding: 40px;
+    padding: 32px;
     width: 100%;
 }
 
@@ -163,29 +161,13 @@ strong {
 }
 
 .oc-footer-message {
-    color: white;
-    padding: 10px;
-    font-size: 0.8rem;
-}
-
-@media only screen and (max-width: 768px) {
-    .oc-logo {
-        height: 60px;
-        top: -90px;
-    }
-
-    .oc-login-bg-icon {
-        display: none;
-    }
-
-    .oc-card {
-        min-width: 50vw !important;
-    }
+    display: none;
 }
 
 @media only screen and (max-width: 600px) {
     .oc-card {
-        width: 100vw !important;
+        width: 90vw !important;
+        border-radius: 8px;
     }
 }
 

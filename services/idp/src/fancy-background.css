@@ -1,17 +1,9 @@
-/* not so fancy background */
+/* minimal background */
 
 #bg {
-  background-color: white;
+  background-color: #f8f9fa;
 }
 
 #bg > div {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-image: url(./images/background.png);
-  z-index: 0;
+  display: none;
 }

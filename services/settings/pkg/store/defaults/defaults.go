@@ -29,6 +29,11 @@ const (
 	// SettingUUIDProfileAutoAcceptShares is the hardcoded setting UUID for the disable notifications setting
 	SettingUUIDProfileAutoAcceptShares = "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9"
 
+	// BundleUUIDExtensionPreferences represents the extension preferences bundle
+	BundleUUIDExtensionPreferences = "f0c7e250-3c6a-4e2a-b6d1-8a7b5e3c9f01"
+	// SettingUUIDExtensionPreferences is the setting UUID for extension preferences (JSON string)
+	SettingUUIDExtensionPreferences = "a1d4f8b2-7e3c-4a9f-b5d6-2c8e1f0a3b74"
+
 	// SettingUUIDProfileEmailSendingInterval is the hardcoded setting UUID for the email sending interval setting
 	SettingUUIDProfileEmailSendingInterval = "08dec2fe-3f97-42a9-9d1b-500855e92f25"
 	// SettingUUIDProfileEventShareCreated it the hardcoded setting UUID for the send in app setting
@@ -62,6 +67,41 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 		generateBundleUserLightRole(),
 		generateBundleProfileRequest(),
 		generateBundleSpaceAdminRole(),
+		generateBundleExtensionPreferences(),
+	}
+}
+
+// generateBundleExtensionPreferences creates a bundle for web extension preferences.
+// Extensions store their settings as JSON under extension-point keys, e.g.:
+//
+//	{"com.kosmos-eu.folderviews.app-new-window": {"selectedExtensionIds": ["...enabled"]}}
+func generateBundleExtensionPreferences() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
+		Id:          BundleUUIDExtensionPreferences,
+		Name:        "extension-preferences",
+		Extension:   "opencloud-accounts",
+		Type:        settingsmsg.Bundle_TYPE_DEFAULT,
+		DisplayName: "Extension Preferences",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
+		},
+		Settings: []*settingsmsg.Setting{
+			{
+				Id:          SettingUUIDExtensionPreferences,
+				Name:        "extension-preferences",
+				DisplayName: "Extension Preferences",
+				Description: "JSON object storing user preferences for web extensions",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_StringValue{
+					StringValue: &settingsmsg.String{
+						Default:   "{}",
+						MaxLength: 65536,
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -131,6 +171,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			DeleteProjectSpacesPermission(All),
 			DeleteReadOnlyPublicLinkPasswordPermission(All),
 			DisableEmailNotificationsPermission(Own),
+			ExtensionPreferencesPermission(Own),
 			ProfileEmailSendingIntervalPermission(Own),
 			ProfileEventShareCreatedPermission(Own),
 			ProfileEventShareRemovedPermission(Own),
@@ -175,6 +216,7 @@ func generateBundleManagerRole() *settingsmsg.Bundle {
 			CreateSharePermission(All),
 			CreateSpacesPermission(Own),
 			DisableEmailNotificationsPermission(Own),
+			ExtensionPreferencesPermission(Own),
 			ProfileEmailSendingIntervalPermission(Own),
 			ProfileEventShareCreatedPermission(Own),
 			ProfileEventShareRemovedPermission(Own),
@@ -213,6 +255,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			DeleteProjectSpacesPermission(All),
 			DeleteReadOnlyPublicLinkPasswordPermission(All),
 			DisableEmailNotificationsPermission(Own),
+			ExtensionPreferencesPermission(Own),
 			ProfileEmailSendingIntervalPermission(Own),
 			ProfileEventShareCreatedPermission(Own),
 			ProfileEventShareRemovedPermission(Own),
@@ -253,6 +296,7 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			CreateSharePermission(All),
 			CreateSpacesPermission(Own),
 			DisableEmailNotificationsPermission(Own),
+			ExtensionPreferencesPermission(Own),
 			ProfileEmailSendingIntervalPermission(Own),
 			ProfileEventShareCreatedPermission(Own),
 			ProfileEventShareRemovedPermission(Own),
@@ -285,6 +329,7 @@ func generateBundleUserLightRole() *settingsmsg.Bundle {
 		Settings: []*settingsmsg.Setting{
 			AutoAcceptSharesPermission(Own),
 			DisableEmailNotificationsPermission(Own),
+			ExtensionPreferencesPermission(Own),
 			ProfileEmailSendingIntervalPermission(Own),
 			LanguageManagementPermission(Own),
 		},

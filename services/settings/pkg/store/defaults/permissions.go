@@ -448,6 +448,25 @@ func GroupManagementPermission(c settingsmsg.Permission_Constraint) *settingsmsg
 	}
 }
 
+// ExtensionPreferencesPermission is the permission to read and write extension preferences
+func ExtensionPreferencesPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "c4e2d8f1-5a3b-4e7c-9f0d-1b6a8e2c3d54",
+		Name:        "ExtensionPreferences.ReadWrite",
+		DisplayName: "Permission to read and write extension preferences",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDExtensionPreferences,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
 // LanguageManagementPermission is the permission to manage the language
 func LanguageManagementPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{

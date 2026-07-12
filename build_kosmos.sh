@@ -110,8 +110,11 @@ fi
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="
 echo ""
-echo "Next steps:"
-echo "  1. Test locally:  podman run --rm ${IMAGE}:${TAG} version"
-echo "  2. Push:          podman push ${IMAGE}:${TAG}"
-echo "  3. Promote:       podman tag ${IMAGE}:${TAG} ${IMAGE}:latest && podman push ${IMAGE}:latest"
-echo "  4. Deploy:        ./deploy_kosmos.sh"
+
+if [ -n "${PUSH_TOKEN:-}" ]; then
+    buildah push --creds="token:${PUSH_TOKEN}" "${IMAGE}:${TAG}"
+    buildah tag "${IMAGE}:${TAG}" "${IMAGE}:latest"
+    buildah push --creds="token:${PUSH_TOKEN}" "${IMAGE}:latest"
+fi
+
+echo "=== Built: ${IMAGE}:${TAG} ==="

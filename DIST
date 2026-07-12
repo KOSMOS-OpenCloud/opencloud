@@ -2,3 +2,10 @@ HOST=cloud.brandis.eu
 APP=opencloud-kosmos
 INSTANCE=opencloud_full-opencloud-1
 DATAPATH=/data/opencloud_podman
+
+# Build pipeline
+REPO=opencloud
+BRANCH=kosmos
+GIT_BASE=https://codeberg.org/kosmos-opencloud
+BUILD_SCRIPT=build_kosmos.sh
+PUSH_TOKEN=06a3d7852c445a0d1c144c7cdf64317778fe7bd4

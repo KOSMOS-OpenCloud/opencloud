@@ -3,6 +3,7 @@ package theme
 import (
 	"encoding/json"
 	"net/http"
+	"path"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	permissionsapi "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
@@ -64,6 +65,8 @@ func NewService(options ServiceOptions) (Service, error) {
 }
 
 // Get renders the theme, the theme is a merge of the default theme, the base theme, and the branding theme.
+// Additionally, it scans all theme directories for platform themes and appends their
+// theme entries to the themes array, so they appear in the ThemeSwitcher.
 func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 	// there is no guarantee that the theme exists, its optional; therefore, we ignore the error
 	baseTheme, _ := LoadKV(s.themeFS, filepathx.JailJoin(r.PathValue("id"), _themeFileName))
@@ -82,6 +85,11 @@ func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Scan for platform themes in sibling directories and append their theme entries.
+	// Each directory (other than the base theme and _branding) may contain a theme.json
+	// with a "clients.web.themes" array. These entries are appended to the merged theme.
+	s.appendPlatformThemes(r.PathValue("id"), mergedTheme)
+
 	b, err := json.Marshal(mergedTheme)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -93,6 +101,76 @@ func (s Service) Get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// appendPlatformThemes scans the themes filesystem for directories other than the base theme
+// and _branding. If a directory contains a theme.json with clients.web.themes entries,
+// those entries are appended to the merged theme's clients.web.themes array.
+func (s Service) appendPlatformThemes(baseID string, mergedTheme KV) {
+	entries, err := afero.ReadDir(s.themeFS, ".")
+	if err != nil {
+		return
+	}
+
+	for _, entry := range entries {
+		name := entry.Name()
+		if !entry.IsDir() || name == baseID || name == _brandingRoot {
+			continue
+		}
+
+		platformTheme, err := LoadKV(s.themeFS, path.Join(name, _themeFileName))
+		if err != nil {
+			continue
+		}
+
+		// Extract clients.web.themes array from the platform theme
+		platformThemes := extractThemes(platformTheme)
+		if len(platformThemes) == 0 {
+			continue
+		}
+
+		// Append to the merged theme's clients.web.themes
+		appendThemes(mergedTheme, platformThemes)
+	}
+}
+
+// extractThemes extracts the clients.web.themes array from a KV.
+func extractThemes(kv KV) []any {
+	clients, ok := kv["clients"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	web, ok := clients["web"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	themes, ok := web["themes"].([]any)
+	if !ok {
+		return nil
+	}
+	return themes
+}
+
+// appendThemes appends theme entries to the merged theme's clients.web.themes array.
+func appendThemes(mergedTheme KV, themes []any) {
+	clients, ok := mergedTheme["clients"].(KV)
+	if !ok {
+		clients2, ok2 := mergedTheme["clients"].(map[string]any)
+		if !ok2 {
+			return
+		}
+		clients = KV(clients2)
+	}
+	web, ok := clients["web"].(KV)
+	if !ok {
+		web2, ok2 := clients["web"].(map[string]any)
+		if !ok2 {
+			return
+		}
+		web = KV(web2)
+	}
+	existing, _ := web["themes"].([]any)
+	web["themes"] = append(existing, themes...)
 }
 
 // LogoUpload implements the endpoint to upload a custom logo for the OpenCloud instance.

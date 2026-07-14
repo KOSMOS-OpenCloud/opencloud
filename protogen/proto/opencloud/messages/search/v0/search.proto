@@ -80,6 +80,8 @@ message Entity {
 	Image image = 18;
 	Photo photo = 19;
 	repeated string favorites = 20;
+	// arbitrary metadata key-value pairs (e.g. oy.fileReference, oy.ftype)
+	map<string, string> metadata = 21;
 }
 
 message Match {

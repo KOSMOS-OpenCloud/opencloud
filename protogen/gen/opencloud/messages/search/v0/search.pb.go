@@ -560,6 +560,7 @@ type Entity struct {
 	Image            *Image                 `protobuf:"bytes,18,opt,name=image,proto3" json:"image,omitempty"`
 	Photo            *Photo                 `protobuf:"bytes,19,opt,name=photo,proto3" json:"photo,omitempty"`
 	Favorites        []string               `protobuf:"bytes,20,rep,name=favorites,proto3" json:"favorites,omitempty"`
+	Metadata         map[string]string      `protobuf:"bytes,21,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *Entity) Reset() {
@@ -730,6 +731,13 @@ func (x *Entity) GetPhoto() *Photo {
 func (x *Entity) GetFavorites() []string {
 	if x != nil {
 		return x.Favorites
+	}
+	return nil
+}
+
+func (x *Entity) GetMetadata() map[string]string {
+	if x != nil {
+		return x.Metadata
 	}
 	return nil
 }

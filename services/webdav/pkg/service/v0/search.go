@@ -262,6 +262,13 @@ func matchToPropResponse(ctx context.Context, davPrefix, publicURL string, match
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:favorite", "1"))
 	}
 
+	// emit arbitrary metadata from the search index (e.g. oy.fileReference, oy.ftype)
+	for key, val := range match.Entity.GetMetadata() {
+		if val != "" {
+			propstatOK.Prop = append(propstatOK.Prop, prop.EscapedNS("http://owncloud.org/ns/metadata", key, val))
+		}
+	}
+
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)
 	}

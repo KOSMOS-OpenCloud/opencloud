@@ -124,6 +124,19 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 		}
 
 		pID, _ := storagespace.ParseID(getFieldValue[string](hit.Fields, "ParentID"))
+		// Extract Metadata.* fields from the flat bleve field map
+		metadata := make(map[string]string)
+		for k, v := range hit.Fields {
+			if strings.HasPrefix(k, "Metadata.") {
+				if s, ok := v.(string); ok {
+					metadata[strings.TrimPrefix(k, "Metadata.")] = s
+				}
+			}
+		}
+		if len(metadata) == 0 {
+			metadata = nil
+		}
+
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
 			Entity: &searchMessage.Entity{
@@ -145,6 +158,7 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 				Image:      getImageValue[searchMessage.Image](hit.Fields),
 				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
 				Photo:      getPhotoValue[searchMessage.Photo](hit.Fields),
+				Metadata:   metadata,
 			},
 		}
 

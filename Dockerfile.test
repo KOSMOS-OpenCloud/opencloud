@@ -10,12 +10,20 @@ RUN git init && \
 
 # Stage 2: Go — build binary with custom reva (web assets get embedded)
 FROM docker.io/golang:1.26-alpine AS build
-RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
+RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev protobuf-dev
 COPY --from=generate /opencloud /opencloud
 COPY reva-src /data/source/gitapps/reva
 COPY go-cs3apis-src /data/source/gitapps/cs3org/go-cs3apis
 RUN cd /data/source/gitapps/reva && git init && git add -A
 WORKDIR /opencloud
+# Regenerate protobuf for modified .proto files (search Entity metadata field)
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
+    cd protogen/proto && \
+    protoc --go_out=../gen/ --go_opt=paths=source_relative \
+           --go-grpc_out=../gen/ --go-grpc_opt=paths=source_relative \
+           -I. opencloud/messages/search/v0/search.proto && \
+    cd /opencloud
 RUN echo 'replace github.com/opencloud-eu/reva/v2 => /data/source/gitapps/reva' >> go.mod && \
     echo 'replace github.com/cs3org/go-cs3apis => /data/source/gitapps/cs3org/go-cs3apis' >> go.mod && \
     go mod tidy && \

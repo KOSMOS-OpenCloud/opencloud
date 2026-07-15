@@ -123,7 +123,10 @@ func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector 
 		return nil, err
 	}
 
-	res, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+	res, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+		Ref:                   ref,
+		ArbitraryMetadataKeys: []string{"*"}, // fetch all metadata to support skip-existing checks
+	})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to stat the moved resource")
 		return nil, err

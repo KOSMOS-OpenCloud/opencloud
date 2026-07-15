@@ -880,7 +880,28 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 		return
 	}
 
-	s.logger.Trace().Str("name", doc.Name).Interface("metadata", metadata).Msg("Storing metadata")
+	// Only write metadata keys that don't already exist on the resource.
+	// Never overwrite user-corrected or previously enriched values.
+	// This protects manual corrections and prevents data loss when
+	// LLM enrichment is unavailable during reindex.
+	existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+	newMetadata := map[string]string{}
+	for k, v := range metadata {
+		if v == "" {
+			continue // never write empty values
+		}
+		if existing != nil {
+			if _, exists := existing[k]; exists {
+				continue // don't overwrite existing xattr
+			}
+		}
+		newMetadata[k] = v
+	}
+	if len(newMetadata) == 0 {
+		return
+	}
+
+	s.logger.Trace().Str("name", doc.Name).Interface("metadata", newMetadata).Msg("Storing new metadata (skip existing)")
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -891,7 +912,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: ref,
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
-			Metadata: metadata,
+			Metadata: newMetadata,
 		},
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {

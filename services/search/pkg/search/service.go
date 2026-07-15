@@ -873,6 +873,9 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	addImageMetadata(metadata, doc.Image)
 	addLocationMetadata(metadata, doc.Location)
 	addPhotoMetadata(metadata, doc.Photo)
+	if doc.Taki != nil {
+		addDocMetadata(metadata, doc.Taki.DocMeta)
+	}
 	if len(metadata) == 0 {
 		return
 	}
@@ -923,6 +926,44 @@ func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
 		return
 	}
 	marshalToStringMap(photo, metadata, "libre.graph.photo.")
+}
+
+// addDocMetadata flattens structured document metadata from open_taki docmeta
+// extraction into the metadata map. Stored as xattr: user.oc.md.doc.subject, etc.
+func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
+	if dm == nil || !dm.IsLetterhead {
+		return
+	}
+
+	setIfNotNil := func(key string, val *string) {
+		if val != nil {
+			metadata[key] = *val
+		}
+	}
+
+	// doc.*
+	setIfNotNil("doc.subject", dm.Doc.Subject)
+	setIfNotNil("doc.type", dm.Doc.Type)
+	setIfNotNil("doc.date", dm.Doc.Date)
+	setIfNotNil("doc.reference", dm.Doc.Reference)
+
+	// sender.*
+	setIfNotNil("sender.company", dm.Sender.Company)
+	setIfNotNil("sender.given_name", dm.Sender.GivenName)
+	setIfNotNil("sender.family_name", dm.Sender.FamilyName)
+	setIfNotNil("sender.street", dm.Sender.Street)
+	setIfNotNil("sender.house_number", dm.Sender.HouseNumber)
+	setIfNotNil("sender.postal_code", dm.Sender.PostalCode)
+	setIfNotNil("sender.sub_locality", dm.Sender.SubLocality)
+	setIfNotNil("sender.city", dm.Sender.City)
+	setIfNotNil("sender.country", dm.Sender.Country)
+	setIfNotNil("sender.email", dm.Sender.Email)
+	setIfNotNil("sender.phone", dm.Sender.Phone)
+
+	// source metadata
+	if dm.Source != "" {
+		metadata["doc.meta_source"] = dm.Source
+	}
 }
 
 func marshalToStringMap[T libregraph.MappedNullable](source T, target map[string]string, prefix string) {

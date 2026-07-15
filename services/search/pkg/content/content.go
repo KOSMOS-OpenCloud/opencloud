@@ -34,11 +34,12 @@ type Document struct {
 
 // TakiExtraction holds extended extraction results from open_taki v2 protocol.
 type TakiExtraction struct {
-	Method   string     `json:"method,omitempty"`
-	Summary  string     `json:"summary,omitempty"`
-	Entities []Entity   `json:"entities,omitempty"`
-	Embed    []float64  `json:"embedding,omitempty"`
-	Routing  *Routing   `json:"routing,omitempty"`
+	Method   string        `json:"method,omitempty"`
+	Summary  string        `json:"summary,omitempty"`
+	Entities []Entity      `json:"entities,omitempty"`
+	Embed    []float64     `json:"embedding,omitempty"`
+	Routing  *Routing      `json:"routing,omitempty"`
+	DocMeta  *TakiDocMeta  `json:"docmeta,omitempty"`
 }
 
 // Entity represents a named entity extracted by the LLM.

@@ -191,15 +191,49 @@ type takiV2Response struct {
 		Language string `json:"language"`
 		DocType  string `json:"doc_type"`
 	} `json:"X-TAKI:meta"`
-	Entities []Entity  `json:"X-TAKI:entities"`
-	Summary  string    `json:"X-TAKI:summary"`
-	Embed    []float64 `json:"X-TAKI:embedding"`
+	Entities []Entity       `json:"X-TAKI:entities"`
+	Summary  string         `json:"X-TAKI:summary"`
+	Embed    []float64      `json:"X-TAKI:embedding"`
+	DocMeta  *TakiDocMeta   `json:"X-TAKI:docmeta"`
 	Routing  *struct {
 		ContentTarget string `json:"content_target"`
 		MetaTarget    string `json:"meta_target"`
 		VectorTarget  string `json:"vector_target"`
 		SourceRef     string `json:"source_ref"`
 	} `json:"X-TAKI:routing"`
+}
+
+// TakiDocMeta holds structured metadata extracted from document letterheads.
+type TakiDocMeta struct {
+	IsLetterhead bool           `json:"is_letterhead"`
+	Doc          TakiDocMetaDoc `json:"doc"`
+	Sender       TakiDocMetaSender `json:"sender"`
+	Uncertain    []string       `json:"uncertain"`
+	Source       string         `json:"source,omitempty"`
+}
+
+// TakiDocMetaDoc holds document-level metadata.
+type TakiDocMetaDoc struct {
+	Subject         *string `json:"subject"`
+	SubjectInferred bool    `json:"subject_inferred"`
+	Type            *string `json:"type"`
+	Date            *string `json:"date"`
+	Reference       *string `json:"reference"`
+}
+
+// TakiDocMetaSender holds sender address metadata.
+type TakiDocMetaSender struct {
+	Company     *string `json:"company"`
+	GivenName   *string `json:"given_name"`
+	FamilyName  *string `json:"family_name"`
+	Street      *string `json:"street"`
+	HouseNumber *string `json:"house_number"`
+	PostalCode  *string `json:"postal_code"`
+	SubLocality *string `json:"sub_locality"`
+	City        *string `json:"city"`
+	Country     *string `json:"country"`
+	Email       *string `json:"email"`
+	Phone       *string `json:"phone"`
 }
 
 // extractTakiV2 uses the open_taki v2 protocol for enhanced extraction.
@@ -219,7 +253,7 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 
 	req.Header.Set("Content-Type", ri.MimeType)
 	req.Header.Set("X-Taki-Protocol", "v2")
-	req.Header.Set("X-Taki-Features", "meta,entities,summary,embedding")
+	req.Header.Set("X-Taki-Features", "docmeta,meta,entities,summary,embedding")
 	req.Header.Set("X-Taki-Source-Ref", sourceRef)
 
 	resp, err := t.httpClient.Do(req)
@@ -269,6 +303,10 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 			MetaTarget:    r.Routing.MetaTarget,
 			VectorTarget:  r.Routing.VectorTarget,
 		}
+	}
+
+	if r.DocMeta != nil {
+		taki.DocMeta = r.DocMeta
 	}
 
 	doc.Taki = taki

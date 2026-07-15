@@ -129,9 +129,10 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 		// Extract Metadata.* fields from the flat bleve field map
 		metadata := make(map[string]string)
 		for k, v := range hit.Fields {
-			if strings.HasPrefix(k, "Metadata.") {
+			kLower := strings.ToLower(k)
+			if strings.HasPrefix(kLower, "metadata.") {
 				if s, ok := v.(string); ok {
-					metadata[strings.TrimPrefix(k, "Metadata.")] = s
+					metadata[k[len("metadata."):]] = s
 				}
 			}
 		}

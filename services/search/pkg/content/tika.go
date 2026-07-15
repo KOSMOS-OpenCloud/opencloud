@@ -203,38 +203,9 @@ type takiV2Response struct {
 	} `json:"X-TAKI:routing"`
 }
 
-// TakiDocMeta holds structured metadata extracted from document letterheads.
-type TakiDocMeta struct {
-	IsLetterhead bool           `json:"is_letterhead"`
-	Doc          TakiDocMetaDoc `json:"doc"`
-	Sender       TakiDocMetaSender `json:"sender"`
-	Uncertain    []string       `json:"uncertain"`
-	Source       string         `json:"source,omitempty"`
-}
-
-// TakiDocMetaDoc holds document-level metadata.
-type TakiDocMetaDoc struct {
-	Subject         *string `json:"subject"`
-	SubjectInferred bool    `json:"subject_inferred"`
-	Type            *string `json:"type"`
-	Date            *string `json:"date"`
-	Reference       *string `json:"reference"`
-}
-
-// TakiDocMetaSender holds sender address metadata.
-type TakiDocMetaSender struct {
-	Company     *string `json:"company"`
-	GivenName   *string `json:"given_name"`
-	FamilyName  *string `json:"family_name"`
-	Street      *string `json:"street"`
-	HouseNumber *string `json:"house_number"`
-	PostalCode  *string `json:"postal_code"`
-	SubLocality *string `json:"sub_locality"`
-	City        *string `json:"city"`
-	Country     *string `json:"country"`
-	Email       *string `json:"email"`
-	Phone       *string `json:"phone"`
-}
+// TakiDocMeta is a dynamic map — fields are defined by the external schema,
+// not by Go types. This allows adding metadata fields without code changes.
+type TakiDocMeta map[string]interface{}
 
 // extractTakiV2 uses the open_taki v2 protocol for enhanced extraction.
 func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data io.ReadCloser, doc Document) (Document, error) {

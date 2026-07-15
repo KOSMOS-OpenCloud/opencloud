@@ -928,41 +928,40 @@ func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
 	marshalToStringMap(photo, metadata, "libre.graph.photo.")
 }
 
-// addDocMetadata flattens structured document metadata from open_taki docmeta
-// extraction into the metadata map. Stored as xattr: user.oc.md.doc.subject, etc.
+// addDocMetadata dynamically flattens structured document metadata from open_taki
+// into the metadata map. Walks "doc.*" and "sender.*" sub-objects.
+// Stored as xattr: user.oc.md.doc.subject, user.oc.md.sender.company, etc.
+// New fields added to docmeta_schema.json flow through without code changes.
 func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
-	if dm == nil || !dm.IsLetterhead {
+	if dm == nil {
+		return
+	}
+	m := map[string]interface{}(*dm)
+
+	// Check is_letterhead
+	if isLH, ok := m["is_letterhead"].(bool); ok && !isLH {
 		return
 	}
 
-	setIfNotNil := func(key string, val *string) {
-		if val != nil {
-			metadata[key] = *val
+	// Flatten sub-objects (doc.*, sender.*)
+	for _, prefix := range []string{"doc", "sender"} {
+		sub, ok := m[prefix].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		for key, val := range sub {
+			if val == nil {
+				continue
+			}
+			if strVal, ok := val.(string); ok && strVal != "" {
+				metadata[prefix+"."+key] = strVal
+			}
 		}
 	}
 
-	// doc.*
-	setIfNotNil("doc.subject", dm.Doc.Subject)
-	setIfNotNil("doc.type", dm.Doc.Type)
-	setIfNotNil("doc.date", dm.Doc.Date)
-	setIfNotNil("doc.reference", dm.Doc.Reference)
-
-	// sender.*
-	setIfNotNil("sender.company", dm.Sender.Company)
-	setIfNotNil("sender.given_name", dm.Sender.GivenName)
-	setIfNotNil("sender.family_name", dm.Sender.FamilyName)
-	setIfNotNil("sender.street", dm.Sender.Street)
-	setIfNotNil("sender.house_number", dm.Sender.HouseNumber)
-	setIfNotNil("sender.postal_code", dm.Sender.PostalCode)
-	setIfNotNil("sender.sub_locality", dm.Sender.SubLocality)
-	setIfNotNil("sender.city", dm.Sender.City)
-	setIfNotNil("sender.country", dm.Sender.Country)
-	setIfNotNil("sender.email", dm.Sender.Email)
-	setIfNotNil("sender.phone", dm.Sender.Phone)
-
 	// source metadata
-	if dm.Source != "" {
-		metadata["doc.meta_source"] = dm.Source
+	if source, ok := m["source"].(string); ok && source != "" {
+		metadata["doc.meta_source"] = source
 	}
 }
 

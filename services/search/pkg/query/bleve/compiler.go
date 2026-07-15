@@ -123,7 +123,9 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				} else if k == "Name" {
 					// Also search Metadata fields when searching by name
 					nameQ := bleveQuery.NewQueryStringQuery(k + ":" + v)
-					metaQ := bleveQuery.NewQueryStringQuery(strings.ToLower(strings.Trim(v, `*\"`)))
+					// Wildcard search on all fields including metadata (e.g. "11.1" matches "11.13")
+					metaTerm := strings.ToLower(strings.Trim(v, `*\"`))
+					metaQ := bleveQuery.NewWildcardQuery("*" + metaTerm + "*")
 					q = bleveQuery.NewDisjunctionQuery([]bleveQuery.Query{nameQ, metaQ})
 					group = true
 					if prev == nil {

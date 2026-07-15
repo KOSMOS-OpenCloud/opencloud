@@ -2,7 +2,9 @@ package bleve
 
 import (
 	"context"
+	"fmt"
 	"math"
+	"os"
 	"strings"
 	"time"
 
@@ -136,6 +138,12 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 		if len(metadata) == 0 {
 			metadata = nil
 		}
+		// Debug: log all field keys and metadata extraction
+		fieldKeys := make([]string, 0, len(hit.Fields))
+		for k := range hit.Fields {
+			fieldKeys = append(fieldKeys, k)
+		}
+		fmt.Fprintf(os.Stderr, "search-debug: doc=%s fields=%v metadata=%v\n", hit.ID, fieldKeys, metadata)
 
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),

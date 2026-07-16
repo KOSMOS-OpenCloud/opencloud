@@ -114,7 +114,7 @@ func DegreesToRadians(d float64) float64 {
 	return d * degreesToRadian
 }
 
-// RadiansToDegrees converts an angle in radians to degress
+// RadiansToDegrees converts an angle in radians to degrees
 func RadiansToDegrees(r float64) float64 {
 	return r * radiansToDegrees
 }
@@ -139,7 +139,7 @@ func RectFromPointDistance(lon, lat, dist float64) (float64, float64, float64, f
 
 	var minLonL, maxLonL float64
 	if minLatL > minLatRad && maxLatL < maxLatRad {
-		deltaLon := asin(sin(radDistance) / cos(radLat))
+		deltaLon := math.Asin(math.Sin(radDistance) / math.Cos(radLat))
 		minLonL = radLon - deltaLon
 		if minLonL < minLonRad {
 			minLonL += 2 * math.Pi

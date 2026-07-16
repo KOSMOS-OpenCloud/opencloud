@@ -51,7 +51,8 @@ type Stats struct {
 	TotTermSearchersStarted  uint64
 	TotTermSearchersFinished uint64
 
-	TotKNNSearches uint64
+	TotKNNSearches     uint64
+	TotSynonymSearches uint64
 
 	TotEventTriggerStarted   uint64
 	TotEventTriggerCompleted uint64
@@ -80,6 +81,7 @@ type Stats struct {
 	TotPersistedItems    uint64
 	TotItemsToPersist    uint64
 	TotPersistedSegments uint64
+	TotMutationsFiltered uint64
 
 	TotPersisterSlowMergerPause  uint64
 	TotPersisterSlowMergerResume uint64
@@ -134,6 +136,9 @@ type Stats struct {
 	MaxMemMergeZapTime      uint64
 	TotMemMergeSegments     uint64
 	TotMemorySegmentsAtRoot uint64
+
+	TotTrainedSamples uint64
+	TotTrainTime      uint64
 }
 
 // atomically populates the returned map

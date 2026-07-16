@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/RoaringBitmap/roaring"
+	"github.com/RoaringBitmap/roaring/v2"
 	index "github.com/blevesearch/bleve_index_api"
 	segment "github.com/blevesearch/scorch_segment_api/v2"
 )
@@ -393,5 +393,9 @@ func (i *IndexSnapshot) unadornedTermFieldReader(
 		includeNorm:        false,
 		includeTermVectors: false,
 		recycle:            false,
+		// signal downstream that this is a special unadorned termFieldReader
+		unadorned: true,
+		// unadorned TFRs do not require bytes read tracking
+		updateBytesRead: false,
 	}
 }

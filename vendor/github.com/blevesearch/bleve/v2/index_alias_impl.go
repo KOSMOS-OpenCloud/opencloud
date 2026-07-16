@@ -16,6 +16,8 @@ package bleve
 
 import (
 	"context"
+	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -31,6 +33,10 @@ type indexAliasImpl struct {
 	indexes []Index
 	mutex   sync.RWMutex
 	open    bool
+	// if all the indexes in that alias have the same mapping
+	// then the user can set the mapping here to avoid
+	// checking the mapping of each index in the alias
+	mapping mapping.IndexMapping
 }
 
 // NewIndexAlias creates a new IndexAlias over the provided
@@ -76,6 +82,43 @@ func (i *indexAliasImpl) Index(id string, data interface{}) error {
 	}
 
 	return i.indexes[0].Index(id, data)
+}
+
+func (i *indexAliasImpl) IndexSynonym(id string, collection string, definition *SynonymDefinition) error {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	err := i.isAliasToSingleIndex()
+	if err != nil {
+		return err
+	}
+
+	if si, ok := i.indexes[0].(SynonymIndex); ok {
+		return si.IndexSynonym(id, collection, definition)
+	}
+	return ErrorSynonymSearchNotSupported
+}
+
+func (i *indexAliasImpl) Train(batch *Batch) error {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	err := i.isAliasToSingleIndex()
+	if err != nil {
+		return err
+	}
+
+	if vi, ok := i.indexes[0].(TrainableIndex); ok {
+		return vi.Train(batch)
+	}
+	return ErrorTrainingNotSupported
 }
 
 func (i *indexAliasImpl) Delete(id string) error {
@@ -162,13 +205,20 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 	if len(i.indexes) < 1 {
 		return nil, ErrorAliasEmpty
 	}
+
 	if _, ok := ctx.Value(search.PreSearchKey).(bool); ok {
 		// since preSearchKey is set, it means that the request
 		// is being executed as part of a preSearch, which
 		// indicates that this index alias is set as an Index
 		// in another alias, so we need to do a preSearch search
 		// and NOT a real search
-		return preSearchDataSearch(ctx, req, i.indexes...)
+		bm25PreSearch := isBM25Enabled(i.mapping)
+		flags := &preSearchFlags{
+			knn:      requestHasKNN(req),
+			synonyms: !isMatchNoneQuery(req.Query),
+			bm25:     bm25PreSearch,
+		}
+		return preSearchDataSearch(ctx, req, flags, i.indexes...)
 	}
 
 	// at this point we know we are doing a real search
@@ -182,12 +232,10 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 	// if necessary
 	var preSearchData map[string]map[string]interface{}
 	if req.PreSearchData != nil {
-		if requestHasKNN(req) {
-			var err error
-			preSearchData, err = redistributeKNNPreSearchData(req, i.indexes)
-			if err != nil {
-				return nil, err
-			}
+		var err error
+		preSearchData, err = redistributePreSearchData(req, i.indexes)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -199,6 +247,21 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 		return i.indexes[0].SearchInContext(ctx, req)
 	}
 
+	// rescorer will be set if score fusion is supposed to happen
+	// at this alias (root alias), else will be nil
+	var rescorer *rescorer
+	if _, ok := ctx.Value(search.ScoreFusionKey).(bool); !ok {
+		// new context will be used in internal functions to collect data
+		// as suitable for fusion. Rescorer is used for rescoring
+		// using fusion algorithms.
+		if IsScoreFusionRequested(req) {
+			ctx = context.WithValue(ctx, search.ScoreFusionKey, true)
+			rescorer = newRescorer(req)
+			rescorer.prepareSearchRequest()
+			defer rescorer.restoreSearchRequest()
+		}
+	}
+
 	// at this stage we know we have multiple indexes
 	// check if preSearchData needs to be gathered from all indexes
 	// before executing the query
@@ -208,12 +271,25 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 	//  - the request requires preSearch
 	var preSearchDuration time.Duration
 	var sr *SearchResult
-	if req.PreSearchData == nil && preSearchRequired(req) {
+
+	// fusionKnnHits stores the KnnHits at the root alias.
+	// This is used with score fusion in case there is no need to
+	// send the knn hits to the leaf indexes in search phase.
+	// Refer to constructPreSearchDataAndFusionKnnHits for more info.
+	// This variable is left nil if we have to send the knn hits to leaf
+	// indexes again, else contains the knn hits if not required.
+	var fusionKnnHits search.DocumentMatchCollection
+	flags, err := preSearchRequired(ctx, req, i.mapping)
+	if err != nil {
+		return nil, err
+	}
+	if req.PreSearchData == nil && flags != nil {
 		searchStart := time.Now()
-		preSearchResult, err := preSearch(ctx, req, i.indexes...)
+		preSearchResult, err := preSearch(ctx, req, flags, i.indexes...)
 		if err != nil {
 			return nil, err
 		}
+
 		// check if the preSearch result has any errors and if so
 		// return the search result as is without executing the query
 		// so that the errors are not lost
@@ -221,17 +297,17 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 			return preSearchResult, nil
 		}
 		// finalize the preSearch result now
-		finalizePreSearchResult(req, preSearchResult)
+		finalizePreSearchResult(req, flags, preSearchResult)
 
 		// if there are no errors, then merge the data in the preSearch result
 		// and construct the preSearchData to be used in the actual search
 		// if the request is satisfied by the preSearch result, then we can
 		// directly return the preSearch result as the final result
-		if requestSatisfiedByPreSearch(req) {
-			sr = finalizeSearchResult(req, preSearchResult)
+		if requestSatisfiedByPreSearch(req, flags) {
+			sr = finalizeSearchResult(ctx, req, preSearchResult, rescorer)
 			// no need to run the 2nd phase MultiSearch(..)
 		} else {
-			preSearchData, err = constructPreSearchData(req, preSearchResult, i.indexes)
+			preSearchData, fusionKnnHits, err = constructPreSearchDataAndFusionKnnHits(req, flags, preSearchResult, rescorer, i.indexes)
 			if err != nil {
 				return nil, err
 			}
@@ -241,7 +317,8 @@ func (i *indexAliasImpl) SearchInContext(ctx context.Context, req *SearchRequest
 
 	// check if search result was generated as part of preSearch itself
 	if sr == nil {
-		sr, err = MultiSearch(ctx, req, preSearchData, i.indexes...)
+		multiSearchParams := &multiSearchParams{preSearchData, rescorer, fusionKnnHits}
+		sr, err = MultiSearch(ctx, req, multiSearchParams, i.indexes...)
 		if err != nil {
 			return nil, err
 		}
@@ -352,12 +429,31 @@ func (i *indexAliasImpl) Close() error {
 	return nil
 }
 
+// SetIndexMapping sets the mapping for the alias and must be used
+// ONLY when all the indexes in the alias have the same mapping.
+// This is to avoid checking the mapping of each index in the alias
+// when executing a search request.
+func (i *indexAliasImpl) SetIndexMapping(m mapping.IndexMapping) error {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+	if !i.open {
+		return ErrorIndexClosed
+	}
+	i.mapping = m
+	return nil
+}
+
 func (i *indexAliasImpl) Mapping() mapping.IndexMapping {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
 
 	if !i.open {
 		return nil
+	}
+
+	// if the mapping is already set, return it
+	if i.mapping != nil {
+		return i.mapping
 	}
 
 	err := i.isAliasToSingleIndex()
@@ -520,27 +616,88 @@ type asyncSearchResult struct {
 	Err    error
 }
 
-func preSearchRequired(req *SearchRequest) bool {
-	return requestHasKNN(req)
+// preSearchFlags is a struct to hold flags indicating why preSearch is required
+type preSearchFlags struct {
+	knn      bool
+	synonyms bool
+	bm25     bool // needs presearch for this too
 }
 
-func preSearch(ctx context.Context, req *SearchRequest, indexes ...Index) (*SearchResult, error) {
+func isBM25Enabled(m mapping.IndexMapping) bool {
+	var rv bool
+	if m, ok := m.(*mapping.IndexMappingImpl); ok {
+		rv = m.ScoringModel == index.BM25Scoring
+	}
+	return rv
+}
+
+// preSearchRequired checks if preSearch is required and returns the presearch flags struct
+// indicating which preSearch is required
+func preSearchRequired(ctx context.Context, req *SearchRequest, m mapping.IndexMapping) (*preSearchFlags, error) {
+	// Check for KNN query
+	knn := requestHasKNN(req)
+	var synonyms bool
+	if !isMatchNoneQuery(req.Query) {
+		// Check if synonyms are defined in the mapping
+		if sm, ok := m.(mapping.SynonymMapping); ok && sm.SynonymCount() > 0 {
+			// check if any of the fields queried have a synonym source
+			// in the index mapping, to prevent unnecessary preSearch
+			fs, err := query.ExtractFields(req.Query, m, nil)
+			if err != nil {
+				return nil, err
+			}
+			for field := range fs {
+				if sm.SynonymSourceForPath(field) != "" {
+					synonyms = true
+					break
+				}
+			}
+		}
+	}
+	var bm25 bool
+	if !isMatchNoneQuery(req.Query) {
+		if ctx != nil {
+			if searchType := ctx.Value(search.SearchTypeKey); searchType != nil {
+				if searchType.(string) == search.GlobalScoring {
+					bm25 = isBM25Enabled(m)
+				}
+			}
+		}
+	}
+
+	if knn || synonyms || bm25 {
+		return &preSearchFlags{
+			knn:      knn,
+			synonyms: synonyms,
+			bm25:     bm25,
+		}, nil
+	}
+	return nil, nil
+}
+
+func preSearch(ctx context.Context, req *SearchRequest, flags *preSearchFlags, indexes ...Index) (*SearchResult, error) {
 	// create a dummy request with a match none query
 	// since we only care about the preSearchData in PreSearch
+	dummyQuery := req.Query
+	if !flags.bm25 && !flags.synonyms {
+		// create a dummy request with a match none query
+		// since we only care about the preSearchData in PreSearch
+		dummyQuery = query.NewMatchNoneQuery()
+	}
 	dummyRequest := &SearchRequest{
-		Query: query.NewMatchNoneQuery(),
+		Query: dummyQuery,
 	}
 	newCtx := context.WithValue(ctx, search.PreSearchKey, true)
-	if requestHasKNN(req) {
+	if flags.knn {
 		addKnnToDummyRequest(dummyRequest, req)
 	}
-	return preSearchDataSearch(newCtx, dummyRequest, indexes...)
+	return preSearchDataSearch(newCtx, dummyRequest, flags, indexes...)
 }
 
 // if the request is satisfied by just the preSearch result,
 // finalize the result and return it directly without
 // performing multi search
-func finalizeSearchResult(req *SearchRequest, preSearchResult *SearchResult) *SearchResult {
+func finalizeSearchResult(ctx context.Context, req *SearchRequest, preSearchResult *SearchResult, rescorer *rescorer) *SearchResult {
 	if preSearchResult == nil {
 		return nil
 	}
@@ -569,7 +726,16 @@ func finalizeSearchResult(req *SearchRequest, preSearchResult *SearchResult) *Se
 	if req.SearchAfter != nil {
 		preSearchResult.Hits = collector.FilterHitsBySearchAfter(preSearchResult.Hits, req.Sort, req.SearchAfter)
 	}
+
+	if rescorer != nil {
+		// rescore takes ftsHits and knnHits as first and second argument respectively
+		// since this is pure knn, set ftsHits to nil. preSearchResult.Hits contains knn results
+		preSearchResult.Hits, preSearchResult.Total, preSearchResult.MaxScore = rescorer.rescore(nil, preSearchResult.Hits)
+		rescorer.restoreSearchRequest()
+	}
+
 	preSearchResult.Hits = hitsInCurrentPage(req, preSearchResult.Hits)
+
 	if reverseQueryExecution {
 		// reverse the sort back to the original
 		req.Sort.Reverse()
@@ -585,33 +751,97 @@ func finalizeSearchResult(req *SearchRequest, preSearchResult *SearchResult) *Se
 	return preSearchResult
 }
 
-func requestSatisfiedByPreSearch(req *SearchRequest) bool {
-	if requestHasKNN(req) && isKNNrequestSatisfiedByPreSearch(req) {
+func requestSatisfiedByPreSearch(req *SearchRequest, flags *preSearchFlags) bool {
+	if flags == nil {
+		return false
+	}
+	// if the synonyms presearch flag is set the request can never be satisfied by
+	// the preSearch result as synonyms are not part of the preSearch result
+	if flags.synonyms {
+		return false
+	}
+	if flags.knn && isKNNrequestSatisfiedByPreSearch(req) {
 		return true
 	}
 	return false
 }
 
-func constructPreSearchData(req *SearchRequest, preSearchResult *SearchResult, indexes []Index) (map[string]map[string]interface{}, error) {
+func constructSynonymPreSearchData(rv map[string]map[string]interface{}, sr *SearchResult, indexes []Index) map[string]map[string]interface{} {
+	for _, index := range indexes {
+		rv[index.Name()][search.SynonymPreSearchDataKey] = sr.SynonymResult
+	}
+	return rv
+}
+
+func constructBM25PreSearchData(rv map[string]map[string]interface{}, sr *SearchResult, indexes []Index) map[string]map[string]interface{} {
+	bmStats := sr.BM25Stats
+	if bmStats != nil {
+		for _, index := range indexes {
+			rv[index.Name()][search.BM25PreSearchDataKey] = &search.BM25Stats{
+				DocCount:         bmStats.DocCount,
+				FieldCardinality: bmStats.FieldCardinality,
+			}
+		}
+	}
+	return rv
+}
+
+func constructPreSearchData(req *SearchRequest, flags *preSearchFlags,
+	preSearchResult *SearchResult, indexes []Index,
+) (map[string]map[string]interface{}, error) {
+	if flags == nil || preSearchResult == nil {
+		return nil, fmt.Errorf("invalid input, flags: %v, preSearchResult: %v", flags, preSearchResult)
+	}
 	mergedOut := make(map[string]map[string]interface{}, len(indexes))
 	for _, index := range indexes {
 		mergedOut[index.Name()] = make(map[string]interface{})
 	}
 	var err error
-	if requestHasKNN(req) {
+	if flags.knn {
 		mergedOut, err = constructKnnPreSearchData(mergedOut, preSearchResult, indexes)
 		if err != nil {
 			return nil, err
 		}
 	}
+	if flags.synonyms {
+		mergedOut = constructSynonymPreSearchData(mergedOut, preSearchResult, indexes)
+	}
+	if flags.bm25 {
+		mergedOut = constructBM25PreSearchData(mergedOut, preSearchResult, indexes)
+	}
 	return mergedOut, nil
 }
 
-func preSearchDataSearch(ctx context.Context, req *SearchRequest, indexes ...Index) (*SearchResult, error) {
+// Constructs the presearch data if required during the search phase.
+// Also if we need to store knn hits at alias.
+// If we need to store knn hits at alias: returns all the knn hits
+// If we should send it to leaf indexes: includes in presearch data
+func constructPreSearchDataAndFusionKnnHits(req *SearchRequest, flags *preSearchFlags,
+	preSearchResult *SearchResult, rescorer *rescorer, indexes []Index,
+) (map[string]map[string]interface{}, search.DocumentMatchCollection, error) {
+	var fusionknnhits search.DocumentMatchCollection
+
+	// Checks if we need to send the KNN hits to the indexes in the
+	// search phase. If there is score fusion enabled, we do not
+	// send the KNN hits to the indexes.
+	if rescorer != nil && flags.knn {
+		fusionknnhits = preSearchResult.Hits
+		preSearchResult.Hits = nil
+	}
+
+	preSearchData, err := constructPreSearchData(req, flags, preSearchResult, indexes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return preSearchData, fusionknnhits, nil
+}
+
+func preSearchDataSearch(ctx context.Context, req *SearchRequest, flags *preSearchFlags, indexes ...Index) (*SearchResult, error) {
 	asyncResults := make(chan *asyncSearchResult, len(indexes))
 	// run search on each index in separate go routine
 	var waitGroup sync.WaitGroup
-	var searchChildIndex = func(in Index, childReq *SearchRequest) {
+	searchChildIndex := func(in Index, childReq *SearchRequest) {
 		rv := asyncSearchResult{Name: in.Name()}
 		rv.Result, rv.Err = in.SearchInContext(ctx, childReq)
 		asyncResults <- &rv
@@ -638,7 +868,7 @@ func preSearchDataSearch(ctx context.Context, req *SearchRequest, indexes ...Ind
 			if prp == nil {
 				// first valid preSearch result
 				// create a new preSearch result processor
-				prp = createPreSearchResultProcessor(req)
+				prp = createPreSearchResultProcessor(req, flags)
 			}
 			prp.add(asr.Result, asr.Name)
 			if sr == nil {
@@ -676,12 +906,66 @@ func preSearchDataSearch(ctx context.Context, req *SearchRequest, indexes ...Ind
 		for indexName, indexErr := range indexErrors {
 			sr.Status.Errors[indexName] = indexErr
 			sr.Status.Total++
-			sr.Status.Failed++
 		}
+		// At this point, all errors have been recorded—either from the preSearch phase
+		// (via status.Merge) or from individual index search failures (indexErrors).
+		// Since partial results are not allowed, mark the entire request as failed.
+		sr.Status.Successful = 0
+		sr.Status.Failed = sr.Status.Total
 	} else {
 		prp.finalize(sr)
 	}
 	return sr, nil
+}
+
+// redistributePreSearchData redistributes the preSearchData sent in the search request to an index alias
+// which would happen in the case of an alias tree and depending on the level of the tree, the preSearchData
+// needs to be redistributed to the indexes at that level
+func redistributePreSearchData(req *SearchRequest, indexes []Index) (map[string]map[string]interface{}, error) {
+	rv := make(map[string]map[string]interface{}, len(indexes))
+	for _, index := range indexes {
+		rv[index.Name()] = make(map[string]interface{})
+	}
+	if knnHits, ok := req.PreSearchData[search.KnnPreSearchDataKey].([]*search.DocumentMatch); ok {
+		// the preSearchData for KNN is a list of DocumentMatch objects
+		// that need to be redistributed to the right index.
+		// This is used only in the case of an alias tree, where the indexes
+		// are at the leaves of the tree, and the master alias is at the root.
+		// At each level of the tree, the preSearchData needs to be redistributed
+		// to the indexes/aliases at that level. Because the preSearchData is
+		// specific to each final index at the leaf.
+		segregatedKnnHits, err := validateAndDistributeKNNHits(knnHits, indexes)
+		if err != nil {
+			return nil, err
+		}
+		for _, index := range indexes {
+			rv[index.Name()][search.KnnPreSearchDataKey] = segregatedKnnHits[index.Name()]
+		}
+	}
+	if fts, ok := req.PreSearchData[search.SynonymPreSearchDataKey].(search.FieldTermSynonymMap); ok {
+		for _, index := range indexes {
+			rv[index.Name()][search.SynonymPreSearchDataKey] = fts
+		}
+	}
+
+	if bm25Data, ok := req.PreSearchData[search.BM25PreSearchDataKey].(*search.BM25Stats); ok {
+		for _, index := range indexes {
+			rv[index.Name()][search.BM25PreSearchDataKey] = bm25Data
+		}
+	}
+	return rv, nil
+}
+
+// finalizePreSearchResult finalizes the preSearch result by applying the finalization steps
+// specific to the preSearch flags
+func finalizePreSearchResult(req *SearchRequest, flags *preSearchFlags, preSearchResult *SearchResult) {
+	// if flags is nil then return
+	if flags == nil {
+		return
+	}
+	if flags.knn {
+		preSearchResult.Hits = finalizeKNNResults(req, preSearchResult.Hits)
+	}
 }
 
 // hitsInCurrentPage returns the hits in the current page
@@ -706,12 +990,27 @@ func hitsInCurrentPage(req *SearchRequest, hits []*search.DocumentMatch) []*sear
 	return hits
 }
 
+// Extra parameters for MultiSearch
+type multiSearchParams struct {
+	preSearchData map[string]map[string]interface{}
+	rescorer      *rescorer
+	fusionKnnHits search.DocumentMatchCollection
+}
+
 // MultiSearch executes a SearchRequest across multiple Index objects,
 // then merges the results.  The indexes must honor any ctx deadline.
-func MultiSearch(ctx context.Context, req *SearchRequest, preSearchData map[string]map[string]interface{}, indexes ...Index) (*SearchResult, error) {
-
+func MultiSearch(ctx context.Context, req *SearchRequest, params *multiSearchParams, indexes ...Index) (*SearchResult, error) {
 	searchStart := time.Now()
 	asyncResults := make(chan *asyncSearchResult, len(indexes))
+
+	var preSearchData map[string]map[string]interface{}
+	var rescorer *rescorer
+	var fusionKnnHits search.DocumentMatchCollection
+	if params != nil {
+		preSearchData = params.preSearchData
+		rescorer = params.rescorer
+		fusionKnnHits = params.fusionKnnHits
+	}
 
 	var reverseQueryExecution bool
 	if req.SearchBefore != nil {
@@ -724,7 +1023,7 @@ func MultiSearch(ctx context.Context, req *SearchRequest, preSearchData map[stri
 	// run search on each index in separate go routine
 	var waitGroup sync.WaitGroup
 
-	var searchChildIndex = func(in Index, childReq *SearchRequest) {
+	searchChildIndex := func(in Index, childReq *SearchRequest) {
 		rv := asyncSearchResult{Name: in.Name()}
 		rv.Result, rv.Err = in.SearchInContext(ctx, childReq)
 		asyncResults <- &rv
@@ -773,6 +1072,11 @@ func MultiSearch(ctx context.Context, req *SearchRequest, preSearchData map[stri
 				Errors: make(map[string]error),
 			},
 		}
+	}
+
+	if rescorer != nil {
+		sr.Hits, sr.Total, sr.MaxScore = rescorer.rescore(sr.Hits, fusionKnnHits)
+		rescorer.restoreSearchRequest()
 	}
 
 	sr.Hits = hitsInCurrentPage(req, sr.Hits)
@@ -855,4 +1159,154 @@ func (f *indexAliasImplFieldDict) Next() (*index.DictEntry, error) {
 func (f *indexAliasImplFieldDict) Close() error {
 	defer f.index.mutex.RUnlock()
 	return f.fieldDict.Close()
+}
+
+func (f *indexAliasImplFieldDict) Cardinality() int {
+	return f.fieldDict.Cardinality()
+}
+
+// -----------------------------------------------------------------------------
+
+func (i *indexAliasImpl) TermFrequencies(field string, limit int, descending bool) (
+	[]index.TermFreq, error) {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return nil, ErrorIndexClosed
+	}
+
+	if len(i.indexes) < 1 {
+		return nil, ErrorAliasEmpty
+	}
+
+	// short circuit the simple case
+	if len(i.indexes) == 1 {
+		if idx, ok := i.indexes[0].(InsightsIndex); ok {
+			return idx.TermFrequencies(field, limit, descending)
+		}
+		return nil, nil
+	}
+
+	// run search on each index in separate go routine
+	var waitGroup sync.WaitGroup
+	asyncResults := make(chan []index.TermFreq, len(i.indexes))
+
+	searchChildIndex := func(in Index, field string, limit int, descending bool) {
+		var rv []index.TermFreq
+		if idx, ok := in.(InsightsIndex); ok {
+			// over sample for higher accuracy
+			rv, _ = idx.TermFrequencies(field, limit*5, descending)
+		}
+		asyncResults <- rv
+		waitGroup.Done()
+	}
+
+	waitGroup.Add(len(i.indexes))
+	for _, in := range i.indexes {
+		go searchChildIndex(in, field, limit, descending)
+	}
+
+	// on another go routine, close after finished
+	go func() {
+		waitGroup.Wait()
+		close(asyncResults)
+	}()
+
+	rvTermFreqsMap := make(map[string]uint64)
+	for asr := range asyncResults {
+		for _, entry := range asr {
+			rvTermFreqsMap[entry.Term] += entry.Frequency
+		}
+	}
+
+	rvTermFreqs := make([]index.TermFreq, 0, len(rvTermFreqsMap))
+	for term, freq := range rvTermFreqsMap {
+		rvTermFreqs = append(rvTermFreqs, index.TermFreq{
+			Term:      term,
+			Frequency: freq,
+		})
+	}
+
+	sort.Slice(rvTermFreqs, func(i, j int) bool {
+		if rvTermFreqs[i].Frequency == rvTermFreqs[j].Frequency {
+			// If frequencies are equal, sort by term lexicographically
+			return rvTermFreqs[i].Term < rvTermFreqs[j].Term
+		}
+		if descending {
+			return rvTermFreqs[i].Frequency > rvTermFreqs[j].Frequency
+		}
+		return rvTermFreqs[i].Frequency < rvTermFreqs[j].Frequency
+	})
+
+	if limit > len(rvTermFreqs) {
+		limit = len(rvTermFreqs)
+	}
+
+	return rvTermFreqs[:limit], nil
+}
+
+func (i *indexAliasImpl) CentroidCardinalities(field string, limit int, descending bool) (
+	[]index.CentroidCardinality, error) {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return nil, ErrorIndexClosed
+	}
+
+	if len(i.indexes) < 1 {
+		return nil, ErrorAliasEmpty
+	}
+
+	// short circuit the simple case
+	if len(i.indexes) == 1 {
+		if idx, ok := i.indexes[0].(InsightsIndex); ok {
+			return idx.CentroidCardinalities(field, limit, descending)
+		}
+		return nil, nil
+	}
+
+	// run search on each index in separate go routine
+	var waitGroup sync.WaitGroup
+	asyncResults := make(chan []index.CentroidCardinality, len(i.indexes))
+
+	searchChildIndex := func(in Index, field string, limit int, descending bool) {
+		var rv []index.CentroidCardinality
+		if idx, ok := in.(InsightsIndex); ok {
+			rv, _ = idx.CentroidCardinalities(field, limit, descending)
+		}
+		asyncResults <- rv
+		waitGroup.Done()
+	}
+
+	waitGroup.Add(len(i.indexes))
+	for _, in := range i.indexes {
+		go searchChildIndex(in, field, limit, descending)
+	}
+
+	// on another go routine, close after finished
+	go func() {
+		waitGroup.Wait()
+		close(asyncResults)
+	}()
+
+	rvCentroidCardinalities := make([]index.CentroidCardinality, 0, limit*len(i.indexes))
+	for asr := range asyncResults {
+		rvCentroidCardinalities = append(rvCentroidCardinalities, asr...)
+	}
+
+	sort.Slice(rvCentroidCardinalities, func(i, j int) bool {
+		if descending {
+			return rvCentroidCardinalities[i].Cardinality > rvCentroidCardinalities[j].Cardinality
+		} else {
+			return rvCentroidCardinalities[i].Cardinality < rvCentroidCardinalities[j].Cardinality
+		}
+	})
+
+	if limit > len(rvCentroidCardinalities) {
+		limit = len(rvCentroidCardinalities)
+	}
+
+	return rvCentroidCardinalities[:limit], nil
 }

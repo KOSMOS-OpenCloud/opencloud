@@ -18,7 +18,7 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/RoaringBitmap/roaring"
+	"github.com/RoaringBitmap/roaring/v2"
 	segment "github.com/blevesearch/scorch_segment_api/v2"
 )
 
@@ -38,6 +38,7 @@ func init() {
 type unadornedPostingsIteratorBitmap struct {
 	actual   roaring.IntPeekable
 	actualBM *roaring.Bitmap
+	next     UnadornedPosting // reused across Next() calls
 }
 
 func (i *unadornedPostingsIteratorBitmap) Next() (segment.Posting, error) {
@@ -53,7 +54,10 @@ func (i *unadornedPostingsIteratorBitmap) nextAtOrAfter(atOrAfter uint64) (segme
 	if !exists {
 		return nil, nil
 	}
-	return UnadornedPosting(docNum), nil
+	i.next = UnadornedPosting{} // clear the struct
+	rv := &i.next
+	rv.docNum = docNum
+	return rv, nil
 }
 
 func (i *unadornedPostingsIteratorBitmap) nextDocNumAtOrAfter(atOrAfter uint64) (uint64, bool) {
@@ -96,6 +100,12 @@ func (i *unadornedPostingsIteratorBitmap) ReplaceActual(actual *roaring.Bitmap) 
 	i.actual = actual.Iterator()
 }
 
+// Resets the iterator to the beginning of the postings list.
+// by resetting the actual iterator.
+func (i *unadornedPostingsIteratorBitmap) ResetIterator() {
+	i.actual = i.actualBM.Iterator()
+}
+
 func newUnadornedPostingsIteratorFromBitmap(bm *roaring.Bitmap) segment.PostingsIterator {
 	return &unadornedPostingsIteratorBitmap{
 		actualBM: bm,
@@ -106,7 +116,9 @@ func newUnadornedPostingsIteratorFromBitmap(bm *roaring.Bitmap) segment.Postings
 const docNum1HitFinished = math.MaxUint64
 
 type unadornedPostingsIterator1Hit struct {
-	docNum uint64
+	docNumOrig uint64           // original 1-hit docNum used to create this iterator
+	docNum     uint64           // current docNum
+	next       UnadornedPosting // reused across Next() calls
 }
 
 func (i *unadornedPostingsIterator1Hit) Next() (segment.Posting, error) {
@@ -122,7 +134,10 @@ func (i *unadornedPostingsIterator1Hit) nextAtOrAfter(atOrAfter uint64) (segment
 	if !exists {
 		return nil, nil
 	}
-	return UnadornedPosting(docNum), nil
+	i.next = UnadornedPosting{} // clear the struct
+	rv := &i.next
+	rv.docNum = docNum
+	return rv, nil
 }
 
 func (i *unadornedPostingsIterator1Hit) nextDocNumAtOrAfter(atOrAfter uint64) (uint64, bool) {
@@ -153,30 +168,42 @@ func (i *unadornedPostingsIterator1Hit) BytesWritten() uint64 {
 
 func (i *unadornedPostingsIterator1Hit) ResetBytesRead(uint64) {}
 
+// ResetIterator resets the iterator to the original state.
+func (i *unadornedPostingsIterator1Hit) ResetIterator() {
+	i.docNum = i.docNumOrig
+}
+
 func newUnadornedPostingsIteratorFrom1Hit(docNum1Hit uint64) segment.PostingsIterator {
 	return &unadornedPostingsIterator1Hit{
-		docNum1Hit,
+		docNumOrig: docNum1Hit,
+		docNum:     docNum1Hit,
 	}
 }
 
-type UnadornedPosting uint64
-
-func (p UnadornedPosting) Number() uint64 {
-	return uint64(p)
+type ResetablePostingsIterator interface {
+	ResetIterator()
 }
 
-func (p UnadornedPosting) Frequency() uint64 {
+type UnadornedPosting struct {
+	docNum uint64
+}
+
+func (p *UnadornedPosting) Number() uint64 {
+	return p.docNum
+}
+
+func (p *UnadornedPosting) Frequency() uint64 {
 	return 0
 }
 
-func (p UnadornedPosting) Norm() float64 {
+func (p *UnadornedPosting) Norm() float64 {
 	return 0
 }
 
-func (p UnadornedPosting) Locations() []segment.Location {
+func (p *UnadornedPosting) Locations() []segment.Location {
 	return nil
 }
 
-func (p UnadornedPosting) Size() int {
+func (p *UnadornedPosting) Size() int {
 	return reflectStaticSizeUnadornedPosting
 }

@@ -26,6 +26,7 @@ import (
 	"github.com/blevesearch/bleve/v2/geo"
 	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
+	"github.com/blevesearch/geo/geojson"
 )
 
 // control the default behavior for dynamic fields (those not explicitly mapped)
@@ -74,12 +75,17 @@ type FieldMapping struct {
 	Dims int `json:"dims,omitempty"`
 
 	// Similarity is the similarity algorithm used for scoring
-	// vector fields.
-	// See: index.DefaultSimilarityMetric & index.SupportedSimilarityMetrics
+	// field's content while performing search on it.
+	// See: index.SimilarityModels
 	Similarity string `json:"similarity,omitempty"`
 
 	// Applicable to vector fields only - optimization string
 	VectorIndexOptimizedFor string `json:"vector_index_optimized_for,omitempty"`
+
+	SynonymSource string `json:"synonym_source,omitempty"`
+
+	// Applicable to vector fields only - enables GPU acceleration for indexing and searching
+	GPU bool `json:"gpu,omitempty"`
 }
 
 // NewTextFieldMapping returns a default field mapping for text
@@ -223,13 +229,18 @@ func (fm *FieldMapping) Options() index.FieldIndexingOptions {
 	if fm.SkipFreqNorm {
 		rv |= index.SkipFreqNorm
 	}
+	if fm.GPU {
+		rv |= index.GPU
+	}
 	return rv
 }
 
 func (fm *FieldMapping) processString(propertyValueString string, pathString string, path []string, indexes []uint64, context *walkContext) {
 	fieldName := getFieldName(pathString, path, fm)
 	options := fm.Options()
-	if fm.Type == "text" {
+
+	switch fm.Type {
+	case "text":
 		analyzer := fm.analyzerForField(path, context)
 		field := document.NewTextFieldCustom(fieldName, indexes, []byte(propertyValueString), options, analyzer)
 		context.doc.AddField(field)
@@ -237,7 +248,7 @@ func (fm *FieldMapping) processString(propertyValueString string, pathString str
 		if !fm.IncludeInAll {
 			context.excludedFromAll = append(context.excludedFromAll, fieldName)
 		}
-	} else if fm.Type == "datetime" {
+	case "datetime":
 		dateTimeFormat := context.im.DefaultDateTimeParser
 		if fm.DateFormat != "" {
 			dateTimeFormat = fm.DateFormat
@@ -249,7 +260,7 @@ func (fm *FieldMapping) processString(propertyValueString string, pathString str
 				fm.processTime(parsedDateTime, layout, pathString, path, indexes, context)
 			}
 		}
-	} else if fm.Type == "IP" {
+	case "IP":
 		ip := net.ParseIP(propertyValueString)
 		if ip != nil {
 			fm.processIP(ip, pathString, path, indexes, context)
@@ -326,32 +337,20 @@ func (fm *FieldMapping) processIP(ip net.IP, pathString string, path []string, i
 }
 
 func (fm *FieldMapping) processGeoShape(propertyMightBeGeoShape interface{},
-	pathString string, path []string, indexes []uint64, context *walkContext) {
+	pathString string, path []string, indexes []uint64, context *walkContext,
+) {
 	coordValue, shape, err := geo.ParseGeoShapeField(propertyMightBeGeoShape)
 	if err != nil {
 		return
 	}
 
-	if shape == geo.CircleType {
-		center, radius, found := geo.ExtractCircle(propertyMightBeGeoShape)
+	if shape == geo.GeometryCollectionType {
+		geoShapes, found := geo.ExtractGeometryCollection(propertyMightBeGeoShape)
 		if found {
 			fieldName := getFieldName(pathString, path, fm)
 			options := fm.Options()
-			field := document.NewGeoCircleFieldWithIndexingOptions(fieldName,
-				indexes, center, radius, options)
-			context.doc.AddField(field)
-
-			if !fm.IncludeInAll {
-				context.excludedFromAll = append(context.excludedFromAll, fieldName)
-			}
-		}
-	} else if shape == geo.GeometryCollectionType {
-		coordinates, shapes, found := geo.ExtractGeometryCollection(propertyMightBeGeoShape)
-		if found {
-			fieldName := getFieldName(pathString, path, fm)
-			options := fm.Options()
-			field := document.NewGeometryCollectionFieldWithIndexingOptions(fieldName,
-				indexes, coordinates, shapes, options)
+			field := document.NewGeometryCollectionFieldFromShapesWithIndexingOptions(fieldName,
+				indexes, geoShapes, options)
 			context.doc.AddField(field)
 
 			if !fm.IncludeInAll {
@@ -359,12 +358,20 @@ func (fm *FieldMapping) processGeoShape(propertyMightBeGeoShape interface{},
 			}
 		}
 	} else {
-		coordinates, shape, found := geo.ExtractGeoShapeCoordinates(coordValue, shape)
+		var geoShape *geojson.GeoShape
+		var found bool
+
+		if shape == geo.CircleType {
+			geoShape, found = geo.ExtractCircle(propertyMightBeGeoShape)
+		} else {
+			geoShape, found = geo.ExtractGeoShapeCoordinates(coordValue, shape)
+		}
+
 		if found {
 			fieldName := getFieldName(pathString, path, fm)
 			options := fm.Options()
-			field := document.NewGeoShapeFieldWithIndexingOptions(fieldName,
-				indexes, coordinates, shape, options)
+			field := document.NewGeoShapeFieldFromShapeWithIndexingOptions(fieldName,
+				indexes, geoShape, options)
 			context.doc.AddField(field)
 
 			if !fm.IncludeInAll {
@@ -399,7 +406,6 @@ func getFieldName(pathString string, path []string, fieldMapping *FieldMapping) 
 
 // UnmarshalJSON offers custom unmarshaling with optional strict validation
 func (fm *FieldMapping) UnmarshalJSON(data []byte) error {
-
 	var tmp map[string]json.RawMessage
 	err := util.UnmarshalJSON(data, &tmp)
 	if err != nil {
@@ -460,17 +466,27 @@ func (fm *FieldMapping) UnmarshalJSON(data []byte) error {
 				return err
 			}
 		case "dims":
-			err := json.Unmarshal(v, &fm.Dims)
+			err := util.UnmarshalJSON(v, &fm.Dims)
 			if err != nil {
 				return err
 			}
 		case "similarity":
-			err := json.Unmarshal(v, &fm.Similarity)
+			err := util.UnmarshalJSON(v, &fm.Similarity)
 			if err != nil {
 				return err
 			}
 		case "vector_index_optimized_for":
-			err := json.Unmarshal(v, &fm.VectorIndexOptimizedFor)
+			err := util.UnmarshalJSON(v, &fm.VectorIndexOptimizedFor)
+			if err != nil {
+				return err
+			}
+		case "synonym_source":
+			err := util.UnmarshalJSON(v, &fm.SynonymSource)
+			if err != nil {
+				return err
+			}
+		case "gpu":
+			err := util.UnmarshalJSON(v, &fm.GPU)
 			if err != nil {
 				return err
 			}

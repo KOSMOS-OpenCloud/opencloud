@@ -25,6 +25,7 @@ import (
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/collector"
 	"github.com/blevesearch/bleve/v2/search/query"
+	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 )
 
@@ -55,15 +56,15 @@ type SearchRequest struct {
 	Query            query.Query       `json:"query"`
 	Size             int               `json:"size"`
 	From             int               `json:"from"`
-	Highlight        *HighlightRequest `json:"highlight"`
-	Fields           []string          `json:"fields"`
-	Facets           FacetsRequest     `json:"facets"`
+	Highlight        *HighlightRequest `json:"highlight,omitempty"`
+	Fields           []string          `json:"fields,omitempty"`
+	Facets           FacetsRequest     `json:"facets,omitempty"`
 	Explain          bool              `json:"explain"`
 	Sort             search.SortOrder  `json:"sort"`
 	IncludeLocations bool              `json:"includeLocations"`
 	Score            string            `json:"score,omitempty"`
-	SearchAfter      []string          `json:"search_after"`
-	SearchBefore     []string          `json:"search_before"`
+	SearchAfter      []string          `json:"search_after,omitempty"`
+	SearchBefore     []string          `json:"search_before,omitempty"`
 
 	// PreSearchData will be a  map that will be used
 	// in the second phase of any 2-phase search, to provide additional
@@ -77,6 +78,8 @@ type SearchRequest struct {
 
 	PreSearchData map[string]interface{} `json:"pre_search_data,omitempty"`
 
+	Params *RequestParams `json:"params,omitempty"`
+
 	sortFunc func(sort.Interface)
 }
 
@@ -84,22 +87,23 @@ type SearchRequest struct {
 // a SearchRequest
 func (r *SearchRequest) UnmarshalJSON(input []byte) error {
 	var temp struct {
-		Q                json.RawMessage   `json:"query"`
-		Size             *int              `json:"size"`
-		From             int               `json:"from"`
-		Highlight        *HighlightRequest `json:"highlight"`
-		Fields           []string          `json:"fields"`
-		Facets           FacetsRequest     `json:"facets"`
-		Explain          bool              `json:"explain"`
-		Sort             []json.RawMessage `json:"sort"`
-		IncludeLocations bool              `json:"includeLocations"`
-		Score            string            `json:"score"`
-		SearchAfter      []string          `json:"search_after"`
-		SearchBefore     []string          `json:"search_before"`
-		PreSearchData    json.RawMessage   `json:"pre_search_data"`
+		Q                json.RawMessage    `json:"query"`
+		Size             *int               `json:"size"`
+		From             int                `json:"from"`
+		Highlight        *HighlightRequest  `json:"highlight"`
+		Fields           []string           `json:"fields"`
+		Facets           FacetsRequest      `json:"facets"`
+		Explain          bool               `json:"explain"`
+		Sort             []json.RawMessage  `json:"sort"`
+		IncludeLocations bool               `json:"includeLocations"`
+		Score            string             `json:"score"`
+		SearchAfter      []string           `json:"search_after"`
+		SearchBefore     []string           `json:"search_before"`
+		PreSearchData    OptionalRawMessage `json:"pre_search_data"`
+		Params           OptionalRawMessage `json:"params"`
 	}
 
-	err := json.Unmarshal(input, &temp)
+	err := util.UnmarshalJSON(input, &temp)
 	if err != nil {
 		return err
 	}
@@ -137,6 +141,23 @@ func (r *SearchRequest) UnmarshalJSON(input []byte) error {
 	if r.From < 0 {
 		r.From = 0
 	}
+
+	if IsScoreFusionRequested(r) {
+		if temp.Params == nil {
+			// If params is not present and it is requires rescoring, assign
+			// default values
+			r.Params = NewDefaultParams(r.From, r.Size)
+		} else {
+			// if it is a request that requires rescoring, parse the rescoring
+			// parameters.
+			params, err := ParseParams(r, temp.Params)
+			if err != nil {
+				return err
+			}
+			r.Params = params
+		}
+	}
+
 	if temp.PreSearchData != nil {
 		r.PreSearchData, err = query.ParsePreSearchData(temp.PreSearchData)
 		if err != nil {
@@ -177,17 +198,21 @@ func (i *indexImpl) runKnnCollector(ctx context.Context, req *SearchRequest, rea
 	return nil, nil
 }
 
-func setKnnHitsInCollector(knnHits []*search.DocumentMatch, req *SearchRequest, coll *collector.TopNCollector) {
+func setKnnHitsInCollector(knnHits []*search.DocumentMatch, coll *collector.TopNCollector) {
 }
 
 func requestHasKNN(req *SearchRequest) bool {
 	return false
 }
 
+func numKNNQueries(req *SearchRequest) int {
+	return 0
+}
+
 func addKnnToDummyRequest(dummyReq *SearchRequest, realReq *SearchRequest) {
 }
 
-func redistributeKNNPreSearchData(req *SearchRequest, indexes []Index) (map[string]map[string]interface{}, error) {
+func validateAndDistributeKNNHits(knnHits []*search.DocumentMatch, indexes []Index) (map[string][]*search.DocumentMatch, error) {
 	return nil, nil
 }
 
@@ -206,4 +231,10 @@ func finalizeKNNResults(req *SearchRequest, knnHits []*search.DocumentMatch) []*
 
 func newKnnPreSearchResultProcessor(req *SearchRequest) *knnPreSearchResultProcessor {
 	return &knnPreSearchResultProcessor{} // equivalent to nil
+}
+
+func (r *rescorer) prepareKnnRequest() {
+}
+
+func (r *rescorer) restoreKnnRequest() {
 }

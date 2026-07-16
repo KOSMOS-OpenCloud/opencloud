@@ -30,7 +30,7 @@ import (
 	index "github.com/blevesearch/bleve_index_api"
 	store "github.com/blevesearch/upsidedown_store_api"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 const Name = "upside_down"
@@ -1042,7 +1042,10 @@ func (udc *UpsideDownCouch) fieldIndexOrNewRow(name string) (uint16, *FieldRow) 
 }
 
 func init() {
-	registry.RegisterIndexType(Name, NewUpsideDownCouch)
+	err := registry.RegisterIndexType(Name, NewUpsideDownCouch)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func backIndexRowForDoc(kvreader store.KVReader, docID index.IndexInternalID) (*BackIndexRow, error) {

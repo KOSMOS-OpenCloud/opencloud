@@ -17,12 +17,14 @@ package mapping
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/blevesearch/bleve/v2/analysis"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/standard"
 	"github.com/blevesearch/bleve/v2/analysis/datetime/optional"
 	"github.com/blevesearch/bleve/v2/document"
 	"github.com/blevesearch/bleve/v2/registry"
+	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 )
@@ -49,6 +51,8 @@ type IndexMappingImpl struct {
 	DefaultType           string                      `json:"default_type"`
 	DefaultAnalyzer       string                      `json:"default_analyzer"`
 	DefaultDateTimeParser string                      `json:"default_datetime_parser"`
+	DefaultSynonymSource  string                      `json:"default_synonym_source,omitempty"`
+	ScoringModel          string                      `json:"scoring_model,omitempty"`
 	DefaultField          string                      `json:"default_field"`
 	StoreDynamic          bool                        `json:"store_dynamic"`
 	IndexDynamic          bool                        `json:"index_dynamic"`
@@ -145,6 +149,15 @@ func (im *IndexMappingImpl) AddCustomDateTimeParser(name string, config map[stri
 	return nil
 }
 
+func (im *IndexMappingImpl) AddSynonymSource(name string, config map[string]interface{}) error {
+	_, err := im.cache.DefineSynonymSource(name, config)
+	if err != nil {
+		return err
+	}
+	im.CustomAnalysis.SynonymSources[name] = config
+	return nil
+}
+
 // NewIndexMapping creates a new IndexMapping that will use all the default indexing rules
 func NewIndexMapping() *IndexMappingImpl {
 	return &IndexMappingImpl{
@@ -174,18 +187,39 @@ func (im *IndexMappingImpl) Validate() error {
 	if err != nil {
 		return err
 	}
-
-	fieldAliasCtx := make(map[string]*FieldMapping)
-	err = im.DefaultMapping.Validate(im.cache, "", fieldAliasCtx)
-	if err != nil {
-		return err
-	}
-	for _, docMapping := range im.TypeMapping {
-		err = docMapping.Validate(im.cache, "", fieldAliasCtx)
+	if im.DefaultSynonymSource != "" {
+		_, err = im.cache.SynonymSourceNamed(im.DefaultSynonymSource)
 		if err != nil {
 			return err
 		}
 	}
+	// fieldAliasCtx is used to detect any field alias conflicts across the entire mapping
+	// the map will hold the fully qualified field name to FieldMapping, so we can
+	// check for conflicts as we validate each DocumentMapping.
+	fieldAliasCtx := make(map[string]*FieldMapping)
+	// ensure that the nested property is not set for top-level default mapping
+	if im.DefaultMapping.Nested {
+		return fmt.Errorf("default mapping cannot be nested")
+	}
+	err = im.DefaultMapping.Validate(im.cache, []string{}, fieldAliasCtx)
+	if err != nil {
+		return err
+	}
+	for name, docMapping := range im.TypeMapping {
+		// ensure that the nested property is not set for top-level mappings
+		if docMapping.Nested {
+			return fmt.Errorf("type mapping named: %s cannot be nested", name)
+		}
+		err = docMapping.Validate(im.cache, []string{}, fieldAliasCtx)
+		if err != nil {
+			return err
+		}
+	}
+
+	if _, ok := index.SupportedScoringModels[im.ScoringModel]; !ok && im.ScoringModel != "" {
+		return fmt.Errorf("unsupported scoring model: %s", im.ScoringModel)
+	}
+
 	return nil
 }
 
@@ -253,6 +287,11 @@ func (im *IndexMappingImpl) UnmarshalJSON(data []byte) error {
 			if err != nil {
 				return err
 			}
+		case "default_synonym_source":
+			err := util.UnmarshalJSON(v, &im.DefaultSynonymSource)
+			if err != nil {
+				return err
+			}
 		case "default_field":
 			err := util.UnmarshalJSON(v, &im.DefaultField)
 			if err != nil {
@@ -283,6 +322,12 @@ func (im *IndexMappingImpl) UnmarshalJSON(data []byte) error {
 			if err != nil {
 				return err
 			}
+		case "scoring_model":
+			err := util.UnmarshalJSON(v, &im.ScoringModel)
+			if err != nil {
+				return err
+			}
+
 		default:
 			invalidKeys = append(invalidKeys, k)
 		}
@@ -334,9 +379,28 @@ func (im *IndexMappingImpl) MapDocument(doc *document.Document, data interface{}
 			field := document.NewCompositeFieldWithIndexingOptions("_all", true, []string{}, walkContext.excludedFromAll, index.IndexField|index.IncludeTermVectors)
 			doc.AddField(field)
 		}
+		doc.SetIndexed()
 	}
 
 	return nil
+}
+
+func (im *IndexMappingImpl) MapSynonymDocument(doc *document.Document, collection string, input []string, synonyms []string) error {
+	// determine all the synonym sources with the given collection
+	// and create a synonym field for each
+	err := im.SynonymSourceVisitor(func(name string, item analysis.SynonymSource) error {
+		if item.Collection() == collection {
+			// create a new field with the name of the synonym source
+			analyzer := im.AnalyzerNamed(item.Analyzer())
+			if analyzer == nil {
+				return fmt.Errorf("unknown analyzer named: %s", item.Analyzer())
+			}
+			field := document.NewSynonymField(name, analyzer, input, synonyms)
+			doc.AddField(field)
+		}
+		return nil
+	})
+	return err
 }
 
 type walkContext struct {
@@ -456,4 +520,134 @@ func (im *IndexMappingImpl) FieldMappingForPath(path string) FieldMapping {
 
 func (im *IndexMappingImpl) DefaultSearchField() string {
 	return im.DefaultField
+}
+
+func (im *IndexMappingImpl) SynonymSourceNamed(name string) analysis.SynonymSource {
+	syn, err := im.cache.SynonymSourceNamed(name)
+	if err != nil {
+		logger.Printf("error using synonym source named: %s", name)
+		return nil
+	}
+	return syn
+}
+
+func (im *IndexMappingImpl) SynonymSourceForPath(path string) string {
+	// first we look for explicit mapping on the field
+	for _, docMapping := range im.TypeMapping {
+		synonymSource := docMapping.synonymSourceForPath(path)
+		if synonymSource != "" {
+			return synonymSource
+		}
+	}
+
+	// now try the default mapping
+	pathMapping, _ := im.DefaultMapping.documentMappingForPath(path)
+	if pathMapping != nil {
+		if len(pathMapping.Fields) > 0 {
+			if pathMapping.Fields[0].SynonymSource != "" {
+				return pathMapping.Fields[0].SynonymSource
+			}
+		}
+	}
+
+	// next we will try default synonym sources for the path
+	pathDecoded := decodePath(path)
+	for _, docMapping := range im.TypeMapping {
+		if docMapping.Enabled {
+			rv := docMapping.defaultSynonymSource(pathDecoded)
+			if rv != "" {
+				return rv
+			}
+		}
+	}
+	// now the default analyzer for the default mapping
+	if im.DefaultMapping.Enabled {
+		rv := im.DefaultMapping.defaultSynonymSource(pathDecoded)
+		if rv != "" {
+			return rv
+		}
+	}
+
+	return im.DefaultSynonymSource
+}
+
+// SynonymCount() returns the number of synonym sources defined in the mapping
+func (im *IndexMappingImpl) SynonymCount() int {
+	return len(im.CustomAnalysis.SynonymSources)
+}
+
+// SynonymSourceVisitor() allows a visitor to iterate over all synonym sources
+func (im *IndexMappingImpl) SynonymSourceVisitor(visitor analysis.SynonymSourceVisitor) error {
+	err := im.cache.SynonymSources.VisitSynonymSources(visitor)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (im *IndexMappingImpl) buildNestedPrefixes() map[string]int {
+	prefixDepth := make(map[string]int)
+	var collectNestedFields func(dm *DocumentMapping, pathComponents []string, currentDepth int)
+	collectNestedFields = func(dm *DocumentMapping, pathComponents []string, currentDepth int) {
+		for name, docMapping := range dm.Properties {
+			newPathComponents := append(pathComponents, name)
+			if docMapping.Nested {
+				// This is a nested field boundary
+				newDepth := currentDepth + 1
+				prefixDepth[strings.Join(newPathComponents, pathSeparator)] = newDepth
+				// Continue deeper with incremented depth
+				collectNestedFields(docMapping, newPathComponents, newDepth)
+			} else {
+				// Not nested, continue with same depth
+				collectNestedFields(docMapping, newPathComponents, currentDepth)
+			}
+		}
+	}
+	// Start from depth 0 (root)
+	if im.DefaultMapping != nil && im.DefaultMapping.Enabled {
+		collectNestedFields(im.DefaultMapping, []string{}, 0)
+	}
+	// Now do this for each type mapping
+	for _, docMapping := range im.TypeMapping {
+		if docMapping.Enabled {
+			collectNestedFields(docMapping, []string{}, 0)
+		}
+	}
+	return prefixDepth
+}
+
+func (im *IndexMappingImpl) NestedDepth(fs search.FieldSet) (int, int) {
+	if im.cache == nil || im.cache.NestedPrefixes == nil {
+		return 0, 0
+	}
+
+	im.cache.NestedPrefixes.InitOnce(func() map[string]int {
+		return im.buildNestedPrefixes()
+	})
+
+	return im.cache.NestedPrefixes.NestedDepth(fs)
+}
+
+func (im *IndexMappingImpl) CountNested() int {
+	if im.cache == nil || im.cache.NestedPrefixes == nil {
+		return 0
+	}
+
+	im.cache.NestedPrefixes.InitOnce(func() map[string]int {
+		return im.buildNestedPrefixes()
+	})
+
+	return im.cache.NestedPrefixes.CountNested()
+}
+
+func (im *IndexMappingImpl) IntersectsPrefix(fs search.FieldSet) bool {
+	if im.cache == nil || im.cache.NestedPrefixes == nil {
+		return false
+	}
+
+	im.cache.NestedPrefixes.InitOnce(func() map[string]int {
+		return im.buildNestedPrefixes()
+	})
+
+	return im.cache.NestedPrefixes.IntersectsPrefix(fs)
 }

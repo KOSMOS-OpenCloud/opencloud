@@ -15,7 +15,6 @@
 package scorch
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"reflect"
@@ -50,6 +49,11 @@ type IndexSnapshotTermFieldReader struct {
 	recycle            bool
 	bytesRead          uint64
 	ctx                context.Context
+	unadorned          bool
+	// flag to indicate whether to increment our bytesRead
+	// value after creation of the TFR while iterating our postings
+	// lists
+	updateBytesRead bool
 }
 
 func (i *IndexSnapshotTermFieldReader) incrementBytesRead(val uint64) {
@@ -82,10 +86,15 @@ func (i *IndexSnapshotTermFieldReader) Next(preAlloced *index.TermFieldDoc) (*in
 	if rv == nil {
 		rv = &index.TermFieldDoc{}
 	}
+	var prevBytesRead uint64
 	// find the next hit
 	for i.segmentOffset < len(i.iterators) {
-		prevBytesRead := i.iterators[i.segmentOffset].BytesRead()
-		next, err := i.iterators[i.segmentOffset].Next()
+		// get our current postings iterator
+		curItr := i.iterators[i.segmentOffset]
+		if i.updateBytesRead {
+			prevBytesRead = curItr.BytesRead()
+		}
+		next, err := curItr.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -93,18 +102,20 @@ func (i *IndexSnapshotTermFieldReader) Next(preAlloced *index.TermFieldDoc) (*in
 			// make segment number into global number by adding offset
 			globalOffset := i.snapshot.offsets[i.segmentOffset]
 			nnum := next.Number()
-			rv.ID = docNumberToBytes(rv.ID, nnum+globalOffset)
+			rv.ID = index.NewIndexInternalID(rv.ID, nnum+globalOffset)
 			i.postingToTermFieldDoc(next, rv)
 
 			i.currID = rv.ID
 			i.currPosting = next
-			// postingsIterators is maintain the bytesRead stat in a cumulative fashion.
-			// this is because there are chances of having a series of loadChunk calls,
-			// and they have to be added together before sending the bytesRead at this point
-			// upstream.
-			bytesRead := i.iterators[i.segmentOffset].BytesRead()
-			if bytesRead > prevBytesRead {
-				i.incrementBytesRead(bytesRead - prevBytesRead)
+			if i.updateBytesRead {
+				// postingsIterators maintains the bytesRead stat in a cumulative fashion.
+				// this is because there are chances of having a series of loadChunk calls,
+				// and they have to be added together before sending the bytesRead at this point
+				// upstream.
+				bytesRead := curItr.BytesRead()
+				if bytesRead > prevBytesRead {
+					i.incrementBytesRead(bytesRead - prevBytesRead)
+				}
 			}
 			return rv, nil
 		}
@@ -145,17 +156,32 @@ func (i *IndexSnapshotTermFieldReader) postingToTermFieldDoc(next segment.Postin
 func (i *IndexSnapshotTermFieldReader) Advance(ID index.IndexInternalID, preAlloced *index.TermFieldDoc) (*index.TermFieldDoc, error) {
 	// FIXME do something better
 	// for now, if we need to seek backwards, then restart from the beginning
-	if i.currPosting != nil && bytes.Compare(i.currID, ID) >= 0 {
-		i2, err := i.snapshot.TermFieldReader(nil, i.term, i.field,
-			i.includeFreq, i.includeNorm, i.includeTermVectors)
-		if err != nil {
-			return nil, err
+	if i.currPosting != nil && i.currID.Compare(ID) >= 0 {
+		// Check if the TFR is a special unadorned composite optimization.
+		// Such a TFR will NOT have a valid `term` or `field` set, making it
+		// impossible for the TFR to replace itself with a new one.
+		if !i.unadorned {
+			i2, err := i.snapshot.TermFieldReader(context.TODO(), i.term, i.field,
+				i.includeFreq, i.includeNorm, i.includeTermVectors)
+			if err != nil {
+				return nil, err
+			}
+			// close the current term field reader before replacing it with a new one
+			_ = i.Close()
+			*i = *(i2.(*IndexSnapshotTermFieldReader))
+		} else {
+			// unadorned composite optimization
+			// we need to reset all the iterators
+			// back to the beginning, which effectively
+			// achieves the same thing as the above
+			for _, iter := range i.iterators {
+				if optimizedIterator, ok := iter.(ResetablePostingsIterator); ok {
+					optimizedIterator.ResetIterator()
+				}
+			}
 		}
-		// close the current term field reader before replacing it with a new one
-		_ = i.Close()
-		*i = *(i2.(*IndexSnapshotTermFieldReader))
 	}
-	num, err := docInternalToNumber(ID)
+	num, err := ID.Value()
 	if err != nil {
 		return nil, fmt.Errorf("error converting to doc number % x - %v", ID, err)
 	}
@@ -180,7 +206,7 @@ func (i *IndexSnapshotTermFieldReader) Advance(ID index.IndexInternalID, preAllo
 	if preAlloced == nil {
 		preAlloced = &index.TermFieldDoc{}
 	}
-	preAlloced.ID = docNumberToBytes(preAlloced.ID, next.Number()+
+	preAlloced.ID = index.NewIndexInternalID(preAlloced.ID, next.Number()+
 		i.snapshot.offsets[segIndex])
 	i.postingToTermFieldDoc(next, preAlloced)
 	i.currID = preAlloced.ID

@@ -17,6 +17,7 @@ package simple
 import (
 	"container/heap"
 	"fmt"
+
 	index "github.com/blevesearch/bleve_index_api"
 
 	"github.com/blevesearch/bleve/v2/registry"
@@ -145,12 +146,8 @@ func (s *Highlighter) BestFragmentsInField(dm *search.DocumentMatch, doc index.D
 			formattedFragments[i] += s.sep
 		}
 	}
-
-	if dm.Fragments == nil {
-		dm.Fragments = make(search.FieldFragmentMap, 0)
-	}
 	if len(formattedFragments) > 0 {
-		dm.Fragments[field] = formattedFragments
+		dm.AddFragments(field, formattedFragments)
 	}
 
 	return formattedFragments
@@ -217,5 +214,8 @@ func Constructor(config map[string]interface{}, cache *registry.Cache) (highligh
 }
 
 func init() {
-	registry.RegisterHighlighter(Name, Constructor)
+	err := registry.RegisterHighlighter(Name, Constructor)
+	if err != nil {
+		panic(err)
+	}
 }

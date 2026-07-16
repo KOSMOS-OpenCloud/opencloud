@@ -109,7 +109,17 @@ func NewVectorField(name string, arrayPositions []uint64,
 func NewVectorFieldWithIndexingOptions(name string, arrayPositions []uint64,
 	vector []float32, dims int, similarity, vectorIndexOptimizedFor string,
 	options index.FieldIndexingOptions) *VectorField {
-	options = options | DefaultVectorIndexingOptions
+	// ensure the options are set to not store/index term vectors/doc values
+	options &^= index.StoreField | index.IncludeTermVectors | index.DocValues
+	// skip freq/norms for vector field
+	options |= index.SkipFreqNorm
+
+	// bivf-sq8 indexes only supports hamming distance for the primary
+	// binary index. Similarity here is used for the backing flat index,
+	// which is set to cosine similarity for recall reasons
+	if index.OptimizationRequiresBinaryIndex(vectorIndexOptimizedFor) {
+		similarity = index.CosineSimilarity
+	}
 
 	return &VectorField{
 		name:                    name,

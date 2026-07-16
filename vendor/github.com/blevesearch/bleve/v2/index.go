@@ -16,6 +16,7 @@ package bleve
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/blevesearch/bleve/v2/index/upsidedown"
 
@@ -51,6 +52,36 @@ func (b *Batch) Index(id string, data interface{}) error {
 	}
 	doc := document.NewDocument(id)
 	err := b.index.Mapping().MapDocument(doc, data)
+	if err != nil {
+		return err
+	}
+	b.internal.Update(doc)
+
+	b.lastDocSize = uint64(doc.Size() +
+		len(id) + size.SizeOfString) // overhead from internal
+	b.totalSize += b.lastDocSize
+
+	return nil
+}
+
+func (b *Batch) IndexSynonym(id string, collection string, definition *SynonymDefinition) error {
+	if id == "" {
+		return ErrorEmptyID
+	}
+	if eventIndex, ok := b.index.(index.EventIndex); ok {
+		eventIndex.FireIndexEvent()
+	}
+	synMap, ok := b.index.Mapping().(mapping.SynonymMapping)
+	if !ok {
+		return ErrorSynonymSearchNotSupported
+	}
+
+	if err := definition.Validate(); err != nil {
+		return err
+	}
+
+	doc := document.NewSynonymDocument(id)
+	err := synMap.MapSynonymDocument(doc, collection, definition.Input, definition.Synonyms)
 	if err != nil {
 		return err
 	}
@@ -118,7 +149,7 @@ func (b *Batch) String() string {
 }
 
 // Reset returns a Batch to the empty state so that it can
-// be re-used in the future.
+// be reused in the future.
 func (b *Batch) Reset() {
 	b.internal.Reset()
 	b.lastDocSize = 0
@@ -294,6 +325,8 @@ func Open(path string) (Index, error) {
 // The mapping used when it was created will be used for all Index/Search operations.
 // The provided runtimeConfig can override settings
 // persisted when the kvstore was created.
+// If runtimeConfig has updated mapping, then an index update is attempted
+// Throws an error without any changes to the index if an unupdatable mapping is provided
 func OpenUsing(path string, runtimeConfig map[string]interface{}) (Index, error) {
 	return openIndexUsing(path, runtimeConfig)
 }
@@ -323,3 +356,58 @@ type IndexCopyable interface {
 // FileSystemDirectory is the default implementation for the
 // index.Directory interface.
 type FileSystemDirectory string
+
+// SynonymDefinition represents a synonym mapping in Bleve.
+// Each instance associates one or more input terms with a list of synonyms,
+// defining how terms are treated as equivalent in searches.
+type SynonymDefinition struct {
+	// Input is an optional list of terms for unidirectional synonym mapping.
+	// When terms are specified in Input, they will map to the terms in Synonyms,
+	// making the relationship unidirectional (each Input maps to all Synonyms).
+	// If Input is omitted, the relationship is bidirectional among all Synonyms.
+	Input []string `json:"input,omitempty"`
+
+	// Synonyms is a list of terms that are considered equivalent.
+	// If Input is specified, each term in Input will map to each term in Synonyms.
+	// If Input is not specified, the Synonyms list will be treated bidirectionally,
+	// meaning each term in Synonyms is treated as synonymous with all others.
+	Synonyms []string `json:"synonyms"`
+}
+
+func (sd *SynonymDefinition) Validate() error {
+	if len(sd.Synonyms) == 0 {
+		return fmt.Errorf("synonym definition must have at least one synonym")
+	}
+	return nil
+}
+
+// SynonymIndex supports indexing synonym definitions alongside regular documents.
+// Synonyms, grouped by collection name, define term relationships for query expansion in searches.
+type SynonymIndex interface {
+	Index
+	// IndexSynonym indexes a synonym definition, with the specified id and belonging to the specified collection.
+	IndexSynonym(id string, collection string, definition *SynonymDefinition) error
+}
+
+type IndexWithCallbacks interface {
+	FileWriterIDsInUse() (map[string]struct{}, error)
+	DropFileWriterIDs(ids map[string]struct{}) error
+}
+
+type InsightsIndex interface {
+	Index
+	// TermFrequencies returns the tokens ordered by frequencies for the field index.
+	TermFrequencies(field string, limit int, descending bool) ([]index.TermFreq, error)
+	// CentroidCardinalities returns the centroids (clusters) from IVF indexes ordered by data density.
+	CentroidCardinalities(field string, limit int, desceding bool) ([]index.CentroidCardinality, error)
+}
+
+type TrainableIndex interface {
+	Index
+	Train(*Batch) error
+}
+
+type IndexFileCopyable interface {
+	SetPathInBolt(key []byte, value []byte) error       //dest index
+	CopyFile(file string, d index.IndexDirectory) error // source index
+}

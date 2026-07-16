@@ -30,10 +30,12 @@ func init() {
 }
 
 type Document struct {
-	id               string  `json:"id"`
-	Fields           []Field `json:"fields"`
+	id               string
+	Fields           []Field     `json:"fields"`
+	NestedDocuments  []*Document `json:"nested_documents"`
 	CompositeFields  []*CompositeField
 	StoredFieldsSize uint64
+	indexed          bool
 }
 
 func (d *Document) StoredFieldsBytes() uint64 {
@@ -48,6 +50,13 @@ func NewDocument(id string) *Document {
 	}
 }
 
+func NewSynonymDocument(id string) *Document {
+	return &Document{
+		id:     id,
+		Fields: make([]Field, 0),
+	}
+}
+
 func (d *Document) Size() int {
 	sizeInBytes := reflectStaticSizeDocument + size.SizeOfPtr +
 		len(d.id)
@@ -58,6 +67,12 @@ func (d *Document) Size() int {
 
 	for _, entry := range d.CompositeFields {
 		sizeInBytes += entry.Size()
+	}
+
+	for _, entry := range d.NestedDocuments {
+		if entry != nil {
+			sizeInBytes += entry.Size()
+		}
 	}
 
 	return sizeInBytes
@@ -103,6 +118,11 @@ func (d *Document) NumPlainTextBytes() uint64 {
 			}
 		}
 	}
+	for _, nestedDoc := range d.NestedDocuments {
+		if nestedDoc != nil {
+			rv += nestedDoc.NumPlainTextBytes()
+		}
+	}
 	return rv
 }
 
@@ -132,4 +152,30 @@ func (d *Document) VisitComposite(visitor index.CompositeFieldVisitor) {
 
 func (d *Document) HasComposite() bool {
 	return len(d.CompositeFields) > 0
+}
+
+func (d *Document) VisitSynonymFields(visitor index.SynonymFieldVisitor) {
+	for _, f := range d.Fields {
+		if sf, ok := f.(index.SynonymField); ok {
+			visitor(sf)
+		}
+	}
+}
+
+func (d *Document) SetIndexed() {
+	d.indexed = true
+}
+
+func (d *Document) Indexed() bool {
+	return d.indexed
+}
+
+func (d *Document) AddNestedDocument(doc *Document) {
+	d.NestedDocuments = append(d.NestedDocuments, doc)
+}
+
+func (d *Document) VisitNestedDocuments(visitor func(doc index.Document)) {
+	for _, doc := range d.NestedDocuments {
+		visitor(doc)
+	}
 }

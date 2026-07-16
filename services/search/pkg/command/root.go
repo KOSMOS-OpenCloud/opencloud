@@ -20,6 +20,7 @@ func GetCommands(cfg *config.Config) []*cobra.Command {
 		Reset(cfg),
 		ReEnrich(cfg),
 		Status(cfg),
+		Test(cfg),
 
 		// infos about this service
 		Health(cfg),

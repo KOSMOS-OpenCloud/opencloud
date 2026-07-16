@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
@@ -66,8 +65,7 @@ data loss), but a future --dry-run mode could skip them entirely.`,
 
 			c := searchsvc.NewSearchProviderClient(conn)
 
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-			defer cancel()
+			ctx := context.Background()
 
 			fmt.Println("Re-enriching: force-rescan with metadata protection (only missing keys will be written)")
 

@@ -46,6 +46,8 @@ const (
 	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
 	// UnifiedRoleDeniedID Unified role to deny all access.
 	UnifiedRoleDeniedID = "63e64e19-8d43-42ec-a738-2b6af2610efa"
+	// UnifiedRoleDropperID Unified role for drop-only access (list + upload/move-in, no read/download).
+	UnifiedRoleDropperID = "7e3e8a1b-4c2d-4f5a-9b6e-1d2c3e4f5a6b"
 
 	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
 	// represent the constraints that a role definition applies to. For the actual syntax, see the SDDL documentation
@@ -197,6 +199,12 @@ var (
 	// UnifiedRole FullDenial, Role DisplayName (resolves directly)
 	_deniedUnifiedRoleDisplayName = l10n.Template("Cannot access")
 
+	// UnifiedRole Dropper, Role Description (resolves directly)
+	_dropperUnifiedRoleDescription = l10n.Template("List and drop files, but cannot open or download.")
+
+	// UnifiedRole Dropper, Role DisplayName (resolves directly)
+	_dropperUnifiedRoleDisplayName = l10n.Template("Can drop")
+
 	// legacyNames contains the legacy role names.
 	legacyNames = map[string]string{
 		UnifiedRoleViewerID: conversions.RoleViewer,
@@ -210,6 +218,7 @@ var (
 		UnifiedRoleEditorLiteID:                 conversions.RoleEditorLite,
 		UnifiedRoleManagerID:                    conversions.RoleManager,
 		UnifiedRoleSecureViewerID:               conversions.RoleSecureViewer,
+		UnifiedRoleDropperID:                    conversions.RoleDropper,
 	}
 
 	// buildInRoles contains the built-in roles.
@@ -229,6 +238,7 @@ var (
 		roleEditorLite,
 		roleManager,
 		roleSecureViewer,
+		roleDropper,
 		roleDenied,
 	}
 
@@ -548,6 +558,23 @@ var (
 				},
 			},
 			LibreGraphWeight: proto.Int32(200),
+		}
+	}()
+
+	// roleDropper creates a dropper role — can list and upload/move-in, but cannot read/download.
+	roleDropper = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewDropperRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleDropperID),
+			Description: proto.String(_dropperUnifiedRoleDescription),
+			DisplayName: proto.String(_dropperUnifiedRoleDisplayName),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(15),
 		}
 	}()
 )

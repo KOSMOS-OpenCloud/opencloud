@@ -169,6 +169,20 @@ func NewFolderUploadLinkPermissionSet() *LinkType {
 	}
 }
 
+// NewFolderDropOnlyLinkPermissionSet creates cs3 permissions for the folder dropOnly link type.
+// Like createOnly but with ListContainer — can see directory contents but not open/download files.
+func NewFolderDropOnlyLinkPermissionSet() *LinkType {
+	return &LinkType{
+		Permissions: &provider.ResourcePermissions{
+			Stat:               true,
+			GetPath:            true,
+			ListContainer:      true,
+			InitiateFileUpload: true,
+		},
+		linkType: "dropOnly",
+	}
+}
+
 // GetAvailableLinkTypes returns a slice of all available link types
 func GetAvailableLinkTypes() []*LinkType {
 	return []*LinkType{
@@ -178,5 +192,6 @@ func GetAvailableLinkTypes() []*LinkType {
 		NewFileEditLinkPermissionSet(),
 		NewFolderEditLinkPermissionSet(),
 		NewFolderDropLinkPermissionSet(),
+		NewFolderDropOnlyLinkPermissionSet(),
 	}
 }

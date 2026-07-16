@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -59,6 +60,18 @@ type Searcher interface {
 	MoveItem(ref *provider.Reference)
 }
 
+// IndexStatus tracks the current indexing state for status queries.
+type IndexStatus struct {
+	Running        bool      `json:"running"`
+	SpaceCurrent   int       `json:"space_current"`
+	SpaceTotal     int       `json:"space_total"`
+	SpaceID        string    `json:"space_id"`
+	FilesProcessed int64     `json:"files_processed"`
+	Errors         int       `json:"errors"`
+	StartedAt      time.Time `json:"started_at,omitempty"`
+	FinishedAt     time.Time `json:"finished_at,omitempty"`
+}
+
 // Service is responsible for indexing spaces and pass on a search
 // to it's underlying engine.
 type Service struct {
@@ -73,7 +86,24 @@ type Service struct {
 	serviceAccountID     string
 	serviceAccountSecret string
 
-	batchSize int
+	batchSize   int
+	indexStatus IndexStatus
+	indexMu     sync.Mutex
+}
+
+// GetIndexStatus returns the current indexing status.
+func (s *Service) GetIndexStatus() IndexStatus {
+	s.indexMu.Lock()
+	defer s.indexMu.Unlock()
+	return s.indexStatus
+}
+
+// SetIndexProgress updates the space progress counters.
+func (s *Service) SetIndexProgress(current, total int) {
+	s.indexMu.Lock()
+	s.indexStatus.SpaceCurrent = current
+	s.indexStatus.SpaceTotal = total
+	s.indexMu.Unlock()
 }
 
 var errSkipSpace error
@@ -578,6 +608,20 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool) error {
+	s.indexMu.Lock()
+	s.indexStatus.Running = true
+	s.indexStatus.SpaceID = spaceID.GetOpaqueId()
+	s.indexStatus.FilesProcessed = 0
+	if s.indexStatus.StartedAt.IsZero() {
+		s.indexStatus.StartedAt = time.Now()
+	}
+	s.indexMu.Unlock()
+	defer func() {
+		s.indexMu.Lock()
+		s.indexStatus.Running = false
+		s.indexStatus.FinishedAt = time.Now()
+		s.indexMu.Unlock()
+	}()
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
@@ -662,6 +706,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 			ResourceId: &rootID,
 		}
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
+		atomic.AddInt64(&s.indexStatus.FilesProcessed, 1)
 
 		if forceRescan {
 			if isTaki {

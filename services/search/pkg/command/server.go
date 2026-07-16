@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"encoding/json"
 	"net/http"
 	"os"
 	"os/signal"
@@ -222,6 +223,17 @@ func Server(cfg *config.Config) *cobra.Command {
 					logger.Error().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
 				}
+
+				// Add /index-status endpoint to the debug server
+				origHandler := debugServer.Handler
+				mux := http.NewServeMux()
+				mux.HandleFunc("/index-status", func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					status := ss.GetIndexStatus()
+					json.NewEncoder(w).Encode(status)
+				})
+				mux.Handle("/", origHandler)
+				debugServer.Handler = mux
 
 				gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".debug", debugServer))
 			}

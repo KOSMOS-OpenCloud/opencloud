@@ -145,7 +145,14 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	}
 
 	var indexErrors int
-	for _, space := range resp.GetStorageSpaces() {
+	spaces := resp.GetStorageSpaces()
+	if svc, ok := s.searcher.(*search.Service); ok {
+		svc.SetIndexProgress(0, len(spaces))
+	}
+	for i, space := range spaces {
+		if svc, ok := s.searcher.(*search.Service); ok {
+			svc.SetIndexProgress(i+1, len(spaces))
+		}
 		if err := s.searcher.IndexSpace(space.GetId(), in.GetForceReindex()); err != nil {
 			s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to index space, continuing")
 			indexErrors++

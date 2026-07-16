@@ -101,7 +101,10 @@ func AnalyzerConstructor(config map[string]interface{}, cache *registry.Cache) (
 }
 
 func init() {
-	registry.RegisterAnalyzer(Name, AnalyzerConstructor)
+	err := registry.RegisterAnalyzer(Name, AnalyzerConstructor)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getCharFilters(charFilterNames []string, cache *registry.Cache) ([]analysis.CharFilter, error) {
@@ -137,7 +140,7 @@ func convertInterfaceSliceToStringSlice(interfaceSlice []interface{}, objType st
 		if ok {
 			stringSlice[i] = stringObj
 		} else {
-			return nil, fmt.Errorf(objType + " name must be a string")
+			return nil, fmt.Errorf("%s name must be a string", objType)
 		}
 	}
 

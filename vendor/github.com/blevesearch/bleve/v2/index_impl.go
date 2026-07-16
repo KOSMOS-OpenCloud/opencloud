@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -38,6 +39,7 @@ import (
 	"github.com/blevesearch/bleve/v2/search/collector"
 	"github.com/blevesearch/bleve/v2/search/facet"
 	"github.com/blevesearch/bleve/v2/search/highlight"
+	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
 	"github.com/blevesearch/geo/s2"
@@ -56,13 +58,15 @@ type indexImpl struct {
 
 const storePath = "store"
 
-var mappingInternalKey = []byte("_mapping")
+const (
+	SearchQueryStartCallbackKey search.ContextKey = "_search_query_start_callback_key"
+	SearchQueryEndCallbackKey   search.ContextKey = "_search_query_end_callback_key"
+)
 
-const SearchQueryStartCallbackKey = "_search_query_start_callback_key"
-const SearchQueryEndCallbackKey = "_search_query_end_callback_key"
-
-type SearchQueryStartCallbackFn func(size uint64) error
-type SearchQueryEndCallbackFn func(size uint64) error
+type (
+	SearchQueryStartCallbackFn func(size uint64) error
+	SearchQueryEndCallbackFn   func(size uint64) error
+)
 
 func indexStorePath(path string) string {
 	return path + string(os.PathSeparator) + storePath
@@ -87,7 +91,10 @@ func newIndexUsing(path string, mapping mapping.IndexMapping, indexType string, 
 		path: path,
 		name: path,
 		m:    mapping,
-		meta: newIndexMeta(indexType, kvstore, kvconfig),
+	}
+	rv.meta, err = newIndexMeta(indexType, kvstore, kvconfig, path)
+	if err != nil {
+		return nil, err
 	}
 	rv.stats = &IndexStat{i: &rv}
 	// at this point there is hope that we can be successful, so save index meta
@@ -128,7 +135,7 @@ func newIndexUsing(path string, mapping mapping.IndexMapping, indexType string, 
 	if err != nil {
 		return nil, err
 	}
-	err = rv.i.SetInternal(mappingInternalKey, mappingBytes)
+	err = rv.i.SetInternal(util.MappingInternalKey, mappingBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +165,9 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 		rv.meta.IndexType = upsidedown.Name
 	}
 
+	var um *mapping.IndexMappingImpl
+	var umBytes []byte
+
 	storeConfig := rv.meta.Config
 	if storeConfig == nil {
 		storeConfig = map[string]interface{}{}
@@ -168,6 +178,21 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 	storeConfig["error_if_exists"] = false
 	for rck, rcv := range runtimeConfig {
 		storeConfig[rck] = rcv
+		if rck == "updated_mapping" {
+			if val, ok := rcv.(string); ok {
+				if len(val) == 0 {
+					return nil, fmt.Errorf("updated_mapping is empty")
+				}
+				umBytes = []byte(val)
+
+				err = util.UnmarshalJSON(umBytes, &um)
+				if err != nil {
+					return nil, fmt.Errorf("error parsing updated_mapping into JSON: %v\nmapping contents:\n%v", err, rck)
+				}
+			} else {
+				return nil, fmt.Errorf("updated_mapping not of type string")
+			}
+		}
 	}
 
 	// open the index
@@ -180,15 +205,32 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 	if err != nil {
 		return nil, err
 	}
-	err = rv.i.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer func(rv *indexImpl) {
-		if !rv.open {
-			rv.i.Close()
+
+	var ui index.UpdateIndex
+	if um != nil {
+		var ok bool
+		ui, ok = rv.i.(index.UpdateIndex)
+		if !ok {
+			return nil, fmt.Errorf("updated mapping present for unupdatable index")
 		}
-	}(rv)
+
+		// Load the meta data from bolt so that we can read the current index
+		// mapping to compare with
+		err = ui.OpenMeta()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = rv.i.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer func(rv *indexImpl) {
+			if !rv.open {
+				rv.i.Close()
+			}
+		}(rv)
+	}
 
 	// now load the mapping
 	indexReader, err := rv.i.Reader()
@@ -201,7 +243,7 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 		}
 	}()
 
-	mappingBytes, err := indexReader.GetInternal(mappingInternalKey)
+	mappingBytes, err := indexReader.GetInternal(util.MappingInternalKey)
 	if err != nil {
 		return nil, err
 	}
@@ -212,18 +254,47 @@ func openIndexUsing(path string, runtimeConfig map[string]interface{}) (rv *inde
 		return nil, fmt.Errorf("error parsing mapping JSON: %v\nmapping contents:\n%s", err, string(mappingBytes))
 	}
 
+	// validate the mapping
+	err = im.Validate()
+	if err != nil {
+		// no longer return usable index on error because there
+		// is a chance the index is not open at this stage
+		return nil, err
+	}
+
+	// Validate and update the index with the new mapping
+	if um != nil && ui != nil {
+		err = um.Validate()
+		if err != nil {
+			return nil, err
+		}
+
+		fieldInfo, err := DeletedFields(im, um)
+		if err != nil {
+			return nil, err
+		}
+
+		err = ui.UpdateFields(fieldInfo, umBytes)
+		if err != nil {
+			return nil, err
+		}
+		im = um
+
+		err = rv.i.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer func(rv *indexImpl) {
+			if !rv.open {
+				rv.i.Close()
+			}
+		}(rv)
+	}
+
 	// mark the index as open
 	rv.mutex.Lock()
 	defer rv.mutex.Unlock()
 	rv.open = true
-
-	// validate the mapping
-	err = im.Validate()
-	if err != nil {
-		// note even if the mapping is invalid
-		// we still return an open usable index
-		return rv, err
-	}
 
 	rv.m = im
 	indexStats.Register(rv)
@@ -265,6 +336,54 @@ func (i *indexImpl) Index(id string, data interface{}) (err error) {
 	}
 	err = i.i.Update(doc)
 	return
+}
+
+// IndexSynonym indexes a synonym definition, with the specified id and belonging to the specified collection.
+// Synonym definition defines term relationships for query expansion in searches.
+func (i *indexImpl) IndexSynonym(id string, collection string, definition *SynonymDefinition) error {
+	if id == "" {
+		return ErrorEmptyID
+	}
+
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	i.FireIndexEvent()
+
+	synMap, ok := i.m.(mapping.SynonymMapping)
+	if !ok {
+		return ErrorSynonymSearchNotSupported
+	}
+
+	if err := definition.Validate(); err != nil {
+		return err
+	}
+
+	doc := document.NewSynonymDocument(id)
+	err := synMap.MapSynonymDocument(doc, collection, definition.Input, definition.Synonyms)
+	if err != nil {
+		return err
+	}
+	err = i.i.Update(doc)
+	return err
+}
+
+func (i *indexImpl) Train(batch *Batch) error {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	if vi, ok := i.i.(index.TrainableIndex); ok {
+		return vi.Train(batch.internal)
+	}
+	return ErrorTrainingNotSupported
 }
 
 // IndexAdvanced takes a document.Document object
@@ -377,10 +496,61 @@ func (i *indexImpl) Search(req *SearchRequest) (sr *SearchResult, err error) {
 	return i.SearchInContext(context.Background(), req)
 }
 
-var documentMatchEmptySize int
-var searchContextEmptySize int
-var facetResultEmptySize int
-var documentEmptySize int
+// returns the set of file callback writer ids in use by the index
+func (i *indexImpl) FileWriterIDsInUse() (map[string]struct{}, error) {
+	ids := map[string]struct{}{i.meta.fileReader.Id(): {}}
+
+	if cidx, ok := i.i.(IndexWithCallbacks); ok {
+		cIds, err := cidx.FileWriterIDsInUse()
+		if err != nil {
+			return nil, err
+		}
+		for k := range cIds {
+			ids[k] = struct{}{}
+		}
+	} else {
+		// if the underlying index does not support callbacks, we
+		// assume that the data being written is with the default
+		// writer id which is the empty string
+		ids[util.DefaultFileCallbackId] = struct{}{}
+	}
+
+	return ids, nil
+}
+
+// drops the file callback writer ids from the index and
+// re-processes data with the latest file callback writer id
+func (i *indexImpl) DropFileWriterIDs(ids map[string]struct{}) error {
+	i.mutex.Lock()
+	if _, ok := ids[i.meta.fileReader.Id()]; ok {
+		var err error
+		err = i.meta.UpdateWriter(i.path)
+		if err != nil {
+			return err
+		}
+	}
+	i.mutex.Unlock()
+
+	if cidx, ok := i.i.(IndexWithCallbacks); ok {
+		return cidx.DropFileWriterIDs(ids)
+	} else {
+		// if the underlying index does not support callbacks and the request is
+		// to drop the empty id, which is the default id, we return an error
+		// because it is not possible to drop it
+		if _, ok := ids[util.DefaultFileCallbackId]; ok {
+			return fmt.Errorf("underlying index does not support DropFileWriterIDs")
+		}
+	}
+
+	return nil
+}
+
+var (
+	documentMatchEmptySize int
+	searchContextEmptySize int
+	facetResultEmptySize   int
+	documentEmptySize      int
+)
 
 func init() {
 	var dm search.DocumentMatch
@@ -400,8 +570,8 @@ func init() {
 // needed to execute a search request.
 func memNeededForSearch(req *SearchRequest,
 	searcher search.Searcher,
-	topnCollector *collector.TopNCollector) uint64 {
-
+	topnCollector *collector.TopNCollector,
+) uint64 {
 	backingSize := req.Size + req.From + 1
 	if req.Size+req.From > collector.PreAllocSizeSkipCap {
 		backingSize = collector.PreAllocSizeSkipCap + 1
@@ -449,12 +619,51 @@ func (i *indexImpl) preSearch(ctx context.Context, req *SearchRequest, reader in
 		}
 	}
 
+	var fts search.FieldTermSynonymMap
+	var count uint64
+	var fieldCardinality map[string]int
+	if !isMatchNoneQuery(req.Query) {
+		if synMap, ok := i.m.(mapping.SynonymMapping); ok {
+			if synReader, ok := reader.(index.ThesaurusReader); ok {
+				fts, err = query.ExtractSynonyms(ctx, synMap, synReader, req.Query, fts)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		if ok := isBM25Enabled(i.m); ok {
+			fieldCardinality = make(map[string]int)
+			count, err = reader.DocCount()
+			if err != nil {
+				return nil, err
+			}
+
+			fs, err := query.ExtractFields(req.Query, i.m, search.NewFieldSet())
+			if err != nil {
+				return nil, err
+			}
+			for field := range fs {
+				if bm25Reader, ok := reader.(index.BM25Reader); ok {
+					fieldCardinality[field], err = bm25Reader.FieldCardinality(field)
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+	}
+
 	return &SearchResult{
 		Status: &SearchStatus{
 			Total:      1,
 			Successful: 1,
 		},
-		Hits: knnHits,
+		Hits:          knnHits,
+		SynonymResult: fts,
+		BM25Stats: &search.BM25Stats{
+			DocCount:         float64(count),
+			FieldCardinality: fieldCardinality,
+		},
 	}, nil
 }
 
@@ -481,54 +690,34 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		}
 	}()
 
-	if _, ok := ctx.Value(search.PreSearchKey).(bool); ok {
-		preSearchResult, err := i.preSearch(ctx, req, indexReader)
-		if err != nil {
-			return nil, err
-		}
-		return preSearchResult, nil
-	}
-
-	var reverseQueryExecution bool
-	if req.SearchBefore != nil {
-		reverseQueryExecution = true
-		req.Sort.Reverse()
-		req.SearchAfter = req.SearchBefore
-		req.SearchBefore = nil
-	}
-
-	var coll *collector.TopNCollector
-	if req.SearchAfter != nil {
-		coll = collector.NewTopNCollectorAfter(req.Size, req.Sort, req.SearchAfter)
-	} else {
-		coll = collector.NewTopNCollector(req.Size, req.From, req.Sort)
-	}
-
-	var knnHits []*search.DocumentMatch
-	var ok bool
-	var skipKnnCollector bool
-	if req.PreSearchData != nil {
-		for k, v := range req.PreSearchData {
-			switch k {
-			case search.KnnPreSearchDataKey:
-				if v != nil {
-					knnHits, ok = v.([]*search.DocumentMatch)
-					if !ok {
-						return nil, fmt.Errorf("knn preSearchData must be of type []*search.DocumentMatch")
-					}
-				}
-				skipKnnCollector = true
-			}
-		}
-	}
-	if !skipKnnCollector && requestHasKNN(req) {
-		knnHits, err = i.runKnnCollector(ctx, req, indexReader, false)
-		if err != nil {
-			return nil, err
+	// rescorer will be set if score fusion is supposed to happen
+	// at this alias (root alias), else will be nil
+	var rescorer *rescorer
+	if _, ok := ctx.Value(search.ScoreFusionKey).(bool); !ok {
+		// new context will be used in internal functions to collect data
+		// as suitable for hybrid search. Rescorer is used for rescoring
+		// using fusion algorithms.
+		if IsScoreFusionRequested(req) {
+			ctx = context.WithValue(ctx, search.ScoreFusionKey, true)
+			rescorer = newRescorer(req)
+			rescorer.prepareSearchRequest()
+			defer rescorer.restoreSearchRequest()
 		}
 	}
 
-	setKnnHitsInCollector(knnHits, req, coll)
+	// ------------------------------------------------------------------------------------------
+	// set up additional contexts for any search operation that will proceed from
+	// here, such as presearch, knn collector, topn collector etc.
+
+	// Scoring model callback to be used to get scoring model
+	scoringModelCallback := func() string {
+		if isBM25Enabled(i.m) {
+			return index.BM25Scoring
+		}
+		return index.DefaultScoringModel
+	}
+	ctx = context.WithValue(ctx, search.GetScoringModelCallbackKey,
+		search.GetScoringModelCallbackFn(scoringModelCallback))
 
 	// This callback and variable handles the tracking of bytes read
 	//  1. as part of creation of tfr and its Next() calls which is
@@ -539,10 +728,20 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	sendBytesRead := func(bytesRead uint64) {
 		totalSearchCost += bytesRead
 	}
+	// Ensure IO cost accounting and result cost assignment happen on all return paths
+	defer func() {
+		if sr != nil {
+			sr.Cost = totalSearchCost
+		}
+		if is, ok := indexReader.(*scorch.IndexSnapshot); ok {
+			is.UpdateIOStats(totalSearchCost)
+		}
+		search.RecordSearchCost(ctx, search.DoneM, 0)
+	}()
 
-	ctx = context.WithValue(ctx, search.SearchIOStatsCallbackKey,
-		search.SearchIOStatsCallbackFunc(sendBytesRead))
+	ctx = context.WithValue(ctx, search.SearchIOStatsCallbackKey, search.SearchIOStatsCallbackFunc(sendBytesRead))
 
+	// Geo buffer pool callback to be used for getting geo buffer pool
 	var bufPool *s2.GeoBufferPool
 	getBufferPool := func() *s2.GeoBufferPool {
 		if bufPool == nil {
@@ -552,8 +751,135 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		return bufPool
 	}
 
-	ctx = context.WithValue(ctx, search.GeoBufferPoolCallbackKey,
-		search.GeoBufferPoolCallbackFunc(getBufferPool))
+	ctx = context.WithValue(ctx, search.GeoBufferPoolCallbackKey, search.GeoBufferPoolCallbackFunc(getBufferPool))
+	// check if the index mapping has any nested fields, which should force
+	// all collectors and searchers to be run in nested mode
+	if nm, ok := i.m.(mapping.NestedMapping); ok {
+		if nm.CountNested() > 0 {
+			ctx = context.WithValue(ctx, search.NestedSearchKey, true)
+		}
+	}
+	// ------------------------------------------------------------------------------------------
+
+	if _, ok := ctx.Value(search.PreSearchKey).(bool); ok {
+		sr, err = i.preSearch(ctx, req, indexReader)
+		if err != nil {
+			return nil, err
+		}
+		// increment the search count here itself,
+		// since the presearch may already satisfy
+		// the search request
+		atomic.AddUint64(&i.stats.searches, 1)
+		// increment the search time stat here as well,
+		// since presearch is part of the overall search
+		// operation and should be included in the search
+		// time stat
+		searchDuration := time.Since(searchStart)
+		atomic.AddUint64(&i.stats.searchTime, uint64(searchDuration))
+
+		return sr, nil
+	}
+
+	var reverseQueryExecution bool
+	if req.SearchBefore != nil {
+		reverseQueryExecution = true
+		req.Sort.Reverse()
+		req.SearchAfter = req.SearchBefore
+		req.SearchBefore = nil
+	}
+
+	coll, err := i.buildTopNCollector(ctx, req, indexReader)
+	if err != nil {
+		return nil, err
+	}
+
+	var knnHits []*search.DocumentMatch
+	var skipKNNCollector bool
+
+	var fts search.FieldTermSynonymMap
+	var skipSynonymCollector bool
+
+	var bm25Stats *search.BM25Stats
+	var ok bool
+	if req.PreSearchData != nil {
+		for k, v := range req.PreSearchData {
+			switch k {
+			case search.KnnPreSearchDataKey:
+				if v != nil {
+					knnHits, ok = v.([]*search.DocumentMatch)
+					if !ok {
+						return nil, fmt.Errorf("knn preSearchData must be of type []*search.DocumentMatch")
+					}
+					skipKNNCollector = true
+				}
+			case search.SynonymPreSearchDataKey:
+				if v != nil {
+					fts, ok = v.(search.FieldTermSynonymMap)
+					if !ok {
+						return nil, fmt.Errorf("synonym preSearchData must be of type search.FieldTermSynonymMap")
+					}
+					skipSynonymCollector = true
+				}
+			case search.BM25PreSearchDataKey:
+				if v != nil {
+					bm25Stats, ok = v.(*search.BM25Stats)
+					if !ok {
+						return nil, fmt.Errorf("bm25 preSearchData must be of type *search.BM25Stats")
+					}
+				}
+			}
+		}
+	}
+
+	_, contextScoreFusionKeyExists := ctx.Value(search.ScoreFusionKey).(bool)
+
+	if !contextScoreFusionKeyExists {
+		// if no score fusion, default behaviour
+		if !skipKNNCollector && requestHasKNN(req) {
+			knnHits, err = i.runKnnCollector(ctx, req, indexReader, false)
+			if err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		// if score fusion, run collect if rescorer is defined
+		if rescorer != nil && requestHasKNN(req) {
+			knnHits, err = i.runKnnCollector(ctx, req, indexReader, false)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if !skipSynonymCollector {
+		if synMap, ok := i.m.(mapping.SynonymMapping); ok && synMap.SynonymCount() > 0 {
+			if synReader, ok := indexReader.(index.ThesaurusReader); ok {
+				fts, err = query.ExtractSynonyms(ctx, synMap, synReader, req.Query, fts)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
+	// if score fusion, no faceting for knn hits is done
+	// hence we can skip setting the knn hits in the collector
+	if !contextScoreFusionKeyExists {
+		setKnnHitsInCollector(knnHits, coll)
+	}
+
+	if fts != nil {
+		if is, ok := indexReader.(*scorch.IndexSnapshot); ok {
+			is.UpdateSynonymSearchCount(1)
+		}
+		ctx = context.WithValue(ctx, search.FieldTermSynonymMapKey, fts)
+	}
+
+	// set the bm25Stats (stats important for consistent scoring) in
+	// the context object
+	if bm25Stats != nil {
+		ctx = context.WithValue(ctx, search.BM25StatsKey, bm25Stats)
+	}
 
 	searcher, err := req.Query.Searcher(ctx, indexReader, i.m, search.SearcherOptions{
 		Explain:            req.Explain,
@@ -567,14 +893,6 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		if serr := searcher.Close(); err == nil && serr != nil {
 			err = serr
 		}
-		if sr != nil {
-			sr.Cost = totalSearchCost
-		}
-		if sr, ok := indexReader.(*scorch.IndexSnapshot); ok {
-			sr.UpdateIOStats(totalSearchCost)
-		}
-
-		search.RecordSearchCost(ctx, search.DoneM, 0)
 	}()
 
 	if req.Facets != nil {
@@ -612,6 +930,26 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 			} else {
 				// build terms facet
 				facetBuilder := facet.NewTermsFacetBuilder(facetRequest.Field, facetRequest.Size)
+
+				// Set prefix filter if provided
+				if facetRequest.TermPrefix != "" {
+					facetBuilder.SetPrefixFilter(facetRequest.TermPrefix)
+				}
+
+				// Set regex filter if provided
+				if facetRequest.TermPattern != "" {
+					// Use cached compiled pattern if available, otherwise compile it now
+					if facetRequest.compiledPattern != nil {
+						facetBuilder.SetRegexFilter(facetRequest.compiledPattern)
+					} else {
+						regex, err := regexp.Compile(facetRequest.TermPattern)
+						if err != nil {
+							return nil, fmt.Errorf("error compiling regex pattern for facet '%s': %v", facetName, err)
+						}
+						facetBuilder.SetRegexFilter(regex)
+					}
+				}
+
 				facetsBuilder.Add(facetName, facetBuilder)
 			}
 		}
@@ -669,7 +1007,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		if i.name != "" && hit.Index == "" {
 			hit.Index = i.name
 		}
-		err, storedFieldsBytes := LoadAndHighlightFields(hit, req, i.name, indexReader, highlighter)
+		err, storedFieldsBytes := LoadAndHighlightAllFields(hit, req, i.name, indexReader, highlighter)
 		if err != nil {
 			return nil, err
 		}
@@ -679,7 +1017,13 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	totalSearchCost += storedFieldsCost
 	search.RecordSearchCost(ctx, search.AddM, storedFieldsCost)
 
-	atomic.AddUint64(&i.stats.searches, 1)
+	if req.PreSearchData == nil {
+		// increment the search count only if this is not a second-phase search
+		// (e.g., for Hybrid Search), since the first-phase search already increments it
+		atomic.AddUint64(&i.stats.searches, 1)
+	}
+	// increment the search time stat, as the first-phase search is part of
+	// the overall operation; adding second-phase time later keeps it accurate
 	searchDuration := time.Since(searchStart)
 	atomic.AddUint64(&i.stats.searchTime, uint64(searchDuration))
 
@@ -711,6 +1055,13 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		Facets:   coll.FacetResults(),
 	}
 
+	// rescore if fusion flag is set
+	if rescorer != nil {
+		rv.Hits, rv.Total, rv.MaxScore = rescorer.rescore(rv.Hits, knnHits)
+		rescorer.restoreSearchRequest()
+		rv.Hits = hitsInCurrentPage(req, rv.Hits)
+	}
+
 	if req.Explain {
 		rv.Request = req
 	}
@@ -720,7 +1071,8 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 
 func LoadAndHighlightFields(hit *search.DocumentMatch, req *SearchRequest,
 	indexName string, r index.IndexReader,
-	highlighter highlight.Highlighter) (error, uint64) {
+	highlighter highlight.Highlighter,
+) (error, uint64) {
 	var totalStoredFieldsBytes uint64
 	if len(req.Fields) > 0 || highlighter != nil {
 		doc, err := r.Document(hit.ID)
@@ -786,6 +1138,11 @@ func LoadAndHighlightFields(hit *search.DocumentMatch, req *SearchRequest,
 								if err == nil {
 									value = v
 								}
+							case index.IPField:
+								ip, err := docF.IP()
+								if err == nil {
+									value = ip.String()
+								}
 							}
 
 							if value != nil {
@@ -815,6 +1172,56 @@ func LoadAndHighlightFields(hit *search.DocumentMatch, req *SearchRequest,
 		}
 	}
 
+	return nil, totalStoredFieldsBytes
+}
+
+const NestedDocumentKey = "_$nested"
+
+// LoadAndHighlightAllFields loads stored fields + highlights for root and its descendants.
+// All descendant documents are collected into a _$nested array in the root DocumentMatch.
+func LoadAndHighlightAllFields(
+	root *search.DocumentMatch,
+	req *SearchRequest,
+	indexName string,
+	r index.IndexReader,
+	highlighter highlight.Highlighter,
+) (error, uint64) {
+	var totalStoredFieldsBytes uint64
+	// load root fields/highlights
+	err, bytes := LoadAndHighlightFields(root, req, indexName, r, highlighter)
+	totalStoredFieldsBytes += bytes
+	if err != nil {
+		return err, totalStoredFieldsBytes
+	}
+	// collect all descendant documents
+	nestedDocs := make([]*search.NestedDocumentMatch, 0, len(root.Descendants))
+	// create a dummy desc DocumentMatch to reuse LoadAndHighlightFields
+	desc := &search.DocumentMatch{}
+	for _, descID := range root.Descendants {
+		extID, err := r.ExternalID(descID)
+		if err != nil {
+			return err, totalStoredFieldsBytes
+		}
+		// reset desc for reuse
+		desc.ID = extID
+		desc.IndexInternalID = descID
+		desc.Locations = root.Locations
+		err, bytes := LoadAndHighlightFields(desc, req, indexName, r, highlighter)
+		totalStoredFieldsBytes += bytes
+		if err != nil {
+			return err, totalStoredFieldsBytes
+		}
+		// copy fields to nested doc and append
+		if len(desc.Fields) != 0 || len(desc.Fragments) != 0 {
+			nestedDocs = append(nestedDocs, search.NewNestedDocumentMatch(desc.Fields, desc.Fragments))
+		}
+		desc.Fields = nil
+		desc.Fragments = nil
+	}
+	// add nested documents to root under _$nested key
+	if len(nestedDocs) > 0 {
+		root.AddFieldValue(NestedDocumentKey, nestedDocs)
+	}
 	return nil, totalStoredFieldsBytes
 }
 
@@ -1032,8 +1439,15 @@ func (f *indexImplFieldDict) Close() error {
 	return f.indexReader.Close()
 }
 
+func (f *indexImplFieldDict) Cardinality() int {
+	return f.fieldDict.Cardinality()
+}
+
 // helper function to remove duplicate entries from slice of strings
 func deDuplicate(fields []string) []string {
+	if len(fields) == 0 {
+		return fields
+	}
 	entries := make(map[string]struct{})
 	ret := []string{}
 	for _, entry := range fields {
@@ -1094,15 +1508,48 @@ func (i *indexImpl) CopyTo(d index.Directory) (err error) {
 
 	err = copyReader.CopyTo(d)
 	if err != nil {
-		return fmt.Errorf("error copying index metadata: %v", err)
+		return fmt.Errorf("error copying index data: %v", err)
 	}
 
 	// copy the metadata
-	return i.meta.CopyTo(d)
+	return i.meta.CopyTo(i.path, d)
+}
+
+func (i *indexImpl) CopyFile(file string, d index.IndexDirectory) (err error) {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	fileCopyIndex, ok := i.i.(IndexFileCopyable)
+	if !ok {
+		return fmt.Errorf("index implementation does not support file copy reader")
+	}
+
+	return fileCopyIndex.CopyFile(file, d)
+}
+
+func (i *indexImpl) SetPathInBolt(key []byte, value []byte) error {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return ErrorIndexClosed
+	}
+
+	fileCopyIndex, ok := i.i.(IndexFileCopyable)
+	if !ok {
+		return fmt.Errorf("index implementation does not support file copy")
+	}
+
+	return fileCopyIndex.SetPathInBolt(key, value)
 }
 
 func (f FileSystemDirectory) GetWriter(filePath string) (io.WriteCloser,
-	error) {
+	error,
+) {
 	dir, file := filepath.Split(filePath)
 	if dir != "" {
 		err := os.MkdirAll(filepath.Join(string(f), dir), os.ModePerm)
@@ -1112,7 +1559,7 @@ func (f FileSystemDirectory) GetWriter(filePath string) (io.WriteCloser,
 	}
 
 	return os.OpenFile(filepath.Join(string(f), dir, file),
-		os.O_RDWR|os.O_CREATE, 0600)
+		os.O_RDWR|os.O_CREATE, 0o600)
 }
 
 func (i *indexImpl) FireIndexEvent() {
@@ -1126,4 +1573,105 @@ func (i *indexImpl) FireIndexEvent() {
 		// fire the Index() event
 		internalEventIndex.FireIndexEvent()
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+func (i *indexImpl) TermFrequencies(field string, limit int, descending bool) (
+	[]index.TermFreq, error) {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return nil, ErrorIndexClosed
+	}
+
+	reader, err := i.i.Reader()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cerr := reader.Close(); err == nil && cerr != nil {
+			err = cerr
+		}
+	}()
+
+	insightsReader, ok := reader.(index.IndexInsightsReader)
+	if !ok {
+		return nil, fmt.Errorf("index reader does not support TermFrequencies")
+	}
+
+	return insightsReader.TermFrequencies(field, limit, descending)
+}
+
+func (i *indexImpl) CentroidCardinalities(field string, limit int, descending bool) (
+	[]index.CentroidCardinality, error) {
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	if !i.open {
+		return nil, ErrorIndexClosed
+	}
+
+	reader, err := i.i.Reader()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cerr := reader.Close(); err == nil && cerr != nil {
+			err = cerr
+		}
+	}()
+
+	insightsReader, ok := reader.(index.IndexInsightsReader)
+	if !ok {
+		return nil, fmt.Errorf("index reader does not support CentroidCardinalities")
+	}
+
+	centroidCardinalities, err := insightsReader.CentroidCardinalities(field, limit, descending)
+	if err != nil {
+		return nil, err
+	}
+
+	for j := 0; j < len(centroidCardinalities); j++ {
+		centroidCardinalities[j].Index = i.name
+	}
+
+	return centroidCardinalities, nil
+}
+
+func (i *indexImpl) buildTopNCollector(ctx context.Context, req *SearchRequest, reader index.IndexReader) (*collector.TopNCollector, error) {
+	newCollector := func() *collector.TopNCollector {
+		if req.SearchAfter != nil {
+			return collector.NewTopNCollectorAfter(req.Size, req.Sort, req.SearchAfter)
+		}
+		return collector.NewTopNCollector(req.Size, req.From, req.Sort)
+	}
+
+	newNestedCollector := func(nr index.NestedReader) *collector.TopNCollector {
+		if req.SearchAfter != nil {
+			return collector.NewNestedTopNCollectorAfter(req.Size, req.Sort, req.SearchAfter, nr)
+		}
+		return collector.NewNestedTopNCollector(req.Size, req.From, req.Sort, nr)
+	}
+
+	// check if we are in nested mode
+	if nestedMode, ok := ctx.Value(search.NestedSearchKey).(bool); ok && nestedMode {
+		// get the nested reader from the index reader
+		if nr, ok := reader.(index.NestedReader); ok {
+			// check if the mapping has any nested fields that intersect
+			if nm, ok := i.m.(mapping.NestedMapping); ok {
+				var fs search.FieldSet
+				var err error
+				fs, err = query.ExtractFields(req.Query, i.m, fs)
+				if err != nil {
+					return nil, err
+				}
+				if fs.HasID() || nm.IntersectsPrefix(fs) {
+					return newNestedCollector(nr), nil
+				}
+			}
+		}
+	}
+	return newCollector(), nil
 }

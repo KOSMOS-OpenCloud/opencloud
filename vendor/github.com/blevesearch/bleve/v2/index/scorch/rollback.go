@@ -19,6 +19,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/blevesearch/bleve/v2/util"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -43,7 +44,7 @@ func RollbackPoints(path string) ([]*RollbackPoint, error) {
 	rootBoltOpt := &bolt.Options{
 		ReadOnly: true,
 	}
-	rootBolt, err := bolt.Open(rootBoltPath, 0600, rootBoltOpt)
+	rootBolt, err := util.OpenBolt(rootBoltPath, 0600, rootBoltOpt)
 	if err != nil || rootBolt == nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func RollbackPoints(path string) ([]*RollbackPoint, error) {
 		_ = rootBolt.Close()
 	}()
 
-	snapshots := tx.Bucket(boltSnapshotsBucket)
+	snapshots := tx.Bucket(util.BoltSnapshotsBucket)
 	if snapshots == nil {
 		return nil, nil
 	}
@@ -77,27 +78,40 @@ func RollbackPoints(path string) ([]*RollbackPoint, error) {
 			continue
 		}
 
-		snapshot := snapshots.Bucket(k)
+		snapshot := snapshots.GetBucket(k)
 		if snapshot == nil {
 			log.Printf("RollbackPoints:"+
 				" snapshot key, but bucket missing %x, continuing", k)
 			continue
 		}
 
+		metaBucket := snapshot.GetBucket(util.BoltMetaDataKey)
+		if metaBucket == nil {
+			return nil, fmt.Errorf("meta-data bucket missing")
+		}
+
+		fileWriterID, err := metaBucket.Get(util.BoltMetaDataFileWriterIDKey, nil)
+		if err != nil {
+			return nil, fmt.Errorf("unable to load file writer ID: %v", err)
+		}
+		reader, err := util.NewFileReader(string(fileWriterID), []byte(rootBoltPath))
+		if err != nil {
+			return nil, fmt.Errorf("unable to load correct reader: %v", err)
+		}
+
 		meta := map[string][]byte{}
 		c2 := snapshot.Cursor()
 		for j, _ := c2.First(); j != nil; j, _ = c2.Next() {
-			if j[0] == boltInternalKey[0] {
-				internalBucket := snapshot.Bucket(j)
+			if j[0] == util.BoltInternalKey[0] {
+				internalBucket := snapshot.GetBucket(j)
 				if internalBucket == nil {
 					err = fmt.Errorf("internal bucket missing")
 					break
 				}
 				err = internalBucket.ForEach(func(key []byte, val []byte) error {
-					copiedVal := append([]byte(nil), val...)
-					meta[string(key)] = copiedVal
+					meta[string(key)] = val
 					return nil
-				})
+				}, reader)
 				if err != nil {
 					break
 				}
@@ -135,7 +149,7 @@ func Rollback(path string, to *RollbackPoint) error {
 	rootBoltOpt := &bolt.Options{
 		ReadOnly: false,
 	}
-	rootBolt, err := bolt.Open(rootBoltPath, 0600, rootBoltOpt)
+	rootBolt, err := util.OpenBolt(rootBoltPath, 0600, rootBoltOpt)
 	if err != nil || rootBolt == nil {
 		return err
 	}
@@ -150,8 +164,8 @@ func Rollback(path string, to *RollbackPoint) error {
 	// including the target one.
 	var found bool
 	var eligibleEpochs []uint64
-	err = rootBolt.View(func(tx *bolt.Tx) error {
-		snapshots := tx.Bucket(boltSnapshotsBucket)
+	err = rootBolt.View(func(tx *util.BoltTxImpl) error {
+		snapshots := tx.Bucket(util.BoltSnapshotsBucket)
 		if snapshots == nil {
 			return nil
 		}
@@ -193,7 +207,7 @@ func Rollback(path string, to *RollbackPoint) error {
 		}
 	}()
 
-	snapshots := tx.Bucket(boltSnapshotsBucket)
+	snapshots := tx.Bucket(util.BoltSnapshotsBucket)
 	if snapshots == nil {
 		return nil
 	}

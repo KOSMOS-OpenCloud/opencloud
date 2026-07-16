@@ -23,7 +23,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/RoaringBitmap/roaring"
 	"github.com/blevesearch/bleve/v2/search"
 	index "github.com/blevesearch/bleve_index_api"
 	segment_api "github.com/blevesearch/scorch_segment_api/v2"
@@ -35,8 +34,6 @@ type OptimizeVR struct {
 	totalCost uint64
 	// maps field to vector readers
 	vrs map[string][]*IndexSnapshotVectorReader
-	// if at least one of the vector readers requires filtered kNN.
-	requiresFiltering bool
 }
 
 // This setting _MUST_ only be changed during init and not after.
@@ -65,11 +62,6 @@ func (o *OptimizeVR) Finish() error {
 	var errorsM sync.Mutex
 	var errors []error
 
-	var snapshotGlobalDocNums map[int]*roaring.Bitmap
-	if o.requiresFiltering {
-		snapshotGlobalDocNums = o.snapshot.globalDocNums()
-	}
-
 	defer o.invokeSearcherEndCallback()
 
 	wg := sync.WaitGroup{}
@@ -85,8 +77,13 @@ func (o *OptimizeVR) Finish() error {
 					wg.Done()
 				}()
 				for field, vrs := range o.vrs {
-					vecIndex, err := segment.InterpretVectorIndex(field,
-						o.requiresFiltering, origSeg.deleted)
+					// Early exit if the field is supposed to be completely deleted or
+					// if it's index data has been deleted
+					if info, ok := o.snapshot.updatedFields[field]; ok && (info.Deleted || info.Index) {
+						continue
+					}
+
+					vecIndex, err := segment.InterpretVectorIndex(field, origSeg.deleted)
 					if err != nil {
 						errorsM.Lock()
 						errors = append(errors, err)
@@ -104,27 +101,12 @@ func (o *OptimizeVR) Finish() error {
 						// for each VR, populate postings list and iterators
 						// by passing the obtained vector index and getting similar vectors.
 
-						// Only applies to filtered kNN.
-						if vr.eligibleDocIDs != nil && len(vr.eligibleDocIDs) > 0 {
-							eligibleVectorInternalIDs := vr.getEligibleDocIDs()
-							if snapshotGlobalDocNums != nil {
-								// Only the eligible documents belonging to this segment
-								// will get filtered out.
-								// There is no way to determine which doc belongs to which segment
-								eligibleVectorInternalIDs.And(snapshotGlobalDocNums[index])
-							}
-
-							eligibleLocalDocNums := make([]uint64,
-								eligibleVectorInternalIDs.GetCardinality())
-							// get the (segment-)local document numbers
-							for i, docNum := range eligibleVectorInternalIDs.ToArray() {
-								localDocNum := o.snapshot.localDocNumFromGlobal(index,
-									uint64(docNum))
-								eligibleLocalDocNums[i] = localDocNum
-							}
-
+						// check if the vector reader is configured to use a pre-filter
+						// to filter out ineligible documents before performing
+						// kNN search.
+						if vr.eligibleSelector != nil {
 							pl, err = vecIndex.SearchWithFilter(vr.vector, vr.k,
-								eligibleLocalDocNums, vr.searchParams)
+								vr.eligibleSelector.SegmentEligibleDocuments(index), vr.searchParams)
 						} else {
 							pl, err = vecIndex.Search(vr.vector, vr.k, vr.searchParams)
 						}
@@ -158,8 +140,8 @@ func (o *OptimizeVR) Finish() error {
 }
 
 func (s *IndexSnapshotVectorReader) VectorOptimize(ctx context.Context,
-	octx index.VectorOptimizableContext) (index.VectorOptimizableContext, error) {
-
+	octx index.VectorOptimizableContext,
+) (index.VectorOptimizableContext, error) {
 	if s.snapshot.parent.segPlugin.Version() < VectorSearchSupportedSegmentVersion {
 		return nil, fmt.Errorf("vector search not supported for this index, "+
 			"index's segment version %v, supported segment version for vector search %v",
@@ -167,8 +149,9 @@ func (s *IndexSnapshotVectorReader) VectorOptimize(ctx context.Context,
 	}
 
 	if octx == nil {
-		octx = &OptimizeVR{snapshot: s.snapshot,
-			vrs: make(map[string][]*IndexSnapshotVectorReader),
+		octx = &OptimizeVR{
+			snapshot: s.snapshot,
+			vrs:      make(map[string][]*IndexSnapshotVectorReader),
 		}
 	}
 
@@ -177,9 +160,6 @@ func (s *IndexSnapshotVectorReader) VectorOptimize(ctx context.Context,
 		return octx, nil
 	}
 	o.ctx = ctx
-	if !o.requiresFiltering {
-		o.requiresFiltering = len(s.eligibleDocIDs) > 0
-	}
 
 	if o.snapshot != s.snapshot {
 		o.invokeSearcherEndCallback()
@@ -205,7 +185,7 @@ func (s *IndexSnapshotVectorReader) VectorOptimize(ctx context.Context,
 				err := cbF(sumVectorIndexSize)
 				if err != nil {
 					// it's important to invoke the end callback at this point since
-					// if the earlier searchers of this optimze struct were successful
+					// if the earlier searchers of this optimize struct were successful
 					// the cost corresponding to it would be incremented and if the
 					// current searcher fails the check then we end up erroring out
 					// the overall optimized searcher creation, the cost needs to be

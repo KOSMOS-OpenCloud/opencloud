@@ -68,12 +68,15 @@ func newBuilder(path string, mapping mapping.IndexMapping, config map[string]int
 		return nil, err
 	}
 	config["internal"] = map[string][]byte{
-		string(mappingInternalKey): mappingBytes,
+		string(util.MappingInternalKey): mappingBytes,
 	}
 
 	// do not use real config, as these are options for the builder,
 	// not the resulting index
-	meta := newIndexMeta(scorch.Name, scorch.Name, map[string]interface{}{})
+	meta, err := newIndexMeta(scorch.Name, scorch.Name, map[string]interface{}{}, path)
+	if err != nil {
+		return nil, err
+	}
 	err = meta.Save(path)
 	if err != nil {
 		return nil, err

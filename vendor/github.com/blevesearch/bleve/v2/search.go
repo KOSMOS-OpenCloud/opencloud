@@ -15,9 +15,15 @@
 package bleve
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"regexp"
+	"slices"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/blevesearch/bleve/v2/analysis"
@@ -31,8 +37,10 @@ import (
 	"github.com/blevesearch/bleve/v2/util"
 )
 
-var reflectStaticSizeSearchResult int
-var reflectStaticSizeSearchStatus int
+var (
+	reflectStaticSizeSearchResult int
+	reflectStaticSizeSearchStatus int
+)
 
 func init() {
 	var sr SearchResult
@@ -44,6 +52,15 @@ func init() {
 var cache = registry.NewCache()
 
 const defaultDateTimeParser = optional.Name
+
+const (
+	ScoreDefault = ""
+	ScoreNone    = "none"
+	ScoreRRF     = "rrf"
+	ScoreRSF     = "rsf"
+)
+
+var AllowedFusionSort = search.SortOrder{&search.SortScore{Desc: true}}
 
 type dateTimeRange struct {
 	Name           string    `json:"name,omitempty"`
@@ -135,8 +152,13 @@ type numericRange struct {
 type FacetRequest struct {
 	Size           int              `json:"size"`
 	Field          string           `json:"field"`
+	TermPrefix     string           `json:"term_prefix,omitempty"`
+	TermPattern    string           `json:"term_pattern,omitempty"`
 	NumericRanges  []*numericRange  `json:"numeric_ranges,omitempty"`
 	DateTimeRanges []*dateTimeRange `json:"date_ranges,omitempty"`
+
+	// Compiled regex pattern (cached during validation)
+	compiledPattern *regexp.Regexp
 }
 
 // NewFacetRequest creates a facet on the specified
@@ -149,7 +171,26 @@ func NewFacetRequest(field string, size int) *FacetRequest {
 	}
 }
 
+// SetPrefixFilter sets the prefix filter for term facets.
+func (fr *FacetRequest) SetPrefixFilter(prefix string) {
+	fr.TermPrefix = prefix
+}
+
+// SetRegexFilter sets the regex pattern filter for term facets.
+func (fr *FacetRequest) SetRegexFilter(pattern string) {
+	fr.TermPattern = pattern
+}
+
 func (fr *FacetRequest) Validate() error {
+	// Validate regex pattern if provided and cache the compiled regex
+	if fr.TermPattern != "" {
+		compiled, err := regexp.Compile(fr.TermPattern)
+		if err != nil {
+			return fmt.Errorf("invalid term pattern: %v", err)
+		}
+		fr.compiledPattern = compiled
+	}
+
 	nrCount := len(fr.NumericRanges)
 	drCount := len(fr.DateTimeRanges)
 	if nrCount > 0 && drCount > 0 {
@@ -309,11 +350,69 @@ func (r *SearchRequest) Validate() error {
 		}
 	}
 
-	err := validateKNN(r)
+	err := r.validatePagination()
+	if err != nil {
+		return err
+	}
+
+	if IsScoreFusionRequested(r) {
+		if r.SearchAfter != nil || r.SearchBefore != nil {
+			return fmt.Errorf("cannot use search after or search before with score fusion")
+		}
+
+		if r.Sort != nil {
+			if !reflect.DeepEqual(r.Sort, AllowedFusionSort) {
+				return fmt.Errorf("sort must be empty or descending order of score for score fusion")
+			}
+		}
+	}
+
+	err = validateKNN(r)
 	if err != nil {
 		return err
 	}
 	return r.Facets.Validate()
+}
+
+// Validates SearchAfter/SearchBefore
+func (r *SearchRequest) validatePagination() error {
+	var pagination []string
+	var afterOrBefore string
+
+	if r.SearchAfter != nil {
+		pagination = r.SearchAfter
+		afterOrBefore = "search after"
+	} else if r.SearchBefore != nil {
+		pagination = r.SearchBefore
+		afterOrBefore = "search before"
+	} else {
+		return nil
+	}
+
+	for i := range pagination {
+		switch ss := r.Sort[i].(type) {
+		case *search.SortGeoDistance:
+			_, err := strconv.ParseFloat(pagination[i], 64)
+			if err != nil {
+				return fmt.Errorf("invalid %s value for sort field '%s': '%s'. %s", afterOrBefore, ss.Field, pagination[i], err)
+			}
+		case *search.SortField:
+			switch ss.Type {
+			case search.SortFieldAsNumber:
+				_, err := strconv.ParseFloat(pagination[i], 64)
+				if err != nil {
+					return fmt.Errorf("invalid %s value for sort field '%s': '%s'. %s", afterOrBefore, ss.Field, pagination[i], err)
+				}
+			case search.SortFieldAsDate:
+				_, err := time.Parse(time.RFC3339Nano, pagination[i])
+				if err != nil {
+					return fmt.Errorf("invalid %s value for sort field '%s': '%s'. %s", afterOrBefore, ss.Field, pagination[i], err)
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // AddFacet adds a FacetRequest to this SearchRequest
@@ -351,6 +450,11 @@ func (r *SearchRequest) SetSearchBefore(before []string) {
 	r.SearchBefore = before
 }
 
+// AddParams adds a RequestParams field to the search request
+func (r *SearchRequest) AddParams(params RequestParams) {
+	r.Params = &params
+}
+
 // NewSearchRequest creates a new SearchRequest
 // for the Query, using default values for all
 // other search parameters.
@@ -375,7 +479,7 @@ func NewSearchRequestOptions(q query.Query, size, from int, explain bool) *Searc
 // IndexErrMap tracks errors with the name of the index where it occurred
 type IndexErrMap map[string]error
 
-// MarshalJSON seralizes the error into a string for JSON consumption
+// MarshalJSON serializes the error into a string for JSON consumption
 func (iem IndexErrMap) MarshalJSON() ([]byte, error) {
 	tmp := make(map[string]string, len(iem))
 	for k, v := range iem {
@@ -396,7 +500,7 @@ func (iem IndexErrMap) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SearchStatus is a secion in the SearchResult reporting how many
+// SearchStatus is a section in the SearchResult reporting how many
 // underlying indexes were queried, how many were successful/failed
 // and a map of any errors that were encountered
 type SearchStatus struct {
@@ -431,7 +535,7 @@ func (ss *SearchStatus) Merge(other *SearchStatus) {
 // scores, score explanation, location info and so on.
 // Total - The total number of documents that matched the query.
 // Cost - indicates how expensive was the query with respect to bytes read
-// from the mmaped index files.
+// from the mapped index files.
 // MaxScore - The maximum score seen across all document hits seen for this query.
 // Took - The time taken to execute the search.
 // Facets - The facet results for the search.
@@ -444,6 +548,12 @@ type SearchResult struct {
 	MaxScore float64                        `json:"max_score"`
 	Took     time.Duration                  `json:"took"`
 	Facets   search.FacetResults            `json:"facets"`
+	// special fields that are applicable only for search
+	// results that are obtained from a presearch
+	SynonymResult search.FieldTermSynonymMap `json:"synonym_result,omitempty"`
+
+	// The following fields are applicable to BM25 preSearch
+	BM25Stats *search.BM25Stats `json:"bm25_stats,omitempty"`
 }
 
 func (sr *SearchResult) Size() int {
@@ -465,48 +575,97 @@ func (sr *SearchResult) Size() int {
 }
 
 func (sr *SearchResult) String() string {
-	rv := ""
+	rv := &strings.Builder{}
 	if sr.Total > 0 {
-		if sr.Request != nil && sr.Request.Size > 0 {
-			rv = fmt.Sprintf("%d matches, showing %d through %d, took %s\n", sr.Total, sr.Request.From+1, sr.Request.From+len(sr.Hits), sr.Took)
+		switch {
+		case sr.Request != nil && sr.Request.Size > 0:
+			start := sr.Request.From + 1
+			end := sr.Request.From + len(sr.Hits)
+			fmt.Fprintf(rv, "%d matches, showing %d through %d, took %s\n", sr.Total, start, end, sr.Took)
 			for i, hit := range sr.Hits {
-				rv += fmt.Sprintf("%5d. %s (%f)\n", i+sr.Request.From+1, hit.ID, hit.Score)
-				for fragmentField, fragments := range hit.Fragments {
-					rv += fmt.Sprintf("\t%s\n", fragmentField)
-					for _, fragment := range fragments {
-						rv += fmt.Sprintf("\t\t%s\n", fragment)
-					}
-				}
-				for otherFieldName, otherFieldValue := range hit.Fields {
-					if _, ok := hit.Fragments[otherFieldName]; !ok {
-						rv += fmt.Sprintf("\t%s\n", otherFieldName)
-						rv += fmt.Sprintf("\t\t%v\n", otherFieldValue)
-					}
-				}
+				rv = formatHit(rv, hit, start+i)
 			}
-		} else {
-			rv = fmt.Sprintf("%d matches, took %s\n", sr.Total, sr.Took)
+		case sr.Request == nil:
+			fmt.Fprintf(rv, "%d matches, took %s\n", sr.Total, sr.Took)
+			for i, hit := range sr.Hits {
+				rv = formatHit(rv, hit, i+1)
+			}
+		default:
+			fmt.Fprintf(rv, "%d matches, took %s\n", sr.Total, sr.Took)
 		}
 	} else {
-		rv = "No matches"
+		fmt.Fprintf(rv, "No matches\n")
 	}
 	if len(sr.Facets) > 0 {
-		rv += fmt.Sprintf("Facets:\n")
+		fmt.Fprintf(rv, "Facets:\n")
 		for fn, f := range sr.Facets {
-			rv += fmt.Sprintf("%s(%d)\n", fn, f.Total)
+			fmt.Fprintf(rv, "%s(%d)\n", fn, f.Total)
 			for _, t := range f.Terms.Terms() {
-				rv += fmt.Sprintf("\t%s(%d)\n", t.Term, t.Count)
+				fmt.Fprintf(rv, "\t%s(%d)\n", t.Term, t.Count)
 			}
 			for _, n := range f.NumericRanges {
-				rv += fmt.Sprintf("\t%s(%d)\n", n.Name, n.Count)
+				fmt.Fprintf(rv, "\t%s(%d)\n", n.Name, n.Count)
 			}
 			for _, d := range f.DateRanges {
-				rv += fmt.Sprintf("\t%s(%d)\n", d.Name, d.Count)
+				fmt.Fprintf(rv, "\t%s(%d)\n", d.Name, d.Count)
 			}
 			if f.Other != 0 {
-				rv += fmt.Sprintf("\tOther(%d)\n", f.Other)
+				fmt.Fprintf(rv, "\tOther(%d)\n", f.Other)
 			}
 		}
+	}
+	return rv.String()
+}
+
+// formatHit is a helper function to format a single hit in the search result for
+// the String() method of SearchResult
+func formatHit(rv *strings.Builder, hit *search.DocumentMatch, hitNumber int) *strings.Builder {
+	fmt.Fprintf(rv, "%5d. %s (%f)\n", hitNumber, hit.ID, hit.Score)
+	for fragmentField, fragments := range hit.Fragments {
+		fmt.Fprintf(rv, "\t%s\n", fragmentField)
+		for _, fragment := range fragments {
+			fmt.Fprintf(rv, "\t\t%s\n", fragment)
+		}
+	}
+	for otherFieldName, otherFieldValue := range hit.Fields {
+		if otherFieldName == NestedDocumentKey {
+			continue
+		}
+		if _, ok := hit.Fragments[otherFieldName]; !ok {
+			fmt.Fprintf(rv, "\t%s\n", otherFieldName)
+			fmt.Fprintf(rv, "\t\t%v\n", otherFieldValue)
+		}
+	}
+	// nested documents
+	if nested, ok := hit.Fields[NestedDocumentKey]; ok {
+		if list, ok := nested.([]*search.NestedDocumentMatch); ok {
+			fmt.Fprintf(rv, "\t%s (%d nested documents)\n", NestedDocumentKey, len(list))
+			for ni, nd := range list {
+				fmt.Fprintf(rv, "\t\tNested #%d:\n", ni+1)
+				for f, frags := range nd.Fragments {
+					fmt.Fprintf(rv, "\t\t\t%s\n", f)
+					for _, frag := range frags {
+						fmt.Fprintf(rv, "\t\t\t\t%s\n", frag)
+					}
+				}
+				for f, v := range nd.Fields {
+					if _, ok := nd.Fragments[f]; !ok {
+						fmt.Fprintf(rv, "\t\t\t%s\n", f)
+						fmt.Fprintf(rv, "\t\t\t\t%v\n", v)
+					}
+				}
+			}
+		}
+	}
+	if len(hit.DecodedSort) > 0 {
+		fmt.Fprintf(rv, "\t_sort: [")
+		for k, v := range hit.DecodedSort {
+			if k > 0 {
+				fmt.Fprintf(rv, ", ")
+			}
+			fmt.Fprintf(rv, "%v", v)
+		}
+		fmt.Fprintf(rv, "]\n")
 	}
 	return rv
 }
@@ -588,4 +747,108 @@ func (r *SearchRequest) SortFunc() func(data sort.Interface) {
 	}
 
 	return sort.Sort
+}
+
+func isMatchNoneQuery(q query.Query) bool {
+	_, ok := q.(*query.MatchNoneQuery)
+	return ok
+}
+
+func isMatchAllQuery(q query.Query) bool {
+	_, ok := q.(*query.MatchAllQuery)
+	return ok
+}
+
+// Checks if the request is hybrid search. Currently supports: RRF, RSF.
+func IsScoreFusionRequested(req *SearchRequest) bool {
+	switch req.Score {
+	case ScoreRRF, ScoreRSF:
+		return true
+	default:
+		return false
+	}
+}
+
+// Additional parameters in the search request. Currently only being
+// used for score fusion parameters.
+type RequestParams struct {
+	ScoreRankConstant int `json:"score_rank_constant,omitempty"`
+	ScoreWindowSize   int `json:"score_window_size,omitempty"`
+}
+
+func NewDefaultParams(from, size int) *RequestParams {
+	return &RequestParams{
+		ScoreRankConstant: DefaultScoreRankConstant,
+		ScoreWindowSize:   from + size,
+	}
+}
+
+func (p *RequestParams) UnmarshalJSON(input []byte) error {
+	var temp struct {
+		ScoreRankConstant *int `json:"score_rank_constant,omitempty"`
+		ScoreWindowSize   *int `json:"score_window_size,omitempty"`
+	}
+
+	if err := util.UnmarshalJSON(input, &temp); err != nil {
+		return err
+	}
+
+	if temp.ScoreRankConstant != nil {
+		p.ScoreRankConstant = *temp.ScoreRankConstant
+	}
+
+	if temp.ScoreWindowSize != nil {
+		p.ScoreWindowSize = *temp.ScoreWindowSize
+	}
+
+	return nil
+}
+
+func (p *RequestParams) Validate(size int) error {
+	if p.ScoreWindowSize < 1 {
+		return fmt.Errorf("score window size must be greater than 0")
+	} else if p.ScoreWindowSize < size {
+		return fmt.Errorf("score window size must be greater than or equal to Size (%d)", size)
+	}
+
+	return nil
+}
+
+func ParseParams(r *SearchRequest, input []byte) (*RequestParams, error) {
+	params := NewDefaultParams(r.From, r.Size)
+	if len(input) == 0 {
+		return params, nil
+	}
+
+	err := util.UnmarshalJSON(input, params)
+	if err != nil {
+		return nil, err
+	}
+
+	// validate params
+	err = params.Validate(r.Size)
+	if err != nil {
+		return nil, err
+	}
+
+	return params, nil
+}
+
+// OptionalRawMessage is a wrapper around json.RawMessage that treats empty or `null` JSON as nil.
+type OptionalRawMessage json.RawMessage
+
+func (n *OptionalRawMessage) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || bytes.Equal(data, []byte("null")) {
+		*n = nil
+		return nil
+	}
+	*n = slices.Clone(data)
+	return nil
+}
+
+func (n OptionalRawMessage) MarshalJSON() ([]byte, error) {
+	if len(n) == 0 {
+		return []byte("null"), nil
+	}
+	return n, nil
 }

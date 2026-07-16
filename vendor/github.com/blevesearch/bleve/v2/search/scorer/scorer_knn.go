@@ -123,12 +123,12 @@ func (sqs *KNNQueryScorer) Score(ctx *search.SearchContext,
 	if sqs.options.Explain {
 		rv.Expl = scoreExplanation
 	}
-	rv.IndexInternalID = append(rv.IndexInternalID, knnMatch.ID...)
+	rv.IndexInternalID = index.NewIndexInternalIDFrom(rv.IndexInternalID, knnMatch.ID)
 	return rv
 }
 
 func (sqs *KNNQueryScorer) Weight() float64 {
-	return sqs.queryBoost * sqs.queryBoost
+	return 1.0
 }
 
 func (sqs *KNNQueryScorer) SetQueryNorm(qnorm float64) {

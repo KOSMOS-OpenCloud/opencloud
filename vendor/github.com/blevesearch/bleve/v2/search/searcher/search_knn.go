@@ -50,23 +50,14 @@ type KNNSearcher struct {
 func NewKNNSearcher(ctx context.Context, i index.IndexReader, m mapping.IndexMapping,
 	options search.SearcherOptions, field string, vector []float32, k int64,
 	boost float64, similarityMetric string, searchParams json.RawMessage,
-	filterIDs []index.IndexInternalID) (
+	eligibleSelector index.EligibleDocumentSelector) (
 	search.Searcher, error) {
 
 	if vr, ok := i.(index.VectorIndexReader); ok {
-		var vectorReader index.VectorReader
-		var err error
-
-		if len(filterIDs) > 0 {
-			vectorReader, err = vr.VectorReaderWithFilter(ctx, vector, field, k,
-				searchParams, filterIDs)
-		} else {
-			vectorReader, err = vr.VectorReader(ctx, vector, field, k, searchParams)
-		}
+		vectorReader, err := vr.VectorReader(ctx, vector, field, k, searchParams, eligibleSelector)
 		if err != nil {
 			return nil, err
 		}
-
 		knnScorer := scorer.NewKNNQueryScorer(vector, field, boost,
 			options, similarityMetric)
 		return &KNNSearcher{
@@ -93,7 +84,7 @@ func (s *KNNSearcher) VectorOptimize(ctx context.Context, octx index.VectorOptim
 
 func (s *KNNSearcher) Advance(ctx *search.SearchContext, ID index.IndexInternalID) (
 	*search.DocumentMatch, error) {
-	knnMatch, err := s.vectorReader.Next(s.vd.Reset())
+	knnMatch, err := s.vectorReader.Advance(ID, s.vd.Reset())
 	if err != nil {
 		return nil, err
 	}

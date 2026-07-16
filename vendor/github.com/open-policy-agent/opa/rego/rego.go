@@ -43,7 +43,7 @@ type EvalContext = v1.EvalContext
 type EvalOption = v1.EvalOption
 
 // EvalInput configures the input for a Prepared Query's evaluation
-func EvalInput(input interface{}) EvalOption {
+func EvalInput(input any) EvalOption {
 	return v1.EvalInput(input)
 }
 
@@ -68,6 +68,7 @@ func EvalInstrument(instrument bool) EvalOption {
 }
 
 // EvalTracer configures a tracer for a Prepared Query's evaluation
+//
 // Deprecated: Use EvalQueryTracer instead.
 func EvalTracer(tracer topdown.Tracer) EvalOption {
 	return v1.EvalTracer(tracer)
@@ -155,7 +156,7 @@ func EvalSortSets(yes bool) EvalOption {
 	return v1.EvalSortSets(yes)
 }
 
-// EvalCopyMaps causes the evaluator to copy `map[string]interface{}`s before returning them.
+// EvalCopyMaps causes the evaluator to copy `map[string]any`s before returning them.
 func EvalCopyMaps(yes bool) EvalOption {
 	return v1.EvalCopyMaps(yes)
 }
@@ -312,7 +313,7 @@ func ParsedImports(imp []*ast.Import) func(r *Rego) {
 
 // Input returns an argument that sets the Rego input document. Input should be
 // a native Go value representing the input document.
-func Input(x interface{}) func(r *Rego) {
+func Input(x any) func(r *Rego) {
 	return v1.Input(x)
 }
 
@@ -407,6 +408,14 @@ func Store(s storage.Store) func(r *Rego) {
 	return v1.Store(s)
 }
 
+// Data returns an argument that sets the Rego data document. Data should be
+// a map representing the data document. This is a simpler alternative to
+// using Store with inmem.NewFromObject for cases where an in-memory store
+// with static data is sufficient.
+func Data(x map[string]any) func(r *Rego) {
+	return v1.Data(x)
+}
+
 // StoreReadAST returns an argument that sets whether the store should eagerly convert data to AST values.
 //
 // Only applicable when no store has been set on the Rego object through the Store option.
@@ -441,6 +450,7 @@ func Trace(yes bool) func(r *Rego) {
 }
 
 // Tracer returns an argument that adds a query tracer to r.
+//
 // Deprecated: Use QueryTracer instead.
 func Tracer(t topdown.Tracer) func(r *Rego) {
 	return v1.Tracer(t)
@@ -545,7 +555,7 @@ func Target(t string) func(r *Rego) {
 }
 
 // GenerateJSON sets the AST to JSON converter for the results.
-func GenerateJSON(f func(*ast.Term, *EvalContext) (interface{}, error)) func(r *Rego) {
+func GenerateJSON(f func(*ast.Term, *EvalContext) (any, error)) func(r *Rego) {
 	return v1.GenerateJSON(f)
 }
 

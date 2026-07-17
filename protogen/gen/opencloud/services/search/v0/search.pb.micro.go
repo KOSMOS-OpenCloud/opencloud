@@ -47,12 +47,6 @@ func NewSearchProviderEndpoints() []*api.Endpoint {
 			Method:  []string{"POST"},
 			Handler: "rpc",
 		},
-		{
-			Name:    "SearchProvider.IndexItem",
-			Path:    []string{"/api/v0/search/index-item"},
-			Method:  []string{"POST"},
-			Handler: "rpc",
-		},
 	}
 }
 
@@ -133,12 +127,6 @@ func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, 
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "SearchProvider.IndexSpace",
 		Path:    []string{"/api/v0/search/index-space"},
-		Method:  []string{"POST"},
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "SearchProvider.IndexItem",
-		Path:    []string{"/api/v0/search/index-item"},
 		Method:  []string{"POST"},
 		Handler: "rpc",
 	}))

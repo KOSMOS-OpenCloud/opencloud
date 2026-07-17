@@ -8,7 +8,7 @@ DOCKERFILE="Dockerfile.test"
 
 # Override expected branch (default: kosmos)
 EXPECT_BRANCH="${BRANCH:-kosmos}"
-GIT_BASE="${GIT_BASE:-https://codeberg.org/kosmos-opencloud}"
+GIT_BASE="${GIT_BASE:-https://github.com/KOSMOS-OpenCloud}"
 
 echo "=== Build kosmos: ${IMAGE}:${TAG} (branch: ${EXPECT_BRANCH}) ==="
 

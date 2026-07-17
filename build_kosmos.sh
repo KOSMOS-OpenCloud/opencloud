@@ -43,8 +43,7 @@ clone_or_update() {
 
 clone_or_update "$REVA_DIR" "opencloud_reva" "${EXPECT_BRANCH}"
 clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
-CS3_GIT="${CS3_GIT:-https://codeberg.org/kosmos-opencloud}"
-clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}" "$CS3_GIT"
+clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 
 # Pipeworx — from kosmos-openworks org, main branch
 PIPEWORX_GIT="${PIPEWORX_GIT:-https://codeberg.org/kosmos-openworks}"

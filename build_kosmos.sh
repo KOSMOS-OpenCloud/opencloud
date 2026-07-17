@@ -41,7 +41,13 @@ clone_or_update() {
     fi
 }
 
+echo "  GIT_BASE=${GIT_BASE}"
+echo "  REVA_DIR=${REVA_DIR}"
 clone_or_update "$REVA_DIR" "opencloud_reva" "${EXPECT_BRANCH}"
+echo "  reva clone result: $?"
+ls -la "$REVA_DIR/pkg/share/" 2>&1 | head -5
+grep SubspaceRootFilter "$REVA_DIR/pkg/share/share.go" 2>&1 | head -3
+
 clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
 clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 

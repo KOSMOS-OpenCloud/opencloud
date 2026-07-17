@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"net/http"
 
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
@@ -8,8 +9,7 @@ import (
 )
 
 // ReindexItem triggers re-indexing and re-enrichment of a drive item's space.
-// Uses IndexSpace with ForceReindex to re-extract all files in the space
-// (existing metadata is protected — only missing keys are written).
+// Runs asynchronously — returns 202 Accepted immediately.
 //
 // POST /drives/{driveID}/items/{itemID}/reindex
 func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
@@ -21,15 +21,18 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 
 	spaceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId()
 
-	_, err = g.searchService.IndexSpace(r.Context(), &searchsvc.IndexSpaceRequest{
-		SpaceId:      spaceID,
-		ForceReindex: true,
-	})
-	if err != nil {
-		g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("reindex failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "reindex failed")
-		return
-	}
+	// Run async — IndexSpace can take a long time for large spaces
+	go func() {
+		_, err := g.searchService.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
+			SpaceId:      spaceID,
+			ForceReindex: true,
+		})
+		if err != nil {
+			g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("async reindex failed")
+		} else {
+			g.logger.Info().Str("spaceID", spaceID).Msg("async reindex complete")
+		}
+	}()
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusAccepted)
 }

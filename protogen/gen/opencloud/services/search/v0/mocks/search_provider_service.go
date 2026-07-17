@@ -204,3 +204,8 @@ func (_c *SearchProviderService_Search_Call) RunAndReturn(run func(ctx context.C
 	_c.Call.Return(run)
 	return _c
 }
+
+// IndexItem provides a mock function for the type SearchProviderService (hand-added for kosmos branch)
+func (_mock *SearchProviderService) IndexItem(ctx context.Context, in *v0.IndexItemRequest, opts ...client.CallOption) (*v0.IndexItemResponse, error) {
+	return &v0.IndexItemResponse{}, nil
+}

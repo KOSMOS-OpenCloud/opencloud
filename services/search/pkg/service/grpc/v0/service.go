@@ -165,6 +165,49 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	return nil
 }
 
+// IndexItem (re-)indexes a single resource by its resource ID.
+// The resource_id format is "storageid$spaceid!opaqueid".
+func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ *searchsvc.IndexItemResponse) error {
+	rid := in.ResourceId
+	if rid == "" {
+		return errors.New("resource_id is required")
+	}
+
+	ref := &provider.Reference{
+		ResourceId: &provider.ResourceId{},
+	}
+
+	// Parse "storageid$spaceid!opaqueid"
+	parts := splitResourceID(rid)
+	if parts == nil {
+		return fmt.Errorf("invalid resource_id format: %s", rid)
+	}
+	ref.ResourceId.StorageId = parts[0]
+	ref.ResourceId.SpaceId = parts[1]
+	ref.ResourceId.OpaqueId = parts[2]
+
+	s.searcher.UpsertItem(ref)
+	return nil
+}
+
+// splitResourceID parses "storageid$spaceid!opaqueid" into [storageid, spaceid, opaqueid].
+func splitResourceID(rid string) []string {
+	dollarIdx := -1
+	bangIdx := -1
+	for i, c := range rid {
+		if c == '$' && dollarIdx == -1 {
+			dollarIdx = i
+		}
+		if c == '!' {
+			bangIdx = i
+		}
+	}
+	if dollarIdx == -1 || bangIdx == -1 || bangIdx <= dollarIdx {
+		return nil
+	}
+	return []string{rid[:dollarIdx], rid[dollarIdx+1 : bangIdx], rid[bangIdx+1:]}
+}
+
 // FromCache pulls a search result from cache
 func (s Service) FromCache(key string) (*searchsvc.SearchResponse, bool) {
 	v, err := s.cache.Get(key)

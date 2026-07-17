@@ -55,6 +55,7 @@ func NewSearchProviderEndpoints() []*api.Endpoint {
 type SearchProviderService interface {
 	Search(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*SearchResponse, error)
 	IndexSpace(ctx context.Context, in *IndexSpaceRequest, opts ...client.CallOption) (*IndexSpaceResponse, error)
+	IndexItem(ctx context.Context, in *IndexItemRequest, opts ...client.CallOption) (*IndexItemResponse, error)
 }
 
 type searchProviderService struct {
@@ -89,17 +90,29 @@ func (c *searchProviderService) IndexSpace(ctx context.Context, in *IndexSpaceRe
 	return out, nil
 }
 
+func (c *searchProviderService) IndexItem(ctx context.Context, in *IndexItemRequest, opts ...client.CallOption) (*IndexItemResponse, error) {
+	req := c.c.NewRequest(c.name, "SearchProvider.IndexItem", in)
+	out := new(IndexItemResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for SearchProvider service
 
 type SearchProviderHandler interface {
 	Search(context.Context, *SearchRequest, *SearchResponse) error
 	IndexSpace(context.Context, *IndexSpaceRequest, *IndexSpaceResponse) error
+	IndexItem(context.Context, *IndexItemRequest, *IndexItemResponse) error
 }
 
 func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, opts ...server.HandlerOption) error {
 	type searchProvider interface {
 		Search(ctx context.Context, in *SearchRequest, out *SearchResponse) error
 		IndexSpace(ctx context.Context, in *IndexSpaceRequest, out *IndexSpaceResponse) error
+		IndexItem(ctx context.Context, in *IndexItemRequest, out *IndexItemResponse) error
 	}
 	type SearchProvider struct {
 		searchProvider
@@ -131,6 +144,19 @@ func (h *searchProviderHandler) Search(ctx context.Context, in *SearchRequest, o
 func (h *searchProviderHandler) IndexSpace(ctx context.Context, in *IndexSpaceRequest, out *IndexSpaceResponse) error {
 	return h.SearchProviderHandler.IndexSpace(ctx, in, out)
 }
+
+func (h *searchProviderHandler) IndexItem(ctx context.Context, in *IndexItemRequest, out *IndexItemResponse) error {
+	return h.SearchProviderHandler.IndexItem(ctx, in, out)
+}
+
+// IndexItemRequest represents a request to (re-)index a single item.
+// Hand-added for kosmos branch — not generated from proto.
+type IndexItemRequest struct {
+	ResourceId string `json:"resource_id,omitempty"`
+}
+
+// IndexItemResponse is the response for IndexItem.
+type IndexItemResponse struct{}
 
 // Api Endpoints for IndexProvider service
 

@@ -278,6 +278,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 							})
 						})
 					})
+					r.Get("/subspaces", svc.ListSubspaces)
 					r.Route("/items/{itemID}", func(r chi.Router) {
 						r.Get("/", drivesDriveItemApi.GetDriveItem)
 						r.Patch("/", drivesDriveItemApi.UpdateDriveItem)
@@ -291,6 +292,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						r.Post("/freeze", svc.FreezeItem)
 						r.Post("/protect", svc.ProtectItem)
 						r.Delete("/protect", svc.UnprotectItem)
+						r.Post("/subspace", svc.SetSubspace)
+						r.Delete("/subspace", svc.DeleteSubspace)
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {

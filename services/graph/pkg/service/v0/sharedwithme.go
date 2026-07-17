@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	"github.com/opencloud-eu/reva/v2/pkg/share"
+	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/thumbnails/pkg/thumbnail"
@@ -42,15 +43,26 @@ func (g Graph) listSharedWithMe(ctx context.Context, expandThumbnails bool) ([]l
 		return nil, err
 	}
 
-	listReceivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
+	// Load subspace root IDs so the share manager can filter them out
+	// (subspace memberships are not "shared with me", like space memberships).
+	subspaceIDs := collectSubspaceRootIDs(ctx, gatewayClient)
+
+	req := &collaboration.ListReceivedSharesRequest{
 		Filters: []*collaboration.Filter{
 			share.SpaceRootFilter(false),
 		},
-	})
+	}
+	if len(subspaceIDs) > 0 {
+		req.Filters = append(req.Filters, share.SubspaceRootFilter(false))
+		req.Opaque = utils.AppendPlainToOpaque(nil, "subspace_root_ids", strings.Join(subspaceIDs, ","))
+	}
+
+	listReceivedSharesResponse, err := gatewayClient.ListReceivedShares(ctx, req)
 	if err := errorcode.FromCS3Status(listReceivedSharesResponse.GetStatus(), err); err != nil {
 		g.logger.Error().Err(err).Msg("listing shares failed")
 		return nil, err
 	}
+
 	driveItems, err := cs3ReceivedSharesToDriveItems(ctx, g.logger, gatewayClient, g.identityCache, listReceivedSharesResponse.GetShares(), g.availableRoles)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("could not convert received shares to drive items")

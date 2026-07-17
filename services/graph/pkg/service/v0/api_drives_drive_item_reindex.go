@@ -7,7 +7,9 @@ import (
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
-// ReindexItem triggers re-indexing and re-enrichment of a single drive item.
+// ReindexItem triggers re-indexing and re-enrichment of a drive item's space.
+// Uses IndexSpace with ForceReindex to re-extract all files in the space
+// (existing metadata is protected — only missing keys are written).
 //
 // POST /drives/{driveID}/items/{itemID}/reindex
 func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
@@ -17,13 +19,14 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId() + "!" + itemID.GetOpaqueId()
+	spaceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId()
 
-	_, err = g.searchService.IndexItem(r.Context(), &searchsvc.IndexItemRequest{
-		ResourceId: resourceID,
+	_, err = g.searchService.IndexSpace(r.Context(), &searchsvc.IndexSpaceRequest{
+		SpaceId:      spaceID,
+		ForceReindex: true,
 	})
 	if err != nil {
-		g.logger.Error().Err(err).Str("resourceID", resourceID).Msg("reindex failed")
+		g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("reindex failed")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "reindex failed")
 		return
 	}

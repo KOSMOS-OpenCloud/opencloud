@@ -287,6 +287,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						r.Post("/createLink", driveItemPermissionsApi.CreateLink)
 						r.Get("/metadata", svc.GetItemMetadata)
 						r.Put("/metadata", svc.SetItemMetadata)
+						r.Post("/reindex", svc.ReindexItem)
 						r.Get("/renditions", svc.GetItemRenditions)
 						r.Post("/renditions", svc.SetItemRendition)
 						r.Post("/freeze", svc.FreezeItem)

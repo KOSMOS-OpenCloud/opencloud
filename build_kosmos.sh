@@ -46,7 +46,7 @@ clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
 clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 
 # Pipeworx — from kosmos-openworks org, main branch
-PIPEWORX_GIT="${PIPEWORX_GIT:-https://codeberg.org/kosmos-openworks}"
+PIPEWORX_GIT="${PIPEWORX_GIT:-https://github.com/KOSMOS-OpenWorks}"
 clone_or_update "$PIPEWORX_DIR" "openworks-pipeworx" "main" "$PIPEWORX_GIT"
 
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"

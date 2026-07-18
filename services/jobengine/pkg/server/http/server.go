@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	stdhttp "net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -10,37 +8,21 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/account"
 	"github.com/opencloud-eu/opencloud/pkg/cors"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
-	"github.com/opencloud-eu/opencloud/pkg/service/http"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
-	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/riandyrn/otelchi"
-	"go-micro.dev/v4"
 )
 
-// Server initializes the http service and server.
-func Server(opts ...Option) (http.Service, error) {
+// Server initializes a plain net/http server with chi router (no go-micro).
+// This avoids go-micro's service registry which can lose the registration
+// under sustained polling load, causing proxy 502 errors.
+func Server(opts ...Option) (*stdhttp.Server, error) {
 	options := newOptions(opts...)
-
-	service, err := http.NewService(
-		http.TLSConfig(options.Config.HTTP.TLS),
-		http.Logger(options.Logger),
-		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name(options.Config.Service.Name),
-		http.Version(version.GetString()),
-		http.Address(options.Config.HTTP.Addr),
-		http.Context(options.Context),
-		http.Flags(options.Flags...),
-		http.TraceProvider(options.TraceProvider),
-	)
-	if err != nil {
-		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
-	}
 
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		chimiddleware.RequestID,
 		middleware.Version(
 			options.Config.Service.Name,
-			version.GetString(),
+			"dev",
 		),
 		middleware.Logger(
 			options.Logger,
@@ -73,9 +55,10 @@ func Server(opts ...Option) (http.Service, error) {
 	// Register jobengine routes
 	options.JobEngine.RegisterRoutes(mux)
 
-	if err := micro.RegisterHandler(service.Server(), mux); err != nil {
-		return http.Service{}, err
+	server := &stdhttp.Server{
+		Addr:    options.Config.HTTP.Addr,
+		Handler: mux,
 	}
 
-	return service, nil
+	return server, nil
 }

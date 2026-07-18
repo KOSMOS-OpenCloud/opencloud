@@ -158,7 +158,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				logger.Info().Str("id", id).Str("label", p.Label).Str("jobType", p.Job.Type).Msg("pipeline registered")
 			}
 
-			// HTTP Server
+			// HTTP Server (plain net/http, no go-micro service registry)
 			{
 				httpServer, err := http.Server(
 					http.Logger(logger),
@@ -172,7 +172,7 @@ func Server(cfg *config.Config) *cobra.Command {
 					return err
 				}
 
-				gr.Add(runner.NewGoMicroHttpServerRunner(cfg.Service.Name+".http", httpServer))
+				gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".http", httpServer))
 			}
 
 			// Debug Server

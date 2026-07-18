@@ -70,7 +70,8 @@ func Server(cfg *config.Config) *cobra.Command {
 			engine := pipeengine.New(engineCfg, &service.RevaAuthExtractor{})
 			defer engine.Shutdown()
 
-			// Connect to NATS for SSE notifications
+			// Connect to NATS for SSE notifications (optional)
+			if cfg.Events.Endpoint != "" {
 			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 			natsStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
 				Endpoint:             cfg.Events.Endpoint,
@@ -102,6 +103,9 @@ func Server(cfg *config.Config) *cobra.Command {
 						logger.Error().Err(err).Msg("could not publish job SSE event")
 					}
 				}
+			}
+			} else {
+				logger.Info().Msg("NATS not configured, job SSE notifications disabled")
 			}
 
 			// Load pipe matrix

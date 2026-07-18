@@ -53,9 +53,9 @@ func TestWorkerPicksAndCompletes(t *testing.T) {
 	}
 
 	// Worker registers + picks
-	e.SetWorkerSlots("worker-1", map[string]int{"convert-pdf": 3})
+	e.SetWorkerSlots("worker-1", map[string]int{"convert": 3})
 	e.recordHeartbeat("worker-1")
-	assignments := e.pickJobs("worker-1", map[string]int{"convert-pdf": 3}, 3)
+	assignments := e.pickJobs("worker-1", map[string]int{"convert": 3}, 3)
 
 	if len(assignments) != 1 {
 		t.Fatalf("expected 1 assignment, got %d", len(assignments))
@@ -118,10 +118,10 @@ func TestWorkerFailsAndRetries(t *testing.T) {
 	e.OnJobDone = func(j *Job) { doneCount.Add(1) }
 
 	job, _ := e.Submit("convert", []string{"bad.pdf"}, "alice", "", false, nil)
-	e.SetWorkerSlots("worker-1", map[string]int{"convert-pdf": 2})
+	e.SetWorkerSlots("worker-1", map[string]int{"convert": 2})
 
 	// Attempt 1: pick + fail
-	e.pickJobs("worker-1", map[string]int{"convert-pdf": 2}, 2)
+	e.pickJobs("worker-1", map[string]int{"convert": 2}, 2)
 	e.processWorkerStatus("worker-1", WorkerJobStatus{
 		JobID:  job.ID,
 		Status: StatusFailed,
@@ -140,7 +140,7 @@ func TestWorkerFailsAndRetries(t *testing.T) {
 	}
 
 	// Attempt 2: pick + fail again (max retries = 2, so this is final)
-	e.pickJobs("worker-1", map[string]int{"convert-pdf": 2}, 2)
+	e.pickJobs("worker-1", map[string]int{"convert": 2}, 2)
 	e.processWorkerStatus("worker-1", WorkerJobStatus{
 		JobID:  job.ID,
 		Status: StatusFailed,
@@ -168,7 +168,7 @@ func TestWorkerStopsPolling(t *testing.T) {
 
 	// Worker registers
 	e.recordHeartbeat("flaky-worker")
-	e.recordPick("flaky-worker", []string{"convert-pdf"})
+	e.recordPick("flaky-worker", []string{"convert"})
 	e.recordCapacity("flaky-worker", 5)
 
 	// Simulate stale heartbeat
@@ -209,15 +209,15 @@ func TestCapacityDistribution(t *testing.T) {
 	}
 
 	// Worker with capacity 3 should get 3 jobs
-	e.SetWorkerSlots("big-worker", map[string]int{"convert-pdf": 10})
-	assignments := e.pickJobs("big-worker", map[string]int{"convert-pdf": 10}, 3)
+	e.SetWorkerSlots("big-worker", map[string]int{"convert": 10})
+	assignments := e.pickJobs("big-worker", map[string]int{"convert": 10}, 3)
 
 	if len(assignments) != 3 {
 		t.Errorf("expected 3 assignments for capacity 3, got %d", len(assignments))
 	}
 
 	// Second poll: capacity still 3, but already has 3 running → 0 new
-	assignments2 := e.pickJobs("big-worker", map[string]int{"convert-pdf": 10}, 3)
+	assignments2 := e.pickJobs("big-worker", map[string]int{"convert": 10}, 3)
 	if len(assignments2) != 0 {
 		t.Errorf("expected 0 new assignments (at capacity), got %d", len(assignments2))
 	}
@@ -228,7 +228,7 @@ func TestCapacityDistribution(t *testing.T) {
 		Status: StatusCompleted,
 	})
 
-	assignments3 := e.pickJobs("big-worker", map[string]int{"convert-pdf": 10}, 3)
+	assignments3 := e.pickJobs("big-worker", map[string]int{"convert": 10}, 3)
 	if len(assignments3) != 1 {
 		t.Errorf("expected 1 new assignment after completing 1, got %d", len(assignments3))
 	}
@@ -244,23 +244,23 @@ func TestMultipleWorkersFairDistribution(t *testing.T) {
 		e.Submit("convert", []string{"file.pdf"}, "alice", "", false, nil)
 	}
 
-	e.SetWorkerSlots("w1", map[string]int{"convert-pdf": 5})
-	e.SetWorkerSlots("w2", map[string]int{"convert-pdf": 5})
+	e.SetWorkerSlots("w1", map[string]int{"convert": 5})
+	e.SetWorkerSlots("w2", map[string]int{"convert": 5})
 
 	// Worker 1 picks 2
-	a1 := e.pickJobs("w1", map[string]int{"convert-pdf": 5}, 2)
+	a1 := e.pickJobs("w1", map[string]int{"convert": 5}, 2)
 	if len(a1) != 2 {
 		t.Errorf("w1: expected 2 assignments, got %d", len(a1))
 	}
 
 	// Worker 2 picks remaining 2
-	a2 := e.pickJobs("w2", map[string]int{"convert-pdf": 5}, 2)
+	a2 := e.pickJobs("w2", map[string]int{"convert": 5}, 2)
 	if len(a2) != 2 {
 		t.Errorf("w2: expected 2 assignments, got %d", len(a2))
 	}
 
 	// No more jobs
-	a3 := e.pickJobs("w1", map[string]int{"convert-pdf": 5}, 2)
+	a3 := e.pickJobs("w1", map[string]int{"convert": 5}, 2)
 	if len(a3) != 0 {
 		t.Errorf("expected 0 assignments (queue empty), got %d", len(a3))
 	}
@@ -277,8 +277,8 @@ func TestSlotLimitEnforced(t *testing.T) {
 	}
 
 	// Worker has capacity 5 but slot limit 2 for convert-pdf
-	e.SetWorkerSlots("w1", map[string]int{"convert-pdf": 2})
-	assignments := e.pickJobs("w1", map[string]int{"convert-pdf": 2}, 5)
+	e.SetWorkerSlots("w1", map[string]int{"convert": 2})
+	assignments := e.pickJobs("w1", map[string]int{"convert": 2}, 5)
 
 	if len(assignments) != 2 {
 		t.Errorf("expected 2 assignments (slot limit), got %d", len(assignments))
@@ -293,7 +293,7 @@ func TestMultiJobTypeWorker(t *testing.T) {
 	e.Submit("convert", []string{"doc.pdf"}, "alice", "", false, nil)
 	e.Submit("thumbnail", []string{"img.jpg"}, "alice", "", false, nil)
 
-	slots := map[string]int{"convert-pdf": 2, "gen-thumb": 2}
+	slots := map[string]int{"convert": 2, "thumbnail": 2}
 	e.SetWorkerSlots("multi-worker", slots)
 	assignments := e.pickJobs("multi-worker", slots, 5)
 
@@ -313,11 +313,11 @@ func TestMultiJobTypeWorker(t *testing.T) {
 // TestServerRestart: simulate engine restart — jobs lost, workers re-register
 func TestServerRestart(t *testing.T) {
 	e1 := scenarioEngine()
-	e1.SetWorkerSlots("w1", map[string]int{"convert-pdf": 3})
+	e1.SetWorkerSlots("w1", map[string]int{"convert": 3})
 
 	// Submit and pick a job
 	job, _ := e1.Submit("convert", []string{"file.pdf"}, "alice", "", false, nil)
-	e1.pickJobs("w1", map[string]int{"convert-pdf": 3}, 3)
+	e1.pickJobs("w1", map[string]int{"convert": 3}, 3)
 
 	got, _ := e1.GetJob(job.ID)
 	if got.Status != StatusRunning {
@@ -337,9 +337,9 @@ func TestServerRestart(t *testing.T) {
 	}
 
 	// Worker re-registers and gets new work
-	e2.SetWorkerSlots("w1", map[string]int{"convert-pdf": 3})
+	e2.SetWorkerSlots("w1", map[string]int{"convert": 3})
 	newJob, _ := e2.Submit("convert", []string{"new-file.pdf"}, "alice", "", false, nil)
-	assignments := e2.pickJobs("w1", map[string]int{"convert-pdf": 3}, 3)
+	assignments := e2.pickJobs("w1", map[string]int{"convert": 3}, 3)
 
 	if len(assignments) != 1 || assignments[0].JobID != newJob.ID {
 		t.Errorf("worker should pick new job after restart")
@@ -360,7 +360,7 @@ func TestQueuedJobCountAndCapacity(t *testing.T) {
 	}
 
 	// Register worker with capacity 3
-	e.SetWorkerSlots("w1", map[string]int{"convert-pdf": 10})
+	e.SetWorkerSlots("w1", map[string]int{"convert": 10})
 	e.recordHeartbeat("w1")
 	e.recordCapacity("w1", 3)
 
@@ -369,7 +369,7 @@ func TestQueuedJobCountAndCapacity(t *testing.T) {
 	}
 
 	// Pick 2 jobs
-	e.pickJobs("w1", map[string]int{"convert-pdf": 10}, 2)
+	e.pickJobs("w1", map[string]int{"convert": 10}, 2)
 
 	if c := e.QueuedJobCount(); c != 3 {
 		t.Errorf("QueuedJobCount after pick = %d, want 3", c)
@@ -387,8 +387,8 @@ func TestCancellationDelivery(t *testing.T) {
 	defer e.Shutdown()
 
 	job, _ := e.Submit("convert", []string{"file.pdf"}, "alice", "", false, nil)
-	e.SetWorkerSlots("w1", map[string]int{"convert-pdf": 3})
-	e.pickJobs("w1", map[string]int{"convert-pdf": 3}, 1)
+	e.SetWorkerSlots("w1", map[string]int{"convert": 3})
+	e.pickJobs("w1", map[string]int{"convert": 3}, 1)
 
 	// Cancel the running job
 	e.CancelJob(job.ID)

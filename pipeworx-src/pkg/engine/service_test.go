@@ -290,7 +290,7 @@ func TestOnJobDoneCalledOnFinalFailure(t *testing.T) {
 		Job: config.JobConfig{
 			Type:       "test-echo",
 			Timeout:    5 * time.Minute,
-			MaxRetries: 1,
+			MaxRetries: 2, // Retries incremented before check: 1st fail → retry, 2nd fail → final
 		},
 	}
 	engine := New(cfg, &testAuth{})

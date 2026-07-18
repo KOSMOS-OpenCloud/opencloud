@@ -620,6 +620,11 @@ func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int
 		}
 		job := c.job
 
+		// Re-check slot limit (candidates collected speculatively)
+		if maxSlots, ok := slots[job.Pipeline]; ok && typeRunning[job.Pipeline] >= maxSlots {
+			continue
+		}
+
 		// Atomic pick
 		job.Status = StatusRunning
 		job.WorkerID = workerID

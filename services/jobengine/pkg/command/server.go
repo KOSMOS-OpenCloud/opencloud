@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	"github.com/opencloud-eu/opencloud/pkg/log"
@@ -94,8 +95,11 @@ func Server(cfg *config.Config) *cobra.Command {
 						return
 					}
 
+					pubCtx, pubCancel := context.WithTimeout(ctx, 5*time.Second)
+					defer pubCancel()
+
 					// Toast notification via SSE
-					if err := events.Publish(context.Background(), natsStream, events.SendSSE{
+					if err := events.Publish(pubCtx, natsStream, events.SendSSE{
 						UserIDs: []string{job.UserID},
 						Type:    "job-finished",
 						Message: b,
@@ -120,11 +124,13 @@ func Server(cfg *config.Config) *cobra.Command {
 					}
 					nb, err := json.Marshal(notification)
 					if err == nil {
-						events.Publish(context.Background(), natsStream, events.SendSSE{
+						if err := events.Publish(pubCtx, natsStream, events.SendSSE{
 							UserIDs: []string{job.UserID},
 							Type:    "userlog-notification",
 							Message: nb,
-						})
+						}); err != nil {
+							logger.Error().Err(err).Msg("could not publish userlog notification")
+						}
 					}
 				}
 			}

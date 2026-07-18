@@ -36,7 +36,7 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		Events: config.Events{
-			Endpoint:  "", // empty = skip NATS, set to "127.0.0.1:9233" to enable SSE notifications
+			Endpoint:  "127.0.0.1:9233",
 			Cluster:   "opencloud-cluster",
 			EnableTLS: false,
 		},

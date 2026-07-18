@@ -72,7 +72,15 @@ func Server(cfg *config.Config) *cobra.Command {
 
 			// Connect to NATS for SSE notifications
 			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
-			natsStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
+			natsStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
+				Endpoint:             cfg.Events.Endpoint,
+				Cluster:              cfg.Events.Cluster,
+				TLSInsecure:          cfg.Events.TLSInsecure,
+				TLSRootCACertificate: cfg.Events.TLSRootCACertificate,
+				EnableTLS:            cfg.Events.EnableTLS,
+				AuthUsername:         cfg.Events.AuthUsername,
+				AuthPassword:         cfg.Events.AuthPassword,
+			})
 			if err != nil {
 				logger.Warn().Err(err).Msg("NATS not available, job notifications disabled")
 			} else {

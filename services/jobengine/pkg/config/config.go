@@ -18,7 +18,7 @@ type Config struct {
 	HTTP  HTTP  `yaml:"http"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
-	Events       shared.Events `yaml:"events"`
+	Events       Events        `yaml:"events"`
 
 	Context context.Context `yaml:"-"`
 
@@ -58,6 +58,17 @@ type CORS struct {
 	AllowedMethods   []string `yaml:"allow_methods" env:"OC_CORS_ALLOW_METHODS;JOBENGINE_CORS_ALLOW_METHODS"`
 	AllowedHeaders   []string `yaml:"allow_headers" env:"OC_CORS_ALLOW_HEADERS;JOBENGINE_CORS_ALLOW_HEADERS"`
 	AllowCredentials bool     `yaml:"allow_credentials" env:"OC_CORS_ALLOW_CREDENTIALS;JOBENGINE_CORS_ALLOW_CREDENTIALS"`
+}
+
+// Events combines the configuration options for the event bus.
+type Events struct {
+	Endpoint             string `yaml:"endpoint" env:"OC_EVENTS_ENDPOINT;JOBENGINE_EVENTS_ENDPOINT"`
+	Cluster              string `yaml:"cluster" env:"OC_EVENTS_CLUSTER;JOBENGINE_EVENTS_CLUSTER"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OC_INSECURE;JOBENGINE_EVENTS_TLS_INSECURE"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OC_EVENTS_TLS_ROOT_CA_CERTIFICATE;JOBENGINE_EVENTS_TLS_ROOT_CA_CERTIFICATE"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OC_EVENTS_ENABLE_TLS;JOBENGINE_EVENTS_ENABLE_TLS"`
+	AuthUsername         string `yaml:"username" env:"OC_EVENTS_AUTH_USERNAME;JOBENGINE_EVENTS_AUTH_USERNAME"`
+	AuthPassword         string `yaml:"password" env:"OC_EVENTS_AUTH_PASSWORD;JOBENGINE_EVENTS_AUTH_PASSWORD"`
 }
 
 // TokenManager is the config for using the reva token manager

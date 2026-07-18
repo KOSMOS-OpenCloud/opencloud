@@ -53,7 +53,7 @@ func DefaultConfig() *config.Config {
 // EnsureDefaults ensures the config contains default values
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.LogLevel == "" {
-		cfg.LogLevel = "error"
+		cfg.LogLevel = "debug"
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

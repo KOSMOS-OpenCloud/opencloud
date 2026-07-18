@@ -25,6 +25,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// zerologAdapter bridges pipeworx Logger interface to zerolog
+type zerologAdapter struct {
+	l log.Logger
+}
+
+func (z *zerologAdapter) Debug(msg string, kv ...any) {
+	e := z.l.Debug()
+	for i := 0; i+1 < len(kv); i += 2 {
+		e = e.Interface(fmt.Sprintf("%v", kv[i]), kv[i+1])
+	}
+	e.Msg(msg)
+}
+func (z *zerologAdapter) Info(msg string, kv ...any) {
+	e := z.l.Info()
+	for i := 0; i+1 < len(kv); i += 2 {
+		e = e.Interface(fmt.Sprintf("%v", kv[i]), kv[i+1])
+	}
+	e.Msg(msg)
+}
+func (z *zerologAdapter) Warn(msg string, kv ...any) {
+	e := z.l.Warn()
+	for i := 0; i+1 < len(kv); i += 2 {
+		e = e.Interface(fmt.Sprintf("%v", kv[i]), kv[i+1])
+	}
+	e.Msg(msg)
+}
+func (z *zerologAdapter) Error(msg string, kv ...any) {
+	e := z.l.Error()
+	for i := 0; i+1 < len(kv); i += 2 {
+		e = e.Interface(fmt.Sprintf("%v", kv[i]), kv[i+1])
+	}
+	e.Msg(msg)
+}
+
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
@@ -69,6 +103,7 @@ func Server(cfg *config.Config) *cobra.Command {
 			}
 
 			engine := pipeengine.New(engineCfg, &service.RevaAuthExtractor{})
+			engine.Log = &zerologAdapter{logger}
 			defer engine.Shutdown()
 
 			// Connect to NATS for SSE notifications (optional — don't block startup)
@@ -158,7 +193,7 @@ func Server(cfg *config.Config) *cobra.Command {
 				logger.Info().Str("id", id).Str("label", p.Label).Str("jobType", p.Job.Type).Msg("pipeline registered")
 			}
 
-			// HTTP Server (plain net/http, no go-micro service registry)
+			// HTTP Server (go-micro for service registry, proxy needs it to route)
 			{
 				httpServer, err := http.Server(
 					http.Logger(logger),
@@ -172,7 +207,7 @@ func Server(cfg *config.Config) *cobra.Command {
 					return err
 				}
 
-				gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".http", httpServer))
+				gr.Add(runner.NewGoMicroHttpServerRunner(cfg.Service.Name+".http", httpServer))
 			}
 
 			// Debug Server

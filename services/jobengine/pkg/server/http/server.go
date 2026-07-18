@@ -1,6 +1,9 @@
 package http
 
 import (
+	"fmt"
+	"time"
+
 	stdhttp "net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,21 +11,61 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/account"
 	"github.com/opencloud-eu/opencloud/pkg/cors"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
+	"github.com/opencloud-eu/opencloud/pkg/service/http"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
+	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/riandyrn/otelchi"
+	"go-micro.dev/v4"
+
+	"github.com/opencloud-eu/opencloud/pkg/log"
 )
 
-// Server initializes a plain net/http server with chi router (no go-micro).
-// This avoids go-micro's service registry which can lose the registration
-// under sustained polling load, causing proxy 502 errors.
-func Server(opts ...Option) (*stdhttp.Server, error) {
+// debugMiddleware logs request timing through the handler chain to detect hangs.
+func debugMiddleware(logger log.Logger) func(stdhttp.Handler) stdhttp.Handler {
+	return func(next stdhttp.Handler) stdhttp.Handler {
+		return stdhttp.HandlerFunc(func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+			start := time.Now()
+			path := r.URL.Path
+			method := r.Method
+
+			logger.Debug().Str("method", method).Str("path", path).Msg("jobengine: request started")
+			next.ServeHTTP(w, r)
+			dur := time.Since(start)
+
+			lvl := logger.Debug()
+			if dur > 5*time.Second {
+				lvl = logger.Warn()
+			}
+			lvl.Str("method", method).Str("path", path).Dur("duration", dur).Msg("jobengine: request completed")
+		})
+	}
+}
+
+// Server initializes the http service and server.
+func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
+
+	service, err := http.NewService(
+		http.TLSConfig(options.Config.HTTP.TLS),
+		http.Logger(options.Logger),
+		http.Namespace(options.Config.HTTP.Namespace),
+		http.Name(options.Config.Service.Name),
+		http.Version(version.GetString()),
+		http.Address(options.Config.HTTP.Addr),
+		http.Context(options.Context),
+		http.Flags(options.Flags...),
+		http.TraceProvider(options.TraceProvider),
+	)
+	if err != nil {
+		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
+	}
 
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
 		chimiddleware.RequestID,
+		debugMiddleware(options.Logger),
 		middleware.Version(
 			options.Config.Service.Name,
-			"dev",
+			version.GetString(),
 		),
 		middleware.Logger(
 			options.Logger,
@@ -55,10 +98,9 @@ func Server(opts ...Option) (*stdhttp.Server, error) {
 	// Register jobengine routes
 	options.JobEngine.RegisterRoutes(mux)
 
-	server := &stdhttp.Server{
-		Addr:    options.Config.HTTP.Addr,
-		Handler: mux,
+	if err := micro.RegisterHandler(service.Server(), mux); err != nil {
+		return http.Service{}, err
 	}
 
-	return server, nil
+	return service, nil
 }

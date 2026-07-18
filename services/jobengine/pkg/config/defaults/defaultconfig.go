@@ -35,6 +35,11 @@ func DefaultConfig() *config.Config {
 				AllowCredentials: true,
 			},
 		},
+		Events: config.Events{
+			Endpoint:  "127.0.0.1:9233",
+			Cluster:   "opencloud-cluster",
+			EnableTLS: false,
+		},
 		MaxWorkers: 4,
 		QueueSize:  100,
 		TempDir:    "/tmp/jobengine",

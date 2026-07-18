@@ -253,10 +253,15 @@ func (g Graph) GetItemSpaceContext(w http.ResponseWriter, r *http.Request) {
 // collectSubspaceRootIDs loads subspace root node IDs for all spaces the user
 // has access to. These IDs are passed to the share manager so it can filter
 // subspace shares at the source (like space root shares).
-func collectSubspaceRootIDs(ctx context.Context, gwc gateway.GatewayAPIClient) []string {
+func (g Graph) collectSubspaceRootIDs(ctx context.Context, gwc gateway.GatewayAPIClient) []string {
 	// List all spaces the user can see
 	listRes, err := gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{})
-	if err != nil || listRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+	if err != nil {
+		g.logger.Warn().Err(err).Msg("collectSubspaceRootIDs: failed to list storage spaces, subspace filter will be skipped")
+		return nil
+	}
+	if listRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		g.logger.Warn().Str("status", listRes.GetStatus().GetCode().String()).Msg("collectSubspaceRootIDs: unexpected status listing storage spaces, subspace filter will be skipped")
 		return nil
 	}
 

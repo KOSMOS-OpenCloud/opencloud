@@ -45,7 +45,7 @@ func (g Graph) listSharedWithMe(ctx context.Context, expandThumbnails bool) ([]l
 
 	// Load subspace root IDs so the share manager can filter them out
 	// (subspace memberships are not "shared with me", like space memberships).
-	subspaceIDs := collectSubspaceRootIDs(ctx, gatewayClient)
+	subspaceIDs := g.collectSubspaceRootIDs(ctx, gatewayClient)
 
 	req := &collaboration.ListReceivedSharesRequest{
 		Filters: []*collaboration.Filter{

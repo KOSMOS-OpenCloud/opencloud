@@ -86,7 +86,6 @@ func Server(cfg *config.Config) *cobra.Command {
 				logger.Warn().Err(err).Msg("NATS not available, job notifications disabled")
 			} else {
 				engine.OnJobDone = func(job *pipeengine.Job) {
-					// Check pipeline notification setting
 					if p, ok := engineCfg.Pipelines[job.Pipeline]; ok && p.Notification == "none" {
 						return
 					}
@@ -95,12 +94,38 @@ func Server(cfg *config.Config) *cobra.Command {
 						logger.Error().Err(err).Msg("could not marshal job for SSE")
 						return
 					}
+
+					// Toast notification via SSE
 					if err := events.Publish(context.Background(), natsStream, events.SendSSE{
 						UserIDs: []string{job.UserID},
 						Type:    "job-finished",
 						Message: b,
 					}); err != nil {
 						logger.Error().Err(err).Msg("could not publish job SSE event")
+					}
+
+					// Persistent notification for the notification panel
+					subject := job.Pipeline
+					if job.Status == "completed" {
+						subject += ": abgeschlossen"
+					} else {
+						subject += ": fehlgeschlagen"
+					}
+					notification := map[string]any{
+						"notification_id": job.ID,
+						"app":             "jobengine",
+						"user":            job.UserID,
+						"datetime":        job.CompletedAt.Format("2006-01-02T15:04:05Z"),
+						"subject":         subject,
+						"message":         job.Error,
+					}
+					nb, err := json.Marshal(notification)
+					if err == nil {
+						events.Publish(context.Background(), natsStream, events.SendSSE{
+							UserIDs: []string{job.UserID},
+							Type:    "userlog-notification",
+							Message: nb,
+						})
 					}
 				}
 			}

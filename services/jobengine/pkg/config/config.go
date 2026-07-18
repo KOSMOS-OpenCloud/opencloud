@@ -18,6 +18,7 @@ type Config struct {
 	HTTP  HTTP  `yaml:"http"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
+	Events       shared.Events `yaml:"events"`
 
 	Context context.Context `yaml:"-"`
 

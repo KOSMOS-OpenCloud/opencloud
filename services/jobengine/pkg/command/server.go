@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
@@ -17,6 +18,9 @@ import (
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/server/debug"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/server/http"
 	"github.com/opencloud-eu/opencloud/services/jobengine/pkg/service"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
+	"github.com/opencloud-eu/reva/v2/pkg/events/stream"
+	"github.com/opencloud-eu/opencloud/pkg/generators"
 	"github.com/spf13/cobra"
 )
 
@@ -65,6 +69,32 @@ func Server(cfg *config.Config) *cobra.Command {
 
 			engine := pipeengine.New(engineCfg, &service.RevaAuthExtractor{})
 			defer engine.Shutdown()
+
+			// Connect to NATS for SSE notifications
+			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+			natsStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
+			if err != nil {
+				logger.Warn().Err(err).Msg("NATS not available, job notifications disabled")
+			} else {
+				engine.OnJobDone = func(job *pipeengine.Job) {
+					// Check pipeline notification setting
+					if p, ok := engineCfg.Pipelines[job.Pipeline]; ok && p.Notification == "none" {
+						return
+					}
+					b, err := json.Marshal(job)
+					if err != nil {
+						logger.Error().Err(err).Msg("could not marshal job for SSE")
+						return
+					}
+					if err := events.Publish(context.Background(), natsStream, events.SendSSE{
+						UserIDs: []string{job.UserID},
+						Type:    "job-finished",
+						Message: b,
+					}); err != nil {
+						logger.Error().Err(err).Msg("could not publish job SSE event")
+					}
+				}
+			}
 
 			// Load pipe matrix
 			if cfg.MatrixFile != "" {

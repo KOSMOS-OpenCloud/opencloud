@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -179,6 +180,74 @@ func subspacesFromOpaque(opaque *types.Opaque) []SubspaceEntry {
 		return []SubspaceEntry{}
 	}
 	return entries
+}
+
+// SpaceContext describes the effective space/subspace context for a resource.
+type SpaceContext struct {
+	Type string `json:"type"` // "space" or "subspace"
+	ID   string `json:"id"`
+	Path string `json:"path"`
+}
+
+// GetItemSpaceContext returns the effective space/subspace context for an item.
+// GET /drives/{driveID}/items/{itemID}/space
+func (g Graph) GetItemSpaceContext(w http.ResponseWriter, r *http.Request) {
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		return
+	}
+	itemID, err := parseIDParam(r, "itemID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
+		return
+	}
+
+	ctx := r.Context()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusServiceUnavailable, "gateway not available")
+		return
+	}
+
+	// Stat the item to get its path
+	statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+		Ref: &provider.Reference{ResourceId: &itemID},
+	})
+	if err != nil || statRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "item not found")
+		return
+	}
+
+	itemPath := statRes.GetInfo().GetPath()
+
+	// Get the subspace list for this space
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(&driveID), gatewayClient)
+	if err != nil || space == nil {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "space not found")
+		return
+	}
+
+	subspaces := subspacesFromOpaque(space.GetOpaque())
+
+	// Find the deepest subspace that contains this path
+	var best *SubspaceEntry
+	for i := range subspaces {
+		ss := &subspaces[i]
+		if itemPath == ss.Path || strings.HasPrefix(itemPath, ss.Path+"/") {
+			if best == nil || len(ss.Path) > len(best.Path) {
+				best = ss
+			}
+		}
+	}
+
+	if best != nil {
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, SpaceContext{Type: "subspace", ID: best.ID, Path: best.Path})
+	} else {
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, SpaceContext{Type: "space", ID: driveID.GetOpaqueId(), Path: "/"})
+	}
 }
 
 // collectSubspaceRootIDs loads subspace root node IDs for all spaces the user

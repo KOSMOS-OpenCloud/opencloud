@@ -295,6 +295,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						r.Delete("/protect", svc.UnprotectItem)
 						r.Post("/subspace", svc.SetSubspace)
 						r.Delete("/subspace", svc.DeleteSubspace)
+						r.Get("/space", svc.GetItemSpaceContext)
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {

@@ -118,9 +118,9 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 
 	if req.RegToken != "" {
 		// Validate existing token
-		e.mu.RLock()
+		e.workerMu.RLock()
 		stored, ok := e.regTokens[workerID]
-		e.mu.RUnlock()
+		e.workerMu.RUnlock()
 		if ok && stored == req.RegToken {
 			regToken = &req.RegToken
 		}
@@ -134,9 +134,9 @@ func (e *JobEngine) handleWorkerPoll(w http.ResponseWriter, r *http.Request) {
 		// If pipelines were sent, issue a new regToken
 		if _, hasPipelines := req.Data["pipelines"]; hasPipelines {
 			newToken := uuid.New().String()
-			e.mu.Lock()
+			e.workerMu.Lock()
 			e.regTokens[workerID] = newToken
-			e.mu.Unlock()
+			e.workerMu.Unlock()
 			regToken = &newToken
 			registeredNow = true
 		}
@@ -197,10 +197,14 @@ func (e *JobEngine) handleListWorkers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	e.mu.RLock()
-	defer e.mu.RUnlock()
+	now := time.Now()
+	maxInterval := time.Duration(e.cfg.Service.PollIntervalMax) * time.Second
+	if maxInterval == 0 {
+		maxInterval = 30 * time.Second
+	}
 
-	// Collect all known worker IDs from heartbeats + matrix
+	// Snapshot worker state
+	e.workerMu.RLock()
 	known := make(map[string]bool)
 	for id := range e.heartbeats {
 		known[id] = true
@@ -208,33 +212,42 @@ func (e *JobEngine) handleListWorkers(w http.ResponseWriter, r *http.Request) {
 	for id := range e.pipeMatrix {
 		known[id] = true
 	}
-
-	now := time.Now()
-	maxInterval := time.Duration(e.cfg.Service.PollIntervalMax) * time.Second
-	if maxInterval == 0 {
-		maxInterval = 30 * time.Second
+	heartbeats := make(map[string]time.Time, len(e.heartbeats))
+	for k, v := range e.heartbeats {
+		heartbeats[k] = v
 	}
+	workerPick := make(map[string][]string, len(e.workerPick))
+	for k, v := range e.workerPick {
+		workerPick[k] = v
+	}
+	workerCap := make(map[string]int, len(e.workerCap))
+	for k, v := range e.workerCap {
+		workerCap[k] = v
+	}
+	e.workerMu.RUnlock()
 
 	// Count running jobs per worker
+	e.jobsMu.RLock()
 	runningPerWorker := make(map[string]int)
 	for _, job := range e.jobs {
 		if job.Status == StatusRunning || job.Status == StatusQueued {
 			runningPerWorker[job.WorkerID]++
 		}
 	}
+	e.jobsMu.RUnlock()
 
 	workers := make([]WorkerInfo, 0, len(known))
 	for id := range known {
 		info := WorkerInfo{ID: id}
-		if last, ok := e.heartbeats[id]; ok {
+		if last, ok := heartbeats[id]; ok {
 			info.LastSeen = last.Format(time.RFC3339)
 			info.Online = now.Sub(last) < maxInterval*2
 			info.OnlineH = math.Round(now.Sub(last).Hours()*10) / 10
 		}
-		if pick, ok := e.workerPick[id]; ok {
+		if pick, ok := workerPick[id]; ok {
 			info.Pick = pick
 		}
-		info.Capacity = e.workerCap[id]
+		info.Capacity = workerCap[id]
 		info.Running = runningPerWorker[id]
 		workers = append(workers, info)
 	}
@@ -244,8 +257,8 @@ func (e *JobEngine) handleListWorkers(w http.ResponseWriter, r *http.Request) {
 
 // processWorkerStatus applies a worker's status report to the job
 func (e *JobEngine) processWorkerStatus(workerID string, s WorkerJobStatus) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.jobsMu.Lock()
+	defer e.jobsMu.Unlock()
 
 	job, ok := e.jobs[s.JobID]
 	if !ok {
@@ -365,8 +378,8 @@ func (e *JobEngine) registerWorkerPipelines(workerID string, pipelines map[strin
 
 // isPollingTooFast checks if the worker is polling below the minimum interval
 func (e *JobEngine) isPollingTooFast(workerID string) bool {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
+	e.workerMu.RLock()
+	defer e.workerMu.RUnlock()
 
 	if last, ok := e.heartbeats[workerID]; ok {
 		minInterval := time.Duration(e.cfg.Service.PollIntervalMin) * time.Second
@@ -379,8 +392,8 @@ func (e *JobEngine) isPollingTooFast(workerID string) bool {
 
 // recordHeartbeat updates the last-seen timestamp for a worker
 func (e *JobEngine) recordHeartbeat(workerID string) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.workerMu.Lock()
+	defer e.workerMu.Unlock()
 
 	if e.heartbeats == nil {
 		e.heartbeats = make(map[string]time.Time)
@@ -390,8 +403,8 @@ func (e *JobEngine) recordHeartbeat(workerID string) {
 
 // recordPick stores the job types offered by a worker
 func (e *JobEngine) recordPick(workerID string, pick []string) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.workerMu.Lock()
+	defer e.workerMu.Unlock()
 
 	if e.workerPick == nil {
 		e.workerPick = make(map[string][]string)
@@ -401,15 +414,15 @@ func (e *JobEngine) recordPick(workerID string, pick []string) {
 
 // recordCapacity stores the capacity reported by a worker
 func (e *JobEngine) recordCapacity(workerID string, capacity int) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.workerMu.Lock()
+	defer e.workerMu.Unlock()
 	e.workerCap[workerID] = capacity
 }
 
 // QueuedJobCount returns the number of queued (unassigned) jobs.
 func (e *JobEngine) QueuedJobCount() int {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
+	e.jobsMu.RLock()
+	defer e.jobsMu.RUnlock()
 	count := 0
 	for _, job := range e.jobs {
 		if job.Status == StatusQueued {
@@ -422,31 +435,42 @@ func (e *JobEngine) QueuedJobCount() int {
 // AvailableCapacity returns total available worker capacity
 // (sum of all online workers' capacity minus their running jobs).
 func (e *JobEngine) AvailableCapacity() int {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
 	now := time.Now()
 	maxInterval := time.Duration(e.cfg.Service.PollIntervalMax) * time.Second
 	if maxInterval == 0 {
 		maxInterval = 30 * time.Second
 	}
 
-	total := 0
+	// Snapshot online workers and their capacity
+	e.workerMu.RLock()
+	type workerSnap struct {
+		cap int
+	}
+	online := make(map[string]workerSnap)
 	for wid, cap := range e.workerCap {
-		// Only count online workers
 		if last, ok := e.heartbeats[wid]; ok && now.Sub(last) < maxInterval*2 {
-			running := 0
-			for _, job := range e.jobs {
-				if job.WorkerID == wid && (job.Status == StatusRunning || job.Status == StatusQueued) {
-					running++
-				}
-			}
-			avail := cap - running
-			if avail > 0 {
-				total += avail
-			}
+			online[wid] = workerSnap{cap: cap}
 		}
 	}
+	e.workerMu.RUnlock()
+
+	// Count running jobs per online worker
+	e.jobsMu.RLock()
+	total := 0
+	for wid, snap := range online {
+		running := 0
+		for _, job := range e.jobs {
+			if job.WorkerID == wid && (job.Status == StatusRunning || job.Status == StatusQueued) {
+				running++
+			}
+		}
+		avail := snap.cap - running
+		if avail > 0 {
+			total += avail
+		}
+	}
+	e.jobsMu.RUnlock()
+
 	return total
 }
 
@@ -460,8 +484,8 @@ func (e *JobEngine) getWorkerSlots(workerID string, pick []string) (slots map[st
 	slots = make(map[string]int)
 	denied = make([]string, 0)
 
-	e.mu.RLock()
-	defer e.mu.RUnlock()
+	e.workerMu.RLock()
+	defer e.workerMu.RUnlock()
 
 	for _, jobType := range pick {
 		if s, ok := e.pipeMatrix[workerID]; ok {
@@ -478,8 +502,8 @@ func (e *JobEngine) getWorkerSlots(workerID string, pick []string) (slots map[st
 
 // getWorkerCancellations returns job IDs that this worker should cancel
 func (e *JobEngine) getWorkerCancellations(workerID string) []string {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
+	e.jobsMu.RLock()
+	defer e.jobsMu.RUnlock()
 
 	var cancellations []string
 	for _, job := range e.jobs {
@@ -492,8 +516,8 @@ func (e *JobEngine) getWorkerCancellations(workerID string) []string {
 
 // pickJobs atomically assigns queued jobs to the worker
 func (e *JobEngine) pickJobs(workerID string, slots map[string]int, capacity int) []JobAssignment {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.jobsMu.Lock()
+	defer e.jobsMu.Unlock()
 
 	// Count how many jobs this worker already has running
 	running := 0

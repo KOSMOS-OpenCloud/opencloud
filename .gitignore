@@ -68,3 +68,6 @@ go.work.sum
 **/opencloud-sandbox-*
 DIST
 DIST
+web-dist/
+pipeworx-src/
+x1.png

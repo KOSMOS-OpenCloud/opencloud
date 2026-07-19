@@ -42,6 +42,8 @@ var _registeredEvents = []events.Unmarshaller{
 	events.LinkRemoved{},
 	events.SpaceShared{},
 	events.SpaceUnshared{},
+	events.SubspaceMemberAdded{},
+	events.SubspaceMemberRemoved{},
 }
 
 // Server is the entrypoint for the server command.

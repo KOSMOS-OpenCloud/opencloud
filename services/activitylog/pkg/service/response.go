@@ -35,6 +35,8 @@ var (
 	MessageLinkDeleted        = l10n.Template("{user} removed link to {resource}")
 	MessageSpaceShared        = l10n.Template("{user} added {sharee} as member of {space}")
 	MessageSpaceUnshared      = l10n.Template("{user} removed {sharee} from {space}")
+	MessageSubspaceMemberAdded   = l10n.Template("{user} added {sharee} as member of subspace {resource}")
+	MessageSubspaceMemberRemoved = l10n.Template("{user} removed {sharee} from subspace {resource}")
 
 	StrSomeField      = l10n.Template("some field")
 	StrPermission     = l10n.Template("permission")

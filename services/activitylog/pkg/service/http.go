@@ -183,6 +183,20 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
 				WithUser(ev.Executant, nil, nil),
 				WithTranslation(&t, loc, "field", ev.UpdateMask))
+		case events.SubspaceMemberAdded:
+			message = MessageSubspaceMemberAdded
+			ts = utils.TSToTime(ev.CTime)
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithUser(ev.Executant, nil, nil),
+				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
+		case events.SubspaceMemberRemoved:
+			message = MessageSubspaceMemberRemoved
+			ts = ev.Timestamp
+			vars, err = s.GetVars(ctx,
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithUser(ev.Executant, nil, nil),
+				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp

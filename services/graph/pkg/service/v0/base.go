@@ -275,6 +275,7 @@ func (g BaseGraphService) listSharesWithSpaceRootFilter(ctx context.Context, spa
 		share.UserGranteeFilter(),
 		share.GroupGranteeFilter(),
 		share.SpaceRootFilter(spaceRoot),
+		share.SubspaceRootFilter(false),
 	}
 	concreteFilters = append(concreteFilters, filters...)
 

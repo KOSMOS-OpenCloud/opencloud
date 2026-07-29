@@ -187,8 +187,12 @@ or full-text content.`,
 						}
 						fmt.Printf("  Files:        %d processed (%.1f/s)\n", idxStatus.FilesProcessed, rate)
 						if idxStatus.Errors > 0 {
-							pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
-							fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
+							if idxStatus.FilesProcessed > 0 {
+								pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
+								fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
+							} else {
+								fmt.Printf("  Errors:       %d\n", idxStatus.Errors)
+							}
 						}
 					} else if idxStatus.FinishedAt != "" && idxStatus.FinishedAt != "0001-01-01T00:00:00Z" {
 						started, _ := time.Parse(time.RFC3339Nano, idxStatus.StartedAt)
@@ -202,8 +206,12 @@ or full-text content.`,
 						fmt.Printf("  Last run:     %s (duration: %s)\n", idxStatus.FinishedAt[:19], duration)
 						fmt.Printf("  Files:        %d processed (%.1f/s)\n", idxStatus.FilesProcessed, rate)
 						if idxStatus.Errors > 0 {
-							pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
-							fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
+							if idxStatus.FilesProcessed > 0 {
+								pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
+								fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
+							} else {
+								fmt.Printf("  Errors:       %d\n", idxStatus.Errors)
+							}
 						}
 					} else {
 						fmt.Printf("Indexing:       no run recorded\n")

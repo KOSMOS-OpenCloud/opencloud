@@ -175,17 +175,36 @@ or full-text content.`,
 				}
 				if err := json.NewDecoder(statusResp.Body).Decode(&idxStatus); err == nil {
 					if idxStatus.Running {
-						fmt.Printf("Indexing:       RUNNING\n")
+						started, _ := time.Parse(time.RFC3339Nano, idxStatus.StartedAt)
+						elapsed := time.Since(started).Truncate(time.Second)
+						var rate float64
+						if elapsed.Seconds() > 0 {
+							rate = float64(idxStatus.FilesProcessed) / elapsed.Seconds()
+						}
+						fmt.Printf("Indexing:       RUNNING (since %s)\n", elapsed)
 						if idxStatus.SpaceTotal > 0 {
 							fmt.Printf("  Space:        %d/%d\n", idxStatus.SpaceCurrent, idxStatus.SpaceTotal)
 						}
-						fmt.Printf("  Files:        %d processed\n", idxStatus.FilesProcessed)
+						fmt.Printf("  Files:        %d processed (%.1f/s)\n", idxStatus.FilesProcessed, rate)
 						if idxStatus.Errors > 0 {
-							fmt.Printf("  Errors:       %d\n", idxStatus.Errors)
+							pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
+							fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
 						}
 					} else if idxStatus.FinishedAt != "" && idxStatus.FinishedAt != "0001-01-01T00:00:00Z" {
-						fmt.Printf("Indexing:       IDLE (last: %s, %d files, %d errors)\n",
-							idxStatus.FinishedAt[:19], idxStatus.FilesProcessed, idxStatus.Errors)
+						started, _ := time.Parse(time.RFC3339Nano, idxStatus.StartedAt)
+						finished, _ := time.Parse(time.RFC3339Nano, idxStatus.FinishedAt)
+						duration := finished.Sub(started).Truncate(time.Second)
+						var rate float64
+						if duration.Seconds() > 0 {
+							rate = float64(idxStatus.FilesProcessed) / duration.Seconds()
+						}
+						fmt.Printf("Indexing:       IDLE\n")
+						fmt.Printf("  Last run:     %s (duration: %s)\n", idxStatus.FinishedAt[:19], duration)
+						fmt.Printf("  Files:        %d processed (%.1f/s)\n", idxStatus.FilesProcessed, rate)
+						if idxStatus.Errors > 0 {
+							pct := float64(idxStatus.Errors) / float64(idxStatus.FilesProcessed) * 100
+							fmt.Printf("  Errors:       %d (%.2f%%)\n", idxStatus.Errors, pct)
+						}
 					} else {
 						fmt.Printf("Indexing:       no run recorded\n")
 					}

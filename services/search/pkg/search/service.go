@@ -629,12 +629,12 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 
 	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
 	if err != nil {
-		s.logger.Error().Err(err).Msg("invalid space id")
+		s.logger.Error().Err(err).Str("space_id", spaceID.OpaqueId).Msg("invalid space id")
 		return err
 	}
 	if rootID.StorageId == "" || rootID.SpaceId == "" {
-		s.logger.Error().Err(err).Msg("invalid space id")
-		return fmt.Errorf("invalid space id")
+		s.logger.Error().Str("space_id", spaceID.OpaqueId).Msg("invalid space id: missing StorageId or SpaceId")
+		return fmt.Errorf("invalid space id: %s", spaceID.OpaqueId)
 	}
 	rootID.OpaqueId = rootID.SpaceId
 
@@ -781,12 +781,12 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 
 	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
 	if err != nil {
-		s.logger.Error().Err(err).Msg("invalid space id")
+		s.logger.Error().Err(err).Str("space_id", spaceID.OpaqueId).Msg("invalid space id")
 		return err
 	}
 	if rootID.StorageId == "" || rootID.SpaceId == "" {
-		s.logger.Error().Err(err).Msg("invalid space id")
-		return fmt.Errorf("invalid space id")
+		s.logger.Error().Str("space_id", spaceID.OpaqueId).Msg("invalid space id: missing StorageId or SpaceId")
+		return fmt.Errorf("invalid space id: %s", spaceID.OpaqueId)
 	}
 	rootID.OpaqueId = rootID.SpaceId
 

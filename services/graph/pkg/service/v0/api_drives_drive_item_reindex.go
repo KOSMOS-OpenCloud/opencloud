@@ -3,13 +3,14 @@ package svc
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
-// ReindexItem triggers re-indexing and re-enrichment of a drive item's space.
-// Runs asynchronously — returns 202 Accepted immediately.
+// ReindexItem triggers re-indexing of a drive item's space.
+// Fire-and-forget — returns 202 Accepted immediately.
 //
 // POST /drives/{driveID}/items/{itemID}/reindex
 func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
@@ -21,16 +22,16 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 
 	spaceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId()
 
-	// Run async — IndexSpace can take a long time for large spaces
+	g.logger.Info().Str("spaceID", spaceID).Msg("reindex requested")
+
+	// Fire-and-forget — micro-client timeout ist erwartbar, kein Fehler
 	go func() {
 		_, err := g.searchService.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 			SpaceId:      spaceID,
 			ForceReindex: true,
 		})
-		if err != nil {
-			g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("async reindex failed")
-		} else {
-			g.logger.Info().Str("spaceID", spaceID).Msg("async reindex complete")
+		if err != nil && !strings.Contains(err.Error(), "deadline exceeded") {
+			g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("reindex failed")
 		}
 	}()
 

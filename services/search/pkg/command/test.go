@@ -1,17 +1,24 @@
 package command
 
 import (
+	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
+	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config/parser"
 
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Test probes all search subsystems and reports their status.
@@ -115,6 +122,40 @@ or full-text content.`,
 				}
 			} else {
 				fmt.Println("Qdrant:         DISABLED")
+			}
+
+			// 3. Test Search gRPC endpoint (re-enrich readiness)
+			fmt.Println()
+			grpcEndpoint := "127.0.0.1:9220"
+			var dialOpts []grpc.DialOption
+			if cfg.GRPCClientTLS.Mode == "insecure" {
+				dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			} else {
+				// Try insecure first, fall back to TLS
+				dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			}
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			conn, err := grpc.DialContext(ctx, grpcEndpoint, append(dialOpts, grpc.WithBlock())...)
+			if err != nil {
+				// Retry with TLS
+				dialOpts = []grpc.DialOption{grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{MinVersion: tls.VersionTLS12}))}
+				ctx2, cancel2 := context.WithTimeout(context.Background(), 3*time.Second)
+				defer cancel2()
+				conn, err = grpc.DialContext(ctx2, grpcEndpoint, append(dialOpts, grpc.WithBlock())...)
+			}
+			if err != nil {
+				fmt.Printf("Search gRPC:    FAILED — %v\n", err)
+			} else {
+				defer conn.Close()
+				// Quick ping via IndexSpace with empty ID (will fail but proves connectivity)
+				c := searchsvc.NewSearchProviderClient(conn)
+				_, pingErr := c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{SpaceId: "__ping__"})
+				if pingErr != nil && strings.Contains(pingErr.Error(), "Unavailable") {
+					fmt.Printf("Search gRPC:    FAILED — %v\n", pingErr)
+				} else {
+					fmt.Printf("Search gRPC:    OK (%s)\n", grpcEndpoint)
+				}
 			}
 
 			return nil

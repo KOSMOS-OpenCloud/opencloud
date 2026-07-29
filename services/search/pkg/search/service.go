@@ -873,6 +873,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	// Taki v2: log + store embedding in Qdrant
 	if doc.Taki != nil {
 		s.logger.Info().
+			Str("id", r.ID).
 			Str("name", doc.Name).
 			Str("method", doc.Taki.Method).
 			Int("content_len", len(doc.Content)).

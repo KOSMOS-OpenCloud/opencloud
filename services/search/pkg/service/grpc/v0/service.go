@@ -120,6 +120,14 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+	// Prüfen ob bereits ein Indexlauf aktiv ist
+	if svc, ok := s.searcher.(*search.Service); ok {
+		if status := svc.GetIndexStatus(); status.Running {
+			s.log.Info().Str("space", in.GetSpaceId()).Msg("index already running, skipping")
+			return nil
+		}
+	}
+
 	if in.GetSpaceId() != "" {
 		// Async: Job annehmen, sofort OK zurückgeben
 		go func() {

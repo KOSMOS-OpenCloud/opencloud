@@ -609,12 +609,14 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool) error {
 	s.indexMu.Lock()
-	s.indexStatus.Running = true
-	s.indexStatus.SpaceID = spaceID.GetOpaqueId()
-	s.indexStatus.FilesProcessed = 0
-	if s.indexStatus.StartedAt.IsZero() {
+	if !s.indexStatus.Running {
+		// Nur beim ersten Space zurücksetzen, nicht bei jedem
+		s.indexStatus.FilesProcessed = 0
+		s.indexStatus.Errors = 0
 		s.indexStatus.StartedAt = time.Now()
 	}
+	s.indexStatus.Running = true
+	s.indexStatus.SpaceID = spaceID.GetOpaqueId()
 	s.indexMu.Unlock()
 	defer func() {
 		s.indexMu.Lock()

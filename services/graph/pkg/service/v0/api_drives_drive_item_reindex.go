@@ -3,6 +3,9 @@ package svc
 import (
 	"context"
 	"net/http"
+	"time"
+
+	"go-micro.dev/v4/client"
 
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
@@ -23,13 +26,15 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 
 	g.logger.Info().Str("itemID", resourceID).Msg("reindex item requested")
 
-	// Einzelnes Item reindexen via IndexItem (UpsertItem im Search-Service)
+	// Einzelnes Item reindexen — 10min Timeout (LLM-OCR kann dauern)
 	go func() {
 		_, err := g.searchService.IndexItem(context.Background(), &searchsvc.IndexItemRequest{
 			ResourceId: resourceID,
-		})
+		}, client.WithRequestTimeout(10*time.Minute))
 		if err != nil {
 			g.logger.Error().Err(err).Str("itemID", resourceID).Msg("reindex item failed")
+		} else {
+			g.logger.Info().Str("itemID", resourceID).Msg("reindex item complete")
 		}
 	}()
 

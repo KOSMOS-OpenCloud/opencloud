@@ -158,6 +158,40 @@ or full-text content.`,
 				}
 			}
 
+			// 4. Indexing status (via debug HTTP endpoint)
+			fmt.Println()
+			statusResp, err := http.Get(fmt.Sprintf("http://%s/index-status", cfg.Debug.Addr))
+			if err == nil {
+				defer statusResp.Body.Close()
+				var idxStatus struct {
+					Running        bool   `json:"running"`
+					SpaceCurrent   int    `json:"space_current"`
+					SpaceTotal     int    `json:"space_total"`
+					SpaceID        string `json:"space_id"`
+					FilesProcessed int64  `json:"files_processed"`
+					Errors         int    `json:"errors"`
+					StartedAt      string `json:"started_at"`
+					FinishedAt     string `json:"finished_at"`
+				}
+				if err := json.NewDecoder(statusResp.Body).Decode(&idxStatus); err == nil {
+					if idxStatus.Running {
+						fmt.Printf("Indexing:       RUNNING\n")
+						if idxStatus.SpaceTotal > 0 {
+							fmt.Printf("  Space:        %d/%d\n", idxStatus.SpaceCurrent, idxStatus.SpaceTotal)
+						}
+						fmt.Printf("  Files:        %d processed\n", idxStatus.FilesProcessed)
+						if idxStatus.Errors > 0 {
+							fmt.Printf("  Errors:       %d\n", idxStatus.Errors)
+						}
+					} else if idxStatus.FinishedAt != "" && idxStatus.FinishedAt != "0001-01-01T00:00:00Z" {
+						fmt.Printf("Indexing:       IDLE (last: %s, %d files, %d errors)\n",
+							idxStatus.FinishedAt[:19], idxStatus.FilesProcessed, idxStatus.Errors)
+					} else {
+						fmt.Printf("Indexing:       no run recorded\n")
+					}
+				}
+			}
+
 			return nil
 		},
 	}

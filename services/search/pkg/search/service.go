@@ -814,7 +814,10 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
-		s.logger.Error().Err(err).Msg("failed to extract resource content")
+		s.logger.Error().Err(err).Str("path", path).Msg("failed to extract resource content")
+		s.indexMu.Lock()
+		s.indexStatus.Errors++
+		s.indexMu.Unlock()
 		return
 	}
 

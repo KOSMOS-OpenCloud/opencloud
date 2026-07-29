@@ -187,26 +187,27 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 
 // IndexItem (re-)indexes a single resource by its resource ID.
 // The resource_id format is "storageid$spaceid!opaqueid".
+// Fire-and-forget: antwortet sofort, Extraktion läuft im Hintergrund.
 func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ *searchsvc.IndexItemResponse) error {
 	rid := in.ResourceId
 	if rid == "" {
 		return errors.New("resource_id is required")
 	}
 
-	ref := &provider.Reference{
-		ResourceId: &provider.ResourceId{},
-	}
-
-	// Parse "storageid$spaceid!opaqueid"
 	parts := splitResourceID(rid)
 	if parts == nil {
 		return fmt.Errorf("invalid resource_id format: %s", rid)
 	}
-	ref.ResourceId.StorageId = parts[0]
-	ref.ResourceId.SpaceId = parts[1]
-	ref.ResourceId.OpaqueId = parts[2]
 
-	s.searcher.UpsertItem(ref)
+	ref := &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: parts[0],
+			SpaceId:   parts[1],
+			OpaqueId:  parts[2],
+		},
+	}
+
+	go s.searcher.UpsertItem(ref)
 	return nil
 }
 

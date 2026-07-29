@@ -148,9 +148,9 @@ or full-text content.`,
 				fmt.Printf("Search gRPC:    FAILED — %v\n", err)
 			} else {
 				defer conn.Close()
-				// Quick ping via IndexSpace with empty ID (will fail but proves connectivity)
+				// Connectivity-Test via Search (leere Query, harmlos)
 				c := searchsvc.NewSearchProviderClient(conn)
-				_, pingErr := c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{SpaceId: "__ping__"})
+				_, pingErr := c.Search(ctx, &searchsvc.SearchRequest{Query: "__ping__", PageSize: 1})
 				if pingErr != nil && strings.Contains(pingErr.Error(), "Unavailable") {
 					fmt.Printf("Search gRPC:    FAILED — %v\n", pingErr)
 				} else {

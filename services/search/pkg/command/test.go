@@ -107,16 +107,16 @@ or full-text content.`,
 					defer resp.Body.Close()
 					var qResult struct {
 						Result struct {
-							PointsCount  int `json:"points_count"`
-							VectorsCount int `json:"vectors_count"`
+							PointsCount         int `json:"points_count"`
+							IndexedVectorsCount int `json:"indexed_vectors_count"`
 						} `json:"result"`
 					}
 					json.NewDecoder(resp.Body).Decode(&qResult)
 					fmt.Printf("Qdrant:         OK (%s)\n", qdrantURL)
 					fmt.Printf("  Collection:   %s\n", collection)
 					fmt.Printf("  Points:       %d\n", qResult.Result.PointsCount)
-					fmt.Printf("  Vectors:      %d\n", qResult.Result.VectorsCount)
-					if qResult.Result.VectorsCount == 0 && qResult.Result.PointsCount > 0 {
+					fmt.Printf("  Vectors:      %d\n", qResult.Result.IndexedVectorsCount)
+					if qResult.Result.IndexedVectorsCount == 0 && qResult.Result.PointsCount > 0 {
 						fmt.Printf("  ⚠ WARNING:    points without vectors — embedding backend may be offline\n")
 					}
 				}

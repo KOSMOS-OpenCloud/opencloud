@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
@@ -20,18 +19,17 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId()
+	resourceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId() + "!" + itemID.GetOpaqueId()
 
-	g.logger.Info().Str("spaceID", spaceID).Msg("reindex requested")
+	g.logger.Info().Str("itemID", resourceID).Msg("reindex item requested")
 
-	// Fire-and-forget — micro-client timeout ist erwartbar, kein Fehler
+	// IndexItem reindexiert nur dieses eine Item, nicht den ganzen Space
 	go func() {
-		_, err := g.searchService.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
-			SpaceId:      spaceID,
-			ForceReindex: true,
+		_, err := g.searchService.IndexItem(context.Background(), &searchsvc.IndexItemRequest{
+			ResourceId: resourceID,
 		})
-		if err != nil && !strings.Contains(err.Error(), "deadline exceeded") {
-			g.logger.Error().Err(err).Str("spaceID", spaceID).Msg("reindex failed")
+		if err != nil {
+			g.logger.Error().Err(err).Str("itemID", resourceID).Msg("reindex item failed")
 		}
 	}()
 

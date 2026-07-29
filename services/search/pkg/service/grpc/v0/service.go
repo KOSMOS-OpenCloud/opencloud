@@ -121,10 +121,16 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	if in.GetSpaceId() != "" {
-		return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex())
+		// Async: Job annehmen, sofort OK zurückgeben
+		go func() {
+			if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex()); err != nil {
+				s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("index space failed")
+			}
+		}()
+		return nil
 	}
 
-	// index all spaces instead
+	// index all spaces — ebenfalls async
 	gwc, err := s.gws.Next()
 	if err != nil {
 		return err
@@ -144,24 +150,30 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 		return errors.New(resp.GetStatus().GetMessage())
 	}
 
-	var indexErrors int
 	spaces := resp.GetStorageSpaces()
-	if svc, ok := s.searcher.(*search.Service); ok {
-		svc.SetIndexProgress(0, len(spaces))
-	}
-	for i, space := range spaces {
-		if svc, ok := s.searcher.(*search.Service); ok {
-			svc.SetIndexProgress(i+1, len(spaces))
-		}
-		if err := s.searcher.IndexSpace(space.GetId(), in.GetForceReindex()); err != nil {
-			s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to index space, continuing")
-			indexErrors++
-		}
-	}
+	s.log.Info().Int("spaces", len(spaces)).Msg("index all spaces started")
 
-	if indexErrors > 0 {
-		return fmt.Errorf("indexing completed with %d error(s), see log for details", indexErrors)
-	}
+	go func() {
+		var indexErrors int
+		if svc, ok := s.searcher.(*search.Service); ok {
+			svc.SetIndexProgress(0, len(spaces))
+		}
+		for i, space := range spaces {
+			if svc, ok := s.searcher.(*search.Service); ok {
+				svc.SetIndexProgress(i+1, len(spaces))
+			}
+			if err := s.searcher.IndexSpace(space.GetId(), in.GetForceReindex()); err != nil {
+				s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to index space, continuing")
+				indexErrors++
+			}
+		}
+		if indexErrors > 0 {
+			s.log.Warn().Int("errors", indexErrors).Msg("indexing completed with errors")
+		} else {
+			s.log.Info().Int("spaces", len(spaces)).Msg("indexing completed successfully")
+		}
+	}()
+
 	return nil
 }
 

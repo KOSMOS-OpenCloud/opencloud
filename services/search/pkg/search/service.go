@@ -879,6 +879,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 			Int("content_len", len(doc.Content)).
 			Int("embedding_dims", len(doc.Taki.Embed)).
 			Int("entities", len(doc.Taki.Entities)).
+			Int("metadata", len(doc.Metadata)).
 			Str("summary", doc.Taki.Summary).
 			Msg("taki v2 extraction complete")
 

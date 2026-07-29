@@ -23,7 +23,7 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 
 	g.logger.Info().Str("itemID", resourceID).Msg("reindex item requested")
 
-	// IndexItem reindexiert nur dieses eine Item, nicht den ganzen Space
+	// Einzelnes Item reindexen via IndexItem (UpsertItem im Search-Service)
 	go func() {
 		_, err := g.searchService.IndexItem(context.Background(), &searchsvc.IndexItemRequest{
 			ResourceId: resourceID,

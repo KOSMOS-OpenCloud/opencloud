@@ -151,12 +151,22 @@ func (h *searchProviderHandler) IndexItem(ctx context.Context, in *IndexItemRequ
 
 // IndexItemRequest represents a request to (re-)index a single item.
 // Hand-added for kosmos branch — not generated from proto.
+// Implements proto.Message via ProtoReflect/ProtoMessage stubs so that
+// the micro gRPC client can serialize it (uses JSON codec fallback).
 type IndexItemRequest struct {
-	ResourceId string `json:"resource_id,omitempty"`
+	ResourceId string `json:"resource_id,omitempty" protobuf:"bytes,1,opt,name=resource_id,json=resourceId"`
 }
+
+func (x *IndexItemRequest) Reset()         { *x = IndexItemRequest{} }
+func (x *IndexItemRequest) String() string { return x.ResourceId }
+func (x *IndexItemRequest) ProtoMessage()  {}
 
 // IndexItemResponse is the response for IndexItem.
 type IndexItemResponse struct{}
+
+func (x *IndexItemResponse) Reset()         {}
+func (x *IndexItemResponse) String() string { return "" }
+func (x *IndexItemResponse) ProtoMessage()  {}
 
 // Api Endpoints for IndexProvider service
 

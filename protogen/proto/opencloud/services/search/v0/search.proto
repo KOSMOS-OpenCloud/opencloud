@@ -47,6 +47,12 @@ service SearchProvider {
         body: "*"
     };
   }
+  rpc IndexItem(IndexItemRequest) returns (IndexItemResponse) {
+    option (google.api.http) = {
+        post: "/api/v0/search/index-item",
+        body: "*"
+    };
+  }
 }
 
 service IndexProvider {
@@ -108,4 +114,11 @@ message IndexSpaceRequest {
 }
 
 message IndexSpaceResponse {
+}
+
+message IndexItemRequest {
+  string resource_id = 1;
+}
+
+message IndexItemResponse {
 }

@@ -1153,9 +1153,11 @@ func (s *Service) DebugSearch(query string, limit int) (interface{}, error) {
 		}
 		matches = append(matches, dm)
 	}
+	docCount, _ := s.engine.DocCount()
 	return map[string]interface{}{
-		"query":   query,
-		"total":   res.TotalMatches,
-		"matches": matches,
+		"query":    query,
+		"total":    res.TotalMatches,
+		"doccount": docCount,
+		"matches":  matches,
 	}, nil
 }

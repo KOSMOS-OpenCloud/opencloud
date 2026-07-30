@@ -397,45 +397,50 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 			continue
 		}
 
-		resourceID, err := storagespace.ParseID(result.ID)
+		// Build match from Qdrant payload — no Stat call needed
+		p := result.Payload
+		ridStr, _ := p["resource_id"].(string)
+		if ridStr == "" {
+			continue
+		}
+		resourceID, err := storagespace.ParseID(ridStr)
 		if err != nil {
 			continue
 		}
 
-		// Stat the resource to get current info
-		statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
-			Ref: &provider.Reference{ResourceId: &resourceID},
-		})
-		if err != nil || statRes.Status.Code != rpc.Code_CODE_OK {
-			continue
+		name, _ := p["name"].(string)
+		mime, _ := p["mime"].(string)
+		path, _ := p["path"].(string)
+		var size uint64
+		if s, ok := p["size"].(float64); ok {
+			size = uint64(s)
 		}
 
-		ri := statRes.Info
 		match := &searchmsg.Match{
 			Score: float32(result.Score),
 			Entity: &searchmsg.Entity{
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
-						StorageId: ri.Id.StorageId,
-						SpaceId:   ri.Id.SpaceId,
-						OpaqueId:  ri.Id.OpaqueId,
+						StorageId: resourceID.StorageId,
+						SpaceId:   resourceID.SpaceId,
+						OpaqueId:  resourceID.OpaqueId,
 					},
+					Path: path,
 				},
 				Id: &searchmsg.ResourceID{
-					StorageId: ri.Id.StorageId,
-					SpaceId:   ri.Id.SpaceId,
-					OpaqueId:  ri.Id.OpaqueId,
+					StorageId: resourceID.StorageId,
+					SpaceId:   resourceID.SpaceId,
+					OpaqueId:  resourceID.OpaqueId,
 				},
-				Name:     ri.Name,
-				Size:     ri.Size,
-				MimeType: ri.MimeType,
+				Name:     name,
+				Size:     size,
+				MimeType: mime,
 			},
 		}
 
-		if ri.Mtime != nil {
+		if mtime, ok := p["mtime"].(float64); ok && mtime > 0 {
 			match.Entity.LastModifiedTime = &timestamppb.Timestamp{
-				Seconds: int64(ri.Mtime.Seconds),
-				Nanos:   int32(ri.Mtime.Nanos),
+				Seconds: int64(mtime),
 			}
 		}
 
@@ -889,6 +894,8 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 				"name":     doc.Name,
 				"title":    doc.Title,
 				"mime":     doc.MimeType,
+				"size":     stat.Info.Size,
+				"mtime":    stat.Info.Mtime.Seconds,
 				"method":   doc.Taki.Method,
 				"path":     r.Path,
 				"root_id":  r.RootID,

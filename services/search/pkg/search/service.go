@@ -1139,10 +1139,14 @@ func (s *Service) DebugSearch(query string, limit int) (interface{}, error) {
 	for _, m := range res.Matches {
 		e := m.GetEntity()
 		dm := debugMatch{
-			ID:     e.GetId(),
-			RootID: e.GetParentId(),
-			Name:   e.GetName(),
-			Score:  float64(m.GetScore()),
+			Name:  e.GetName(),
+			Score: float64(m.GetScore()),
+		}
+		if id := e.GetId(); id != nil {
+			dm.ID = fmt.Sprintf("%s$%s!%s", id.GetStorageId(), id.GetSpaceId(), id.GetOpaqueId())
+		}
+		if pid := e.GetParentId(); pid != nil {
+			dm.RootID = fmt.Sprintf("%s$%s", pid.GetStorageId(), pid.GetSpaceId())
 		}
 		if ref := e.GetRef(); ref != nil {
 			dm.Path = ref.GetPath()

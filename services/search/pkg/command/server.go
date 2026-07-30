@@ -232,6 +232,21 @@ func Server(cfg *config.Config) *cobra.Command {
 					status := ss.GetIndexStatus()
 					json.NewEncoder(w).Encode(status)
 				})
+				// /index-lookup?q=name:sitzung9 — debug: search bleve directly
+				mux.HandleFunc("/index-lookup", func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					q := r.URL.Query().Get("q")
+					if q == "" {
+						http.Error(w, `{"error":"missing ?q= parameter"}`, 400)
+						return
+					}
+					res, err := ss.DebugSearch(q, 10)
+					if err != nil {
+						json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+						return
+					}
+					json.NewEncoder(w).Encode(res)
+				})
 				mux.Handle("/", origHandler)
 				debugServer.Handler = mux
 

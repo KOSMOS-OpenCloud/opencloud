@@ -1112,3 +1112,46 @@ func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.S
 
 	return ownerCtx, statRes, r.GetPath()
 }
+
+// DebugSearch searches the bleve index directly without auth context.
+// Returns raw results for debugging.
+func (s *Service) DebugSearch(query string, limit int) (interface{}, error) {
+	ctx := context.Background()
+	req := &searchsvc.SearchIndexRequest{
+		Query:    query,
+		PageSize: int32(limit),
+	}
+	res, err := s.engine.Search(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	type debugMatch struct {
+		ID        string   `json:"id"`
+		RootID    string   `json:"root_id"`
+		Name      string   `json:"name"`
+		Path      string   `json:"path"`
+		Type      string   `json:"type"`
+		Favorites []string `json:"favorites,omitempty"`
+		Score     float64  `json:"score"`
+	}
+	matches := []debugMatch{}
+	for _, m := range res.Matches {
+		e := m.GetEntity()
+		dm := debugMatch{
+			ID:     e.GetId(),
+			RootID: e.GetParentId(),
+			Name:   e.GetName(),
+			Score:  float64(m.GetScore()),
+		}
+		if ref := e.GetRef(); ref != nil {
+			dm.Path = ref.GetPath()
+		}
+		matches = append(matches, dm)
+	}
+	return map[string]interface{}{
+		"query":   query,
+		"total":   res.TotalMatches,
+		"matches": matches,
+	}, nil
+}

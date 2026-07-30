@@ -1017,13 +1017,15 @@ func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
 		return
 	}
 	m := map[string]interface{}(*dm)
-	fmt.Printf("search-debug: addDocMetadata keys=%v\n", func() []string {
-		var ks []string
-		for k, v := range m {
-			ks = append(ks, fmt.Sprintf("%s(%T)", k, v))
+	for key, val := range m {
+		sub, ok := val.(map[string]interface{})
+		if !ok {
+			continue
 		}
-		return ks
-	}())
+		for sk, sv := range sub {
+			fmt.Printf("search-debug: %s.%s = %v (%T)\n", key, sk, sv, sv)
+		}
+	}
 
 	// Flatten all sub-objects dynamically
 	for key, val := range m {

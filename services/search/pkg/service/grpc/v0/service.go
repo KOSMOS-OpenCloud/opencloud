@@ -131,6 +131,11 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	if in.GetSpaceId() != "" {
 		// Async: Job annehmen, sofort OK zurückgeben
 		go func() {
+			if svc, ok := s.searcher.(*search.Service); ok {
+				svc.StartIndexing()
+				svc.SetIndexProgress(1, 1)
+				defer svc.FinishIndexing()
+			}
 			if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex()); err != nil {
 				s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("index space failed")
 			}
@@ -164,7 +169,9 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	go func() {
 		var indexErrors int
 		if svc, ok := s.searcher.(*search.Service); ok {
+			svc.StartIndexing()
 			svc.SetIndexProgress(0, len(spaces))
+			defer svc.FinishIndexing()
 		}
 		for i, space := range spaces {
 			if svc, ok := s.searcher.(*search.Service); ok {

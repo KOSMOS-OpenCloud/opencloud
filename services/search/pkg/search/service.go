@@ -611,24 +611,29 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	return res, nil
 }
 
+// StartIndexing marks the index job as running. Call FinishIndexing when done.
+func (s *Service) StartIndexing() {
+	s.indexMu.Lock()
+	s.indexStatus.Running = true
+	s.indexStatus.FilesProcessed = 0
+	s.indexStatus.Errors = 0
+	s.indexStatus.StartedAt = time.Now()
+	s.indexMu.Unlock()
+}
+
+// FinishIndexing marks the index job as finished.
+func (s *Service) FinishIndexing() {
+	s.indexMu.Lock()
+	s.indexStatus.Running = false
+	s.indexStatus.FinishedAt = time.Now()
+	s.indexMu.Unlock()
+}
+
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool) error {
 	s.indexMu.Lock()
-	if !s.indexStatus.Running {
-		// Nur beim ersten Space zurücksetzen, nicht bei jedem
-		s.indexStatus.FilesProcessed = 0
-		s.indexStatus.Errors = 0
-		s.indexStatus.StartedAt = time.Now()
-	}
-	s.indexStatus.Running = true
 	s.indexStatus.SpaceID = spaceID.GetOpaqueId()
 	s.indexMu.Unlock()
-	defer func() {
-		s.indexMu.Lock()
-		s.indexStatus.Running = false
-		s.indexStatus.FinishedAt = time.Now()
-		s.indexMu.Unlock()
-	}()
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err

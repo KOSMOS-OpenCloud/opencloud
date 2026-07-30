@@ -1002,7 +1002,7 @@ func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
 }
 
 // addDocMetadata dynamically flattens structured document metadata from open_taki
-// into the metadata map. Walks "doc.*" and "sender.*" sub-objects.
+// into the metadata map. Walks all sub-objects (doc.*, sender.*, recipient.*, amounts.*).
 // Stored as xattr: user.oc.md.doc.subject, user.oc.md.sender.company, etc.
 // New fields added to docmeta_schema.json flow through without code changes.
 func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
@@ -1011,23 +1011,18 @@ func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
 	}
 	m := map[string]interface{}(*dm)
 
-	// Check is_letterhead
-	if isLH, ok := m["is_letterhead"].(bool); ok && !isLH {
-		return
-	}
-
-	// Flatten sub-objects (doc.*, sender.*)
-	for _, prefix := range []string{"doc", "sender"} {
-		sub, ok := m[prefix].(map[string]interface{})
+	// Flatten all sub-objects dynamically
+	for key, val := range m {
+		sub, ok := val.(map[string]interface{})
 		if !ok {
 			continue
 		}
-		for key, val := range sub {
-			if val == nil {
+		for subKey, subVal := range sub {
+			if subVal == nil {
 				continue
 			}
-			if strVal, ok := val.(string); ok && strVal != "" {
-				metadata[prefix+"."+key] = strVal
+			if strVal, ok := subVal.(string); ok && strVal != "" {
+				metadata[key+"."+subKey] = strVal
 			}
 		}
 	}

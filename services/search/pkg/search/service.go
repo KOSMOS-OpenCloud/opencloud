@@ -1017,6 +1017,13 @@ func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
 		return
 	}
 	m := map[string]interface{}(*dm)
+	fmt.Printf("search-debug: addDocMetadata keys=%v\n", func() []string {
+		var ks []string
+		for k, v := range m {
+			ks = append(ks, fmt.Sprintf("%s(%T)", k, v))
+		}
+		return ks
+	}())
 
 	// Flatten all sub-objects dynamically
 	for key, val := range m {
@@ -1030,6 +1037,10 @@ func addDocMetadata(metadata map[string]string, dm *content.TakiDocMeta) {
 			}
 			if strVal, ok := subVal.(string); ok && strVal != "" {
 				metadata[key+"."+subKey] = strVal
+			} else if boolVal, ok := subVal.(bool); ok {
+				if boolVal {
+					metadata[key+"."+subKey] = "true"
+				}
 			}
 		}
 	}

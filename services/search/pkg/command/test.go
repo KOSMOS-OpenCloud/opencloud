@@ -65,6 +65,10 @@ or full-text content.`,
 					Detail  string `json:"detail"`
 					Latency string `json:"latency"`
 				} `json:"subsystems"`
+				Queue struct {
+					InFlight      int `json:"in_flight"`
+					OldestSeconds int `json:"oldest_seconds"`
+				} `json:"queue"`
 			}
 
 			if err := json.Unmarshal(body, &result); err != nil {
@@ -90,6 +94,12 @@ or full-text content.`,
 				if sub.Detail != "" && sub.Status != "ok" {
 					fmt.Printf("    → %s\n", sub.Detail)
 				}
+			}
+
+			if result.Queue.InFlight > 0 {
+				fmt.Printf("  Queue:        %d in-flight (oldest: %ds)\n", result.Queue.InFlight, result.Queue.OldestSeconds)
+			} else {
+				fmt.Printf("  Queue:        idle\n")
 			}
 
 			// 2. Test Qdrant

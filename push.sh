@@ -27,7 +27,8 @@ if ! command -v podman &>/dev/null; then
 fi
 
 # Login to registry
-echo "${PUSH_TOKEN}" | $LOGIN -u "${PUSH_USER}" --password-stdin "${REGISTRY}"
+echo "[push] registry=${REGISTRY} user=${PUSH_USER} token_len=${#PUSH_TOKEN} token_sha=$(printf '%s' "${PUSH_TOKEN}" | sha256sum | cut -d' ' -f1)"
+printf '%s' "${PUSH_TOKEN}" | $LOGIN -u "${PUSH_USER}" --password-stdin "${REGISTRY}"
 
 # Re-tag if build used a different image name
 BUILD_IMAGE="${REGISTRY}/${NS}/${APP}"

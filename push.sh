@@ -7,12 +7,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$SCRIPT_DIR/DIST" ] && . "$SCRIPT_DIR/DIST"
 
+# Accept both UPPER and lower case env vars (DIST uses UPPER, worker passes lower)
 TAG="${TAG:?TAG required}"
-REGISTRY="${PUSH_REGISTRY:?PUSH_REGISTRY required}"
-NS="${PUSH_NS:?PUSH_NS required}"
-APP="${APP:?APP required}"
-PUSH_TOKEN="${PUSH_TOKEN:?PUSH_TOKEN required}"
-PUSH_USER="${PUSH_USER:-flash7777}"
+REGISTRY="${PUSH_REGISTRY:-${push_registry:?PUSH_REGISTRY required}}"
+NS="${PUSH_NS:-${push_ns:?PUSH_NS required}}"
+APP="${APP:-${app:-opencloud-kosmos}}"
+PUSH_TOKEN="${PUSH_TOKEN:-${push_token:?PUSH_TOKEN required}}"
+PUSH_USER="${PUSH_USER:-${push_user:-flash7777}}"
 
 IMAGE="${REGISTRY}/${NS}/${APP}"
 

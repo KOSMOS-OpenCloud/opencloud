@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="codeberg.org/kosmos-opencloud/opencloud-kosmos"
+IMAGE="${PUSH_REGISTRY:-codeberg.org}/${PUSH_NS:-kosmos-opencloud}/${APP:-opencloud-kosmos}"
 TAG="${TAG:-$(date +%Y%m%d-%H%M)}"
 DOCKERFILE="Dockerfile.test"
 

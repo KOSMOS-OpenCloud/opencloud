@@ -76,23 +76,29 @@ elif [ -f "$SCRIPT_DIR/build_web.sh" ] && [ -d "$SCRIPT_DIR/../kosmos-cloud-depl
     echo "  Building web-dist from ${WEB_DIR} ..."
     "$SCRIPT_DIR/build_web.sh" build
 else
-    # Fetch latest from Codeberg Generic Packages (with retry on API timeout)
-    echo "  Fetching latest web-dist from Codeberg..."
-    WEB_PKG_VERSION=""
-    for attempt in 1 2 3; do
-        WEB_PKG_VERSION=$(curl -sf --max-time 15 "https://codeberg.org/api/v1/packages/kosmos-opencloud?type=generic&q=opencloud-web" \
-            | python3 -c "import json,sys; pkgs=[p for p in json.load(sys.stdin) if p['name']=='opencloud-web' and p['version']!='latest']; pkgs.sort(key=lambda p:p['version'],reverse=True); print(pkgs[0]['version'])" 2>/dev/null) && break
-        echo "  API attempt $attempt failed, retrying in 10s..."
-        sleep 10
-    done
-    if [ -z "$WEB_PKG_VERSION" ]; then
-        echo "  ERROR: no opencloud-web package found on Codeberg (API down?)" >&2; exit 1
-    fi
-    WEB_ZIP_URL="https://codeberg.org/api/packages/kosmos-opencloud/generic/opencloud-web/${WEB_PKG_VERSION}/opencloud-web.zip"
-    echo "  Downloading: ${WEB_ZIP_URL}"
+    # Fetch web-dist: try local cache, then Codeberg
     rm -rf web-dist && mkdir -p web-dist
-    curl -sfL "$WEB_ZIP_URL" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
-    echo "  Unpacked: $(find web-dist -type f | wc -l) files (version: ${WEB_PKG_VERSION})"
+    LOCAL_WEB="/build/opencloud-web.tar.gz"
+    if [ -f "$LOCAL_WEB" ]; then
+        echo "  Using local web-dist: ${LOCAL_WEB}"
+        tar xzf "$LOCAL_WEB" -C web-dist/
+    else
+        echo "  Fetching latest web-dist from Codeberg..."
+        WEB_PKG_VERSION=""
+        for attempt in 1 2 3; do
+            WEB_PKG_VERSION=$(curl -sf --max-time 15 "https://codeberg.org/api/v1/packages/kosmos-opencloud?type=generic&q=opencloud-web" \
+                | python3 -c "import json,sys; pkgs=[p for p in json.load(sys.stdin) if p['name']=='opencloud-web' and p['version']!='latest']; pkgs.sort(key=lambda p:p['version'],reverse=True); print(pkgs[0]['version'])" 2>/dev/null) && break
+            echo "  API attempt $attempt failed, retrying in 10s..."
+            sleep 10
+        done
+        if [ -z "$WEB_PKG_VERSION" ]; then
+            echo "  ERROR: no opencloud-web package found (Codeberg down?)" >&2; exit 1
+        fi
+        WEB_ZIP_URL="https://codeberg.org/api/packages/kosmos-opencloud/generic/opencloud-web/${WEB_PKG_VERSION}/opencloud-web.zip"
+        echo "  Downloading: ${WEB_ZIP_URL}"
+        curl -sfL "$WEB_ZIP_URL" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
+    fi
+    echo "  Unpacked: $(find web-dist -type f | wc -l) files"
 fi
 
 # Generate kosmos revision

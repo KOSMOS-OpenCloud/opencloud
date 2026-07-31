@@ -56,6 +56,7 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]a
 					"share_folder":                      cfg.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 					// other
 					"disable_home_creation_on_login": cfg.DisableHomeCreationOnLogin,
+					"cross_space_move":               cfg.CrossSpaceMove,
 					"datagateway":                    strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data",
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,

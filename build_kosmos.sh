@@ -76,25 +76,35 @@ elif [ -f "$SCRIPT_DIR/build_web.sh" ] && [ -d "$SCRIPT_DIR/../kosmos-cloud-depl
     echo "  Building web-dist from ${WEB_DIR} ..."
     "$SCRIPT_DIR/build_web.sh" build
 else
-    # Fetch web-dist: try local cache, then Codeberg
+    # Fetch web-dist: local cache or remote (determined by GIT_BASE)
     rm -rf web-dist && mkdir -p web-dist
     LOCAL_WEB="/build/opencloud-web.tar.gz"
     if [ -f "$LOCAL_WEB" ]; then
         echo "  Using local web-dist: ${LOCAL_WEB}"
         tar xzf "$LOCAL_WEB" -C web-dist/
-    else
-        echo "  Fetching latest web-dist from Codeberg..."
-        WEB_PKG_VERSION=""
-        for attempt in 1 2 3; do
-            WEB_PKG_VERSION=$(curl -sf --max-time 15 "https://codeberg.org/api/v1/packages/kosmos-opencloud?type=generic&q=opencloud-web" \
-                | python3 -c "import json,sys; pkgs=[p for p in json.load(sys.stdin) if p['name']=='opencloud-web' and p['version']!='latest']; pkgs.sort(key=lambda p:p['version'],reverse=True); print(pkgs[0]['version'])" 2>/dev/null) && break
-            echo "  API attempt $attempt failed, retrying in 10s..."
-            sleep 10
-        done
-        if [ -z "$WEB_PKG_VERSION" ]; then
-            echo "  ERROR: no opencloud-web package found (Codeberg down?)" >&2; exit 1
+    elif [[ "$GIT_BASE" == *github.com* ]]; then
+        # GitHub: fetch from Releases
+        WEB_REPO="${GIT_BASE##*/}/opencloud_web"
+        echo "  Fetching latest web-dist from GitHub (${WEB_REPO})..."
+        WEB_ZIP_URL=$(curl -sf --max-time 15 "https://api.github.com/repos/${WEB_REPO}/releases/latest" \
+            | python3 -c "import json,sys; r=json.load(sys.stdin); assets=[a for a in r.get('assets',[]) if a['name'].endswith('.zip')]; print(assets[0]['browser_download_url'])" 2>/dev/null)
+        if [ -z "$WEB_ZIP_URL" ]; then
+            echo "  ERROR: no web-dist release found on GitHub" >&2; exit 1
         fi
-        WEB_ZIP_URL="https://codeberg.org/api/packages/kosmos-opencloud/generic/opencloud-web/${WEB_PKG_VERSION}/opencloud-web.zip"
+        echo "  Downloading: ${WEB_ZIP_URL}"
+        curl -sfL "$WEB_ZIP_URL" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
+    else
+        # Codeberg: fetch from Generic Packages
+        REGISTRY="${GIT_BASE#https://}"
+        REGISTRY="${REGISTRY%%/*}"
+        OWNER="${PUSH_ORG:-kosmos-opencloud}"
+        echo "  Fetching latest web-dist from ${REGISTRY}..."
+        WEB_PKG_VERSION=$(curl -sf --max-time 15 "https://${REGISTRY}/api/v1/packages/${OWNER}?type=generic&q=opencloud-web" \
+            | python3 -c "import json,sys; pkgs=[p for p in json.load(sys.stdin) if p['name']=='opencloud-web' and p['version']!='latest']; pkgs.sort(key=lambda p:p['version'],reverse=True); print(pkgs[0]['version'])" 2>/dev/null)
+        if [ -z "$WEB_PKG_VERSION" ]; then
+            echo "  ERROR: no web-dist package found on ${REGISTRY}" >&2; exit 1
+        fi
+        WEB_ZIP_URL="https://${REGISTRY}/api/packages/${OWNER}/generic/opencloud-web/${WEB_PKG_VERSION}/opencloud-web.zip"
         echo "  Downloading: ${WEB_ZIP_URL}"
         curl -sfL "$WEB_ZIP_URL" -o /tmp/web-dist.zip && unzip -qo /tmp/web-dist.zip -d web-dist/ && rm -f /tmp/web-dist.zip
     fi

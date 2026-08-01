@@ -96,6 +96,7 @@ func Posix(cfg *config.Config, enableFSScan, enableFSWatch bool) map[string]any 
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
 		"treetime_accounting":         true,
 		"treesize_accounting":         true,
+		"cross_space_move":            true,
 		"asyncfileuploads":            cfg.Drivers.Posix.AsyncUploads,
 		"scan_debounce_delay":         cfg.Drivers.Posix.ScanDebounceDelay,
 		"max_quota":                   cfg.Drivers.Posix.MaxQuota,

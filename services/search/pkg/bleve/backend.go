@@ -96,10 +96,13 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 	}
 
 	bleveReq.Fields = []string{"*"}
+	wallStart := time.Now()
 	res, err := b.index.Search(bleveReq)
+	wallDur := time.Since(wallStart)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Fprintf(os.Stderr, "bleve-search: took=%v wall=%v hits=%d segments=%d query=%s\n", res.Took, wallDur, res.Total, 0, sir.Query)
 
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	totalMatches := res.Total

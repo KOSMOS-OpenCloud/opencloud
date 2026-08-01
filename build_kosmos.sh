@@ -139,12 +139,4 @@ fi
 
 echo ""
 echo "=== Built: ${IMAGE}:${TAG} ==="
-echo ""
-
-if [ -n "${PUSH_TOKEN:-}" ]; then
-    buildah push --creds="token:${PUSH_TOKEN}" "${IMAGE}:${TAG}"
-    buildah tag "${IMAGE}:${TAG}" "${IMAGE}:latest"
-    buildah push --creds="token:${PUSH_TOKEN}" "${IMAGE}:latest"
-fi
-
-echo "=== Built: ${IMAGE}:${TAG} ==="
+# Push happens via push.sh (called by worker after build)

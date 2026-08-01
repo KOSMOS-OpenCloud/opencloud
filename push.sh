@@ -41,4 +41,6 @@ done
 
 echo "=== Push ${IMAGE}:${TAG} ==="
 $PUSH "${IMAGE}:${TAG}"
-echo "=== Pushed ${IMAGE}:${TAG} ==="
+$TAG_CMD "${IMAGE}:${TAG}" "${IMAGE}:latest"
+$PUSH "${IMAGE}:latest"
+echo "=== Pushed ${IMAGE}:${TAG} + latest ==="

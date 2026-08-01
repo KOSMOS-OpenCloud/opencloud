@@ -689,33 +689,6 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 		logDocCount(s.engine, s.logger)
 	}()
 
-	// Parallel extraction when taki v2 is detected (LLM benefits from concurrent calls)
-	isTaki := false
-	if tikaExtractor, ok := s.extractor.(*content.Tika); ok {
-		isTaki = tikaExtractor.IsTaki()
-	}
-
-	indexWorkers := s.cfg.Extractor.Tika.MaxWorkers
-	if indexWorkers < 1 {
-		indexWorkers = 8
-	}
-	var workCh chan *provider.Reference
-	var indexWg sync.WaitGroup
-
-	if isTaki {
-		s.logger.Info().Int("workers", indexWorkers).Msg("taki v2 detected: parallel indexing enabled")
-		workCh = make(chan *provider.Reference, indexWorkers*2)
-		for i := 0; i < indexWorkers; i++ {
-			indexWg.Add(1)
-			go func() {
-				defer indexWg.Done()
-				for ref := range workCh {
-					s.doUpsertItem(ref, nil)
-				}
-			}()
-		}
-	}
-
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			s.logger.Error().Err(err).Msg("error walking the tree")
@@ -730,50 +703,38 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootID,
 		}
-		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 		atomic.AddInt64(&s.indexStatus.FilesProcessed, 1)
 
-		if forceRescan {
-			if isTaki {
-				workCh <- ref
-			} else {
-				s.doUpsertItem(ref, batch)
+		if !forceRescan {
+			// Skip if already indexed and unchanged
+			searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
+				Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
+			})
+			if err == nil && len(searchRes.Matches) >= 1 {
+				if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					return filepath.SkipDir
+				}
+				return nil
 			}
-			return nil
 		}
 
-		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
-		})
-
-		if err == nil && len(searchRes.Matches) >= 1 {
-			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-				s.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
-				return filepath.SkipDir
-			}
-			s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
-			return nil
-		}
-
-		if isTaki {
-			workCh <- ref
-		} else {
-			s.doUpsertItem(ref, batch)
-		}
-
+		// Fast index: metadata only from ResourceInfo (no Taki/LLM)
+		s.doFastIndex(info, ref, batch)
 		return nil
 	})
-
-	if isTaki {
-		close(workCh)
-		indexWg.Wait()
-	}
 
 	if err != nil {
 		return err
 	}
-	success = true
 
+	s.logger.Info().
+		Str("space", spaceID.GetOpaqueId()).
+		Int64("files", atomic.LoadInt64(&s.indexStatus.FilesProcessed)).
+		Int("errors", s.indexStatus.Errors).
+		Str("duration", time.Since(startTime).String()).
+		Msg("IndexSpace completed")
+
+	success = true
 	return nil
 }
 
@@ -831,6 +792,55 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 }
 
 // doUpsertItem indexes or stores Resource data fields.
+// doFastIndex indexes a resource from its ResourceInfo without calling Taki.
+// Used for quick index rebuilds — only metadata, no content extraction.
+func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Reference, batch BatchOperator) {
+	id := storagespace.FormatResourceID(info.Id)
+	rootID := storagespace.FormatResourceID(&provider.ResourceId{
+		StorageId: info.Id.StorageId,
+		OpaqueId:  info.Id.SpaceId,
+		SpaceId:   info.Id.SpaceId,
+	})
+
+	mtime := ""
+	if info.Mtime != nil {
+		mtime = utils.TSToTime(info.Mtime).Format(time.RFC3339Nano)
+	}
+
+	r := Resource{
+		ID:     id,
+		RootID: rootID,
+		Path:   ref.Path,
+		Type:   uint64(info.Type),
+	}
+	r.Name = info.Name
+	r.Title = info.Name
+	r.Size = info.Size
+	r.MimeType = info.MimeType
+	r.Mtime = mtime
+	// Copy arbitrary metadata (xattrs: oy.fileReference, oy.subject, etc.)
+	if info.ArbitraryMetadata != nil && len(info.ArbitraryMetadata.Metadata) > 0 {
+		r.Metadata = info.ArbitraryMetadata.Metadata
+	}
+	r.Hidden = strings.HasPrefix(r.Path, ".")
+	if parentID := info.GetParentId(); parentID != nil {
+		r.ParentID = storagespace.FormatResourceID(parentID)
+	}
+
+	var err error
+	if batch != nil {
+		err = batch.Upsert(id, r)
+	} else {
+		err = s.engine.Upsert(id, r)
+	}
+	if err != nil {
+		s.logger.Error().Err(err).Str("path", ref.Path).Msg("fast index: error upserting")
+		s.indexMu.Lock()
+		s.indexStatus.Errors++
+		s.indexMu.Unlock()
+	}
+}
+
 func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {

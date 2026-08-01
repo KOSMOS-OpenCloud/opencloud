@@ -144,6 +144,10 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 
 // Search processes a search request and passes it down to the engine.
 func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
+	searchStart := time.Now()
+	defer func() {
+		s.logger.Info().Str("query", req.Query).Str("total_duration", time.Since(searchStart).String()).Msg("search completed")
+	}()
 	s.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
 	// collect metrics
@@ -227,6 +231,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 
 	// Get the spaces to search
+	listSpacesStart := time.Now()
 	spaces := []*provider.StorageSpace{}
 	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{Filters: filters})
 	if err != nil {
@@ -260,9 +265,12 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		mountpointMap[grantSpaceID] = space.Id.OpaqueId
 	}
 
+	s.logger.Info().Str("list_spaces_duration", time.Since(listSpacesStart).String()).Int("spaces", len(spaces)).Msg("search: spaces listed")
+
 	matches := matchArray{}
 	total := int32(0)
 
+	bleveStart := time.Now()
 	errg, ctx := errgroup.WithContext(ctx)
 	work := make(chan *provider.StorageSpace, len(spaces))
 	results := make(chan *searchsvc.SearchIndexResponse, len(spaces))
@@ -330,7 +338,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		}
 	}
 
+	s.logger.Info().Str("bleve_duration", time.Since(bleveStart).String()).Int("matches", len(matches)).Msg("search: bleve done")
+
 	// Qdrant semantic search: only for freetext queries (no field prefixes)
+	qdrantStart := time.Now()
 	if s.vectorClient != nil && isFreetext(req.Query) {
 		vectorMatches := s.searchVector(ctx, req, gatewayClient, spaces, mountpointMap)
 		if len(vectorMatches) > 0 {
@@ -357,6 +368,8 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	if int32(len(matches)) > limit && limit != -1 {
 		matches = matches[0:limit]
 	}
+
+	s.logger.Info().Str("qdrant_duration", time.Since(qdrantStart).String()).Int("total_matches", len(matches)).Msg("search: qdrant done")
 
 	success = true
 	return &searchsvc.SearchResponse{

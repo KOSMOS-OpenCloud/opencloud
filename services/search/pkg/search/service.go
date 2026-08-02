@@ -181,10 +181,8 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		}
 	}
 
-	// Strip content: queries (expensive full-text scan on bleve).
-	// Content search should go via Qdrant (semantic). Can be re-enabled
-	// per user preference in a future version.
-	query = stripContentQuery(query)
+	// Extract content: term from query — route to Qdrant instead of bleve.
+	query, contentTerm := extractContentQuery(query)
 
 	// Extract scope from query if set
 	query, scope := ParseScope(query)
@@ -346,10 +344,16 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	s.logger.Info().Str("bleve_duration", time.Since(bleveStart).String()).Int("matches", len(matches)).Msg("search: bleve done")
 
-	// Qdrant semantic search: only for freetext queries (no field prefixes)
+	// Qdrant semantic search: when content: term is present or freetext query
 	qdrantStart := time.Now()
-	if s.vectorClient != nil && isFreetext(req.Query) {
-		vectorMatches := s.searchVector(ctx, req, gatewayClient, spaces, mountpointMap)
+	qdrantQuery := req.Query
+	if contentTerm != "" {
+		qdrantQuery = contentTerm // use extracted content term for embedding
+	}
+	if s.vectorClient != nil && (contentTerm != "" || isFreetext(req.Query)) {
+		contentReq := *req
+		contentReq.Query = qdrantQuery
+		vectorMatches := s.searchVector(ctx, &contentReq, gatewayClient, spaces, mountpointMap)
 		if len(vectorMatches) > 0 {
 			// Merge: add vector results that aren't already in keyword results
 			existingIDs := map[string]bool{}

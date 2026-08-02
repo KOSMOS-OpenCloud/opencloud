@@ -200,22 +200,28 @@ func ParseScope(query string) (string, string) {
 	return query, ""
 }
 
-// stripContentQuery removes content:"..." terms from the query.
-// Content search is expensive on bleve (full-text scan). By default it's stripped.
-// Future: user preference can route content queries to qdrant (semantic) or bleve.
-func stripContentQuery(query string) string {
-	// Remove patterns like: content:"something" or OR content:"something"
+// extractContentQuery splits content:"..." from the query.
+// Returns the cleaned query (for bleve) and the content search term (for qdrant).
+// If no content: term is found, contentTerm is empty.
+func extractContentQuery(query string) (bleveQuery string, contentTerm string) {
+	// Extract the content value
+	valueRe := regexp.MustCompile(`content:"([^"]*)"`)
+	if m := valueRe.FindStringSubmatch(query); len(m) >= 2 {
+		contentTerm = m[1]
+	}
+
+	// Remove content:"..." and optional OR prefix from query
 	re := regexp.MustCompile(`\s*(?:OR\s+)?content:"[^"]*"`)
-	cleaned := re.ReplaceAllString(query, "")
+	bleveQuery = re.ReplaceAllString(query, "")
 	// Clean up leftover parentheses with single term: (name:"*x*" ) -> name:"*x*"
-	cleaned = strings.TrimSpace(cleaned)
-	if strings.HasPrefix(cleaned, "(") && strings.HasSuffix(cleaned, ")") {
-		inner := strings.TrimSpace(cleaned[1 : len(cleaned)-1])
+	bleveQuery = strings.TrimSpace(bleveQuery)
+	if strings.HasPrefix(bleveQuery, "(") && strings.HasSuffix(bleveQuery, ")") {
+		inner := strings.TrimSpace(bleveQuery[1 : len(bleveQuery)-1])
 		if !strings.Contains(inner, "(") {
-			cleaned = inner
+			bleveQuery = inner
 		}
 	}
-	return strings.TrimSpace(cleaned)
+	return strings.TrimSpace(bleveQuery), contentTerm
 }
 
 // ParseFlags extracts supported flags from the query string and returns the cleaned query and a map of flags

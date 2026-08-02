@@ -64,7 +64,21 @@ func getFieldSliceValue[T any](m map[string]any, key string) (out []T) {
 
 // buildHighlights combines Content and Metadata highlights into a single string.
 // Content highlights are shown first, followed by metadata field matches.
+// friendlyKey maps internal metadata keys to human-readable labels.
+var friendlyKey = map[string]string{
+	"oy.fileReference": "Aktenzeichen",
+	"oy.subject":       "Betreff",
+	"oy.fullPath":      "Pfad",
+	"doc.subject":      "Dokument",
+	"doc.type":         "Typ",
+	"sender.company":   "Absender",
+	"sender.email":     "E-Mail",
+	"info.subject":     "Info",
+	"note":             "Notiz",
+}
+
 func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]interface{}, query string) string {
+	searchTerm := extractSearchTerm(query)
 	var parts []string
 
 	// Content highlight (traditional full-text match)
@@ -76,33 +90,112 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]i
 	for field, frags := range fragments {
 		if strings.HasPrefix(field, "Metadata.") && len(frags) > 0 {
 			key := strings.TrimPrefix(field, "Metadata.")
-			parts = append(parts, key+": "+frags[0])
+			parts = append(parts, formatHighlight(key, frags[0], searchTerm))
 		}
 	}
 
 	// Fallback: if bleve didn't produce fragments (e.g. wildcard queries),
 	// check metadata fields manually for the search term
-	if len(parts) == 0 && query != "" {
-		searchTerm := strings.ToLower(extractSearchTerm(query))
-		if searchTerm != "" {
-			for k, v := range fields {
-				if !strings.HasPrefix(strings.ToLower(k), "metadata.") {
-					continue
+	if len(parts) == 0 && searchTerm != "" {
+		lowerTerm := strings.ToLower(searchTerm)
+		for k, v := range fields {
+			if !strings.HasPrefix(strings.ToLower(k), "metadata.") {
+				continue
+			}
+			if s, ok := v.(string); ok && strings.Contains(strings.ToLower(s), lowerTerm) {
+				key := k[len("Metadata."):]
+				// lowercase variant
+				if strings.HasPrefix(k, "metadata.") {
+					key = k[len("metadata."):]
 				}
-				if s, ok := v.(string); ok && strings.Contains(strings.ToLower(s), searchTerm) {
-					key := k[len("metadata."):]
-					parts = append(parts, key+": "+s)
-				}
+				parts = append(parts, formatHighlight(key, s, searchTerm))
 			}
 		}
+	}
+
+	// Limit to 3 most relevant highlights
+	if len(parts) > 3 {
+		parts = parts[:3]
 	}
 
 	return strings.Join(parts, " · ")
 }
 
+// formatHighlight formats a single highlight entry with friendly key name,
+// truncated value, and <mark> tags around the search term.
+func formatHighlight(key, value, searchTerm string) string {
+	// Use friendly name if available
+	label := key
+	if friendly, ok := friendlyKey[key]; ok {
+		label = friendly
+	}
+
+	// Truncate long values around the match
+	value = truncateAroundMatch(value, searchTerm, 80)
+
+	// Mark the search term in the value
+	if searchTerm != "" {
+		value = markTerm(value, searchTerm)
+	}
+
+	return "<b>" + label + ":</b> " + value
+}
+
+// truncateAroundMatch truncates a string to maxLen chars, centered on the first
+// occurrence of term. Adds "..." where truncated.
+func truncateAroundMatch(s, term string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	idx := strings.Index(strings.ToLower(s), strings.ToLower(term))
+	if idx < 0 {
+		return s[:maxLen] + "..."
+	}
+	start := idx - maxLen/2
+	if start < 0 {
+		start = 0
+	}
+	end := start + maxLen
+	if end > len(s) {
+		end = len(s)
+		start = end - maxLen
+		if start < 0 {
+			start = 0
+		}
+	}
+	result := s[start:end]
+	if start > 0 {
+		result = "..." + result
+	}
+	if end < len(s) {
+		result = result + "..."
+	}
+	return result
+}
+
+// markTerm wraps occurrences of term in <mark> tags (case-insensitive).
+func markTerm(s, term string) string {
+	lower := strings.ToLower(s)
+	lowerTerm := strings.ToLower(term)
+	var result strings.Builder
+	pos := 0
+	for {
+		idx := strings.Index(lower[pos:], lowerTerm)
+		if idx < 0 {
+			result.WriteString(s[pos:])
+			break
+		}
+		result.WriteString(s[pos : pos+idx])
+		result.WriteString("<mark>")
+		result.WriteString(s[pos+idx : pos+idx+len(term)])
+		result.WriteString("</mark>")
+		pos += idx + len(term)
+	}
+	return result.String()
+}
+
 // extractSearchTerm pulls the raw search term from a query like name:"*Sparkasse*"
 func extractSearchTerm(query string) string {
-	// Try name:"*term*" pattern
 	if i := strings.Index(query, `name:"`); i >= 0 {
 		rest := query[i+6:]
 		if j := strings.Index(rest, `"`); j >= 0 {
@@ -111,7 +204,7 @@ func extractSearchTerm(query string) string {
 			return term
 		}
 	}
-	return query
+	return ""
 }
 
 func getFragmentValue(m bleveSearch.FieldFragmentMap, key string, idx int) string {

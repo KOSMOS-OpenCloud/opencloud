@@ -51,6 +51,7 @@ type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
 
 	IndexSpace(rID *provider.StorageSpaceId, forceRescan bool) error
+	ReEnrichSpace(rID *provider.StorageSpaceId, force bool) error
 	PurgeDeleted(spaceID *provider.StorageSpaceId) error
 
 	TrashItem(rID *provider.ResourceId)
@@ -784,6 +785,188 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 	logDocCount(s.engine, s.logger)
 
 	return nil
+}
+
+// ReEnrichSpace walks all files in a space, calls Taki/LLM for each,
+// and writes metadata to xattrs. By default only missing keys are written.
+// If force is true, all keys are overwritten (destructive — user corrections lost).
+// Bleve is updated automatically via ArbitraryMetadataUpdated events.
+func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, force bool) error {
+	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+	if err != nil {
+		return err
+	}
+
+	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
+	if err != nil {
+		return fmt.Errorf("invalid space id: %w", err)
+	}
+	if rootID.StorageId == "" || rootID.SpaceId == "" {
+		return fmt.Errorf("invalid space id")
+	}
+	rootID.OpaqueId = rootID.SpaceId
+
+	startTime := time.Now()
+	w := walker.NewWalker(s.gatewaySelector)
+
+	// Parallel Taki extraction
+	indexWorkers := s.cfg.Extractor.Tika.MaxWorkers
+	if indexWorkers < 1 {
+		indexWorkers = 8
+	}
+
+	var enriched, skipped, errors int64
+	workCh := make(chan *provider.Reference, indexWorkers*2)
+	var wg sync.WaitGroup
+
+	for i := 0; i < indexWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for ref := range workCh {
+				if s.doEnrichItem(ownerCtx, ref, force) {
+					atomic.AddInt64(&enriched, 1)
+				} else {
+					atomic.AddInt64(&skipped, 1)
+				}
+			}
+		}()
+	}
+
+	s.logger.Info().
+		Str("space", spaceID.GetOpaqueId()).
+		Bool("force", force).
+		Int("workers", indexWorkers).
+		Msg("re-enrich: starting")
+
+	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
+		if err != nil {
+			atomic.AddInt64(&errors, 1)
+			return err
+		}
+		if info == nil || info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+			return nil
+		}
+		ref := &provider.Reference{
+			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
+			ResourceId: &rootID,
+		}
+		workCh <- ref
+		return nil
+	})
+
+	close(workCh)
+	wg.Wait()
+
+	s.logger.Info().
+		Str("space", spaceID.GetOpaqueId()).
+		Int64("enriched", enriched).
+		Int64("skipped", skipped).
+		Int64("errors", errors).
+		Str("duration", time.Since(startTime).String()).
+		Msg("re-enrich: completed")
+
+	return err
+}
+
+// doEnrichItem extracts metadata via Taki and writes missing (or all if force) xattrs.
+// Returns true if metadata was written, false if skipped.
+func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, force bool) bool {
+	_, stat, path := s.resInfo(ref)
+	if stat == nil || path == "" {
+		return false
+	}
+
+	doc, err := s.extractor.Extract(ctx, stat.Info)
+	if err != nil {
+		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: extraction failed")
+		return false
+	}
+
+	// Collect metadata from extraction
+	metadata := map[string]string{}
+	addAudioMetadata(metadata, doc.Audio)
+	addImageMetadata(metadata, doc.Image)
+	addLocationMetadata(metadata, doc.Location)
+	addPhotoMetadata(metadata, doc.Photo)
+	if doc.Taki != nil {
+		addDocMetadata(metadata, doc.Taki.DocMeta)
+	}
+	if len(metadata) == 0 {
+		return false
+	}
+
+	// Filter: only missing keys unless force
+	writeMetadata := metadata
+	if !force {
+		existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+		writeMetadata = map[string]string{}
+		for k, v := range metadata {
+			if v == "" {
+				continue
+			}
+			if existing != nil {
+				if _, exists := existing[k]; exists {
+					continue
+				}
+			}
+			writeMetadata[k] = v
+		}
+	}
+	if len(writeMetadata) == 0 {
+		return false
+	}
+
+	// Write xattrs via SetArbitraryMetadata → triggers ArbitraryMetadataUpdated → Bleve auto-update
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Msg("re-enrich: no gateway client")
+		return false
+	}
+
+	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+		Ref: ref,
+		ArbitraryMetadata: &provider.ArbitraryMetadata{
+			Metadata: writeMetadata,
+		},
+	})
+	if err != nil || resp.Status.Code != rpc.Code_CODE_OK {
+		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: SetArbitraryMetadata failed")
+		return false
+	}
+
+	s.logger.Info().
+		Str("name", doc.Name).
+		Int("keys", len(writeMetadata)).
+		Bool("force", force).
+		Msg("re-enrich: metadata written")
+
+	// Also update Qdrant embedding if available
+	if s.vectorClient != nil && doc.Taki != nil && len(doc.Taki.Embed) > 0 {
+		payload := map[string]interface{}{
+			"name":        doc.Name,
+			"title":       doc.Title,
+			"mime":        doc.MimeType,
+			"size":        stat.Info.Size,
+			"mtime":       stat.Info.Mtime.Seconds,
+			"method":      doc.Taki.Method,
+			"path":        utils.MakeRelativePath(path),
+			"resource_id": storagespace.FormatResourceID(stat.Info.Id),
+		}
+		if doc.Taki.Summary != "" {
+			payload["summary"] = doc.Taki.Summary
+		}
+		point := qdrant.Point{
+			ID:      stat.Info.Id.OpaqueId,
+			Vector:  doc.Taki.Embed,
+			Payload: payload,
+		}
+		if err := s.vectorClient.Upsert([]qdrant.Point{point}); err != nil {
+			s.logger.Warn().Err(err).Str("name", doc.Name).Msg("re-enrich: qdrant upsert failed")
+		}
+	}
+
+	return true
 }
 
 // UpsertItem indexes or stores Resource data fields.

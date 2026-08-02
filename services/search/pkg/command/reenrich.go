@@ -1,10 +1,13 @@
 package command
 
 import (
+	"bufio"
 	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/opencloud-eu/opencloud/pkg/config/configlog"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
@@ -18,24 +21,20 @@ import (
 )
 
 // ReEnrich re-processes files with missing metadata via Taki/LLM.
-// Uses force-rescan mode with the existing metadata protection in doUpsertItem —
-// only missing keys are written, existing values are never overwritten.
 func ReEnrich(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "re-enrich",
 		Short: "re-process files with missing metadata via Taki/LLM",
-		Long: `Triggers a force-rescan of the specified space(s). Each file is
-re-extracted via Taki, but only MISSING metadata keys are written
-to xattrs. Existing values (including manual corrections) are
-never overwritten.
+		Long: `Walks all files and calls Taki/LLM for metadata extraction.
+By default, only MISSING metadata keys are written to xattrs.
+Existing values (including user corrections) are never overwritten.
 
-Use this after Taki/LLM was unavailable during a previous indexing
-run, or after updating the Taki configuration.
+Use --force to overwrite ALL metadata keys (destructive!).
+This requires interactive confirmation because user-corrected
+metadata will be lost.
 
-The Taki /schema endpoint is used to determine which metadata keys
-are expected per MIME type. Files that already have all expected
-keys are still re-extracted (the metadata protection ensures no
-data loss), but a future --dry-run mode could skip them entirely.`,
+Bleve index is updated automatically via ArbitraryMetadataUpdated
+events — no separate reindex needed after re-enrich.`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
@@ -44,8 +43,23 @@ data loss), but a future --dry-run mode could skip them entirely.`,
 			spaceFlag, _ := cmd.Flags().GetString("space")
 			endpointFlag, _ := cmd.Flags().GetString("endpoint")
 			insecureFlag, _ := cmd.Flags().GetBool("insecure")
+			forceFlag, _ := cmd.Flags().GetBool("force")
+
 			if spaceFlag == "" && !allSpacesFlag {
 				return errors.New("either --space or --all-spaces is required")
+			}
+
+			// --force requires interactive confirmation
+			if forceFlag {
+				fmt.Println("WARNING: --force will OVERWRITE all existing metadata.")
+				fmt.Println("User corrections will be lost. This cannot be undone.")
+				fmt.Print("Type 'yes' to continue: ")
+				reader := bufio.NewReader(os.Stdin)
+				answer, _ := reader.ReadString('\n')
+				if strings.TrimSpace(answer) != "yes" {
+					fmt.Println("Aborted.")
+					return nil
+				}
 			}
 
 			var dialOpts []grpc.DialOption
@@ -64,20 +78,24 @@ data loss), but a future --dry-run mode could skip them entirely.`,
 			defer conn.Close()
 
 			c := searchsvc.NewSearchProviderClient(conn)
-
 			ctx := context.Background()
 
-			fmt.Println("Re-enriching: force-rescan with metadata protection (only missing keys will be written)")
+			if forceFlag {
+				fmt.Println("Re-enriching: FORCE mode — all metadata will be overwritten")
+			} else {
+				fmt.Println("Re-enriching: only missing metadata keys will be written")
+			}
 
 			_, err = c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId:      spaceFlag,
-				ForceReindex: true, // force rescan to re-extract all files
+				SpaceId:        spaceFlag,
+				ReEnrich:       true,
+				ForceOverwrite: forceFlag,
 			})
 			if err != nil {
 				fmt.Println("re-enrich failed: " + err.Error())
 				return err
 			}
-			fmt.Println("Re-enrichment complete.")
+			fmt.Println("Re-enrichment started. Monitor progress with: opencloud search status")
 			return nil
 		},
 	}
@@ -85,6 +103,7 @@ data loss), but a future --dry-run mode could skip them entirely.`,
 	cmd.Flags().Bool("all-spaces", false, "re-enrich all spaces.")
 	cmd.Flags().String("endpoint", "127.0.0.1:9220", "search service gRPC endpoint.")
 	cmd.Flags().Bool("insecure", false, "disable TLS for gRPC.")
+	cmd.Flags().Bool("force", false, "overwrite ALL metadata (destructive, requires confirmation).")
 
 	return cmd
 }

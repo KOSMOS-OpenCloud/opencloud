@@ -136,8 +136,14 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 				svc.SetIndexProgress(1, 1)
 				defer svc.FinishIndexing()
 			}
-			if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex()); err != nil {
-				s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("index space failed")
+			if in.GetReEnrich() {
+				if err := s.searcher.ReEnrichSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceOverwrite()); err != nil {
+					s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("re-enrich space failed")
+				}
+			} else {
+				if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex()); err != nil {
+					s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("index space failed")
+				}
 			}
 		}()
 		return nil
@@ -177,9 +183,16 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 			if svc, ok := s.searcher.(*search.Service); ok {
 				svc.SetIndexProgress(i+1, len(spaces))
 			}
-			if err := s.searcher.IndexSpace(space.GetId(), in.GetForceReindex()); err != nil {
-				s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to index space, continuing")
-				indexErrors++
+			if in.GetReEnrich() {
+				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceOverwrite()); err != nil {
+					s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to re-enrich space, continuing")
+					indexErrors++
+				}
+			} else {
+				if err := s.searcher.IndexSpace(space.GetId(), in.GetForceReindex()); err != nil {
+					s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to index space, continuing")
+					indexErrors++
+				}
 			}
 		}
 		if indexErrors > 0 {

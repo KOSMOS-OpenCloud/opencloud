@@ -111,6 +111,8 @@ message IndexSpaceRequest {
   string space_id = 1;
   string user_id = 2;
   bool force_reindex = 3;
+  bool re_enrich = 4;       // run Taki/LLM extraction + write missing xattrs (no bleve rebuild)
+  bool force_overwrite = 5;  // with re_enrich: overwrite ALL metadata (destructive)
 }
 
 message IndexSpaceResponse {

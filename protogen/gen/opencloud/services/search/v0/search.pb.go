@@ -307,9 +307,11 @@ type IndexSpaceRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SpaceId      string `protobuf:"bytes,1,opt,name=space_id,json=spaceId,proto3" json:"space_id,omitempty"`
-	UserId       string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	ForceReindex bool   `protobuf:"varint,3,opt,name=force_reindex,json=forceReindex,proto3" json:"force_reindex,omitempty"`
+	SpaceId        string `protobuf:"bytes,1,opt,name=space_id,json=spaceId,proto3" json:"space_id,omitempty"`
+	UserId         string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ForceReindex   bool   `protobuf:"varint,3,opt,name=force_reindex,json=forceReindex,proto3" json:"force_reindex,omitempty"`
+	ReEnrich       bool   `protobuf:"varint,4,opt,name=re_enrich,json=reEnrich,proto3" json:"re_enrich,omitempty"`
+	ForceOverwrite bool   `protobuf:"varint,5,opt,name=force_overwrite,json=forceOverwrite,proto3" json:"force_overwrite,omitempty"`
 }
 
 func (x *IndexSpaceRequest) Reset() {
@@ -361,6 +363,20 @@ func (x *IndexSpaceRequest) GetUserId() string {
 func (x *IndexSpaceRequest) GetForceReindex() bool {
 	if x != nil {
 		return x.ForceReindex
+	}
+	return false
+}
+
+func (x *IndexSpaceRequest) GetReEnrich() bool {
+	if x != nil {
+		return x.ReEnrich
+	}
+	return false
+}
+
+func (x *IndexSpaceRequest) GetForceOverwrite() bool {
+	if x != nil {
+		return x.ForceOverwrite
 	}
 	return false
 }

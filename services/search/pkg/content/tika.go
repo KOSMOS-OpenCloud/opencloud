@@ -31,7 +31,6 @@ type Tika struct {
 	Retriever
 	tika                       *tika.Client
 	tikaURL                    string
-	llmURL                     string
 	httpClient                 *http.Client
 	ContentExtractionSizeLimit uint64
 	CleanStopWords             bool
@@ -43,34 +42,31 @@ func (t *Tika) IsTaki() bool {
 	return t.isTaki
 }
 
-// GetEmbedding requests an embedding for the given text via the LLM embedding endpoint.
+// GetEmbedding requests an embedding for the given text from open_taki.
 func (t *Tika) GetEmbedding(text string) []float64 {
 	if !t.isTaki || text == "" {
 		return nil
 	}
 
-	// Use the LLM endpoint (microllm) for query embeddings, not taki /rmeta
-	embeddingURL := t.llmURL + "/v1/embeddings"
-	body, _ := json.Marshal(map[string]interface{}{
-		"input": text,
-		"model": "local-embed",
-	})
+	req, err := http.NewRequest("PUT", t.tikaURL+"/rmeta/text", bytes.NewReader([]byte(text)))
+	if err != nil {
+		return nil
+	}
+	req.Header.Set("Content-Type", "text/plain")
+	req.Header.Set("X-Taki-Protocol", "v2")
+	req.Header.Set("X-Taki-Features", "embedding")
 
-	resp, err := t.httpClient.Post(embeddingURL, "application/json", bytes.NewReader(body))
+	resp, err := t.httpClient.Do(req)
 	if err != nil {
 		return nil
 	}
 	defer resp.Body.Close()
 
-	var result struct {
-		Data []struct {
-			Embedding []float64 `json:"embedding"`
-		} `json:"data"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil || len(result.Data) == 0 {
+	var results []takiV2Response
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil || len(results) == 0 {
 		return nil
 	}
-	return result.Data[0].Embedding
+	return results[0].Embed
 }
 
 // NewTikaExtractor creates a new Tika instance.
@@ -90,7 +86,6 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 
 	// Detect open_taki by checking the health endpoint
 	isTaki := false
-	llmURL := ""
 	hc := &http.Client{Timeout: 5 * time.Second}
 	if resp, err := hc.Get(tikaURL + "/tika"); err == nil {
 		defer resp.Body.Close()
@@ -98,10 +93,7 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		if json.NewDecoder(resp.Body).Decode(&health) == nil {
 			if name, ok := health["name"].(string); ok && name == "open_taki" {
 				isTaki = true
-				if u, ok := health["llm"].(string); ok {
-					llmURL = u
-				}
-				logger.Info().Msgf("open_taki detected (version: %v, llm: %s), using v2 protocol", health["version"], llmURL)
+				logger.Info().Msgf("open_taki detected (version: %v), using v2 protocol", health["version"])
 			}
 		}
 	}
@@ -115,7 +107,6 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tk,
 		tikaURL:                    tikaURL,
-		llmURL:                     llmURL,
 		httpClient:                 &http.Client{Timeout: 5 * time.Minute},
 		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,

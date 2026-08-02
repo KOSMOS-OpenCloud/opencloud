@@ -87,9 +87,8 @@ events — no separate reindex needed after re-enrich.`,
 			}
 
 			_, err = c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId:        spaceFlag,
-				ReEnrich:       true,
-				ForceOverwrite: forceFlag,
+				SpaceId:      spaceFlag,
+				ForceReindex: true, // triggers ReEnrichSpace on the server
 			})
 			if err != nil {
 				fmt.Println("re-enrich failed: " + err.Error())

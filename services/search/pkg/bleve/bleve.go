@@ -64,7 +64,7 @@ func getFieldSliceValue[T any](m map[string]any, key string) (out []T) {
 
 // buildHighlights combines Content and Metadata highlights into a single string.
 // Content highlights are shown first, followed by metadata field matches.
-func buildHighlights(fragments bleveSearch.FieldFragmentMap) string {
+func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]interface{}, query string) string {
 	var parts []string
 
 	// Content highlight (traditional full-text match)
@@ -72,7 +72,7 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap) string {
 		parts = append(parts, contentFrags[0])
 	}
 
-	// Metadata highlights (e.g. Metadata.oy.fileReference, Metadata.oy.subject, ...)
+	// Metadata highlights from bleve fragments
 	for field, frags := range fragments {
 		if strings.HasPrefix(field, "Metadata.") && len(frags) > 0 {
 			key := strings.TrimPrefix(field, "Metadata.")
@@ -80,7 +80,38 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap) string {
 		}
 	}
 
+	// Fallback: if bleve didn't produce fragments (e.g. wildcard queries),
+	// check metadata fields manually for the search term
+	if len(parts) == 0 && query != "" {
+		searchTerm := strings.ToLower(extractSearchTerm(query))
+		if searchTerm != "" {
+			for k, v := range fields {
+				if !strings.HasPrefix(strings.ToLower(k), "metadata.") {
+					continue
+				}
+				if s, ok := v.(string); ok && strings.Contains(strings.ToLower(s), searchTerm) {
+					key := k[len("metadata."):]
+					parts = append(parts, key+": "+s)
+				}
+			}
+		}
+	}
+
 	return strings.Join(parts, " · ")
+}
+
+// extractSearchTerm pulls the raw search term from a query like name:"*Sparkasse*"
+func extractSearchTerm(query string) string {
+	// Try name:"*term*" pattern
+	if i := strings.Index(query, `name:"`); i >= 0 {
+		rest := query[i+6:]
+		if j := strings.Index(rest, `"`); j >= 0 {
+			term := rest[:j]
+			term = strings.Trim(term, "*")
+			return term
+		}
+	}
+	return query
 }
 
 func getFragmentValue(m bleveSearch.FieldFragmentMap, key string, idx int) string {

@@ -142,12 +142,6 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 		if len(metadata) == 0 {
 			metadata = nil
 		}
-		// Debug: log all field keys and metadata extraction
-		fieldKeys := make([]string, 0, len(hit.Fields))
-		for k := range hit.Fields {
-			fieldKeys = append(fieldKeys, k)
-		}
-		fmt.Fprintf(os.Stderr, "search-debug: doc=%s fields=%v metadata=%v\n", hit.ID, fieldKeys, metadata)
 
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
@@ -165,7 +159,7 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Favorites:  getFieldSliceValue[string](hit.Fields, "Favorites"),
-				Highlights: buildHighlights(hit.Fragments),
+				Highlights: buildHighlights(hit.Fragments, hit.Fields, sir.Query),
 				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
 				Image:      getImageValue[searchMessage.Image](hit.Fields),
 				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),

@@ -206,8 +206,10 @@ func (s Service) processEvent(e raw.Event) error {
 		s.indexSpaceDebouncer.Debounce(ev.ID, e.Ack)
 	case events.LabelAdded:
 		s.index.UpsertItem(ev.Ref)
+		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
 	case events.LabelRemoved:
 		s.index.UpsertItem(ev.Ref)
+		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
 	}
 	return nil
 }

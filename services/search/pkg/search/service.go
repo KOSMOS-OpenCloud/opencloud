@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -23,6 +24,7 @@ import (
 	sdk "github.com/opencloud-eu/reva/v2/pkg/sdk/common"
 	"github.com/opencloud-eu/reva/v2/pkg/storage/utils/walker"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
+	"github.com/opencloud-eu/reva/v2/pkg/tags"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -1021,6 +1023,21 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 	if parentID := info.GetParentId(); parentID != nil {
 		r.ParentID = storagespace.FormatResourceID(parentID)
+	}
+	// Copy tags from ArbitraryMetadata
+	if m := info.ArbitraryMetadata.GetMetadata(); m != nil {
+		if t, ok := m["tags"]; ok {
+			r.Tags = tags.New(t).AsSlice()
+		}
+	}
+	// Copy favorites from Opaque (list of user IDs who favorited this item)
+	if m := info.Opaque.GetMap(); m != nil && m["favorites"] != nil {
+		if favEntry := m["favorites"]; favEntry.Decoder == "json" {
+			var favorites []string
+			if err := json.Unmarshal(favEntry.Value, &favorites); err == nil {
+				r.Favorites = favorites
+			}
+		}
 	}
 
 	var err error

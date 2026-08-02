@@ -42,31 +42,30 @@ func (t *Tika) IsTaki() bool {
 	return t.isTaki
 }
 
-// GetEmbedding requests an embedding for the given text from open_taki.
+// GetEmbedding requests a query embedding from open_taki's /embed endpoint.
 func (t *Tika) GetEmbedding(text string) []float64 {
 	if !t.isTaki || text == "" {
 		return nil
 	}
 
-	req, err := http.NewRequest("PUT", t.tikaURL+"/rmeta/text", bytes.NewReader([]byte(text)))
-	if err != nil {
-		return nil
-	}
-	req.Header.Set("Content-Type", "text/plain")
-	req.Header.Set("X-Taki-Protocol", "v2")
-	req.Header.Set("X-Taki-Features", "embedding")
-
-	resp, err := t.httpClient.Do(req)
+	body, _ := json.Marshal(map[string]string{"text": text})
+	resp, err := t.httpClient.Post(t.tikaURL+"/embed", "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil
 	}
 	defer resp.Body.Close()
 
-	var results []takiV2Response
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil || len(results) == 0 {
+	if resp.StatusCode != 200 {
 		return nil
 	}
-	return results[0].Embed
+
+	var result struct {
+		Embedding []float64 `json:"embedding"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil
+	}
+	return result.Embedding
 }
 
 // NewTikaExtractor creates a new Tika instance.

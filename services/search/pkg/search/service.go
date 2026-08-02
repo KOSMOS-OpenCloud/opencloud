@@ -416,7 +416,11 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 	// Convert Qdrant results to search matches
 	var matches []*searchmsg.Match
 	for _, result := range results {
-		if result.Score < 0.3 { // minimum relevance threshold
+		threshold := s.cfg.Vector.ScoreThreshold
+		if threshold <= 0 {
+			threshold = 0.6 // default
+		}
+		if result.Score < threshold {
 			continue
 		}
 

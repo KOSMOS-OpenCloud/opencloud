@@ -18,7 +18,8 @@ type ExtractorTika struct {
 // When enabled, document embeddings from open_taki v2 are stored in Qdrant
 // alongside the keyword index (bleve/opensearch).
 type VectorStore struct {
-	Enabled    bool   `yaml:"enabled" env:"SEARCH_VECTOR_ENABLED" desc:"Enable vector search via Qdrant. Requires open_taki with embedding support." introductionVersion:"7.1.0"`
-	URL        string `yaml:"url" env:"SEARCH_VECTOR_URL" desc:"URL of the Qdrant server." introductionVersion:"7.1.0"`
-	Collection string `yaml:"collection" env:"SEARCH_VECTOR_COLLECTION" desc:"Qdrant collection name. Defaults to 'opencloud'." introductionVersion:"7.1.0"`
+	Enabled        bool    `yaml:"enabled" env:"SEARCH_VECTOR_ENABLED" desc:"Enable vector search via Qdrant. Requires open_taki with embedding support." introductionVersion:"7.1.0"`
+	URL            string  `yaml:"url" env:"SEARCH_VECTOR_URL" desc:"URL of the Qdrant server." introductionVersion:"7.1.0"`
+	Collection     string  `yaml:"collection" env:"SEARCH_VECTOR_COLLECTION" desc:"Qdrant collection name. Defaults to 'opencloud'." introductionVersion:"7.1.0"`
+	ScoreThreshold float64 `yaml:"score_threshold" env:"SEARCH_VECTOR_SCORE_THRESHOLD" desc:"Minimum relevance score for Qdrant results (0.0-1.0). Default 0.6." introductionVersion:"7.1.0"`
 }

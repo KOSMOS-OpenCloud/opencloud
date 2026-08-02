@@ -181,6 +181,11 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		}
 	}
 
+	// Strip content: queries (expensive full-text scan on bleve).
+	// Content search should go via Qdrant (semantic). Can be re-enabled
+	// per user preference in a future version.
+	query = stripContentQuery(query)
+
 	// Extract scope from query if set
 	query, scope := ParseScope(query)
 	if query == "" {

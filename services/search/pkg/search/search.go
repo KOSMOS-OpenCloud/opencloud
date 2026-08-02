@@ -200,6 +200,24 @@ func ParseScope(query string) (string, string) {
 	return query, ""
 }
 
+// stripContentQuery removes content:"..." terms from the query.
+// Content search is expensive on bleve (full-text scan). By default it's stripped.
+// Future: user preference can route content queries to qdrant (semantic) or bleve.
+func stripContentQuery(query string) string {
+	// Remove patterns like: content:"something" or OR content:"something"
+	re := regexp.MustCompile(`\s*(?:OR\s+)?content:"[^"]*"`)
+	cleaned := re.ReplaceAllString(query, "")
+	// Clean up leftover parentheses with single term: (name:"*x*" ) -> name:"*x*"
+	cleaned = strings.TrimSpace(cleaned)
+	if strings.HasPrefix(cleaned, "(") && strings.HasSuffix(cleaned, ")") {
+		inner := strings.TrimSpace(cleaned[1 : len(cleaned)-1])
+		if !strings.Contains(inner, "(") {
+			cleaned = inner
+		}
+	}
+	return strings.TrimSpace(cleaned)
+}
+
 // ParseFlags extracts supported flags from the query string and returns the cleaned query and a map of flags
 func ParseFlags(query string) (string, []string) {
 	supportedFlags := []string{"is:favorite"}

@@ -64,19 +64,6 @@ func getFieldSliceValue[T any](m map[string]any, key string) (out []T) {
 
 // buildHighlights combines Content and Metadata highlights into a single string.
 // Content highlights are shown first, followed by metadata field matches.
-// friendlyKey maps internal metadata keys to human-readable labels.
-var friendlyKey = map[string]string{
-	"oy.fileReference": "Aktenzeichen",
-	"oy.subject":       "Betreff",
-	"oy.fullPath":      "Pfad",
-	"doc.subject":      "Dokument",
-	"doc.type":         "Typ",
-	"sender.company":   "Absender",
-	"sender.email":     "E-Mail",
-	"info.subject":     "Info",
-	"note":             "Notiz",
-}
-
 func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]interface{}, query string) string {
 	searchTerm := extractSearchTerm(query)
 	var parts []string
@@ -124,11 +111,7 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]i
 // formatHighlight formats a single highlight entry with friendly key name,
 // truncated value, and <mark> tags around the search term.
 func formatHighlight(key, value, searchTerm string) string {
-	// Use friendly name if available
 	label := key
-	if friendly, ok := friendlyKey[key]; ok {
-		label = friendly
-	}
 
 	// Truncate long values around the match
 	value = truncateAroundMatch(value, searchTerm, 80)

@@ -26,12 +26,13 @@ func ReEnrich(cfg *config.Config) *cobra.Command {
 		Use:   "re-enrich",
 		Short: "re-process files with missing metadata via Taki/LLM",
 		Long: `Walks all files and calls Taki/LLM for metadata extraction.
-By default, only MISSING metadata keys are written to xattrs.
-Existing values (including user corrections) are never overwritten.
+By default, files that already have doc.type set are skipped entirely
+(no Taki call), and only MISSING metadata keys are written to xattrs.
 
-Use --force to overwrite ALL metadata keys (destructive!).
-This requires interactive confirmation because user-corrected
-metadata will be lost.
+Use --force-rescan to also re-process files that already have doc.type.
+Use --force-overwrite to overwrite ALL metadata keys (destructive!).
+  This requires interactive confirmation because user-corrected
+  metadata will be lost.
 
 Bleve index is updated automatically via ArbitraryMetadataUpdated
 events — no separate reindex needed after re-enrich.`,
@@ -43,15 +44,16 @@ events — no separate reindex needed after re-enrich.`,
 			spaceFlag, _ := cmd.Flags().GetString("space")
 			endpointFlag, _ := cmd.Flags().GetString("endpoint")
 			insecureFlag, _ := cmd.Flags().GetBool("insecure")
-			forceFlag, _ := cmd.Flags().GetBool("force")
+			forceRescan, _ := cmd.Flags().GetBool("force-rescan")
+			forceOverwrite, _ := cmd.Flags().GetBool("force-overwrite")
 
 			if spaceFlag == "" && !allSpacesFlag {
 				return errors.New("either --space or --all-spaces is required")
 			}
 
-			// --force requires interactive confirmation
-			if forceFlag {
-				fmt.Println("WARNING: --force will OVERWRITE all existing metadata.")
+			// --force-overwrite requires interactive confirmation
+			if forceOverwrite {
+				fmt.Println("WARNING: --force-overwrite will OVERWRITE all existing metadata.")
 				fmt.Println("User corrections will be lost. This cannot be undone.")
 				fmt.Print("Type 'yes' to continue: ")
 				reader := bufio.NewReader(os.Stdin)
@@ -80,15 +82,21 @@ events — no separate reindex needed after re-enrich.`,
 			c := searchsvc.NewSearchProviderClient(conn)
 			ctx := context.Background()
 
-			if forceFlag {
-				fmt.Println("Re-enriching: FORCE mode — all metadata will be overwritten")
-			} else {
-				fmt.Println("Re-enriching: only missing metadata keys will be written")
+			mode := "skip enriched, write missing keys only"
+			if forceRescan && forceOverwrite {
+				mode = "rescan ALL + overwrite ALL metadata"
+			} else if forceRescan {
+				mode = "rescan ALL, write missing keys only"
+			} else if forceOverwrite {
+				mode = "skip enriched, overwrite ALL metadata"
 			}
+			fmt.Printf("Re-enriching: %s\n", mode)
 
 			_, err = c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId:      spaceFlag,
-				ForceReindex: true, // triggers ReEnrichSpace on the server
+				SpaceId:        spaceFlag,
+				ReEnrich:       true,
+				ForceReindex:   forceRescan,
+				ForceOverwrite: forceOverwrite,
 			})
 			if err != nil {
 				fmt.Println("re-enrich failed: " + err.Error())
@@ -102,7 +110,8 @@ events — no separate reindex needed after re-enrich.`,
 	cmd.Flags().Bool("all-spaces", false, "re-enrich all spaces.")
 	cmd.Flags().String("endpoint", "127.0.0.1:9220", "search service gRPC endpoint.")
 	cmd.Flags().Bool("insecure", false, "disable TLS for gRPC.")
-	cmd.Flags().Bool("force", false, "overwrite ALL metadata (destructive, requires confirmation).")
+	cmd.Flags().Bool("force-rescan", false, "re-process files that already have doc.type (default: skip them).")
+	cmd.Flags().Bool("force-overwrite", false, "overwrite ALL metadata (destructive, requires confirmation).")
 
 	return cmd
 }

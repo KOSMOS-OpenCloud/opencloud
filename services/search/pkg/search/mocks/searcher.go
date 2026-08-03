@@ -97,14 +97,14 @@ func (_c *Searcher_IndexSpace_Call) RunAndReturn(run func(rID *providerv1beta1.S
 }
 
 // ReEnrichSpace provides a mock function for the type Searcher
-func (_mock *Searcher) ReEnrichSpace(rID *providerv1beta1.StorageSpaceId, force bool) error {
-	ret := _mock.Called(rID, force)
+func (_mock *Searcher) ReEnrichSpace(rID *providerv1beta1.StorageSpaceId, forceRescan, forceOverwrite bool) error {
+	ret := _mock.Called(rID, forceRescan, forceOverwrite)
 	if len(ret) == 0 {
 		panic("no return value specified for ReEnrichSpace")
 	}
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId, bool) error); ok {
-		r0 = returnFunc(rID, force)
+	if returnFunc, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId, bool, bool) error); ok {
+		r0 = returnFunc(rID, forceRescan, forceOverwrite)
 	} else {
 		r0 = ret.Error(0)
 	}

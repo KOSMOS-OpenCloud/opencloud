@@ -138,7 +138,7 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 			}
 			if in.GetReEnrich() || in.GetForceReindex() {
 				// ForceReindex now means re-enrich (Taki/LLM extraction)
-				if err := s.searcher.ReEnrichSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceOverwrite()); err != nil {
+				if err := s.searcher.ReEnrichSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex(), in.GetForceOverwrite()); err != nil {
 					s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("re-enrich space failed")
 				}
 			} else {
@@ -185,7 +185,7 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 				svc.SetIndexProgress(i+1, len(spaces))
 			}
 			if in.GetReEnrich() || in.GetForceReindex() {
-				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceOverwrite()); err != nil {
+				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceReindex(), in.GetForceOverwrite()); err != nil {
 					s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to re-enrich space, continuing")
 					indexErrors++
 				}

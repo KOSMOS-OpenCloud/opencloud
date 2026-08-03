@@ -53,7 +53,7 @@ type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
 
 	IndexSpace(rID *provider.StorageSpaceId, forceRescan bool) error
-	ReEnrichSpace(rID *provider.StorageSpaceId, force bool) error
+	ReEnrichSpace(rID *provider.StorageSpaceId, forceRescan, forceOverwrite bool) error
 	PurgeDeleted(spaceID *provider.StorageSpaceId) error
 
 	TrashItem(rID *provider.ResourceId)
@@ -806,7 +806,7 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 // and writes metadata to xattrs. By default only missing keys are written.
 // If force is true, all keys are overwritten (destructive — user corrections lost).
 // Bleve is updated automatically via ArbitraryMetadataUpdated events.
-func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, force bool) error {
+func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, forceOverwrite bool) error {
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
@@ -839,7 +839,7 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, force bool) er
 		go func() {
 			defer wg.Done()
 			for ref := range workCh {
-				if s.doEnrichItem(ownerCtx, ref, force) {
+				if s.doEnrichItem(ownerCtx, ref, forceRescan, forceOverwrite) {
 					atomic.AddInt64(&enriched, 1)
 				} else {
 					atomic.AddInt64(&skipped, 1)
@@ -850,7 +850,8 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, force bool) er
 
 	s.logger.Info().
 		Str("space", spaceID.GetOpaqueId()).
-		Bool("force", force).
+		Bool("forceRescan", forceRescan).
+		Bool("forceOverwrite", forceOverwrite).
 		Int("workers", indexWorkers).
 		Msg("re-enrich: starting")
 
@@ -884,12 +885,25 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, force bool) er
 	return err
 }
 
-// doEnrichItem extracts metadata via Taki and writes missing (or all if force) xattrs.
+// doEnrichItem extracts metadata via Taki and writes missing (or all if forceOverwrite) xattrs.
 // Returns true if metadata was written, false if skipped.
-func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, force bool) bool {
+// When forceRescan is false, items that already have doc.type are skipped entirely
+// (no Taki call). Use forceRescan to re-extract everything.
+// forceOverwrite controls whether existing metadata keys are overwritten.
+func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, forceRescan, forceOverwrite bool) bool {
 	_, stat, path := s.resInfo(ref)
 	if stat == nil || path == "" {
 		return false
+	}
+
+	// Skip already-enriched items (doc.type present) unless forceRescan
+	if !forceRescan {
+		existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+		if existing != nil {
+			if dt, ok := existing["doc.type"]; ok && dt != "" {
+				return false
+			}
+		}
 	}
 
 	doc, err := s.extractor.Extract(ctx, stat.Info)
@@ -911,9 +925,9 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 		return false
 	}
 
-	// Filter: only missing keys unless force
+	// Filter: only missing keys unless forceOverwrite
 	writeMetadata := metadata
-	if !force {
+	if !forceOverwrite {
 		existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
 		writeMetadata = map[string]string{}
 		for k, v := range metadata {
@@ -953,7 +967,7 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 	s.logger.Info().
 		Str("name", doc.Name).
 		Int("keys", len(writeMetadata)).
-		Bool("force", force).
+		Bool("forceOverwrite", forceOverwrite).
 		Msg("re-enrich: metadata written")
 
 	// Also update Qdrant embedding if available

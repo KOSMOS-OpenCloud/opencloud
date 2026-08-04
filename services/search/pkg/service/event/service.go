@@ -240,21 +240,24 @@ func (s Service) monitorAndPurge(ctx context.Context, name string) {
 					s.m.EventsRedelivered.Set(float64(info.NumRedelivered))
 				}
 
-				totalPending := int(info.NumPending + info.NumAckPending)
+				totalPending := int(info.NumPending) + info.NumAckPending
 				if s.purgeThreshold > 0 && totalPending > s.purgeThreshold {
 					s.log.Error().
 						Int("pending", int(info.NumPending)).
-						Int("ack_pending", int(info.NumAckPending)).
+						Int("ack_pending", info.NumAckPending).
 						Int("total", totalPending).
 						Int("threshold", s.purgeThreshold).
-						Msg("SEARCH EVENT QUEUE OVERLOADED — purging consumer. Run 'opencloud search index --all-spaces --force-rescan --insecure' to rebuild the index.")
+						Msg("SEARCH EVENT QUEUE OVERLOADED — purging stream. Run 'opencloud search index --all-spaces --force-rescan --insecure' to rebuild the index.")
 
-					if err := consumer.Purge(ctx); err != nil {
-						s.log.Error().Err(err).Msg("failed to purge consumer")
+					stream, err := s.stream.JetStream().Stream(ctx, "main-queue")
+					if err != nil {
+						s.log.Error().Err(err).Msg("failed to get stream for purge")
+					} else if err := stream.Purge(ctx); err != nil {
+						s.log.Error().Err(err).Msg("failed to purge stream")
 					} else {
 						s.log.Warn().
 							Int("purged", totalPending).
-							Msg("search event consumer purged — index may be stale until reindex")
+							Msg("search event stream purged — index may be stale until reindex")
 					}
 				}
 			}

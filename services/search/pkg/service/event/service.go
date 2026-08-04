@@ -249,10 +249,7 @@ func (s Service) monitorAndPurge(ctx context.Context, name string) {
 						Int("threshold", s.purgeThreshold).
 						Msg("SEARCH EVENT QUEUE OVERLOADED — purging stream. Run 'opencloud search index --all-spaces --force-rescan --insecure' to rebuild the index.")
 
-					stream, err := s.stream.JetStream().Stream(ctx, "main-queue")
-					if err != nil {
-						s.log.Error().Err(err).Msg("failed to get stream for purge")
-					} else if err := stream.Purge(ctx); err != nil {
+					if err := s.stream.JetStream().Purge(ctx); err != nil {
 						s.log.Error().Err(err).Msg("failed to purge stream")
 					} else {
 						s.log.Warn().

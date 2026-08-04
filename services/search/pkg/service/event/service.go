@@ -34,21 +34,23 @@ type Service struct {
 	stream              raw.Stream
 	indexSpaceDebouncer *SpaceDebouncer
 	numConsumers        int
+	purgeThreshold      int
 	stopCh              chan struct{}
 	stopped             *atomic.Bool
 }
 
 // New returns a service implementation for Service.
-func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, debounceDuration int, numConsumers int, asyncUploads bool) (Service, error) {
+func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, debounceDuration int, numConsumers int, asyncUploads bool, purgeThreshold int) (Service, error) {
 	svc := Service{
-		ctx:     ctx,
-		log:     logger,
-		tp:      tp,
-		m:       m,
-		index:   index,
-		stream:  stream,
-		stopCh:  make(chan struct{}, 1),
-		stopped: new(atomic.Bool),
+		ctx:            ctx,
+		log:            logger,
+		tp:             tp,
+		m:              m,
+		index:          index,
+		stream:         stream,
+		purgeThreshold: purgeThreshold,
+		stopCh:         make(chan struct{}, 1),
+		stopped:        new(atomic.Bool),
 		events: []events.Unmarshaller{
 			events.ItemTrashed{},
 			events.ItemPurged{},
@@ -90,9 +92,7 @@ func (s Service) Run() error {
 		return err
 	}
 
-	if s.m != nil {
-		monitorMetrics(s.ctx, s.stream, "search-pull", s.m, s.log)
-	}
+	s.monitorAndPurge(s.ctx, "search-pull")
 
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(s.ctx)
@@ -214,10 +214,11 @@ func (s Service) processEvent(e raw.Event) error {
 	return nil
 }
 
-func monitorMetrics(ctx context.Context, stream raw.Stream, name string, m *metrics.Metrics, logger log.Logger) {
-	consumer, err := stream.JetStream().Consumer(ctx, name)
+func (s Service) monitorAndPurge(ctx context.Context, name string) {
+	consumer, err := s.stream.JetStream().Consumer(ctx, name)
 	if err != nil {
-		logger.Error().Err(err).Msg("failed to get consumer")
+		s.log.Error().Err(err).Msg("failed to get consumer")
+		return
 	}
 	ticker := time.NewTicker(5 * time.Second)
 	go func() {
@@ -229,14 +230,33 @@ func monitorMetrics(ctx context.Context, stream raw.Stream, name string, m *metr
 			case <-ticker.C:
 				info, err := consumer.Info(ctx)
 				if err != nil {
-					logger.Error().Err(err).Msg("failed to get consumer")
+					s.log.Error().Err(err).Msg("failed to get consumer info")
 					continue
 				}
 
-				m.EventsOutstandingAcks.Set(float64(info.NumAckPending))
-				m.EventsUnprocessed.Set(float64(info.NumPending))
-				m.EventsRedelivered.Set(float64(info.NumRedelivered))
-				logger.Trace().Msg("updated search event metrics")
+				if s.m != nil {
+					s.m.EventsOutstandingAcks.Set(float64(info.NumAckPending))
+					s.m.EventsUnprocessed.Set(float64(info.NumPending))
+					s.m.EventsRedelivered.Set(float64(info.NumRedelivered))
+				}
+
+				totalPending := int(info.NumPending + info.NumAckPending)
+				if s.purgeThreshold > 0 && totalPending > s.purgeThreshold {
+					s.log.Error().
+						Int("pending", int(info.NumPending)).
+						Int("ack_pending", int(info.NumAckPending)).
+						Int("total", totalPending).
+						Int("threshold", s.purgeThreshold).
+						Msg("SEARCH EVENT QUEUE OVERLOADED — purging consumer. Run 'opencloud search index --all-spaces --force-rescan --insecure' to rebuild the index.")
+
+					if err := consumer.Purge(ctx); err != nil {
+						s.log.Error().Err(err).Msg("failed to purge consumer")
+					} else {
+						s.log.Warn().
+							Int("purged", totalPending).
+							Msg("search event consumer purged — index may be stale until reindex")
+					}
+				}
 			}
 		}
 	}()

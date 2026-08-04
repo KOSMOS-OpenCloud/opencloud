@@ -197,7 +197,7 @@ func Server(cfg *config.Config) *cobra.Command {
 					return err
 				}
 
-				eventSvc, err := svcEvent.New(ctx, bus, logger, traceProvider, mtrcs, ss, cfg.Events.DebounceDuration, cfg.Events.NumConsumers, cfg.Events.AsyncUploads)
+				eventSvc, err := svcEvent.New(ctx, bus, logger, traceProvider, mtrcs, ss, cfg.Events.DebounceDuration, cfg.Events.NumConsumers, cfg.Events.AsyncUploads, cfg.Events.PurgeThreshold)
 				if err != nil {
 					logger.Error().Err(err).Str("transport", "event").Msg("Failed to initialize server")
 					return err

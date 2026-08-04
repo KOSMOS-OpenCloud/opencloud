@@ -19,4 +19,6 @@ type Events struct {
 
 	MaxAckPending int           `yaml:"max_ack_pending" env:"SEARCH_EVENTS_MAX_ACK_PENDING" desc:"The maximum number of unacknowledged messages. This is used to limit the number of messages that can be in flight at the same time." introductionVersion:"4.0.0"`
 	AckWait       time.Duration `yaml:"ack_wait" env:"SEARCH_EVENTS_ACK_WAIT" desc:"The time to wait for an ack before the message is redelivered. This is used to ensure that messages are not lost if the consumer crashes." introductionVersion:"4.0.0"`
+
+	PurgeThreshold int `yaml:"purge_threshold" env:"SEARCH_EVENTS_PURGE_THRESHOLD" desc:"When pending events exceed this threshold, purge the consumer and trigger a full reindex. Set to 0 to disable. Default: 10000." introductionVersion:"7.1.0"`
 }

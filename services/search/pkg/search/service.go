@@ -89,9 +89,10 @@ type Service struct {
 	serviceAccountID     string
 	serviceAccountSecret string
 
-	batchSize   int
-	indexStatus IndexStatus
-	indexMu     sync.Mutex
+	batchSize      int
+	indexStatus    IndexStatus
+	indexMu        sync.Mutex
+	upsertCounter  int64 // atomic op counter for doUpsertItem logging
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -1069,23 +1070,28 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 }
 
 func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
+	opID := atomic.AddInt64(&s.upsertCounter, 1)
+	t0 := time.Now()
+
 	refID := ""
 	if ref.GetResourceId() != nil {
 		refID = storagespace.FormatResourceID(ref.GetResourceId())
 	}
-	s.logger.Info().Str("ref", refID).Str("path", ref.GetPath()).Msg("doUpsertItem: start")
+	s.logger.Info().Int64("op", opID).Str("ref", refID).Str("path", ref.GetPath()).Msg("doUpsertItem: start")
 
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
-		s.logger.Warn().Str("ref", refID).Msg("doUpsertItem: resInfo failed (stat returned nil)")
+		s.logger.Warn().Int64("op", opID).Str("ref", refID).Dur("stat_ms", time.Since(t0)).Msg("doUpsertItem: resInfo failed (stat returned nil)")
 		return
 	}
+	tStat := time.Since(t0)
 
-	s.logger.Info().Str("name", stat.Info.Name).Str("path", path).Str("mime", stat.Info.MimeType).Msg("doUpsertItem: stat ok, extracting")
+	s.logger.Info().Int64("op", opID).Str("name", stat.Info.Name).Str("path", path).Str("mime", stat.Info.MimeType).Dur("stat_ms", tStat).Msg("doUpsertItem: stat ok, extracting")
 
+	tExtract := time.Now()
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
-		s.logger.Error().Err(err).Str("path", path).Msg("doUpsertItem: extract failed")
+		s.logger.Error().Err(err).Int64("op", opID).Str("path", path).Dur("extract_ms", time.Since(tExtract)).Msg("doUpsertItem: extract failed")
 		s.indexMu.Lock()
 		s.indexStatus.Errors++
 		s.indexMu.Unlock()
@@ -1093,12 +1099,14 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	}
 
 	s.logger.Info().
+		Int64("op", opID).
 		Str("name", doc.Name).
 		Int("content_len", len(doc.Content)).
 		Int("tags", len(doc.Tags)).
 		Int("favorites", len(doc.Favorites)).
 		Int("metadata", len(doc.Metadata)).
 		Bool("has_taki", doc.Taki != nil).
+		Dur("extract_ms", time.Since(tExtract)).
 		Msg("doUpsertItem: extract ok")
 
 	r := Resource{
@@ -1137,21 +1145,23 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 	bleveResource := r
 	bleveResource.Document = bleveDoc
 
+	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Msg("doUpsertItem: bleve upsert starting")
+	tBleve := time.Now()
 	if batch != nil {
 		err = batch.Upsert(r.ID, bleveResource)
 	} else {
 		err = s.engine.Upsert(r.ID, bleveResource)
 	}
 	if err != nil {
-		s.logger.Error().Err(err).Str("name", doc.Name).Msg("doUpsertItem: bleve upsert failed")
+		s.logger.Error().Err(err).Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert failed")
 	} else {
-		s.logger.Info().Str("name", doc.Name).Str("id", r.ID).Msg("doUpsertItem: bleve upsert ok")
+		s.logger.Info().Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert ok")
 	}
 
 	// Taki v2: log + store embedding in Qdrant
 	if doc.Taki != nil {
 		s.logger.Info().
-			Str("id", r.ID).
+			Int64("op", opID).
 			Str("name", doc.Name).
 			Str("method", doc.Taki.Method).
 			Int("content_len", len(doc.Content)).
@@ -1159,7 +1169,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 			Int("entities", len(doc.Taki.Entities)).
 			Int("metadata", len(doc.Metadata)).
 			Str("summary", doc.Taki.Summary).
-			Msg("taki v2 extraction complete")
+			Msg("doUpsertItem: taki v2 complete")
 
 		// Store embedding in Qdrant if enabled and embedding present
 		if s.vectorClient != nil && len(doc.Taki.Embed) > 0 {
@@ -1193,10 +1203,11 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 				Payload: payload,
 			}
 
+			tQdrant := time.Now()
 			if err := s.vectorClient.Upsert([]qdrant.Point{point}); err != nil {
-				s.logger.Error().Err(err).Str("name", doc.Name).Msg("doUpsertItem: qdrant upsert failed")
+				s.logger.Error().Err(err).Int64("op", opID).Str("name", doc.Name).Dur("qdrant_ms", time.Since(tQdrant)).Msg("doUpsertItem: qdrant upsert failed")
 			} else {
-				s.logger.Info().Str("name", doc.Name).Int("dims", len(doc.Taki.Embed)).Msg("doUpsertItem: qdrant upsert ok")
+				s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("dims", len(doc.Taki.Embed)).Dur("qdrant_ms", time.Since(tQdrant)).Msg("doUpsertItem: qdrant upsert ok")
 			}
 		}
 	}
@@ -1235,7 +1246,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 		return
 	}
 
-	s.logger.Info().Str("name", doc.Name).Int("keys", len(newMetadata)).Msg("doUpsertItem: writing metadata xattrs")
+	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("keys", len(newMetadata)).Msg("doUpsertItem: writing metadata xattrs")
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -1250,10 +1261,10 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 		},
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Str("name", doc.Name).Msg("doUpsertItem: metadata write failed")
+		s.logger.Error().Err(err).Int64("op", opID).Int32("status", int32(resp.GetStatus().GetCode())).Str("name", doc.Name).Msg("doUpsertItem: metadata write failed")
 		return
 	}
-	s.logger.Info().Str("name", doc.Name).Int("keys", len(newMetadata)).Msg("doUpsertItem: metadata written")
+	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("keys", len(newMetadata)).Dur("total_ms", time.Since(t0)).Msg("doUpsertItem: done")
 }
 
 func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {

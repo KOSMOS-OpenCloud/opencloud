@@ -102,6 +102,19 @@ func (s *Service) GetIndexStatus() IndexStatus {
 	return s.indexStatus
 }
 
+// DocCount returns the number of documents in the index.
+func (s *Service) DocCount() (uint64, error) {
+	return s.engine.DocCount()
+}
+
+// SegmentCount returns the number of segments in the index (Scorch .zap files).
+func (s *Service) SegmentCount() (uint64, error) {
+	if sm, ok := s.engine.(interface{ SegmentCount() uint64 }); ok {
+		return sm.SegmentCount(), nil
+	}
+	return 0, nil
+}
+
 // SetIndexProgress updates the space progress counters.
 func (s *Service) SetIndexProgress(current, total int) {
 	s.indexMu.Lock()

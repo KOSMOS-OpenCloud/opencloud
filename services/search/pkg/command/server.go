@@ -230,7 +230,22 @@ func Server(cfg *config.Config) *cobra.Command {
 				mux.HandleFunc("/index-status", func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "application/json")
 					status := ss.GetIndexStatus()
-					json.NewEncoder(w).Encode(status)
+					// Enrich with engine stats
+					type enrichedStatus struct {
+						search.IndexStatus
+						DocCount uint64 `json:"doc_count,omitempty"`
+						Segments uint64 `json:"segments,omitempty"`
+					}
+					es := enrichedStatus{IndexStatus: status}
+					if svc, ok := ss.(*search.Service); ok {
+						if dc, err := svc.DocCount(); err == nil {
+							es.DocCount = dc
+						}
+						if segs, err := svc.SegmentCount(); err == nil {
+							es.Segments = segs
+						}
+					}
+					json.NewEncoder(w).Encode(es)
 				})
 				// /index-lookup?q=name:sitzung9 — debug: search bleve directly
 				mux.HandleFunc("/index-lookup", func(w http.ResponseWriter, r *http.Request) {

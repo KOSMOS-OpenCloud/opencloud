@@ -185,6 +185,20 @@ func (b *Backend) DocCount() (uint64, error) {
 	return b.index.DocCount()
 }
 
+// SegmentCount returns the number of Scorch segments in the index.
+func (b *Backend) SegmentCount() uint64 {
+	m := b.index.StatsMap()
+	if v, ok := m["num_root_filesegments"]; ok {
+		switch n := v.(type) {
+		case uint64:
+			return n
+		case float64:
+			return uint64(n)
+		}
+	}
+	return 0
+}
+
 func (b *Backend) Upsert(id string, r search.Resource) error {
 	batch, err := b.NewBatch(defaultBatchSize)
 	if err != nil {

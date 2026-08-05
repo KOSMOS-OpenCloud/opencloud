@@ -234,14 +234,10 @@ func Server(cfg *config.Config) *cobra.Command {
 					type enrichedStatus struct {
 						search.IndexStatus
 						DocCount uint64 `json:"doc_count,omitempty"`
-						Segments uint64 `json:"segments,omitempty"`
 					}
 					es := enrichedStatus{IndexStatus: status}
 					if dc, err := ss.DocCount(); err == nil {
 						es.DocCount = dc
-					}
-					if segs, err := ss.SegmentCount(); err == nil {
-						es.Segments = segs
 					}
 					json.NewEncoder(w).Encode(es)
 				})

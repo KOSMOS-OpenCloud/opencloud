@@ -429,3 +429,35 @@ func (_c *Searcher_UpsertItem_Call) RunAndReturn(run func(ref *providerv1beta1.R
 	_c.Run(run)
 	return _c
 }
+
+// EnqueueEnrich provides a mock function for the type Searcher
+func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string) {
+	_mock.Called(ref, priority)
+	return
+}
+
+// Searcher_EnqueueEnrich_Call is a *mock.Call
+type Searcher_EnqueueEnrich_Call struct {
+	*mock.Call
+}
+
+func (_e *Searcher_Expecter) EnqueueEnrich(ref interface{}, priority interface{}) *Searcher_EnqueueEnrich_Call {
+	return &Searcher_EnqueueEnrich_Call{Call: _e.mock.On("EnqueueEnrich", ref, priority)}
+}
+
+func (_c *Searcher_EnqueueEnrich_Call) Run(run func(ref *providerv1beta1.Reference, priority string)) *Searcher_EnqueueEnrich_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*providerv1beta1.Reference), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Searcher_EnqueueEnrich_Call) Return() *Searcher_EnqueueEnrich_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Searcher_EnqueueEnrich_Call) RunAndReturn(run func(ref *providerv1beta1.Reference, priority string)) *Searcher_EnqueueEnrich_Call {
+	_c.Run(run)
+	return _c
+}

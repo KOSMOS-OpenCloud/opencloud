@@ -48,6 +48,13 @@ const (
 	_slowQueryDuration   = 500 * time.Millisecond
 )
 
+// EnrichPriority defines the priority of an enrich request.
+const (
+	EnrichPriorityHigh   = "high"   // UI reindex button — user waits
+	EnrichPriorityNormal = "normal" // upload — background
+	EnrichPriorityLow    = "low"    // batch re-enrich
+)
+
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
@@ -59,6 +66,7 @@ type Searcher interface {
 	TrashItem(rID *provider.ResourceId)
 	PurgeItem(rID *provider.Reference)
 	UpsertItem(ref *provider.Reference)
+	EnqueueEnrich(ref *provider.Reference, priority string)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 }
@@ -93,6 +101,16 @@ type Service struct {
 	indexStatus    IndexStatus
 	indexMu        sync.Mutex
 	upsertCounter  int64 // atomic op counter for doUpsertItem logging
+
+	indexCh        chan queueRequest
+	enrichCh       chan queueRequest
+	indexProcessed int64
+	enrichProcessed int64
+}
+
+type queueRequest struct {
+	ref      *provider.Reference
+	priority string // high, normal, low
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -132,6 +150,8 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
 
 		batchSize: cfg.BatchSize,
+		indexCh:   make(chan queueRequest, 1000),
+		enrichCh:  make(chan queueRequest, 1000),
 	}
 
 	// Initialize Qdrant vector store if enabled
@@ -1005,9 +1025,101 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 	return true
 }
 
-// UpsertItem indexes or stores Resource data fields.
+// UpsertItem indexes or stores Resource data fields (legacy, calls both queues).
 func (s *Service) UpsertItem(ref *provider.Reference) {
-	s.doUpsertItem(ref, nil)
+	s.EnqueueIndex(ref)
+	s.EnqueueEnrich(ref, EnrichPriorityNormal)
+}
+
+// EnqueueIndex sends a Bleve-only index request (metadata, no Taki).
+func (s *Service) EnqueueIndex(ref *provider.Reference) {
+	select {
+	case s.indexCh <- queueRequest{ref: ref}:
+		s.logger.Debug().Int("index_pending", len(s.indexCh)).Msg("index-queue: queued")
+	default:
+		s.logger.Warn().Int("index_max", cap(s.indexCh)).Msg("index-queue: full, dropping")
+	}
+}
+
+// EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
+func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string) {
+	select {
+	case s.enrichCh <- queueRequest{ref: ref, priority: priority}:
+		s.logger.Info().
+			Str("priority", priority).
+			Int("enrich_pending", len(s.enrichCh)).
+			Msg("enrich-queue: queued")
+	default:
+		s.logger.Warn().
+			Str("priority", priority).
+			Int("enrich_max", cap(s.enrichCh)).
+			Msg("enrich-queue: full, dropping")
+	}
+}
+
+// QueueStats returns current queue statistics.
+type QueueStats struct {
+	Pending   int   `json:"pending"`
+	Max       int   `json:"max"`
+	Processed int64 `json:"processed"`
+}
+
+func (s *Service) IndexQueueStats() QueueStats {
+	return QueueStats{
+		Pending:   len(s.indexCh),
+		Max:       cap(s.indexCh),
+		Processed: atomic.LoadInt64(&s.indexProcessed),
+	}
+}
+
+func (s *Service) EnrichQueueStats() QueueStats {
+	return QueueStats{
+		Pending:   len(s.enrichCh),
+		Max:       cap(s.enrichCh),
+		Processed: atomic.LoadInt64(&s.enrichProcessed),
+	}
+}
+
+// StartWorkers starts the index and enrich worker goroutines. Call once.
+func (s *Service) StartWorkers(ctx context.Context) {
+	// Index Worker: Bleve-only updates (metadata, tags, favorites)
+	s.logger.Info().Msg("starting index-queue worker")
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case req, ok := <-s.indexCh:
+				if !ok {
+					return
+				}
+				s.logger.Info().Int("index_pending", len(s.indexCh)).Msg("index-queue: processing")
+				s.doIndexItem(req.ref)
+				atomic.AddInt64(&s.indexProcessed, 1)
+			}
+		}
+	}()
+
+	// Enrich Worker: Taki extraction + Qdrant + xattrs + Bleve (full content)
+	s.logger.Info().Msg("starting enrich-queue worker")
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case req, ok := <-s.enrichCh:
+				if !ok {
+					return
+				}
+				s.logger.Info().
+					Str("priority", req.priority).
+					Int("enrich_pending", len(s.enrichCh)).
+					Msg("enrich-queue: processing")
+				s.doUpsertItem(req.ref, nil)
+				atomic.AddInt64(&s.enrichProcessed, 1)
+			}
+		}
+	}()
 }
 
 // doUpsertItem indexes or stores Resource data fields.
@@ -1072,6 +1184,48 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 		s.indexMu.Lock()
 		s.indexStatus.Errors++
 		s.indexMu.Unlock()
+	}
+}
+
+// doIndexItem does a Bleve-only update (metadata from Stat, no Taki call).
+func (s *Service) doIndexItem(ref *provider.Reference) {
+	ctx, stat, path := s.resInfo(ref)
+	if ctx == nil || stat == nil || path == "" {
+		return
+	}
+
+	r := Resource{
+		ID: storagespace.FormatResourceID(stat.Info.Id),
+		RootID: storagespace.FormatResourceID(&provider.ResourceId{
+			StorageId: stat.Info.Id.StorageId,
+			OpaqueId:  stat.Info.Id.SpaceId,
+			SpaceId:   stat.Info.Id.SpaceId,
+		}),
+		Path: utils.MakeRelativePath(path),
+		Type: uint64(stat.Info.Type),
+	}
+
+	// basic.Extract: metadata, tags, favorites — no Taki
+	doc, err := content.NewBasicExtractor(s.logger)
+	if err != nil {
+		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: basic extractor failed")
+		return
+	}
+	r.Document, err = doc.Extract(ctx, stat.Info)
+	if err != nil {
+		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: extract failed")
+		return
+	}
+	r.Name = stat.Info.Name
+	r.Hidden = strings.HasPrefix(r.Path, ".")
+	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
+		r.ParentID = storagespace.FormatResourceID(parentID)
+	}
+
+	if err := s.engine.Upsert(r.ID, r); err != nil {
+		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: bleve upsert failed")
+	} else {
+		s.logger.Debug().Str("name", stat.Info.Name).Msg("doIndexItem: ok")
 	}
 }
 

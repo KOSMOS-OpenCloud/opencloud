@@ -229,8 +229,8 @@ func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ 
 		Path: ".",
 	}
 
-	s.log.Info().Str("resource_id", rid).Msg("IndexItem: triggering UpsertItem")
-	go s.searcher.UpsertItem(ref)
+	s.log.Info().Str("resource_id", rid).Msg("IndexItem: enqueuing (priority=high)")
+	s.searcher.EnqueueEnrich(ref, search.EnrichPriorityHigh)
 	return nil
 }
 

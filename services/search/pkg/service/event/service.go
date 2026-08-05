@@ -23,12 +23,6 @@ func init() {
 	tracer = otel.Tracer("github.com/opencloud-eu/opencloud/services/search/pkg/service/event")
 }
 
-// EnrichRequest represents a deferred Taki enrichment job.
-type EnrichRequest struct {
-	Ref      *provider.Reference
-	Priority string // "high" (UI reindex), "normal" (upload), "low" (batch)
-}
-
 // Service defines the service handlers.
 type Service struct {
 	ctx                 context.Context
@@ -41,17 +35,12 @@ type Service struct {
 	indexSpaceDebouncer *SpaceDebouncer
 	numConsumers        int
 	purgeThreshold      int
-	enrichCh            chan EnrichRequest
-	enrichWorkers       int
 	stopCh              chan struct{}
 	stopped             *atomic.Bool
 }
 
 // New returns a service implementation for Service.
-func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, debounceDuration int, numConsumers int, asyncUploads bool, purgeThreshold int, enrichWorkers int) (Service, error) {
-	if enrichWorkers < 1 {
-		enrichWorkers = 4
-	}
+func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, debounceDuration int, numConsumers int, asyncUploads bool, purgeThreshold int) (Service, error) {
 	svc := Service{
 		ctx:            ctx,
 		log:            logger,
@@ -60,8 +49,6 @@ func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.Tra
 		index:          index,
 		stream:         stream,
 		purgeThreshold: purgeThreshold,
-		enrichCh:       make(chan EnrichRequest, 1000),
-		enrichWorkers:  enrichWorkers,
 		stopCh:         make(chan struct{}, 1),
 		stopped:        new(atomic.Bool),
 		events: []events.Unmarshaller{
@@ -141,31 +128,6 @@ func (s Service) Run() error {
 		}(i)
 	}
 
-	// start enrich workers (Taki extraction, rate-limited)
-	s.log.Info().Int("enrich_workers", s.enrichWorkers).Int("enrich_buffer", cap(s.enrichCh)).Msg("starting enrich worker pool")
-	for i := 0; i < s.enrichWorkers; i++ {
-		wg.Add(1)
-		go func(workerID int) {
-			defer wg.Done()
-			for {
-				select {
-				case <-ctx.Done():
-					return
-				case req, ok := <-s.enrichCh:
-					if !ok {
-						return
-					}
-					s.log.Info().
-						Int("enrich_worker", workerID).
-						Str("priority", req.Priority).
-						Int("enrich_pending", len(s.enrichCh)).
-						Msg("enrich: processing")
-					s.index.UpsertItem(req.Ref)
-				}
-			}
-		}(i)
-	}
-
 	// wait for stop signal
 	<-s.stopCh
 	cancel() // signal workers to stop
@@ -183,23 +145,6 @@ func (s Service) Run() error {
 func (s Service) Close() {
 	if s.stopped.CompareAndSwap(false, true) {
 		close(s.stopCh)
-	}
-}
-
-// enqueueEnrich sends an enrichment request to the enrich worker pool.
-// Non-blocking: drops the request if the queue is full (logs a warning).
-func (s Service) enqueueEnrich(ref *provider.Reference, priority string) {
-	select {
-	case s.enrichCh <- EnrichRequest{Ref: ref, Priority: priority}:
-		s.log.Info().
-			Str("priority", priority).
-			Int("enrich_pending", len(s.enrichCh)).
-			Msg("enrich: queued")
-	default:
-		s.log.Warn().
-			Str("priority", priority).
-			Int("enrich_max", cap(s.enrichCh)).
-			Msg("enrich: queue full, dropping request")
 	}
 }
 
@@ -255,10 +200,10 @@ func (s Service) processEvent(e raw.Event) error {
 	case events.FileUploaded:
 		// Upload: fast-index (Bleve) + deferred enrich (Taki)
 		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
-		s.enqueueEnrich(ev.Ref, "normal")
+		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal)
 	case events.UploadReady:
 		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef), e.Ack)
-		s.enqueueEnrich(ev.FileRef, "normal")
+		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal)
 	case events.SpaceRenamed:
 		s.indexSpaceDebouncer.Debounce(ev.ID, e.Ack)
 	case events.LabelAdded:

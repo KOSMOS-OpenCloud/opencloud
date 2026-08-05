@@ -21,5 +21,4 @@ type Events struct {
 	AckWait       time.Duration `yaml:"ack_wait" env:"SEARCH_EVENTS_ACK_WAIT" desc:"The time to wait for an ack before the message is redelivered. This is used to ensure that messages are not lost if the consumer crashes." introductionVersion:"4.0.0"`
 
 	PurgeThreshold int `yaml:"purge_threshold" env:"SEARCH_EVENTS_PURGE_THRESHOLD" desc:"When pending events exceed this threshold, purge the consumer and trigger a full reindex. Set to 0 to disable. Default: 10000." introductionVersion:"7.1.0"`
-	EnrichWorkers  int `yaml:"enrich_workers" env:"SEARCH_ENRICH_WORKERS" desc:"Number of parallel workers for deferred Taki enrichment. Default: 4." introductionVersion:"7.1.0"`
 }

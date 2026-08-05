@@ -197,11 +197,14 @@ func Server(cfg *config.Config) *cobra.Command {
 					return err
 				}
 
-				eventSvc, err := svcEvent.New(ctx, bus, logger, traceProvider, mtrcs, ss, cfg.Events.DebounceDuration, cfg.Events.NumConsumers, cfg.Events.AsyncUploads, cfg.Events.PurgeThreshold, cfg.Events.EnrichWorkers)
+				eventSvc, err := svcEvent.New(ctx, bus, logger, traceProvider, mtrcs, ss, cfg.Events.DebounceDuration, cfg.Events.NumConsumers, cfg.Events.AsyncUploads, cfg.Events.PurgeThreshold)
 				if err != nil {
 					logger.Error().Err(err).Str("transport", "event").Msg("Failed to initialize server")
 					return err
 				}
+
+				// Start queue workers (index + enrich)
+				ss.StartWorkers(ctx)
 
 				gr.Add(runner.New(cfg.Service.Name+".svc", func() error {
 					return eventSvc.Run()
@@ -233,9 +236,15 @@ func Server(cfg *config.Config) *cobra.Command {
 					// Enrich with engine stats
 					type enrichedStatus struct {
 						search.IndexStatus
-						DocCount uint64 `json:"doc_count,omitempty"`
+						DocCount     uint64            `json:"doc_count,omitempty"`
+						IndexQueue   search.QueueStats `json:"index_queue"`
+						EnrichQueue  search.QueueStats `json:"enrich_queue"`
 					}
-					es := enrichedStatus{IndexStatus: status}
+					es := enrichedStatus{
+						IndexStatus: status,
+						IndexQueue:  ss.IndexQueueStats(),
+						EnrichQueue: ss.EnrichQueueStats(),
+					}
 					if dc, err := ss.DocCount(); err == nil {
 						es.DocCount = dc
 					}

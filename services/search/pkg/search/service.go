@@ -66,6 +66,7 @@ type Searcher interface {
 	TrashItem(rID *provider.ResourceId)
 	PurgeItem(rID *provider.Reference)
 	UpsertItem(ref *provider.Reference)
+	EnqueueIndex(ref *provider.Reference)
 	EnqueueEnrich(ref *provider.Reference, priority string)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)

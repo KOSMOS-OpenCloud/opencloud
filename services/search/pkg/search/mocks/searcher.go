@@ -430,6 +430,12 @@ func (_c *Searcher_UpsertItem_Call) RunAndReturn(run func(ref *providerv1beta1.R
 	return _c
 }
 
+// EnqueueIndex provides a mock function for the type Searcher
+func (_mock *Searcher) EnqueueIndex(ref *providerv1beta1.Reference) {
+	_mock.Called(ref)
+	return
+}
+
 // EnqueueEnrich provides a mock function for the type Searcher
 func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string) {
 	_mock.Called(ref, priority)

@@ -29,6 +29,8 @@ type Config struct {
 	Vector                     VectorStore           `yaml:"vector"`
 	ContentExtractionSizeLimit uint64                `yaml:"content_extraction_size_limit" env:"SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT" desc:"Maximum file size in bytes that is allowed for content extraction." introductionVersion:"1.0.0"`
 	BatchSize                  int                   `yaml:"batch_size" env:"SEARCH_BATCH_SIZE" desc:"The number of documents to process in a single batch. Defaults to 500." introductionVersion:"1.0.0"`
+	IndexQueueSize             int                   `yaml:"index_queue_size" env:"SEARCH_INDEX_QUEUE_SIZE" desc:"Buffer size for the index queue (Bleve-only updates). Default: 50000." introductionVersion:"7.1.0"`
+	EnrichQueueSize            int                   `yaml:"enrich_queue_size" env:"SEARCH_ENRICH_QUEUE_SIZE" desc:"Buffer size for the enrich queue (Taki extraction). Default: 50000." introductionVersion:"7.1.0"`
 
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 

@@ -151,8 +151,8 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
 
 		batchSize: cfg.BatchSize,
-		indexCh:   make(chan queueRequest, 1000),
-		enrichCh:  make(chan queueRequest, 1000),
+		indexCh:   make(chan queueRequest, cfg.IndexQueueSize),
+		enrichCh:  make(chan queueRequest, cfg.EnrichQueueSize),
 	}
 
 	// Initialize Qdrant vector store if enabled

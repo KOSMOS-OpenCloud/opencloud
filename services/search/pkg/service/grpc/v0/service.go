@@ -226,8 +226,10 @@ func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ 
 			SpaceId:   parts[1],
 			OpaqueId:  parts[2],
 		},
+		Path: ".",
 	}
 
+	s.log.Info().Str("resource_id", rid).Msg("IndexItem: triggering UpsertItem")
 	go s.searcher.UpsertItem(ref)
 	return nil
 }

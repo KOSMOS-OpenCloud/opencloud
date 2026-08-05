@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "DEPRECATED"
+exit
+
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/DIST" 2>/dev/null || { echo "ERROR: DIST not found"; exit 1; }
 

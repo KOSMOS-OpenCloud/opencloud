@@ -27,7 +27,7 @@ var _ = DescribeTable("event",
 		ch := make(chan raw.Event, 1)
 		stream.EXPECT().Consume(mock.Anything, mock.Anything).Return((<-chan raw.Event)(ch), nil)
 
-		event, err := event.New(context.Background(), stream, log.NewLogger(), nil, nil, s, 50, 1, asyncUploads, 0)
+		event, err := event.New(context.Background(), stream, log.NewLogger(), nil, nil, s, 50, 1, asyncUploads, 0, 4)
 		Expect(err).NotTo(HaveOccurred())
 
 		go func() {

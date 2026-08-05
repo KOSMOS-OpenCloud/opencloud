@@ -237,13 +237,11 @@ func Server(cfg *config.Config) *cobra.Command {
 						Segments uint64 `json:"segments,omitempty"`
 					}
 					es := enrichedStatus{IndexStatus: status}
-					if svc, ok := ss.(*search.Service); ok {
-						if dc, err := svc.DocCount(); err == nil {
-							es.DocCount = dc
-						}
-						if segs, err := svc.SegmentCount(); err == nil {
-							es.Segments = segs
-						}
+					if dc, err := ss.DocCount(); err == nil {
+						es.DocCount = dc
+					}
+					if segs, err := ss.SegmentCount(); err == nil {
+						es.Segments = segs
 					}
 					json.NewEncoder(w).Encode(es)
 				})

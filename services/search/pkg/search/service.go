@@ -1031,15 +1031,16 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	s.EnqueueEnrich(ref, EnrichPriorityNormal)
 }
 
-// EnqueueIndex sends a Bleve-only index request (metadata, no Taki).
+// EnqueueIndex sends a Bleve-only index request for a single item (metadata, no Taki).
 func (s *Service) EnqueueIndex(ref *provider.Reference) {
 	select {
 	case s.indexCh <- queueRequest{ref: ref}:
-		s.logger.Debug().Int("index_pending", len(s.indexCh)).Msg("index-queue: queued")
+		s.logger.Debug().Int("index_pending", len(s.indexCh)).Msg("index-queue: queued (item)")
 	default:
 		s.logger.Warn().Int("index_max", cap(s.indexCh)).Msg("index-queue: full, dropping")
 	}
 }
+
 
 // EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
 func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string) {

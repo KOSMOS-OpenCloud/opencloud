@@ -32,7 +32,6 @@ type Service struct {
 	index               search.Searcher
 	events              []events.Unmarshaller
 	stream              raw.Stream
-	indexSpaceDebouncer *SpaceDebouncer
 	numConsumers        int
 	purgeThreshold      int
 	stopCh              chan struct{}
@@ -40,7 +39,7 @@ type Service struct {
 }
 
 // New returns a service implementation for Service.
-func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, debounceDuration int, numConsumers int, asyncUploads bool, purgeThreshold int) (Service, error) {
+func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.TracerProvider, m *metrics.Metrics, index search.Searcher, numConsumers int, asyncUploads bool, purgeThreshold int) (Service, error) {
 	svc := Service{
 		ctx:            ctx,
 		log:            logger,
@@ -75,12 +74,6 @@ func New(ctx context.Context, stream raw.Stream, logger log.Logger, tp trace.Tra
 	} else {
 		svc.events = append(svc.events, events.FileUploaded{})
 	}
-
-	svc.indexSpaceDebouncer = NewSpaceDebouncer(time.Duration(debounceDuration)*time.Millisecond, 30*time.Second, func(id *provider.StorageSpaceId) {
-		if err := svc.index.IndexSpace(id, false); err != nil {
-			svc.log.Error().Err(err).Interface("spaceID", id).Msg("error while indexing a space")
-		}
-	}, svc.log)
 
 	return svc, nil
 }
@@ -170,7 +163,7 @@ func (s Service) processEvent(e raw.Event) error {
 	switch ev := e.Event.Event.(type) {
 	case events.ItemTrashed:
 		s.index.TrashItem(ev.ID)
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		e.Ack()
 	case events.ItemPurged:
 		s.index.PurgeItem(ev.Ref)
 		e.Ack()
@@ -179,38 +172,46 @@ func (s Service) processEvent(e raw.Event) error {
 		e.Ack()
 	case events.ItemMoved:
 		s.index.MoveItem(ev.Ref)
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		e.Ack()
 	case events.ItemRestored:
 		s.index.RestoreItem(ev.Ref)
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.ContainerCreated:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.FileTouched:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.FileVersionRestored:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.TagsAdded:
-		// Tags: only Bleve update needed, no Taki
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.TagsRemoved:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.ArbitraryMetadataUpdated:
-		// Metadata changed: Bleve reindex (via debouncer) is enough
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.FileUploaded:
-		// Upload: fast-index (Bleve) + deferred enrich (Taki)
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
 		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal)
+		e.Ack()
 	case events.UploadReady:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef), e.Ack)
+		s.index.EnqueueIndex(ev.FileRef)
 		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal)
+		e.Ack()
 	case events.SpaceRenamed:
-		s.indexSpaceDebouncer.Debounce(ev.ID, e.Ack)
+		// Space rename: no single ref, handled by IndexSpace separately
+		e.Ack()
 	case events.LabelAdded:
-		// Favorites: only Bleve update needed, no Taki
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	case events.LabelRemoved:
-		s.indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), e.Ack)
+		s.index.EnqueueIndex(ev.Ref)
+		e.Ack()
 	}
 	return nil
 }

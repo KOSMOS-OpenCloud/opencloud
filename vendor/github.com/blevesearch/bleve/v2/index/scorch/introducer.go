@@ -63,9 +63,44 @@ func (s *Scorch) introducerLoop() {
 	}()
 
 	var epochWatchers []*epochWatcher
+	mergePaused := false
 OUTER:
 	for {
 		atomic.AddUint64(&s.stats.TotIntroduceLoop, 1)
+
+		// Check segment count and pause introductions if too high
+		if s.maxSegmentsBeforeMergePause > 0 {
+			s.rootLock.RLock()
+			nsegs := 0
+			if s.root != nil {
+				nsegs = len(s.root.segment)
+			}
+			s.rootLock.RUnlock()
+
+			if nsegs >= s.maxSegmentsBeforeMergePause && !mergePaused {
+				mergePaused = true
+				s.fireEvent(EventKindMergeTaskIntroductionStart, 0)
+				fmt.Printf("[scorch] merge pause: %d segments >= limit %d, draining merges before accepting writes\n", nsegs, s.maxSegmentsBeforeMergePause)
+			} else if nsegs < s.maxSegmentsBeforeMergePause && mergePaused {
+				mergePaused = false
+				fmt.Printf("[scorch] merge resume: %d segments < limit %d, accepting writes again\n", nsegs, s.maxSegmentsBeforeMergePause)
+			}
+
+			if mergePaused {
+				// Only accept merges, persists and close — no new introductions
+				select {
+				case <-s.closeCh:
+					break OUTER
+				case nextMerge := <-s.merges:
+					s.introduceMerge(nextMerge)
+				case persist := <-s.persists:
+					s.introducePersist(persist)
+				case epochWatcher := <-s.introducerNotifier:
+					epochWatchers = append(epochWatchers, epochWatcher)
+				}
+				goto EPOCH_CHECK
+			}
+		}
 
 		select {
 		case <-s.closeCh:
@@ -87,6 +122,8 @@ OUTER:
 			s.introducePersist(persist)
 
 		}
+
+	EPOCH_CHECK:
 
 		var epochCurr uint64
 		s.rootLock.RLock()

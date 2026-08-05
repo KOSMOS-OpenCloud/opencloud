@@ -90,6 +90,8 @@ type Scorch struct {
 
 	forceMergeRequestCh chan *mergerCtrl
 
+	maxSegmentsBeforeMergePause int // 0 = disabled, default 200
+
 	segPlugin SegmentPlugin
 
 	spatialPlugin index.SpatialAnalyzerPlugin
@@ -425,6 +427,13 @@ func (s *Scorch) openBolt() error {
 	if ok {
 		if err := s.loadSpatialAnalyzerPlugin(typ); err != nil {
 			return err
+		}
+	}
+
+	s.maxSegmentsBeforeMergePause = 200 // default
+	if v, ok := s.config["maxSegmentsBeforeMergePause"]; ok {
+		if t, err := parseToInteger(v); err == nil && t > 0 {
+			s.maxSegmentsBeforeMergePause = t
 		}
 	}
 

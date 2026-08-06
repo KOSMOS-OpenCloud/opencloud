@@ -29,6 +29,11 @@ func getFieldValue[T any](m map[string]any, key string) (out T) {
 	return
 }
 
+// getFieldString reads a string field and sanitizes invalid UTF-8.
+func getFieldString(m map[string]any, key string) string {
+	return sanitizeUTF8(getFieldValue[string](m, key))
+}
+
 func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.ResourceID {
 	return &searchMessage.ResourceID{
 		StorageId: id.GetStorageId(),

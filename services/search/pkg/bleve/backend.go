@@ -109,7 +109,7 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 	totalMatches := res.Total
 	for _, hit := range res.Hits {
 		if sir.Ref != nil {
-			hitPath := strings.TrimSuffix(getFieldValue[string](hit.Fields, "Path"), "/")
+			hitPath := strings.TrimSuffix(getFieldString(hit.Fields, "Path"), "/")
 			requestedPath := utils.MakeRelativePath(sir.Ref.Path)
 			isRoot := hitPath == requestedPath
 
@@ -119,17 +119,17 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 			}
 		}
 
-		rootID, err := storagespace.ParseID(getFieldValue[string](hit.Fields, "RootID"))
+		rootID, err := storagespace.ParseID(getFieldString(hit.Fields, "RootID"))
 		if err != nil {
 			return nil, err
 		}
 
-		rID, err := storagespace.ParseID(getFieldValue[string](hit.Fields, "ID"))
+		rID, err := storagespace.ParseID(getFieldString(hit.Fields, "ID"))
 		if err != nil {
 			return nil, err
 		}
 
-		pID, _ := storagespace.ParseID(getFieldValue[string](hit.Fields, "ParentID"))
+		pID, _ := storagespace.ParseID(getFieldString(hit.Fields, "ParentID"))
 		// Extract Metadata.* fields from the flat bleve field map
 		metadata := make(map[string]string)
 		for k, v := range hit.Fields {
@@ -158,18 +158,18 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 			Entity: &searchMessage.Entity{
 				Ref: &searchMessage.Reference{
 					ResourceId: resourceIDtoSearchID(rootID),
-					Path:       sanitizeUTF8(getFieldValue[string](hit.Fields, "Path")),
+					Path:       getFieldString(hit.Fields, "Path")),
 				},
 				Id:         resourceIDtoSearchID(rID),
-				Name:       sanitizeUTF8(getFieldValue[string](hit.Fields, "Name")),
+				Name:       getFieldString(hit.Fields, "Name")),
 				ParentId:   resourceIDtoSearchID(pID),
 				Size:       uint64(getFieldValue[float64](hit.Fields, "Size")),
 				Type:       uint64(getFieldValue[float64](hit.Fields, "Type")),
-				MimeType:   sanitizeUTF8(getFieldValue[string](hit.Fields, "MimeType")),
+				MimeType:   getFieldString(hit.Fields, "MimeType")),
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Favorites:  getFieldSliceValue[string](hit.Fields, "Favorites"),
-				Highlights: buildHighlights(hit.Fragments, hit.Fields, sir.Query),
+				Highlights: sanitizeUTF8(buildHighlights(hit.Fragments, hit.Fields, sir.Query)),
 				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
 				Image:      getImageValue[searchMessage.Image](hit.Fields),
 				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
@@ -178,7 +178,7 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 			},
 		}
 
-		if mtime, err := time.Parse(time.RFC3339, getFieldValue[string](hit.Fields, "Mtime")); err == nil {
+		if mtime, err := time.Parse(time.RFC3339, getFieldString(hit.Fields, "Mtime")); err == nil {
 			match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 		}
 

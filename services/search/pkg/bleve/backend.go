@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/search/query"
@@ -143,19 +144,28 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 			metadata = nil
 		}
 
+		// Sanitize metadata values (gRPC marshaling fails on invalid UTF-8)
+		if metadata != nil {
+			for k, v := range metadata {
+				if !utf8.ValidString(v) {
+					metadata[k] = strings.ToValidUTF8(v, "\uFFFD")
+				}
+			}
+		}
+
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
 			Entity: &searchMessage.Entity{
 				Ref: &searchMessage.Reference{
 					ResourceId: resourceIDtoSearchID(rootID),
-					Path:       getFieldValue[string](hit.Fields, "Path"),
+					Path:       sanitizeUTF8(getFieldValue[string](hit.Fields, "Path")),
 				},
 				Id:         resourceIDtoSearchID(rID),
-				Name:       getFieldValue[string](hit.Fields, "Name"),
+				Name:       sanitizeUTF8(getFieldValue[string](hit.Fields, "Name")),
 				ParentId:   resourceIDtoSearchID(pID),
 				Size:       uint64(getFieldValue[float64](hit.Fields, "Size")),
 				Type:       uint64(getFieldValue[float64](hit.Fields, "Type")),
-				MimeType:   getFieldValue[string](hit.Fields, "MimeType"),
+				MimeType:   sanitizeUTF8(getFieldValue[string](hit.Fields, "MimeType")),
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Favorites:  getFieldSliceValue[string](hit.Fields, "Favorites"),
@@ -253,4 +263,13 @@ func (b *Backend) Purge(id string, onlyDeleted bool) error {
 
 func (b *Backend) NewBatch(size int) (search.BatchOperator, error) {
 	return NewBatch(b.index, size)
+}
+
+// sanitizeUTF8 replaces invalid UTF-8 bytes with U+FFFD.
+// Prevents gRPC marshaling errors ("string field contains invalid UTF-8").
+func sanitizeUTF8(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+	return strings.ToValidUTF8(s, "\uFFFD")
 }

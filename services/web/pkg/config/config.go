@@ -73,6 +73,7 @@ type OIDC struct {
 	ResponseType          string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"The OIDC response type to use for authentication." introductionVersion:"1.0.0"`
 	Scope                 string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc." introductionVersion:"1.0.0"`
 	PostLogoutRedirectURI string `json:"post_logout_redirect_uri,omitempty" yaml:"post_logout_redirect_uri" env:"WEB_OIDC_POST_LOGOUT_REDIRECT_URI" desc:"This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page." introductionVersion:"1.0.0"`
+	SilentRenewMode       string `json:"silentRenewMode,omitempty" yaml:"silent_renew_mode" env:"WEB_OIDC_SILENT_RENEW_MODE" desc:"Silent renew mode: 'iframe' (default) or 'refresh_token' (uses refresh token directly, recommended for external IDPs)." introductionVersion:"7.1.0"`
 }
 
 // Application defines an application for the Web app switcher.

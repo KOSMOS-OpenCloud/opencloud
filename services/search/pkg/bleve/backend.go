@@ -158,14 +158,14 @@ func (b *Backend) Search(_ context.Context, sir *searchService.SearchIndexReques
 			Entity: &searchMessage.Entity{
 				Ref: &searchMessage.Reference{
 					ResourceId: resourceIDtoSearchID(rootID),
-					Path:       getFieldString(hit.Fields, "Path")),
+					Path:       getFieldString(hit.Fields, "Path"),
 				},
 				Id:         resourceIDtoSearchID(rID),
-				Name:       getFieldString(hit.Fields, "Name")),
+				Name:       getFieldString(hit.Fields, "Name"),
 				ParentId:   resourceIDtoSearchID(pID),
 				Size:       uint64(getFieldValue[float64](hit.Fields, "Size")),
 				Type:       uint64(getFieldValue[float64](hit.Fields, "Type")),
-				MimeType:   getFieldString(hit.Fields, "MimeType")),
+				MimeType:   getFieldString(hit.Fields, "MimeType"),
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
 				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
 				Favorites:  getFieldSliceValue[string](hit.Fields, "Favorites"),

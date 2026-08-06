@@ -15,9 +15,11 @@
 package scorch
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"sync/atomic"
+	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
 	index "github.com/blevesearch/bleve_index_api"
@@ -88,6 +90,11 @@ OUTER:
 
 			if mergePaused {
 				// Only accept merges, persists and close — no new introductions
+				// Force-trigger the merger by requesting a merge via the control channel
+				select {
+				case s.forceMergeRequestCh <- &mergerCtrl{ctx: context.Background(), doneCh: nil}:
+				default:
+				}
 				select {
 				case <-s.closeCh:
 					break OUTER
@@ -97,6 +104,8 @@ OUTER:
 					s.introducePersist(persist)
 				case epochWatcher := <-s.introducerNotifier:
 					epochWatchers = append(epochWatchers, epochWatcher)
+				case <-time.After(1 * time.Second):
+					// Timeout: re-check segment count in case merger reduced it
 				}
 				goto EPOCH_CHECK
 			}

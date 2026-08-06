@@ -1084,20 +1084,53 @@ func (s *Service) EnrichQueueStats() QueueStats {
 
 // StartWorkers starts the index and enrich worker goroutines. Call once.
 func (s *Service) StartWorkers(ctx context.Context) {
-	// Index Worker: Bleve-only updates (metadata, tags, favorites)
-	s.logger.Info().Msg("starting index-queue worker")
+	// Index Worker: Bleve-only updates with batching
+	// Collects items for up to 500ms or batchSize items, then flushes as one Bleve batch.
+	s.logger.Info().Int("batch_size", s.batchSize).Msg("starting index-queue worker (batched)")
 	go func() {
+		batch, err := s.engine.NewBatch(s.batchSize)
+		if err != nil {
+			s.logger.Error().Err(err).Msg("index-queue: failed to create batch")
+			return
+		}
+		batchCount := 0
+		flushTimer := time.NewTimer(500 * time.Millisecond)
+		flushTimer.Stop()
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			if err := batch.Push(); err != nil {
+				s.logger.Error().Err(err).Int("items", batchCount).Msg("index-queue: batch flush failed")
+			} else {
+				s.logger.Info().Int("items", batchCount).Msg("index-queue: batch flushed")
+			}
+			batchCount = 0
+			flushTimer.Stop()
+		}
+
 		for {
 			select {
 			case <-ctx.Done():
+				flush()
 				return
+			case <-flushTimer.C:
+				flush()
 			case req, ok := <-s.indexCh:
 				if !ok {
+					flush()
 					return
 				}
-				s.logger.Info().Int("index_pending", len(s.indexCh)).Msg("index-queue: processing")
-				s.doIndexItem(req.ref)
+				s.doIndexItemBatch(req.ref, batch)
+				batchCount++
 				atomic.AddInt64(&s.indexProcessed, 1)
+
+				if batchCount >= s.batchSize {
+					flush()
+				} else if batchCount == 1 {
+					flushTimer.Reset(500 * time.Millisecond)
+				}
 			}
 		}
 	}()
@@ -1189,8 +1222,9 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 	}
 }
 
-// doIndexItem does a Bleve-only update (metadata from Stat, no Taki call).
-func (s *Service) doIndexItem(ref *provider.Reference) {
+// doIndexItemBatch adds a Bleve-only update to a batch (metadata from Stat, no Taki call).
+// The batch is flushed by the index worker when full or after a timeout.
+func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator) {
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
@@ -1224,10 +1258,8 @@ func (s *Service) doIndexItem(ref *provider.Reference) {
 		r.ParentID = storagespace.FormatResourceID(parentID)
 	}
 
-	if err := s.engine.Upsert(r.ID, r); err != nil {
-		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: bleve upsert failed")
-	} else {
-		s.logger.Debug().Str("name", stat.Info.Name).Msg("doIndexItem: ok")
+	if err := batch.Upsert(r.ID, r); err != nil {
+		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: batch upsert failed")
 	}
 }
 

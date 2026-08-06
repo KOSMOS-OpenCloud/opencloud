@@ -750,26 +750,14 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 		atomic.AddInt64(&s.indexStatus.FilesProcessed, 1)
 
 		if !forceRescan {
-			// Skip if already indexed and unchanged
-			searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-				Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
-			})
-			if err == nil && len(searchRes.Matches) >= 1 {
-				if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-					// Only skip directory if it has children in the index.
-					// Without this check, a container whose children were lost
-					// (e.g. due to a Bleve write-block) would be skipped forever.
-					childQuery := "Path:" + utils.MakeRelativePath(filepath.Join(wd, info.Path)) + "/*"
-					childRes, childErr := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-						Query:    childQuery,
-						PageSize: 1,
-					})
-					if childErr == nil && len(childRes.Matches) > 0 {
-						return filepath.SkipDir
-					}
-					// Container has no children in index — walk into it
-				} else {
-					return nil
+			// Skip unchanged files. Never skip directories — always walk into them
+			// to catch children that might be missing from the index.
+			if info.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+				searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
+					Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
+				})
+				if err == nil && len(searchRes.Matches) >= 1 {
+					return nil // file unchanged, skip
 				}
 			}
 		}

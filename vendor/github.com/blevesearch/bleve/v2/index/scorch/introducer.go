@@ -17,6 +17,7 @@ package scorch
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sync/atomic"
 	"time"
@@ -82,10 +83,10 @@ OUTER:
 			if nsegs >= s.maxSegmentsBeforeMergePause && !mergePaused {
 				mergePaused = true
 				s.fireEvent(EventKindMergeTaskIntroductionStart, 0)
-				fmt.Printf("[scorch] merge pause: %d segments >= limit %d, draining merges before accepting writes\n", nsegs, s.maxSegmentsBeforeMergePause)
+				fmt.Fprintf(os.Stderr, "[scorch] merge pause: %d segments >= limit %d, draining merges before accepting writes\n", nsegs, s.maxSegmentsBeforeMergePause)
 			} else if nsegs < s.maxSegmentsBeforeMergePause && mergePaused {
 				mergePaused = false
-				fmt.Printf("[scorch] merge resume: %d segments < limit %d, accepting writes again\n", nsegs, s.maxSegmentsBeforeMergePause)
+				fmt.Fprintf(os.Stderr, "[scorch] merge resume: %d segments < limit %d, accepting writes again\n", nsegs, s.maxSegmentsBeforeMergePause)
 			}
 
 			if mergePaused {

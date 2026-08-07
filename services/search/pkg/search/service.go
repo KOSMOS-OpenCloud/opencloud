@@ -446,6 +446,12 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 		return nil
 	}
 
+	// Build set of accessible space IDs for permission filtering
+	allowedSpaces := make(map[string]bool, len(spaces))
+	for _, sp := range spaces {
+		allowedSpaces[sp.Id.OpaqueId] = true
+	}
+
 	// Convert Qdrant results to search matches
 	var matches []*searchmsg.Match
 	for _, result := range results {
@@ -465,6 +471,11 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 		}
 		resourceID, err := storagespace.ParseID(ridStr)
 		if err != nil {
+			continue
+		}
+
+		// Filter by space permissions — skip results from spaces the user cannot access
+		if !allowedSpaces[resourceID.SpaceId] {
 			continue
 		}
 

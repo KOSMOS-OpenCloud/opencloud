@@ -82,6 +82,9 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]i
 	for field, frags := range fragments {
 		if strings.HasPrefix(field, "Metadata.") && len(frags) > 0 {
 			key := strings.TrimPrefix(field, "Metadata.")
+			if key == "fullPath" || key == "oy.fullPath" {
+				continue
+			}
 			parts = append(parts, formatHighlight(key, frags[0], searchTerm))
 		}
 	}
@@ -100,6 +103,9 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]i
 				if strings.HasPrefix(k, "metadata.") {
 					key = k[len("metadata."):]
 				}
+				if key == "fullPath" || key == "oy.fullPath" {
+					continue
+				}
 				parts = append(parts, formatHighlight(key, s, searchTerm))
 			}
 		}
@@ -110,7 +116,7 @@ func buildHighlights(fragments bleveSearch.FieldFragmentMap, fields map[string]i
 		parts = parts[:3]
 	}
 
-	return strings.Join(parts, " · ")
+	return strings.Join(parts, "<br>")
 }
 
 // formatHighlight formats a single highlight entry with friendly key name,

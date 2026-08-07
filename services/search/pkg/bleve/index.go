@@ -41,7 +41,7 @@ func NewIndex(root string) (bleve.Index, error) {
 	kvconfig := map[string]interface{}{
 		"scorchPersisterOptions": map[string]interface{}{
 			"PersisterNapTimeMSec":      500,
-			"PersisterNapUnderNumFiles": 50,
+			"PersisterNapUnderNumFiles": 500,
 		},
 	}
 	index, err = bleve.NewUsing(destination, indexMapping, "scorch", "scorch", kvconfig)

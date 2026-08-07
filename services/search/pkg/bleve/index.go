@@ -20,7 +20,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 )
 
-func NewIndex(root string) (bleve.Index, error) {
+func NewIndex(root string, persisterNapTimeMs, persisterNapUnderNumFiles int) (bleve.Index, error) {
 	destination := filepath.Join(root, "bleve")
 	index, err := bleve.Open(destination)
 	if err == nil {
@@ -38,11 +38,12 @@ func NewIndex(root string) (bleve.Index, error) {
 	if err != nil {
 		return nil, err
 	}
-	kvconfig := map[string]interface{}{
-		"scorchPersisterOptions": map[string]interface{}{
-			"PersisterNapTimeMSec":      500,
-			"PersisterNapUnderNumFiles": 500,
-		},
+	kvconfig := map[string]interface{}{}
+	if persisterNapTimeMs > 0 {
+		kvconfig["scorchPersisterOptions"] = map[string]interface{}{
+			"PersisterNapTimeMSec":      persisterNapTimeMs,
+			"PersisterNapUnderNumFiles": persisterNapUnderNumFiles,
+		}
 	}
 	index, err = bleve.NewUsing(destination, indexMapping, "scorch", "scorch", kvconfig)
 	if err != nil {

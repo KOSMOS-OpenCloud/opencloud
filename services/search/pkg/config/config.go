@@ -31,6 +31,8 @@ type Config struct {
 	BatchSize                  int                   `yaml:"batch_size" env:"SEARCH_BATCH_SIZE" desc:"The number of documents to process in a single batch. Defaults to 500." introductionVersion:"1.0.0"`
 	IndexQueueSize             int                   `yaml:"index_queue_size" env:"SEARCH_INDEX_QUEUE_SIZE" desc:"Buffer size for the index queue (Bleve-only updates). Default: 50000." introductionVersion:"7.1.0"`
 	EnrichQueueSize            int                   `yaml:"enrich_queue_size" env:"SEARCH_ENRICH_QUEUE_SIZE" desc:"Buffer size for the enrich queue (Taki extraction). Default: 50000." introductionVersion:"7.1.0"`
+	PersisterNapTimeMs         int                   `yaml:"persister_nap_time_ms" env:"SEARCH_PERSISTER_NAP_TIME_MS" desc:"Scorch persister nap time in ms. Delays persist to let merger consolidate segments. 0=disabled. Default: 500." introductionVersion:"7.1.0"`
+	PersisterNapUnderNumFiles  int                   `yaml:"persister_nap_under_num_files" env:"SEARCH_PERSISTER_NAP_UNDER_NUM_FILES" desc:"Scorch persister naps only when on-disk files are below this count. Default: 500." introductionVersion:"7.1.0"`
 
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 

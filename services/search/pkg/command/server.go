@@ -72,7 +72,7 @@ func Server(cfg *config.Config) *cobra.Command {
 			var eng search.Engine
 			switch cfg.Engine.Type {
 			case "bleve":
-				idx, err := bleve.NewIndex(cfg.Engine.Bleve.Datapath)
+				idx, err := bleve.NewIndex(cfg.Engine.Bleve.Datapath, cfg.PersisterNapTimeMs, cfg.PersisterNapUnderNumFiles)
 				if err != nil {
 					return err
 				}

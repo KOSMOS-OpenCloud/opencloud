@@ -718,6 +718,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 	s.indexMu.Lock()
 	s.indexStatus.SpaceID = spaceID.GetOpaqueId()
 	s.indexMu.Unlock()
+	s.logger.Info().Str("space", spaceID.GetOpaqueId()).Bool("force", forceRescan).Msg("IndexSpace starting")
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err
@@ -1026,6 +1027,7 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 // If force is true, all keys are overwritten (destructive — user corrections lost).
 // Bleve is updated automatically via ArbitraryMetadataUpdated events.
 func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, forceOverwrite bool) error {
+	s.logger.Info().Str("space", spaceID.GetOpaqueId()).Bool("forceRescan", forceRescan).Bool("forceOverwrite", forceOverwrite).Msg("ReEnrichSpace starting")
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
 	if err != nil {
 		return err

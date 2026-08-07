@@ -265,6 +265,11 @@ func Server(cfg *config.Config) *cobra.Command {
 					}
 					json.NewEncoder(w).Encode(res)
 				})
+				// /index-stats — internal Scorch statistics (segments, merges, persister)
+				mux.HandleFunc("/index-stats", func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode(ss.StatsMap())
+				})
 				// /reindex-path?space=storageid$spaceid&path=relative/path — debug: walk+index a specific path
 				mux.HandleFunc("/reindex-path", func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "application/json")

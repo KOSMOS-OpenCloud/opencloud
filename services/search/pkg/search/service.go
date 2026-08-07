@@ -129,6 +129,18 @@ func (s *Service) DocCount() (uint64, error) {
 	return s.engine.DocCount()
 }
 
+// StatsMap returns internal index statistics if the engine supports it.
+type statsMapper interface {
+	StatsMap() map[string]interface{}
+}
+
+func (s *Service) StatsMap() map[string]interface{} {
+	if sm, ok := s.engine.(statsMapper); ok {
+		return sm.StatsMap()
+	}
+	return map[string]interface{}{"error": "engine does not support StatsMap"}
+}
+
 
 // SetIndexProgress updates the space progress counters.
 func (s *Service) SetIndexProgress(current, total int) {

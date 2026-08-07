@@ -195,6 +195,10 @@ func (b *Backend) DocCount() (uint64, error) {
 	return b.index.DocCount()
 }
 
+// StatsMap returns internal Scorch index statistics (segments, merges, persister, etc.).
+func (b *Backend) StatsMap() map[string]interface{} {
+	return b.index.StatsMap()
+}
 
 func (b *Backend) Upsert(id string, r search.Resource) error {
 	batch, err := b.NewBatch(defaultBatchSize)

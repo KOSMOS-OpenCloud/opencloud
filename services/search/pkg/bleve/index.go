@@ -38,7 +38,13 @@ func NewIndex(root string) (bleve.Index, error) {
 	if err != nil {
 		return nil, err
 	}
-	index, err = bleve.New(destination, indexMapping)
+	kvconfig := map[string]interface{}{
+		"scorchPersisterOptions": map[string]interface{}{
+			"PersisterNapTimeMSec":      500,
+			"PersisterNapUnderNumFiles": 50,
+		},
+	}
+	index, err = bleve.NewUsing(destination, indexMapping, "scorch", "scorch", kvconfig)
 	if err != nil {
 		return nil, err
 	}

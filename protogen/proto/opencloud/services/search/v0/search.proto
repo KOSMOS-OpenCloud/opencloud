@@ -120,6 +120,7 @@ message IndexSpaceResponse {
 
 message IndexItemRequest {
   string resource_id = 1;
+  bool force_overwrite = 2;  // overwrite existing metadata (xattrs) during re-enrichment
 }
 
 message IndexItemResponse {

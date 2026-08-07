@@ -20,12 +20,14 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceID := itemID.GetStorageId() + "$" + itemID.GetSpaceId() + "!" + itemID.GetOpaqueId()
+	forceOverwrite := r.URL.Query().Get("overwrite") == "true"
 
-	g.logger.Info().Str("itemID", resourceID).Msg("reindex item requested")
+	g.logger.Info().Str("itemID", resourceID).Bool("overwrite", forceOverwrite).Msg("reindex item requested")
 
 	// Trigger: Search-Service verarbeitet async, Client wartet nicht
 	g.searchService.IndexItem(context.Background(), &searchsvc.IndexItemRequest{
-		ResourceId: resourceID,
+		ResourceId:     resourceID,
+		ForceOverwrite: forceOverwrite,
 	})
 
 	w.WriteHeader(http.StatusAccepted)

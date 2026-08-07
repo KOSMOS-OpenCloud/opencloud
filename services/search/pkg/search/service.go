@@ -67,7 +67,7 @@ type Searcher interface {
 	PurgeItem(rID *provider.Reference)
 	UpsertItem(ref *provider.Reference)
 	EnqueueIndex(ref *provider.Reference, source string)
-	EnqueueEnrich(ref *provider.Reference, priority string, source string)
+	EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite ...bool)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 }
@@ -111,9 +111,10 @@ type Service struct {
 }
 
 type queueRequest struct {
-	ref      *provider.Reference
-	priority string // high, normal, low
-	source   string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
+	ref            *provider.Reference
+	priority       string // high, normal, low
+	source         string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
+	forceOverwrite bool   // overwrite existing metadata (xattrs) during enrichment
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -1221,8 +1222,9 @@ func (s *Service) EnqueueIndex(ref *provider.Reference, source string) {
 }
 
 // EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
-func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string) {
-	req := queueRequest{ref: ref, priority: priority, source: source}
+func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite ...bool) {
+	overwrite := len(forceOverwrite) > 0 && forceOverwrite[0]
+	req := queueRequest{ref: ref, priority: priority, source: source, forceOverwrite: overwrite}
 	if priority == EnrichPriorityHigh {
 		select {
 		case s.enrichHighCh <- req:
@@ -1345,9 +1347,10 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				}
 				s.logger.Info().
 					Str("source", req.source).
+					Bool("overwrite", req.forceOverwrite).
 					Int("enrich_high_pending", len(s.enrichHighCh)).
 					Msg("enrich-queue: processing (high priority)")
-				s.doUpsertItem(req.ref, nil)
+				s.doUpsertItem(req.ref, nil, req.forceOverwrite)
 				atomic.AddInt64(&s.enrichProcessed, 1)
 				continue
 			default:
@@ -1362,9 +1365,10 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				}
 				s.logger.Info().
 					Str("source", req.source).
+					Bool("overwrite", req.forceOverwrite).
 					Int("enrich_high_pending", len(s.enrichHighCh)).
 					Msg("enrich-queue: processing (high priority)")
-				s.doUpsertItem(req.ref, nil)
+				s.doUpsertItem(req.ref, nil, req.forceOverwrite)
 				atomic.AddInt64(&s.enrichProcessed, 1)
 			case req, ok := <-s.enrichCh:
 				if !ok {
@@ -1488,7 +1492,8 @@ func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator)
 	}
 }
 
-func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
+func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, forceOverwrite ...bool) {
+	overwrite := len(forceOverwrite) > 0 && forceOverwrite[0]
 	opID := atomic.AddInt64(&s.upsertCounter, 1)
 	t0 := time.Now()
 
@@ -1644,17 +1649,15 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator) {
 		return
 	}
 
-	// Only write metadata keys that don't already exist on the resource.
-	// Never overwrite user-corrected or previously enriched values.
-	// This protects manual corrections and prevents data loss when
-	// LLM enrichment is unavailable during reindex.
+	// Only write metadata keys that don't already exist on the resource,
+	// unless forceOverwrite is set (UI reindex with overwrite option).
 	existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
 	newMetadata := map[string]string{}
 	for k, v := range metadata {
 		if v == "" {
 			continue // never write empty values
 		}
-		if existing != nil {
+		if !overwrite && existing != nil {
 			if _, exists := existing[k]; exists {
 				continue // don't overwrite existing xattr
 			}

@@ -154,7 +154,8 @@ func (h *searchProviderHandler) IndexItem(ctx context.Context, in *IndexItemRequ
 // Implements proto.Message via ProtoReflect/ProtoMessage stubs so that
 // the micro gRPC client can serialize it (uses JSON codec fallback).
 type IndexItemRequest struct {
-	ResourceId string `json:"resource_id,omitempty" protobuf:"bytes,1,opt,name=resource_id,json=resourceId"`
+	ResourceId     string `json:"resource_id,omitempty" protobuf:"bytes,1,opt,name=resource_id,json=resourceId"`
+	ForceOverwrite bool   `json:"force_overwrite,omitempty" protobuf:"varint,2,opt,name=force_overwrite,json=forceOverwrite"`
 }
 
 func (x *IndexItemRequest) Reset()         { *x = IndexItemRequest{} }

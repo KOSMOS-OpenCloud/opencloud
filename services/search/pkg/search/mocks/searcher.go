@@ -437,8 +437,8 @@ func (_mock *Searcher) EnqueueIndex(ref *providerv1beta1.Reference, source strin
 }
 
 // EnqueueEnrich provides a mock function for the type Searcher
-func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string, source string) {
-	_mock.Called(ref, priority, source)
+func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite ...bool) {
+	_mock.Called(ref, priority, source, forceOverwrite)
 	return
 }
 
@@ -447,11 +447,13 @@ type Searcher_EnqueueEnrich_Call struct {
 	*mock.Call
 }
 
-func (_e *Searcher_Expecter) EnqueueEnrich(ref interface{}, priority interface{}, source interface{}) *Searcher_EnqueueEnrich_Call {
-	return &Searcher_EnqueueEnrich_Call{Call: _e.mock.On("EnqueueEnrich", ref, priority, source)}
+func (_e *Searcher_Expecter) EnqueueEnrich(ref interface{}, priority interface{}, source interface{}, forceOverwrite ...interface{}) *Searcher_EnqueueEnrich_Call {
+	args := []interface{}{ref, priority, source}
+	args = append(args, forceOverwrite...)
+	return &Searcher_EnqueueEnrich_Call{Call: _e.mock.On("EnqueueEnrich", args...)}
 }
 
-func (_c *Searcher_EnqueueEnrich_Call) Run(run func(ref *providerv1beta1.Reference, priority string, source string)) *Searcher_EnqueueEnrich_Call {
+func (_c *Searcher_EnqueueEnrich_Call) Run(run func(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite ...bool)) *Searcher_EnqueueEnrich_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*providerv1beta1.Reference), args[1].(string), args[2].(string))
 	})

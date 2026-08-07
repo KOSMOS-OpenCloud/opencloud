@@ -1680,7 +1680,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 		return
 	}
 
-	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("keys", len(newMetadata)).Msg("doUpsertItem: writing metadata xattrs")
+	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("keys", len(newMetadata)).Bool("overwrite", overwrite).Interface("metadata", newMetadata).Msg("doUpsertItem: writing metadata xattrs")
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {

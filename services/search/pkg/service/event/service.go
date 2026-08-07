@@ -175,42 +175,42 @@ func (s Service) processEvent(e raw.Event) error {
 		e.Ack()
 	case events.ItemRestored:
 		s.index.RestoreItem(ev.Ref)
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:ItemRestored")
 		e.Ack()
 	case events.ContainerCreated:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:ContainerCreated")
 		e.Ack()
 	case events.FileTouched:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:FileTouched")
 		e.Ack()
 	case events.FileVersionRestored:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:FileVersionRestored")
 		e.Ack()
 	case events.TagsAdded:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:TagsAdded")
 		e.Ack()
 	case events.TagsRemoved:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:TagsRemoved")
 		e.Ack()
 	case events.ArbitraryMetadataUpdated:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:ArbitraryMetadataUpdated")
 		e.Ack()
 	case events.FileUploaded:
-		s.index.EnqueueIndex(ev.Ref)
-		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal)
+		s.index.EnqueueIndex(ev.Ref, "event:FileUploaded")
+		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal, "event:FileUploaded")
 		e.Ack()
 	case events.UploadReady:
-		s.index.EnqueueIndex(ev.FileRef)
-		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal)
+		s.index.EnqueueIndex(ev.FileRef, "event:UploadReady")
+		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal, "event:UploadReady")
 		e.Ack()
 	case events.SpaceRenamed:
 		// Space rename: no single ref, handled by IndexSpace separately
 		e.Ack()
 	case events.LabelAdded:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:LabelAdded")
 		e.Ack()
 	case events.LabelRemoved:
-		s.index.EnqueueIndex(ev.Ref)
+		s.index.EnqueueIndex(ev.Ref, "event:LabelRemoved")
 		e.Ack()
 	}
 	return nil

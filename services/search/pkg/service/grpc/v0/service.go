@@ -229,7 +229,7 @@ func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ 
 	}
 
 	s.log.Info().Str("resource_id", rid).Msg("IndexItem: enqueuing (priority=high)")
-	s.searcher.EnqueueEnrich(ref, search.EnrichPriorityHigh)
+	s.searcher.EnqueueEnrich(ref, search.EnrichPriorityHigh, "grpc:IndexItem")
 	return nil
 }
 

@@ -66,8 +66,8 @@ type Searcher interface {
 	TrashItem(rID *provider.ResourceId)
 	PurgeItem(rID *provider.Reference)
 	UpsertItem(ref *provider.Reference)
-	EnqueueIndex(ref *provider.Reference)
-	EnqueueEnrich(ref *provider.Reference, priority string)
+	EnqueueIndex(ref *provider.Reference, source string)
+	EnqueueEnrich(ref *provider.Reference, priority string, source string)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 }
@@ -112,6 +112,7 @@ type Service struct {
 type queueRequest struct {
 	ref      *provider.Reference
 	priority string // high, normal, low
+	source   string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -722,7 +723,13 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 	}()
 
 	w := walker.NewWalker(s.gatewaySelector)
-	batch, err := s.engine.NewBatch(s.batchSize)
+	// Use larger batch size for bulk reindex to reduce Scorch segment count.
+	// Normal event-driven indexing uses s.batchSize (50), reindex uses 10x.
+	reindexBatchSize := s.batchSize * 10
+	if reindexBatchSize < 500 {
+		reindexBatchSize = 500
+	}
+	batch, err := s.engine.NewBatch(reindexBatchSize)
 	if err != nil {
 		return err
 	}
@@ -1028,31 +1035,32 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 
 // UpsertItem indexes or stores Resource data fields (legacy, calls both queues).
 func (s *Service) UpsertItem(ref *provider.Reference) {
-	s.EnqueueIndex(ref)
-	s.EnqueueEnrich(ref, EnrichPriorityNormal)
+	s.EnqueueIndex(ref, "legacy:UpsertItem")
+	s.EnqueueEnrich(ref, EnrichPriorityNormal, "legacy:UpsertItem")
 }
 
 // EnqueueIndex sends a Bleve-only index request for a single item (metadata, no Taki).
-func (s *Service) EnqueueIndex(ref *provider.Reference) {
+func (s *Service) EnqueueIndex(ref *provider.Reference, source string) {
 	select {
-	case s.indexCh <- queueRequest{ref: ref}:
-		s.logger.Debug().Int("index_pending", len(s.indexCh)).Msg("index-queue: queued (item)")
+	case s.indexCh <- queueRequest{ref: ref, source: source}:
+		s.logger.Debug().Str("source", source).Int("index_pending", len(s.indexCh)).Msg("index-queue: queued")
 	default:
-		s.logger.Warn().Int("index_max", cap(s.indexCh)).Msg("index-queue: full, dropping")
+		s.logger.Warn().Str("source", source).Int("index_max", cap(s.indexCh)).Msg("index-queue: full, dropping")
 	}
 }
 
-
 // EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
-func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string) {
+func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string) {
 	select {
-	case s.enrichCh <- queueRequest{ref: ref, priority: priority}:
+	case s.enrichCh <- queueRequest{ref: ref, priority: priority, source: source}:
 		s.logger.Info().
+			Str("source", source).
 			Str("priority", priority).
 			Int("enrich_pending", len(s.enrichCh)).
 			Msg("enrich-queue: queued")
 	default:
 		s.logger.Warn().
+			Str("source", source).
 			Str("priority", priority).
 			Int("enrich_max", cap(s.enrichCh)).
 			Msg("enrich-queue: full, dropping")

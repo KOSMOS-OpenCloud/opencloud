@@ -105,6 +105,7 @@ type Service struct {
 
 	indexCh        chan queueRequest
 	enrichCh       chan queueRequest
+	enrichHighCh   chan queueRequest
 	indexProcessed int64
 	enrichProcessed int64
 }
@@ -152,8 +153,9 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
 
 		batchSize: cfg.BatchSize,
-		indexCh:   make(chan queueRequest, cfg.IndexQueueSize),
-		enrichCh:  make(chan queueRequest, cfg.EnrichQueueSize),
+		indexCh:      make(chan queueRequest, cfg.IndexQueueSize),
+		enrichCh:     make(chan queueRequest, cfg.EnrichQueueSize),
+		enrichHighCh: make(chan queueRequest, 100),
 	}
 
 	// Initialize Qdrant vector store if enabled
@@ -1051,8 +1053,24 @@ func (s *Service) EnqueueIndex(ref *provider.Reference, source string) {
 
 // EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
 func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string) {
+	req := queueRequest{ref: ref, priority: priority, source: source}
+	if priority == EnrichPriorityHigh {
+		select {
+		case s.enrichHighCh <- req:
+			s.logger.Info().
+				Str("source", source).
+				Int("enrich_high_pending", len(s.enrichHighCh)).
+				Msg("enrich-queue: queued (high priority)")
+		default:
+			s.logger.Warn().
+				Str("source", source).
+				Int("enrich_high_max", cap(s.enrichHighCh)).
+				Msg("enrich-queue-high: full, dropping")
+		}
+		return
+	}
 	select {
-	case s.enrichCh <- queueRequest{ref: ref, priority: priority, source: source}:
+	case s.enrichCh <- req:
 		s.logger.Info().
 			Str("source", source).
 			Str("priority", priority).
@@ -1084,7 +1102,7 @@ func (s *Service) IndexQueueStats() QueueStats {
 
 func (s *Service) EnrichQueueStats() QueueStats {
 	return QueueStats{
-		Pending:   len(s.enrichCh),
+		Pending:   len(s.enrichCh) + len(s.enrichHighCh),
 		Max:       cap(s.enrichCh),
 		Processed: atomic.LoadInt64(&s.enrichProcessed),
 	}
@@ -1144,17 +1162,47 @@ func (s *Service) StartWorkers(ctx context.Context) {
 	}()
 
 	// Enrich Worker: Taki extraction + Qdrant + xattrs + Bleve (full content)
+	// High-priority items (UI reindex) are processed before normal items.
 	s.logger.Info().Msg("starting enrich-queue worker")
 	go func() {
 		for {
+			// Drain high-priority channel first
 			select {
 			case <-ctx.Done():
 				return
+			case req, ok := <-s.enrichHighCh:
+				if !ok {
+					return
+				}
+				s.logger.Info().
+					Str("source", req.source).
+					Int("enrich_high_pending", len(s.enrichHighCh)).
+					Msg("enrich-queue: processing (high priority)")
+				s.doUpsertItem(req.ref, nil)
+				atomic.AddInt64(&s.enrichProcessed, 1)
+				continue
+			default:
+			}
+			// No high-priority items — process normal
+			select {
+			case <-ctx.Done():
+				return
+			case req, ok := <-s.enrichHighCh:
+				if !ok {
+					return
+				}
+				s.logger.Info().
+					Str("source", req.source).
+					Int("enrich_high_pending", len(s.enrichHighCh)).
+					Msg("enrich-queue: processing (high priority)")
+				s.doUpsertItem(req.ref, nil)
+				atomic.AddInt64(&s.enrichProcessed, 1)
 			case req, ok := <-s.enrichCh:
 				if !ok {
 					return
 				}
 				s.logger.Info().
+					Str("source", req.source).
 					Str("priority", req.priority).
 					Int("enrich_pending", len(s.enrichCh)).
 					Msg("enrich-queue: processing")

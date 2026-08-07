@@ -14,15 +14,33 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/token/porter"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
+	"github.com/blevesearch/bleve/v2/index/scorch"
 	"github.com/blevesearch/bleve/v2/mapping"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
 	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 )
 
+func init() {
+	scorch.RegistryAsyncErrorCallbacks["log"] = func(err error, path string) {
+		fmt.Fprintf(os.Stderr, "search: scorch async error (path=%s): %v\n", path, err)
+	}
+}
+
 func NewIndex(root string, persisterNapTimeMs, persisterNapUnderNumFiles int) (bleve.Index, error) {
 	destination := filepath.Join(root, "bleve")
-	index, err := bleve.Open(destination)
+
+	kvconfig := map[string]interface{}{
+		"asyncErrorCallbackName": "log",
+	}
+	if persisterNapTimeMs > 0 {
+		kvconfig["scorchPersisterOptions"] = map[string]interface{}{
+			"PersisterNapTimeMSec":      persisterNapTimeMs,
+			"PersisterNapUnderNumFiles": persisterNapUnderNumFiles,
+		}
+	}
+
+	index, err := bleve.OpenUsing(destination, kvconfig)
 	if err == nil {
 		return index, nil
 	}
@@ -37,13 +55,6 @@ func NewIndex(root string, persisterNapTimeMs, persisterNapUnderNumFiles int) (b
 	indexMapping, err := NewMapping()
 	if err != nil {
 		return nil, err
-	}
-	kvconfig := map[string]interface{}{}
-	if persisterNapTimeMs > 0 {
-		kvconfig["scorchPersisterOptions"] = map[string]interface{}{
-			"PersisterNapTimeMSec":      persisterNapTimeMs,
-			"PersisterNapUnderNumFiles": persisterNapUnderNumFiles,
-		}
 	}
 	index, err = bleve.NewUsing(destination, indexMapping, "scorch", "scorch", kvconfig)
 	if err != nil {

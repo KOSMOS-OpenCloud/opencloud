@@ -802,6 +802,164 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 	return nil
 }
 
+// ReindexPath walks a specific path within a space and reindexes all items.
+// Returns detailed debug info about each item: found/skipped/indexed/errors.
+// spaceID format: "storageid$spaceid" (e.g. "f7e671d7...$5ac86946...")
+// path: relative path within the space (e.g. "Innere Verwaltung/Kopierer")
+func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, error) {
+	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+	if err != nil {
+		return nil, fmt.Errorf("auth failed: %w", err)
+	}
+
+	rootID, err := storagespace.ParseID(spaceID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid space id %q: %w", spaceID, err)
+	}
+	if rootID.StorageId == "" || rootID.SpaceId == "" {
+		return nil, fmt.Errorf("invalid space id (missing storage/space): %s", spaceID)
+	}
+	rootID.OpaqueId = rootID.SpaceId
+
+	// Step 1: Stat the target path
+	gwc, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, fmt.Errorf("gateway error: %w", err)
+	}
+
+	targetRef := &provider.Reference{
+		ResourceId: &rootID,
+		Path:       utils.MakeRelativePath(path),
+	}
+	statResp, err := gwc.Stat(ownerCtx, &provider.StatRequest{Ref: targetRef})
+	if err != nil {
+		return nil, fmt.Errorf("stat failed: %w", err)
+	}
+	if statResp.Status.Code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("stat error: %s (%s)", statResp.Status.Message, statResp.Status.Code)
+	}
+
+	var results []map[string]interface{}
+
+	targetInfo := statResp.Info
+	results = append(results, map[string]interface{}{
+		"action": "stat",
+		"path":   path,
+		"name":   targetInfo.Name,
+		"type":   targetInfo.Type.String(),
+		"id":     storagespace.FormatResourceID(targetInfo.Id),
+		"status": "ok",
+	})
+
+	// Step 2: If directory, ListContainer to get children
+	if targetInfo.Type != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		// Single file — just index it
+		ref := &provider.Reference{
+			Path:       utils.MakeRelativePath(path),
+			ResourceId: &rootID,
+		}
+		batch, bErr := s.engine.NewBatch(50)
+		if bErr != nil {
+			return nil, fmt.Errorf("batch error: %w", bErr)
+		}
+		s.doFastIndex(targetInfo, ref, batch)
+		if pErr := batch.Push(); pErr != nil {
+			results = append(results, map[string]interface{}{
+				"action": "index",
+				"name":   targetInfo.Name,
+				"status": "error",
+				"error":  pErr.Error(),
+			})
+		} else {
+			results = append(results, map[string]interface{}{
+				"action": "index",
+				"name":   targetInfo.Name,
+				"status": "ok",
+			})
+		}
+		return results, nil
+	}
+
+	// ListContainer on the directory
+	listResp, err := gwc.ListContainer(ownerCtx, &provider.ListContainerRequest{
+		Ref:                   targetRef,
+		ArbitraryMetadataKeys: []string{"*"},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("ListContainer failed: %w", err)
+	}
+	if listResp.Status.Code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("ListContainer error: %s (%s)", listResp.Status.Message, listResp.Status.Code)
+	}
+
+	results = append(results, map[string]interface{}{
+		"action":   "list",
+		"path":     path,
+		"children": len(listResp.Infos),
+		"status":   "ok",
+	})
+
+	// Step 3: Index each child
+	batch, bErr := s.engine.NewBatch(500)
+	if bErr != nil {
+		return nil, fmt.Errorf("batch error: %w", bErr)
+	}
+
+	for _, info := range listResp.Infos {
+		childPath := filepath.Join(path, info.Name)
+		ref := &provider.Reference{
+			Path:       utils.MakeRelativePath(childPath),
+			ResourceId: &rootID,
+		}
+
+		entry := map[string]interface{}{
+			"action":   "index",
+			"name":     info.Name,
+			"path":     childPath,
+			"id":       storagespace.FormatResourceID(info.Id),
+			"type":     info.Type.String(),
+			"size":     info.Size,
+			"mimeType": info.MimeType,
+		}
+
+		// Check if already in index
+		searchRes, sErr := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
+			Query: "id:" + storagespace.FormatResourceID(info.Id),
+		})
+		if sErr == nil && len(searchRes.Matches) > 0 {
+			entry["in_index"] = true
+		} else {
+			entry["in_index"] = false
+		}
+
+		// Index it
+		s.doFastIndex(info, ref, batch)
+		entry["status"] = "indexed"
+
+		// Check arbitrary metadata
+		if info.ArbitraryMetadata != nil && len(info.ArbitraryMetadata.Metadata) > 0 {
+			entry["metadata_keys"] = len(info.ArbitraryMetadata.Metadata)
+		}
+
+		results = append(results, entry)
+	}
+
+	if pErr := batch.Push(); pErr != nil {
+		results = append(results, map[string]interface{}{
+			"action": "batch_push",
+			"status": "error",
+			"error":  pErr.Error(),
+		})
+	} else {
+		results = append(results, map[string]interface{}{
+			"action": "batch_push",
+			"status": "ok",
+		})
+	}
+
+	return results, nil
+}
+
 // TrashItem marks the item as deleted.
 func (s *Service) TrashItem(rID *provider.ResourceId) {
 	if err := s.engine.Delete(storagespace.FormatResourceID(rID)); err != nil {

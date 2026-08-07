@@ -265,6 +265,25 @@ func Server(cfg *config.Config) *cobra.Command {
 					}
 					json.NewEncoder(w).Encode(res)
 				})
+				// /reindex-path?space=storageid$spaceid&path=relative/path — debug: walk+index a specific path
+				mux.HandleFunc("/reindex-path", func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					spaceID := r.URL.Query().Get("space")
+					path := r.URL.Query().Get("path")
+					if spaceID == "" {
+						http.Error(w, `{"error":"missing ?space= parameter (format: storageid$spaceid)"}`, 400)
+						return
+					}
+					if path == "" {
+						path = "."
+					}
+					results, err := ss.ReindexPath(spaceID, path)
+					if err != nil {
+						json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+						return
+					}
+					json.NewEncoder(w).Encode(results)
+				})
 				mux.Handle("/", origHandler)
 				debugServer.Handler = mux
 

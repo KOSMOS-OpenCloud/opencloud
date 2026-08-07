@@ -414,4 +414,5 @@ exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-eu/go-micro-plugins/v4/store/nats-js-kv v0.0.0-20250512152754-23325793059a
 replace codeberg.org/kosmos-openworks/openworks-pipeworx => ./pipeworx-src
+replace github.com/blevesearch/zapx/v15 => github.com/KOSMOS-OpenCloud/opencloud_zapx v0.0.0-20260807201141-e5865c7c5502
 

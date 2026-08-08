@@ -108,6 +108,9 @@ type Service struct {
 	enrichHighCh   chan queueRequest
 	indexProcessed int64
 	enrichProcessed int64
+	indexFlushed   int64 // atomic: successful batch flushes
+	indexBatchItems int64 // atomic: items currently in unflushed batch
+	flushBlockedSince atomic.Pointer[time.Time] // set when flush starts, cleared when done
 }
 
 type queueRequest struct {
@@ -1231,17 +1234,26 @@ func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source
 
 // QueueStats returns current queue statistics.
 type QueueStats struct {
-	Pending   int   `json:"pending"`
-	Max       int   `json:"max"`
-	Processed int64 `json:"processed"`
+	Pending      int    `json:"pending"`
+	Max          int    `json:"max"`
+	Processed    int64  `json:"processed"`
+	Flushed      int64  `json:"flushed,omitempty"`
+	BatchItems   int64  `json:"batch_items,omitempty"`
+	FlushBlocked string `json:"flush_blocked_since,omitempty"`
 }
 
 func (s *Service) IndexQueueStats() QueueStats {
-	return QueueStats{
-		Pending:   len(s.indexCh),
-		Max:       cap(s.indexCh),
-		Processed: atomic.LoadInt64(&s.indexProcessed),
+	qs := QueueStats{
+		Pending:    len(s.indexCh),
+		Max:        cap(s.indexCh),
+		Processed:  atomic.LoadInt64(&s.indexProcessed),
+		Flushed:    atomic.LoadInt64(&s.indexFlushed),
+		BatchItems: atomic.LoadInt64(&s.indexBatchItems),
 	}
+	if t := s.flushBlockedSince.Load(); t != nil {
+		qs.FlushBlocked = t.Format("2006-01-02T15:04:05Z07:00")
+	}
+	return qs
 }
 
 func (s *Service) EnrichQueueStats() QueueStats {
@@ -1271,11 +1283,17 @@ func (s *Service) StartWorkers(ctx context.Context) {
 			if batchCount == 0 {
 				return
 			}
+			atomic.StoreInt64(&s.indexBatchItems, int64(batchCount))
+			now := time.Now()
+			s.flushBlockedSince.Store(&now)
 			if err := batch.Push(); err != nil {
 				s.logger.Error().Err(err).Int("items", batchCount).Msg("index-queue: batch flush failed")
 			} else {
+				atomic.AddInt64(&s.indexFlushed, 1)
 				s.logger.Info().Int("items", batchCount).Msg("index-queue: batch flushed")
 			}
+			s.flushBlockedSince.Store(nil)
+			atomic.StoreInt64(&s.indexBatchItems, 0)
 			batchCount = 0
 			flushTimer.Stop()
 		}

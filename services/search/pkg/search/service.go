@@ -865,8 +865,7 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 			"action": "index",
 			"name":   targetInfo.Name,
 			"status": "queued",
-			})
-		}
+		})
 		return results, nil
 	}
 
@@ -931,7 +930,7 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 	results = append(results, map[string]interface{}{
 		"action": "batch_queued",
 		"status": "ok",
-	}
+	})
 
 	return results, nil
 }

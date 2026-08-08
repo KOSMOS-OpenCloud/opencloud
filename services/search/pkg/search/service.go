@@ -1583,17 +1583,18 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 	bleveResource := r
 	bleveResource.Document = bleveDoc
 
-	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Msg("doUpsertItem: bleve upsert starting")
-	tBleve := time.Now()
 	if batch != nil {
+		s.logger.Info().Int64("op", opID).Str("name", doc.Name).Msg("doUpsertItem: bleve upsert starting (batch)")
+		tBleve := time.Now()
 		err = batch.Upsert(r.ID, bleveResource)
+		if err != nil {
+			s.logger.Error().Err(err).Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert failed")
+		} else {
+			s.logger.Info().Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert ok")
+		}
 	} else {
-		err = s.engine.Upsert(r.ID, bleveResource)
-	}
-	if err != nil {
-		s.logger.Error().Err(err).Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert failed")
-	} else {
-		s.logger.Info().Int64("op", opID).Str("name", doc.Name).Dur("bleve_ms", time.Since(tBleve)).Msg("doUpsertItem: bleve upsert ok")
+		// Route through index-queue for batched writes (avoids 1-segment-per-write)
+		s.EnqueueIndex(ref, "enrich:doUpsertItem")
 	}
 
 	// Taki v2: log + store embedding in Qdrant

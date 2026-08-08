@@ -16,6 +16,7 @@ COPY reva-src /data/source/gitapps/reva
 COPY go-cs3apis-src /data/source/gitapps/cs3org/go-cs3apis
 COPY bleve-src /data/source/gitapps/bleve
 COPY zapx-src /data/source/gitapps/zapx
+COPY zapx-v17-src /data/source/gitapps/zapx-v17
 RUN cd /data/source/gitapps/reva && git init && git add -A
 WORKDIR /opencloud
 # Regenerate protobuf for modified .proto files (search Entity metadata field)
@@ -30,6 +31,7 @@ RUN echo 'replace github.com/opencloud-eu/reva/v2 => /data/source/gitapps/reva' 
     echo 'replace github.com/cs3org/go-cs3apis => /data/source/gitapps/cs3org/go-cs3apis' >> go.mod && \
     echo 'replace github.com/blevesearch/bleve/v2 => /data/source/gitapps/bleve' >> go.mod && \
     echo 'replace github.com/blevesearch/zapx/v15 => /data/source/gitapps/zapx' >> go.mod && \
+    echo 'replace github.com/blevesearch/zapx/v17 => /data/source/gitapps/zapx-v17' >> go.mod && \
     go mod tidy && \
     go mod vendor && \
     cd opencloud && \

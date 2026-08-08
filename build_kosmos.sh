@@ -18,6 +18,7 @@ WEB_DIR="${SCRIPT_DIR}/../opencloud_web"
 CS3_DIR="${SCRIPT_DIR}/go-cs3apis-src"
 BLEVE_DIR="${SCRIPT_DIR}/../opencloud_bleve"
 ZAPX_DIR="${SCRIPT_DIR}/../opencloud_zapx"
+ZAPX_V17_DIR="${SCRIPT_DIR}/../opencloud_zapx_v17"
 PIPEWORX_DIR="${SCRIPT_DIR}/../openworks-pipeworx"
 
 # Clone or update repos (build-worker mode)
@@ -48,6 +49,7 @@ clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
 clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
 clone_or_update "$BLEVE_DIR" "opencloud_bleve" "${EXPECT_BRANCH}"
 clone_or_update "$ZAPX_DIR" "opencloud_zapx" "${EXPECT_BRANCH}"
+clone_or_update "$ZAPX_V17_DIR" "opencloud_zapx_v17" "${EXPECT_BRANCH}"
 
 # Pipeworx — from kosmos-openworks org, main branch
 PIPEWORX_GIT="${PIPEWORX_GIT:-https://github.com/KOSMOS-OpenWorks}"
@@ -69,6 +71,8 @@ echo "  Syncing bleve-src from ${BLEVE_DIR} ..."
 rsync -a --delete --exclude='.git' "$BLEVE_DIR/" bleve-src/
 echo "  Syncing zapx-src from ${ZAPX_DIR} ..."
 rsync -a --delete --exclude='.git' "$ZAPX_DIR/" zapx-src/
+echo "  Syncing zapx-v17-src from ${ZAPX_V17_DIR} ..."
+rsync -a --delete --exclude='.git' "$ZAPX_V17_DIR/" zapx-v17-src/
 echo "  Syncing pipeworx-src from ${PIPEWORX_DIR} ..."
 rsync -a --delete --exclude='.git' "$PIPEWORX_DIR/" pipeworx-src/
 

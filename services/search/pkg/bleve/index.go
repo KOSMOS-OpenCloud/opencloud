@@ -68,8 +68,8 @@ func NewIndex(root string, persisterNapTimeMs, persisterNapUnderNumFiles int) (b
 		// Defaults: SegmentsPerMergeTask=10, MaxSegmentSize=5000000
 		"scorchMergePlanOptions": map[string]interface{}{
 			"MaxSegmentsPerTier":   10,
-			"MaxSegmentSize":       int64(1000000), // 1MB (down from 2MB)
-			"SegmentsPerMergeTask": 2,              // 2 segments per task (down from 4)
+			"MaxSegmentSize":       int64(2000000),
+			"SegmentsPerMergeTask": 4,
 			"TierGrowth":           10.0,
 			"FloorSegmentSize":     int64(2000),
 			"ReclaimDeletesWeight": 2.0,
@@ -114,7 +114,11 @@ func NewMapping() (mapping.IndexMapping, error) {
 	lowercaseMapping.IncludeInAll = false
 	lowercaseMapping.Analyzer = "lowercaseKeyword"
 
-	// Content: disabled in Bleve. Fulltext search runs via Qdrant.
+	// Content field: disabled in Bleve. Fulltext search runs via Qdrant
+	// (semantic/embedding). Indexing Content in Bleve caused millions of
+	// unique terms (OCR noise, numbers, typos) that made segment merges
+	// impossible (45GB RAM, OOM). Bleve handles: Name, Tags, Favorites,
+	// Metadata — structured fields with bounded term cardinality.
 	contentFieldMapping := bleve.NewTextFieldMapping()
 	contentFieldMapping.Index = false
 	contentFieldMapping.Store = false
@@ -122,14 +126,10 @@ func NewMapping() (mapping.IndexMapping, error) {
 	contentFieldMapping.IncludeTermVectors = false
 	contentFieldMapping.DocValues = false
 
-	// Lean keyword mapping for structured fields (IDs, paths, mime types).
-	// No term vectors, no doc values — just index + store. This prevents
-	// the merger from building 1.3GB+ of position data during merge.
-	kwFieldMapping := bleve.NewTextFieldMapping()
-	kwFieldMapping.Analyzer = keyword.Name
-	kwFieldMapping.IncludeTermVectors = false
-	kwFieldMapping.DocValues = false
-	kwFieldMapping.IncludeInAll = false
+	// Metadata fields are handled by the default document mapping with
+	// StoreDynamic=true on the IndexMapping. This ensures Metadata.* fields
+	// are both indexed (searchable) AND stored (returned in hit.Fields).
+	// A separate SubDocumentMapping would override StoreDynamic inheritance.
 
 	docMapping := bleve.NewDocumentMapping()
 	docMapping.AddFieldMappingsAt("Name", nameMapping)
@@ -137,20 +137,9 @@ func NewMapping() (mapping.IndexMapping, error) {
 	docMapping.AddFieldMappingsAt("Favorites", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Content", contentFieldMapping)
 
-	// Explicit mappings for all Resource fields — prevents dynamic mapping
-	// from adding IncludeTermVectors=true on these.
-	docMapping.AddFieldMappingsAt("ID", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("RootID", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("Path", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("ParentID", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("MimeType", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("Mtime", kwFieldMapping)
-	docMapping.AddFieldMappingsAt("Title", kwFieldMapping)
-
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
-	indexMapping.StoreDynamic = true  // Metadata.* fields returned in hit.Fields
-	indexMapping.DocValuesDynamic = false // no faceting/sorting on dynamic fields
+	indexMapping.StoreDynamic = true // ensure Metadata.* fields are returned in hit.Fields
 	indexMapping.DefaultMapping = docMapping
 	err := indexMapping.AddCustomAnalyzer("lowercaseKeyword",
 		map[string]any{

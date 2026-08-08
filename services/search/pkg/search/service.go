@@ -115,6 +115,10 @@ type queueRequest struct {
 	priority       string // high, normal, low
 	source         string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
 	forceOverwrite bool   // overwrite existing metadata (xattrs) during enrichment
+	op             string // "index" (default), "delete", "move"
+	resourceID     string // for delete/move: formatted resource ID
+	parentID       string // for move: formatted parent ID
+	path           string // for move: new path
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -974,10 +978,12 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 	return results, nil
 }
 
-// TrashItem marks the item as deleted.
+// TrashItem marks the item as deleted via the index-queue.
 func (s *Service) TrashItem(rID *provider.ResourceId) {
-	if err := s.engine.Delete(storagespace.FormatResourceID(rID)); err != nil {
-		s.logger.Info().Err(err).Interface("Id", rID).Msg("failed to remove item from index")
+	select {
+	case s.indexCh <- queueRequest{op: "delete", resourceID: storagespace.FormatResourceID(rID), source: "event:TrashItem"}:
+	default:
+		s.logger.Warn().Str("id", storagespace.FormatResourceID(rID)).Msg("index-queue full, dropping delete")
 	}
 }
 
@@ -1321,6 +1327,25 @@ func (s *Service) StartWorkers(ctx context.Context) {
 			flushTimer.Stop()
 		}
 
+		// waitForMerger pauses writes if too many segments have accumulated,
+		// giving the merger time to consolidate before we push more.
+		waitForMerger := func() {
+			const maxSegments = 200
+			const checkInterval = 2 * time.Second
+			for {
+				stats := s.StatsMap()
+				if segs, ok := stats["num_root_filesegments"]; ok {
+					if n, ok := segs.(uint64); ok && n < maxSegments {
+						return
+					}
+					s.logger.Warn().Interface("segments", segs).Msg("index-queue: waiting for merger to consolidate segments")
+				} else {
+					return // can't check, proceed
+				}
+				time.Sleep(checkInterval)
+			}
+		}
+
 		for {
 			select {
 			case <-ctx.Done():
@@ -1328,17 +1353,32 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				return
 			case <-flushTimer.C:
 				flush()
+				waitForMerger()
 			case req, ok := <-s.indexCh:
 				if !ok {
 					flush()
 					return
 				}
-				s.doIndexItemBatch(req.ref, batch)
-				batchCount++
+				switch req.op {
+				case "delete":
+					flush() // flush pending upserts first
+					if err := s.engine.Delete(req.resourceID); err != nil {
+						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: delete failed")
+					}
+				case "move":
+					flush() // flush pending upserts first
+					if err := s.engine.Move(req.resourceID, req.parentID, req.path); err != nil {
+						s.logger.Error().Err(err).Str("path", req.path).Msg("index-queue: move failed")
+					}
+				default: // "index" or empty
+					s.doIndexItemBatch(req.ref, batch)
+					batchCount++
+				}
 				atomic.AddInt64(&s.indexProcessed, 1)
 
 				if batchCount >= s.batchSize {
 					flush()
+					waitForMerger()
 				} else if batchCount == 1 {
 					flushTimer.Reset(500 * time.Millisecond)
 				}
@@ -1455,7 +1495,9 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 	if batch != nil {
 		err = batch.Upsert(id, r)
 	} else {
-		err = s.engine.Upsert(id, r)
+		// No batch — route through index-queue for batched writes
+		s.EnqueueIndex(ref, "fastIndex:noBatch")
+		return
 	}
 	if err != nil {
 		s.logger.Error().Err(err).Str("path", ref.Path).Msg("fast index: error upserting")
@@ -1833,8 +1875,16 @@ func (s *Service) MoveItem(ref *provider.Reference) {
 		return
 	}
 
-	if err := s.engine.Move(storagespace.FormatResourceID(stat.GetInfo().GetId()), storagespace.FormatResourceID(stat.GetInfo().GetParentId()), path); err != nil {
-		s.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
+	select {
+	case s.indexCh <- queueRequest{
+		op:         "move",
+		resourceID: storagespace.FormatResourceID(stat.GetInfo().GetId()),
+		parentID:   storagespace.FormatResourceID(stat.GetInfo().GetParentId()),
+		path:       path,
+		source:     "event:MoveItem",
+	}:
+	default:
+		s.logger.Warn().Str("path", path).Msg("index-queue full, dropping move")
 	}
 }
 

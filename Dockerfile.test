@@ -14,6 +14,8 @@ RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools
 COPY --from=generate /opencloud /opencloud
 COPY reva-src /data/source/gitapps/reva
 COPY go-cs3apis-src /data/source/gitapps/cs3org/go-cs3apis
+COPY bleve-src /data/source/gitapps/bleve
+COPY zapx-src /data/source/gitapps/zapx
 RUN cd /data/source/gitapps/reva && git init && git add -A
 WORKDIR /opencloud
 # Regenerate protobuf for modified .proto files (search Entity metadata field)
@@ -26,6 +28,8 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     cd /opencloud
 RUN echo 'replace github.com/opencloud-eu/reva/v2 => /data/source/gitapps/reva' >> go.mod && \
     echo 'replace github.com/cs3org/go-cs3apis => /data/source/gitapps/cs3org/go-cs3apis' >> go.mod && \
+    echo 'replace github.com/blevesearch/bleve/v2 => /data/source/gitapps/bleve' >> go.mod && \
+    echo 'replace github.com/blevesearch/zapx/v15 => /data/source/gitapps/zapx' >> go.mod && \
     go mod tidy && \
     go mod vendor && \
     cd opencloud && \

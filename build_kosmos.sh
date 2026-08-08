@@ -16,6 +16,8 @@ echo "=== Build kosmos: ${IMAGE}:${TAG} (branch: ${EXPECT_BRANCH}) ==="
 REVA_DIR="${SCRIPT_DIR}/../opencloud_reva"
 WEB_DIR="${SCRIPT_DIR}/../opencloud_web"
 CS3_DIR="${SCRIPT_DIR}/go-cs3apis-src"
+BLEVE_DIR="${SCRIPT_DIR}/../opencloud_bleve"
+ZAPX_DIR="${SCRIPT_DIR}/../opencloud_zapx"
 PIPEWORX_DIR="${SCRIPT_DIR}/../openworks-pipeworx"
 
 # Clone or update repos (build-worker mode)
@@ -44,6 +46,8 @@ clone_or_update() {
 clone_or_update "$REVA_DIR" "opencloud_reva" "${EXPECT_BRANCH}"
 clone_or_update "$WEB_DIR" "opencloud_web" "${EXPECT_BRANCH}"
 clone_or_update "$CS3_DIR" "go-cs3apis" "${EXPECT_BRANCH}"
+clone_or_update "$BLEVE_DIR" "opencloud_bleve" "${EXPECT_BRANCH}"
+clone_or_update "$ZAPX_DIR" "opencloud_zapx" "${EXPECT_BRANCH}"
 
 # Pipeworx — from kosmos-openworks org, main branch
 PIPEWORX_GIT="${PIPEWORX_GIT:-https://github.com/KOSMOS-OpenWorks}"
@@ -61,6 +65,10 @@ echo "  web branch:       ${WEB_BRANCH}"
 echo "=== Stage: prepare ==="
 echo "  Syncing reva-src from ${REVA_DIR} ..."
 rsync -a --delete --exclude='.git' "$REVA_DIR/" reva-src/
+echo "  Syncing bleve-src from ${BLEVE_DIR} ..."
+rsync -a --delete --exclude='.git' "$BLEVE_DIR/" bleve-src/
+echo "  Syncing zapx-src from ${ZAPX_DIR} ..."
+rsync -a --delete --exclude='.git' "$ZAPX_DIR/" zapx-src/
 echo "  Syncing pipeworx-src from ${PIPEWORX_DIR} ..."
 rsync -a --delete --exclude='.git' "$PIPEWORX_DIR/" pipeworx-src/
 

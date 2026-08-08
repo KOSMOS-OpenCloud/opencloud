@@ -32,6 +32,16 @@ func NewIndex(root string, persisterNapTimeMs, persisterNapUnderNumFiles int) (b
 
 	kvconfig := map[string]interface{}{
 		"asyncErrorCallbackName": "log",
+		// Merge tuning: smaller tasks to reduce peak memory during merge.
+		// Defaults: SegmentsPerMergeTask=10, MaxSegmentSize=5000000
+		"scorchMergePlanOptions": map[string]interface{}{
+			"MaxSegmentsPerTier":   10,
+			"MaxSegmentSize":       int64(2000000),
+			"SegmentsPerMergeTask": 4,
+			"TierGrowth":           10.0,
+			"FloorSegmentSize":     int64(2000),
+			"ReclaimDeletesWeight": 2.0,
+		},
 	}
 	if persisterNapTimeMs > 0 {
 		kvconfig["scorchPersisterOptions"] = map[string]interface{}{

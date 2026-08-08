@@ -754,22 +754,6 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 	}()
 
 	w := walker.NewWalker(s.gatewaySelector)
-	// Use larger batch size for bulk reindex to reduce Scorch segment count.
-	// Normal event-driven indexing uses s.batchSize (50), reindex uses 10x.
-	reindexBatchSize := s.batchSize * 10
-	if reindexBatchSize < 500 {
-		reindexBatchSize = 500
-	}
-	batch, err := s.engine.NewBatch(reindexBatchSize)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := batch.Push(); err != nil {
-			s.logger.Error().Err(err).Msg("failed to end batch")
-		}
-		logDocCount(s.engine, s.logger)
-	}()
 
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
@@ -800,8 +784,8 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, forceRescan bool)
 			}
 		}
 
-		// Fast index: metadata only from ResourceInfo (no Taki/LLM)
-		s.doFastIndex(info, ref, batch)
+		// Fast index via queue: metadata only from ResourceInfo (no Taki/LLM)
+		s.EnqueueIndex(ref, "walk:IndexSpace")
 		return nil
 	})
 
@@ -876,23 +860,11 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 			Path:       utils.MakeRelativePath(path),
 			ResourceId: &rootID,
 		}
-		batch, bErr := s.engine.NewBatch(50)
-		if bErr != nil {
-			return nil, fmt.Errorf("batch error: %w", bErr)
-		}
-		s.doFastIndex(targetInfo, ref, batch)
-		if pErr := batch.Push(); pErr != nil {
-			results = append(results, map[string]interface{}{
-				"action": "index",
-				"name":   targetInfo.Name,
-				"status": "error",
-				"error":  pErr.Error(),
-			})
-		} else {
-			results = append(results, map[string]interface{}{
-				"action": "index",
-				"name":   targetInfo.Name,
-				"status": "ok",
+		s.EnqueueIndex(ref, "debug:ReindexPath")
+		results = append(results, map[string]interface{}{
+			"action": "index",
+			"name":   targetInfo.Name,
+			"status": "queued",
 			})
 		}
 		return results, nil
@@ -917,12 +889,7 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 		"status":   "ok",
 	})
 
-	// Step 3: Index each child
-	batch, bErr := s.engine.NewBatch(500)
-	if bErr != nil {
-		return nil, fmt.Errorf("batch error: %w", bErr)
-	}
-
+	// Step 3: Index each child via queue
 	for _, info := range listResp.Infos {
 		childPath := filepath.Join(path, info.Name)
 		ref := &provider.Reference{
@@ -950,9 +917,8 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 			entry["in_index"] = false
 		}
 
-		// Index it
-		s.doFastIndex(info, ref, batch)
-		entry["status"] = "indexed"
+		s.EnqueueIndex(ref, "debug:ReindexPath")
+		entry["status"] = "queued"
 
 		// Check arbitrary metadata
 		if info.ArbitraryMetadata != nil && len(info.ArbitraryMetadata.Metadata) > 0 {
@@ -962,17 +928,9 @@ func (s *Service) ReindexPath(spaceID, path string) ([]map[string]interface{}, e
 		results = append(results, entry)
 	}
 
-	if pErr := batch.Push(); pErr != nil {
-		results = append(results, map[string]interface{}{
-			"action": "batch_push",
-			"status": "error",
-			"error":  pErr.Error(),
-		})
-	} else {
-		results = append(results, map[string]interface{}{
-			"action": "batch_push",
-			"status": "ok",
-		})
+	results = append(results, map[string]interface{}{
+		"action": "batch_queued",
+		"status": "ok",
 	}
 
 	return results, nil
@@ -993,13 +951,11 @@ func (s *Service) PurgeItem(ref *provider.Reference) {
 		return
 	}
 
-	err := s.engine.Purge(storagespace.FormatResourceID(ref.ResourceId), false)
-	if err != nil {
-		s.logger.Error().Err(err).Interface("Id", ref.ResourceId).Msg("failed to purge item from index")
-		return
+	select {
+	case s.indexCh <- queueRequest{op: "purge", resourceID: storagespace.FormatResourceID(ref.ResourceId), source: "event:PurgeItem"}:
+	default:
+		s.logger.Warn().Interface("Id", ref.ResourceId).Msg("index-queue full, dropping purge")
 	}
-	s.logger.Info().Interface("Id", ref.ResourceId).Msg("purged item from index")
-	logDocCount(s.engine, s.logger)
 }
 
 func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
@@ -1018,13 +974,11 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 	}
 	rootID.OpaqueId = rootID.SpaceId
 
-	if err := s.engine.Purge(storagespace.FormatResourceID(&rootID), true); err != nil {
-		s.logger.Error().Err(err).Interface("Id", &rootID).Msg("failed to purge deleted items from index")
-		return err
+	select {
+	case s.indexCh <- queueRequest{op: "purge-deleted", resourceID: storagespace.FormatResourceID(&rootID), source: "event:PurgeDeleted"}:
+	default:
+		s.logger.Warn().Interface("Id", &rootID).Msg("index-queue full, dropping purge-deleted")
 	}
-
-	logDocCount(s.engine, s.logger)
-
 	return nil
 }
 
@@ -1361,14 +1315,29 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				}
 				switch req.op {
 				case "delete":
-					flush() // flush pending upserts first
+					flush()
 					if err := s.engine.Delete(req.resourceID); err != nil {
 						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: delete failed")
 					}
 				case "move":
-					flush() // flush pending upserts first
+					flush()
 					if err := s.engine.Move(req.resourceID, req.parentID, req.path); err != nil {
 						s.logger.Error().Err(err).Str("path", req.path).Msg("index-queue: move failed")
+					}
+				case "purge":
+					flush()
+					if err := s.engine.Purge(req.resourceID, false); err != nil {
+						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: purge failed")
+					}
+				case "purge-deleted":
+					flush()
+					if err := s.engine.Purge(req.resourceID, true); err != nil {
+						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: purge-deleted failed")
+					}
+				case "restore":
+					flush()
+					if err := s.engine.Restore(req.resourceID); err != nil {
+						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: restore failed")
 					}
 				default: // "index" or empty
 					s.doIndexItemBatch(req.ref, batch)
@@ -1863,8 +1832,10 @@ func (s *Service) RestoreItem(ref *provider.Reference) {
 		return
 	}
 
-	if err := s.engine.Restore(storagespace.FormatResourceID(stat.Info.Id)); err != nil {
-		s.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+	select {
+	case s.indexCh <- queueRequest{op: "restore", resourceID: storagespace.FormatResourceID(stat.Info.Id), source: "event:RestoreItem"}:
+	default:
+		s.logger.Warn().Str("id", storagespace.FormatResourceID(stat.Info.Id)).Msg("index-queue full, dropping restore")
 	}
 }
 

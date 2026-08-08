@@ -114,9 +114,17 @@ func NewMapping() (mapping.IndexMapping, error) {
 	lowercaseMapping.IncludeInAll = false
 	lowercaseMapping.Analyzer = "lowercaseKeyword"
 
-	fulltextFieldMapping := bleve.NewTextFieldMapping()
-	fulltextFieldMapping.Analyzer = "fulltext"
-	fulltextFieldMapping.IncludeInAll = false
+	// Content field: disabled in Bleve. Fulltext search runs via Qdrant
+	// (semantic/embedding). Indexing Content in Bleve caused millions of
+	// unique terms (OCR noise, numbers, typos) that made segment merges
+	// impossible (45GB RAM, OOM). Bleve handles: Name, Tags, Favorites,
+	// Metadata — structured fields with bounded term cardinality.
+	contentFieldMapping := bleve.NewTextFieldMapping()
+	contentFieldMapping.Index = false
+	contentFieldMapping.Store = false
+	contentFieldMapping.IncludeInAll = false
+	contentFieldMapping.IncludeTermVectors = false
+	contentFieldMapping.DocValues = false
 
 	// Metadata fields are handled by the default document mapping with
 	// StoreDynamic=true on the IndexMapping. This ensures Metadata.* fields
@@ -127,7 +135,7 @@ func NewMapping() (mapping.IndexMapping, error) {
 	docMapping.AddFieldMappingsAt("Name", nameMapping)
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Favorites", lowercaseMapping)
-	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
+	docMapping.AddFieldMappingsAt("Content", contentFieldMapping)
 
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name

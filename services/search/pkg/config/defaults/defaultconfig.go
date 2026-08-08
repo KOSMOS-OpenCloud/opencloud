@@ -52,6 +52,7 @@ func DefaultConfig() *config.Config {
 				TikaURL:        "http://127.0.0.1:9998",
 				CleanStopWords: false,
 				MaxWorkers:     8,
+				Features:       "docmeta,meta,entities,summary,embedding,store_detect",
 			},
 		},
 		Vector: config.VectorStore{

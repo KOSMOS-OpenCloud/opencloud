@@ -35,6 +35,7 @@ type Tika struct {
 	ContentExtractionSizeLimit uint64
 	CleanStopWords             bool
 	isTaki                     bool
+	features                   string
 }
 
 // IsTaki returns true if open_taki was detected as the extraction backend.
@@ -110,6 +111,7 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 		isTaki:                     isTaki,
+		features:                   cfg.Extractor.Tika.Features,
 	}, nil
 }
 
@@ -223,7 +225,9 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 
 	req.Header.Set("Content-Type", ri.MimeType)
 	req.Header.Set("X-Taki-Protocol", "v2")
-	req.Header.Set("X-Taki-Features", "docmeta,meta,entities,summary,embedding")
+	if t.features != "" {
+		req.Header.Set("X-Taki-Features", t.features)
+	}
 	req.Header.Set("X-Taki-Source-Ref", sourceRef)
 
 	resp, err := t.httpClient.Do(req)

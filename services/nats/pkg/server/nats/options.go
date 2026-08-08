@@ -50,3 +50,19 @@ func AllowNonTLS(v bool) NatsOption {
 		o.AllowNonTLS = v
 	}
 }
+
+// HTTPPort enables the NATS monitoring endpoint on the given port (e.g. 8222).
+// Set to 0 or negative to disable.
+func HTTPPort(port int) NatsOption {
+	return func(o *nserver.Options) {
+		o.HTTPPort = port
+	}
+}
+
+// MaxConnections limits the number of simultaneous client connections.
+// Set to 0 or negative for unlimited (default).
+func MaxConnections(n int) NatsOption {
+	return func(o *nserver.Options) {
+		o.MaxConn = n
+	}
+}

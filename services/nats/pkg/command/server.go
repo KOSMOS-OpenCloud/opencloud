@@ -75,14 +75,25 @@ func Server(cfg *config.Config) *cobra.Command {
 					Certificates: []tls.Certificate{crt},
 				}
 			}
-			natsServer, err := nats.NewNATSServer(
-				logging.NewLogWrapper(logger),
+			natsOpts := []nats.NatsOption{
 				nats.Host(cfg.Nats.Host),
 				nats.Port(cfg.Nats.Port),
 				nats.ClusterID(cfg.Nats.ClusterID),
 				nats.StoreDir(cfg.Nats.StoreDir),
 				nats.TLSConfig(tlsConf),
 				nats.AllowNonTLS(!cfg.Nats.EnableTLS),
+			}
+			if cfg.Nats.HTTPMonitorPort > 0 {
+				natsOpts = append(natsOpts, nats.HTTPPort(cfg.Nats.HTTPMonitorPort))
+				logger.Info().Int("port", cfg.Nats.HTTPMonitorPort).Msg("NATS monitoring enabled")
+			}
+			if cfg.Nats.MaxConnections > 0 {
+				natsOpts = append(natsOpts, nats.MaxConnections(cfg.Nats.MaxConnections))
+				logger.Info().Int("max", cfg.Nats.MaxConnections).Msg("NATS max connections set")
+			}
+			natsServer, err := nats.NewNATSServer(
+				logging.NewLogWrapper(logger),
+				natsOpts...,
 			)
 			if err != nil {
 				return err

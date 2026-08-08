@@ -139,7 +139,8 @@ func NewMapping() (mapping.IndexMapping, error) {
 
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
-	indexMapping.StoreDynamic = true // ensure Metadata.* fields are returned in hit.Fields
+	indexMapping.StoreDynamic = true  // Metadata.* fields returned in hit.Fields
+	indexMapping.DocValuesDynamic = false // no faceting/sorting on dynamic fields
 	indexMapping.DefaultMapping = docMapping
 	err := indexMapping.AddCustomAnalyzer("lowercaseKeyword",
 		map[string]any{

@@ -6,6 +6,8 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sync/atomic"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
@@ -21,9 +23,39 @@ import (
 	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
 )
 
+// mergerDead is set to 1 when the scorch merger goroutine fires an async
+// error (typically a panic). Once set it never clears — the index must be
+// considered degraded until the process is restarted.
+var mergerDead atomic.Int32
+
+// mergerDeadSince records the wall-clock time of the first async error.
+var mergerDeadSince atomic.Pointer[time.Time]
+
+// MergerIsDead returns true after the scorch merger goroutine has died.
+func MergerIsDead() bool { return mergerDead.Load() != 0 }
+
+// MergerDeadSince returns the time the merger died, or zero if alive.
+func MergerDeadSince() time.Time {
+	if t := mergerDeadSince.Load(); t != nil {
+		return *t
+	}
+	return time.Time{}
+}
+
 func init() {
 	scorch.RegistryAsyncErrorCallbacks["log"] = func(err error, path string) {
-		fmt.Fprintf(os.Stderr, "search: scorch async error (path=%s): %v\n", path, err)
+		now := time.Now()
+		mergerDead.Store(1)
+		mergerDeadSince.CompareAndSwap(nil, &now)
+		fmt.Fprintf(os.Stderr,
+			"\n*** SEARCH ALARM: scorch merger goroutine died ***\n"+
+				"    path:  %s\n"+
+				"    error: %v\n"+
+				"    time:  %s\n"+
+				"    Bleve can no longer merge segments. Segment count will grow\n"+
+				"    unbounded until writes block at 200 segments. The search\n"+
+				"    index is degraded — a process restart is required.\n\n",
+			path, err, now.Format(time.RFC3339))
 	}
 }
 

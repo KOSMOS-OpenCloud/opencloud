@@ -1283,19 +1283,66 @@ func (s *Service) StartWorkers(ctx context.Context) {
 
 		// waitForMerger pauses writes if too many segments have accumulated,
 		// giving the merger time to consolidate before we push more.
+		// If the merger goroutine is dead (async errors fired, merge epoch
+		// stuck) we log an alarm and stop waiting — blocking forever would
+		// be worse than proceeding with degraded merge.
+		var mergerAlarmFired bool
 		waitForMerger := func() {
 			const maxSegments = 200
 			const checkInterval = 2 * time.Second
+			const maxWait = 60 * time.Second
+			start := time.Now()
 			for {
 				stats := s.StatsMap()
-				if segs, ok := stats["num_root_filesegments"]; ok {
-					if n, ok := segs.(uint64); ok && n < maxSegments {
-						return
-					}
-					s.logger.Warn().Interface("segments", segs).Msg("index-queue: waiting for merger to consolidate segments")
-				} else {
+
+				// --- segment count check ---
+				segs, ok := stats["num_root_filesegments"]
+				if !ok {
 					return // can't check, proceed
 				}
+				n, ok := segs.(uint64)
+				if !ok {
+					return
+				}
+				if n < maxSegments {
+					return
+				}
+
+				// --- merger-dead detection ---
+				// If async errors have been fired AND the merge epoch is
+				// behind the root epoch, the merger goroutine is dead.
+				asyncErrors, _ := stats["TotOnErrors"].(uint64)
+				rootEpoch, _ := stats["CurRootEpoch"].(uint64)
+				lastMerged, _ := stats["LastMergedEpoch"].(uint64)
+				mergerStuck := asyncErrors > 0 && rootEpoch > 0 && lastMerged < rootEpoch
+
+				if mergerStuck && !mergerAlarmFired {
+					mergerAlarmFired = true
+					s.logger.Error().
+						Uint64("segments", n).
+						Uint64("async_errors", asyncErrors).
+						Uint64("root_epoch", rootEpoch).
+						Uint64("last_merged_epoch", lastMerged).
+						Msg("*** SEARCH ALARM: merger goroutine appears dead — " +
+							"segments will not be merged. Index is degraded. " +
+							"A process restart is required. ***")
+				}
+
+				// --- timeout ---
+				if time.Since(start) > maxWait {
+					s.logger.Error().
+						Uint64("segments", n).
+						Bool("merger_stuck", mergerStuck).
+						Dur("waited", time.Since(start)).
+						Msg("index-queue: giving up waiting for merger after timeout — " +
+							"proceeding with writes despite high segment count")
+					return
+				}
+
+				s.logger.Warn().
+					Uint64("segments", n).
+					Bool("merger_stuck", mergerStuck).
+					Msg("index-queue: waiting for merger to consolidate segments")
 				time.Sleep(checkInterval)
 			}
 		}

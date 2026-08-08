@@ -233,17 +233,27 @@ func Server(cfg *config.Config) *cobra.Command {
 				mux.HandleFunc("/index-status", func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "application/json")
 					status := ss.GetIndexStatus()
-					// Enrich with engine stats
+					// Enrich with engine stats + merger health
+					type mergerHealth struct {
+						Alive     bool   `json:"alive"`
+						DeadSince string `json:"dead_since,omitempty"`
+					}
 					type enrichedStatus struct {
 						search.IndexStatus
 						DocCount     uint64            `json:"doc_count,omitempty"`
 						IndexQueue   search.QueueStats `json:"index_queue"`
 						EnrichQueue  search.QueueStats `json:"enrich_queue"`
+						Merger       mergerHealth      `json:"merger"`
+					}
+					mh := mergerHealth{Alive: !bleve.MergerIsDead()}
+					if t := bleve.MergerDeadSince(); !t.IsZero() {
+						mh.DeadSince = t.Format("2006-01-02T15:04:05Z07:00")
 					}
 					es := enrichedStatus{
 						IndexStatus: status,
 						IndexQueue:  ss.IndexQueueStats(),
 						EnrichQueue: ss.EnrichQueueStats(),
+						Merger:      mh,
 					}
 					if dc, err := ss.DocCount(); err == nil {
 						es.DocCount = dc

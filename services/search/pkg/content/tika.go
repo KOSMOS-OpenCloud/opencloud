@@ -8,6 +8,7 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +23,14 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/config"
 )
+
+// traceIDKey is the context key for passing trace IDs to Taki requests.
+type traceIDKey struct{}
+
+// ContextWithTraceID returns a context with the given trace ID attached.
+func ContextWithTraceID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, traceIDKey{}, id)
+}
 
 // Tika is used to extract content from a resource.
 // Supports both Apache Tika and open_taki (drop-in replacement).
@@ -229,6 +238,14 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 		req.Header.Set("X-Taki-Features", t.features)
 	}
 	req.Header.Set("X-Taki-Source-Ref", sourceRef)
+
+	// Pass trace ID for per-document debug correlation (if set via context)
+	if traceID, ok := ctx.Value(traceIDKey{}).(string); ok && traceID != "" {
+		req.Header.Set("X-Taki-Trace-Id", traceID)
+	}
+	if os.Getenv("SEARCH_TRACE_DEBUG") == "true" {
+		req.Header.Set("X-Taki-Debug", "true")
+	}
 
 	resp, err := t.httpClient.Do(req)
 	if err != nil {

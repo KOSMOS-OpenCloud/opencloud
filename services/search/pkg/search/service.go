@@ -1089,6 +1089,10 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 		}
 	}
 
+	// Attach trace ID for Taki debug correlation
+	traceID := fmt.Sprintf("enrich_%s", storagespace.FormatResourceID(stat.Info.Id))
+	ctx = content.ContextWithTraceID(ctx, traceID)
+
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
 		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: extraction failed")
@@ -1154,7 +1158,17 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 		Msg("re-enrich: metadata written")
 
 	// Also update Qdrant embedding if available
-	if s.vectorClient != nil && doc.Taki != nil && len(doc.Taki.Embed) > 0 {
+	hasTaki := doc.Taki != nil
+	hasEmbed := hasTaki && len(doc.Taki.Embed) > 0
+	s.logger.Info().
+		Str("name", doc.Name).
+		Str("trace", traceID).
+		Bool("has_taki", hasTaki).
+		Bool("has_embed", hasEmbed).
+		Bool("has_vector_client", s.vectorClient != nil).
+		Int("content_len", len(doc.Content)).
+		Msg("re-enrich: backend routing")
+	if s.vectorClient != nil && hasEmbed {
 		payload := map[string]interface{}{
 			"name":        doc.Name,
 			"title":       doc.Title,
@@ -1600,6 +1614,10 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 	tStat := time.Since(t0)
 
 	s.logger.Info().Int64("op", opID).Str("name", stat.Info.Name).Str("path", path).Str("mime", stat.Info.MimeType).Dur("stat_ms", tStat).Msg("doUpsertItem: stat ok, extracting")
+
+	// Attach trace ID for Taki debug correlation
+	traceID := fmt.Sprintf("op%d", opID)
+	ctx = content.ContextWithTraceID(ctx, traceID)
 
 	tExtract := time.Now()
 	doc, err := s.extractor.Extract(ctx, stat.Info)

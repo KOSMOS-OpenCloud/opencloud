@@ -92,14 +92,22 @@ events — no separate reindex needed after re-enrich.`,
 			}
 			fmt.Printf("Re-enriching: %s\n", mode)
 
-			req := &searchsvc.IndexSpaceRequest{
-				SpaceId:        spaceFlag,
-				ReEnrich:       true,
-				ForceReindex:   forceRescan,
-				ForceOverwrite: forceOverwrite,
+			// Workaround: go-micro server drops ReEnrich bool when called
+			// from standard gRPC client. Use SpaceId prefix as signal.
+			spaceVal := spaceFlag
+			if spaceVal == "" {
+				spaceVal = "reenrich:"
+			} else {
+				spaceVal = "reenrich:" + spaceVal
 			}
-			fmt.Printf("gRPC request: space=%q re_enrich=%v force_reindex=%v force_overwrite=%v\n",
-				req.SpaceId, req.ReEnrich, req.ForceReindex, req.ForceOverwrite)
+			if forceOverwrite {
+				spaceVal = "reenrich-overwrite:" + spaceFlag
+			}
+			req := &searchsvc.IndexSpaceRequest{
+				SpaceId:      spaceVal,
+				ForceReindex: forceRescan,
+			}
+			fmt.Printf("gRPC request: space=%q force_reindex=%v\n", req.SpaceId, req.ForceReindex)
 			_, err = c.IndexSpace(ctx, req)
 			if err != nil {
 				fmt.Println("re-enrich failed: " + err.Error())

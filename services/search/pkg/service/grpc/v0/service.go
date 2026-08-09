@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -120,22 +121,36 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+	// Workaround: go-micro server drops ReEnrich/ForceOverwrite bools when
+	// called from standard gRPC client. Parse SpaceId prefix as signal.
+	spaceID := in.GetSpaceId()
+	reEnrich := in.GetReEnrich()
+	forceOverwrite := in.GetForceOverwrite()
+	if strings.HasPrefix(spaceID, "reenrich-overwrite:") {
+		reEnrich = true
+		forceOverwrite = true
+		spaceID = strings.TrimPrefix(spaceID, "reenrich-overwrite:")
+	} else if strings.HasPrefix(spaceID, "reenrich:") {
+		reEnrich = true
+		spaceID = strings.TrimPrefix(spaceID, "reenrich:")
+	}
+
 	s.log.Info().
-		Str("space_id", in.GetSpaceId()).
-		Bool("re_enrich", in.GetReEnrich()).
+		Str("space_id", spaceID).
+		Bool("re_enrich", reEnrich).
 		Bool("force_reindex", in.GetForceReindex()).
-		Bool("force_overwrite", in.GetForceOverwrite()).
+		Bool("force_overwrite", forceOverwrite).
 		Msg("gRPC IndexSpace called")
 
 	// Prüfen ob bereits ein Indexlauf aktiv ist
 	if svc, ok := s.searcher.(*search.Service); ok {
 		if status := svc.GetIndexStatus(); status.Running {
-			s.log.Info().Str("space", in.GetSpaceId()).Msg("index already running, skipping")
+			s.log.Info().Str("space", spaceID).Msg("index already running, skipping")
 			return nil
 		}
 	}
 
-	if in.GetSpaceId() != "" {
+	if spaceID != "" {
 		// Async: Job annehmen, sofort OK zurückgeben
 		go func() {
 			if svc, ok := s.searcher.(*search.Service); ok {
@@ -143,13 +158,13 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 				svc.SetIndexProgress(1, 1)
 				defer svc.FinishIndexing()
 			}
-			if in.GetReEnrich() {
-				if err := s.searcher.ReEnrichSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex(), in.GetForceOverwrite()); err != nil {
-					s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("re-enrich space failed")
+			if reEnrich {
+				if err := s.searcher.ReEnrichSpace(&provider.StorageSpaceId{OpaqueId: spaceID}, in.GetForceReindex(), forceOverwrite); err != nil {
+					s.log.Error().Err(err).Str("space", spaceID).Msg("re-enrich space failed")
 				}
 			} else {
-				if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.GetSpaceId()}, in.GetForceReindex()); err != nil {
-					s.log.Error().Err(err).Str("space", in.GetSpaceId()).Msg("index space failed")
+				if err := s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: spaceID}, in.GetForceReindex()); err != nil {
+					s.log.Error().Err(err).Str("space", spaceID).Msg("index space failed")
 				}
 			}
 		}()
@@ -190,8 +205,8 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 			if svc, ok := s.searcher.(*search.Service); ok {
 				svc.SetIndexProgress(i+1, len(spaces))
 			}
-			if in.GetReEnrich() {
-				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceReindex(), in.GetForceOverwrite()); err != nil {
+			if reEnrich {
+				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceReindex(), forceOverwrite); err != nil {
 					s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to re-enrich space, continuing")
 					indexErrors++
 				}

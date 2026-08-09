@@ -92,12 +92,15 @@ events — no separate reindex needed after re-enrich.`,
 			}
 			fmt.Printf("Re-enriching: %s\n", mode)
 
-			_, err = c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
+			req := &searchsvc.IndexSpaceRequest{
 				SpaceId:        spaceFlag,
 				ReEnrich:       true,
 				ForceReindex:   forceRescan,
 				ForceOverwrite: forceOverwrite,
-			})
+			}
+			fmt.Printf("gRPC request: space=%q re_enrich=%v force_reindex=%v force_overwrite=%v\n",
+				req.SpaceId, req.ReEnrich, req.ForceReindex, req.ForceOverwrite)
+			_, err = c.IndexSpace(ctx, req)
 			if err != nil {
 				fmt.Println("re-enrich failed: " + err.Error())
 				return err

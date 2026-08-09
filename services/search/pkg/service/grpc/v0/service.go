@@ -120,6 +120,13 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
+	s.log.Info().
+		Str("space_id", in.GetSpaceId()).
+		Bool("re_enrich", in.GetReEnrich()).
+		Bool("force_reindex", in.GetForceReindex()).
+		Bool("force_overwrite", in.GetForceOverwrite()).
+		Msg("gRPC IndexSpace called")
+
 	// Prüfen ob bereits ein Indexlauf aktiv ist
 	if svc, ok := s.searcher.(*search.Service); ok {
 		if status := svc.GetIndexStatus(); status.Running {

@@ -1099,75 +1099,9 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 		return false
 	}
 
-	// Collect metadata from extraction
-	metadata := map[string]string{}
-	addAudioMetadata(metadata, doc.Audio)
-	addImageMetadata(metadata, doc.Image)
-	addLocationMetadata(metadata, doc.Location)
-	addPhotoMetadata(metadata, doc.Photo)
-	if doc.Taki != nil {
-		addDocMetadata(metadata, doc.Taki.DocMeta)
-	}
-	if len(metadata) == 0 {
-		return false
-	}
-
-	// Filter: only missing keys unless forceOverwrite
-	writeMetadata := metadata
-	if !forceOverwrite {
-		existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
-		writeMetadata = map[string]string{}
-		for k, v := range metadata {
-			if v == "" {
-				continue
-			}
-			if existing != nil {
-				if _, exists := existing[k]; exists {
-					continue
-				}
-			}
-			writeMetadata[k] = v
-		}
-	}
-	if len(writeMetadata) == 0 {
-		return false
-	}
-
-	// Write xattrs via SetArbitraryMetadata → triggers ArbitraryMetadataUpdated → Bleve auto-update
-	gatewayClient, err := s.gatewaySelector.Next()
-	if err != nil {
-		s.logger.Error().Err(err).Msg("re-enrich: no gateway client")
-		return false
-	}
-
-	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
-		Ref: ref,
-		ArbitraryMetadata: &provider.ArbitraryMetadata{
-			Metadata: writeMetadata,
-		},
-	})
-	if err != nil || resp.Status.Code != rpc.Code_CODE_OK {
-		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: SetArbitraryMetadata failed")
-		return false
-	}
-
-	s.logger.Info().
-		Str("name", doc.Name).
-		Int("keys", len(writeMetadata)).
-		Bool("forceOverwrite", forceOverwrite).
-		Msg("re-enrich: metadata written")
-
-	// Also update Qdrant embedding if available
+	// Qdrant embedding — independent of xattr write
 	hasTaki := doc.Taki != nil
 	hasEmbed := hasTaki && len(doc.Taki.Embed) > 0
-	s.logger.Info().
-		Str("name", doc.Name).
-		Str("trace", traceID).
-		Bool("has_taki", hasTaki).
-		Bool("has_embed", hasEmbed).
-		Bool("has_vector_client", s.vectorClient != nil).
-		Int("content_len", len(doc.Content)).
-		Msg("re-enrich: backend routing")
 	if s.vectorClient != nil && hasEmbed {
 		payload := map[string]interface{}{
 			"name":        doc.Name,
@@ -1191,6 +1125,64 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 			s.logger.Warn().Err(err).Str("name", doc.Name).Msg("re-enrich: qdrant upsert failed")
 		}
 	}
+
+	// Collect metadata from extraction
+	metadata := map[string]string{}
+	addAudioMetadata(metadata, doc.Audio)
+	addImageMetadata(metadata, doc.Image)
+	addLocationMetadata(metadata, doc.Location)
+	addPhotoMetadata(metadata, doc.Photo)
+	if doc.Taki != nil {
+		addDocMetadata(metadata, doc.Taki.DocMeta)
+	}
+	if len(metadata) == 0 {
+		return hasEmbed // true if qdrant was updated
+	}
+
+	// Filter: only missing keys unless forceOverwrite
+	writeMetadata := metadata
+	if !forceOverwrite {
+		existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+		writeMetadata = map[string]string{}
+		for k, v := range metadata {
+			if v == "" {
+				continue
+			}
+			if existing != nil {
+				if _, exists := existing[k]; exists {
+					continue
+				}
+			}
+			writeMetadata[k] = v
+		}
+	}
+	if len(writeMetadata) == 0 {
+		return hasEmbed // true if qdrant was updated
+	}
+
+	// Write xattrs via SetArbitraryMetadata → triggers ArbitraryMetadataUpdated → Bleve auto-update
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Msg("re-enrich: no gateway client")
+		return hasEmbed
+	}
+
+	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+		Ref: ref,
+		ArbitraryMetadata: &provider.ArbitraryMetadata{
+			Metadata: writeMetadata,
+		},
+	})
+	if err != nil || resp.Status.Code != rpc.Code_CODE_OK {
+		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: SetArbitraryMetadata failed")
+		return hasEmbed
+	}
+
+	s.logger.Info().
+		Str("name", doc.Name).
+		Int("keys", len(writeMetadata)).
+		Bool("forceOverwrite", forceOverwrite).
+		Msg("re-enrich: metadata written")
 
 	return true
 }

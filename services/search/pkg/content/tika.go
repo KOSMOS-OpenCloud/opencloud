@@ -211,6 +211,27 @@ type takiV2Response struct {
 		VectorTarget  string `json:"vector_target"`
 		SourceRef     string `json:"source_ref"`
 	} `json:"X-TAKI:routing"`
+
+	// EXIF metadata (images only, extracted natively by Taki)
+	Image    *struct {
+		Width  int32 `json:"width"`
+		Height int32 `json:"height"`
+	} `json:"X-TAKI:image"`
+	Photo    *struct {
+		CameraMake          string  `json:"cameraMake"`
+		CameraModel         string  `json:"cameraModel"`
+		FNumber             float64 `json:"fNumber"`
+		FocalLength         float64 `json:"focalLength"`
+		ISO                 int32   `json:"iso"`
+		Orientation         int32   `json:"orientation"`
+		TakenDateTime       string  `json:"takenDateTime"`
+		ExposureNumerator   float64 `json:"exposureNumerator"`
+		ExposureDenominator float64 `json:"exposureDenominator"`
+	} `json:"X-TAKI:photo"`
+	Location *struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	} `json:"X-TAKI:location"`
 }
 
 // TakiDocMeta is a dynamic map — fields are defined by the external schema,
@@ -301,6 +322,58 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 	}
 
 	doc.Taki = taki
+
+	// EXIF metadata from Taki v2 (native EXIF parsing, not LLM)
+	if r.Image != nil {
+		img := libregraph.NewImage()
+		if r.Image.Width > 0 {
+			img.SetWidth(r.Image.Width)
+		}
+		if r.Image.Height > 0 {
+			img.SetHeight(r.Image.Height)
+		}
+		doc.Image = img
+	}
+	if r.Photo != nil {
+		photo := libregraph.NewPhoto()
+		if r.Photo.CameraMake != "" {
+			photo.SetCameraMake(r.Photo.CameraMake)
+		}
+		if r.Photo.CameraModel != "" {
+			photo.SetCameraModel(r.Photo.CameraModel)
+		}
+		if r.Photo.FNumber > 0 {
+			photo.SetFNumber(r.Photo.FNumber)
+		}
+		if r.Photo.FocalLength > 0 {
+			photo.SetFocalLength(r.Photo.FocalLength)
+		}
+		if r.Photo.ISO > 0 {
+			photo.SetIso(r.Photo.ISO)
+		}
+		if r.Photo.Orientation > 0 {
+			photo.SetOrientation(r.Photo.Orientation)
+		}
+		if r.Photo.TakenDateTime != "" {
+			layout := "2006-01-02T15:04:05"
+			if pt, err := time.Parse(layout, r.Photo.TakenDateTime); err == nil {
+				photo.SetTakenDateTime(pt)
+			}
+		}
+		if r.Photo.ExposureNumerator > 0 {
+			photo.SetExposureNumerator(r.Photo.ExposureNumerator)
+			photo.SetExposureDenominator(r.Photo.ExposureDenominator)
+		}
+		doc.Photo = photo
+	}
+	if r.Location != nil {
+		loc := libregraph.NewGeoCoordinates()
+		if r.Location.Latitude != 0 || r.Location.Longitude != 0 {
+			loc.SetLatitude(r.Location.Latitude)
+			loc.SetLongitude(r.Location.Longitude)
+			doc.Location = loc
+		}
+	}
 
 	if t.CleanStopWords && r.Meta != nil && r.Meta.Language != "" {
 		doc.Content = CleanString(doc.Content, r.Meta.Language)

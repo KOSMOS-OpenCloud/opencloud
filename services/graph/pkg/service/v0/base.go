@@ -58,10 +58,7 @@ func (g BaseGraphService) getDriveItem(ctx context.Context, ref *storageprovider
 		return nil, err
 	}
 
-	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
-		Ref:                   ref,
-		ArbitraryMetadataKeys: []string{"*"},
-	})
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
 		return nil, err
 	}

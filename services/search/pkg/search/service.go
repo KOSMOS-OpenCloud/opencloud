@@ -1592,6 +1592,13 @@ func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator)
 		r.ParentID = storagespace.FormatResourceID(parentID)
 	}
 
+	// Reconstruct typed Photo/Image/Location from ArbitraryMetadata
+	if m := stat.GetInfo().GetArbitraryMetadata().GetMetadata(); m != nil {
+		r.Image = reconstructImage(m)
+		r.Photo = reconstructPhoto(m)
+		r.Location = reconstructLocation(m)
+	}
+
 	if err := batch.Upsert(r.ID, r); err != nil {
 		s.logger.Error().Err(err).Str("name", stat.Info.Name).Msg("doIndexItem: batch upsert failed")
 	}

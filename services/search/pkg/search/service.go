@@ -1597,6 +1597,16 @@ func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator)
 		r.Image = reconstructImage(m)
 		r.Photo = reconstructPhoto(m)
 		r.Location = reconstructLocation(m)
+		if r.Photo != nil || r.Location != nil {
+			s.logger.Info().
+				Str("name", stat.Info.Name).
+				Bool("hasPhoto", r.Photo != nil).
+				Bool("hasLocation", r.Location != nil).
+				Int("mdKeys", len(m)).
+				Msg("doIndexItemBatch: reconstructed EXIF from ArbitraryMetadata")
+		}
+	} else {
+		s.logger.Debug().Str("name", stat.Info.Name).Msg("doIndexItemBatch: no ArbitraryMetadata")
 	}
 
 	if err := batch.Upsert(r.ID, r); err != nil {

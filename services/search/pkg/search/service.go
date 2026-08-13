@@ -1505,11 +1505,19 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 	r.Mtime = mtime
 	// Copy arbitrary metadata (xattrs: oy.fileReference, oy.subject, etc.)
 	if info.ArbitraryMetadata != nil && len(info.ArbitraryMetadata.Metadata) > 0 {
-		r.Metadata = info.ArbitraryMetadata.Metadata
+		raw := info.ArbitraryMetadata.Metadata
 		// Reconstruct typed Photo/Image/Location from flat libre.graph.* keys
-		r.Image = reconstructImage(r.Metadata)
-		r.Photo = reconstructPhoto(r.Metadata)
-		r.Location = reconstructLocation(r.Metadata)
+		r.Image = reconstructImage(raw)
+		r.Photo = reconstructPhoto(raw)
+		r.Location = reconstructLocation(raw)
+		// Filter libre.graph.* from Metadata map — they live in typed fields above
+		filtered := make(map[string]string, len(raw))
+		for k, v := range raw {
+			if !strings.HasPrefix(k, "libre.graph.") {
+				filtered[k] = v
+			}
+		}
+		r.Metadata = filtered
 	}
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 	if parentID := info.GetParentId(); parentID != nil {

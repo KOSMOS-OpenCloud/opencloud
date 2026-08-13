@@ -1548,6 +1548,7 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator) {
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
+		s.logger.Warn().Str("path", ref.GetPath()).Str("space", storagespace.FormatResourceID(ref.GetResourceId())).Msg("doIndexItemBatch: resInfo failed, skipping")
 		return
 	}
 

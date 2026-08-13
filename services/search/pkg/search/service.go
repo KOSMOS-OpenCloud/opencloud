@@ -1506,6 +1506,10 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 	// Copy arbitrary metadata (xattrs: oy.fileReference, oy.subject, etc.)
 	if info.ArbitraryMetadata != nil && len(info.ArbitraryMetadata.Metadata) > 0 {
 		r.Metadata = info.ArbitraryMetadata.Metadata
+		// Reconstruct typed Photo/Image/Location from flat libre.graph.* keys
+		r.Image = reconstructImage(r.Metadata)
+		r.Photo = reconstructPhoto(r.Metadata)
+		r.Location = reconstructLocation(r.Metadata)
 	}
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 	if parentID := info.GetParentId(); parentID != nil {
@@ -1813,6 +1817,62 @@ func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
 		return
 	}
 	marshalToStringMap(photo, metadata, "libre.graph.photo.")
+}
+
+// reconstructImage builds a libregraph.Image from flat libre.graph.image.* metadata keys.
+func reconstructImage(m map[string]string) *libregraph.Image {
+	var img *libregraph.Image
+	init := func() { if img == nil { img = libregraph.NewImage() } }
+	if v, ok := m["libre.graph.image.width"]; ok {
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); img.SetWidth(int32(i)) }
+	}
+	if v, ok := m["libre.graph.image.height"]; ok {
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); img.SetHeight(int32(i)) }
+	}
+	return img
+}
+
+// reconstructPhoto builds a libregraph.Photo from flat libre.graph.photo.* metadata keys.
+func reconstructPhoto(m map[string]string) *libregraph.Photo {
+	var p *libregraph.Photo
+	init := func() { if p == nil { p = libregraph.NewPhoto() } }
+	if v, ok := m["libre.graph.photo.cameraMake"]; ok && v != "" { init(); p.SetCameraMake(v) }
+	if v, ok := m["libre.graph.photo.cameraModel"]; ok && v != "" { init(); p.SetCameraModel(v) }
+	if v, ok := m["libre.graph.photo.fNumber"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetFNumber(f) }
+	}
+	if v, ok := m["libre.graph.photo.focalLength"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetFocalLength(f) }
+	}
+	if v, ok := m["libre.graph.photo.iso"]; ok {
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); p.SetIso(int32(i)) }
+	}
+	if v, ok := m["libre.graph.photo.orientation"]; ok {
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); p.SetOrientation(int32(i)) }
+	}
+	if v, ok := m["libre.graph.photo.takenDateTime"]; ok && v != "" {
+		if t, err := time.Parse("2006-01-02T15:04:05Z", v); err == nil { init(); p.SetTakenDateTime(t) }
+	}
+	if v, ok := m["libre.graph.photo.exposureNumerator"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetExposureNumerator(f) }
+	}
+	if v, ok := m["libre.graph.photo.exposureDenominator"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetExposureDenominator(f) }
+	}
+	return p
+}
+
+// reconstructLocation builds a libregraph.GeoCoordinates from flat libre.graph.location.* metadata keys.
+func reconstructLocation(m map[string]string) *libregraph.GeoCoordinates {
+	var loc *libregraph.GeoCoordinates
+	init := func() { if loc == nil { loc = libregraph.NewGeoCoordinates() } }
+	if v, ok := m["libre.graph.location.latitude"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); loc.SetLatitude(f) }
+	}
+	if v, ok := m["libre.graph.location.longitude"]; ok {
+		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); loc.SetLongitude(f) }
+	}
+	return loc
 }
 
 // addDocMetadata dynamically flattens structured document metadata from open_taki

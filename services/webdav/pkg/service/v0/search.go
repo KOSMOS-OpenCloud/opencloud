@@ -262,6 +262,10 @@ func matchToPropResponse(ctx context.Context, davPrefix, publicURL string, match
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:favorite", "1"))
 	}
 
+	// Photo/Location metadata from search index (EXIF data indexed by Tika/Taki)
+	propstatOK.Prop = appendPhotoProps(propstatOK.Prop, match.Entity.Photo)
+	propstatOK.Prop = appendLocationProps(propstatOK.Prop, match.Entity.Location)
+
 	// emit arbitrary metadata from the search index (e.g. oy.fileReference, oy.ftype)
 	for key, val := range match.Entity.GetMetadata() {
 		if val != "" {
@@ -274,6 +278,64 @@ func matchToPropResponse(ctx context.Context, davPrefix, publicURL string, match
 	}
 
 	return &response, nil
+}
+
+func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.PropertyXML {
+	if photo == nil {
+		return props
+	}
+	if t := photo.GetTakenDateTime(); t != nil {
+		props = append(props, prop.Escaped("oc:photo-taken-date-time",
+			t.AsTime().Format("2006-01-02T15:04:05Z07:00")))
+	}
+	if v := photo.GetCameraMake(); v != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-make", v))
+	}
+	if v := photo.GetCameraModel(); v != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-model", v))
+	}
+	if v := photo.GetFNumber(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-f-number",
+			strconv.FormatFloat(float64(v), 'f', 2, 32)))
+	}
+	if v := photo.GetFocalLength(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-focal-length",
+			strconv.FormatFloat(float64(v), 'f', 2, 32)))
+	}
+	if v := photo.GetIso(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-iso",
+			strconv.FormatInt(int64(v), 10)))
+	}
+	if v := photo.GetOrientation(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-orientation",
+			strconv.FormatInt(int64(v), 10)))
+	}
+	if v := photo.GetExposureNumerator(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-exposure-numerator",
+			strconv.FormatFloat(float64(v), 'f', 0, 32)))
+	}
+	if v := photo.GetExposureDenominator(); v != 0 {
+		props = append(props, prop.Escaped("oc:photo-exposure-denominator",
+			strconv.FormatFloat(float64(v), 'f', 0, 32)))
+	}
+	return props
+}
+
+func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordinates) []prop.PropertyXML {
+	if location == nil {
+		return props
+	}
+	if location.GetLatitude() != 0 || location.GetLongitude() != 0 {
+		props = append(props, prop.Escaped("oc:photo-location-latitude",
+			strconv.FormatFloat(location.GetLatitude(), 'f', 6, 64)))
+		props = append(props, prop.Escaped("oc:photo-location-longitude",
+			strconv.FormatFloat(location.GetLongitude(), 'f', 6, 64)))
+	}
+	if location.GetAltitude() != 0 {
+		props = append(props, prop.Escaped("oc:photo-location-altitude",
+			strconv.FormatFloat(location.GetAltitude(), 'f', 1, 64)))
+	}
+	return props
 }
 
 func hasPreview(md *provider.ResourceInfo, appendToOK func(p ...prop.PropertyXML)) {

@@ -37,6 +37,20 @@ var _fields = map[string]string{
 	"favorite":  "Favorites",
 }
 
+// _photoFields maps query-side photo field names to Bleve index paths.
+// Usage: photo.cameraMake:samsung → Photo.CameraMake:samsung
+var _photoFields = map[string]string{
+	"cameramake":          "Photo.CameraMake",
+	"cameramodel":         "Photo.CameraModel",
+	"takendatetime":       "Photo.TakenDateTime",
+	"fnumber":             "Photo.FNumber",
+	"focallength":         "Photo.FocalLength",
+	"iso":                 "Photo.Iso",
+	"orientation":         "Photo.Orientation",
+	"exposurenumerator":   "Photo.ExposureNumerator",
+	"exposuredenominator": "Photo.ExposureDenominator",
+}
+
 // The following quoted string enumerates the characters which may be escaped: "+-=&|><!(){}[]^\"~*?:\\/ "
 // based on bleve docs https://blevesearch.com/docs/Query-String-Query/
 // Wildcards * and ? are excluded
@@ -299,8 +313,16 @@ func getField(name string) string {
 	if name == "" {
 		return ""
 	}
-	if _, ok := _fields[strings.ToLower(name)]; ok {
-		return _fields[strings.ToLower(name)]
+	lower := strings.ToLower(name)
+	if v, ok := _fields[lower]; ok {
+		return v
+	}
+	// photo.xxx → Photo.Xxx (nested field lookup)
+	if strings.HasPrefix(lower, "photo.") {
+		subField := lower[len("photo."):]
+		if v, ok := _photoFields[subField]; ok {
+			return v
+		}
 	}
 	return name
 }

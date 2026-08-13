@@ -266,6 +266,18 @@ func matchToPropResponse(ctx context.Context, davPrefix, publicURL string, match
 	propstatOK.Prop = appendPhotoProps(propstatOK.Prop, match.Entity.Photo)
 	propstatOK.Prop = appendLocationProps(propstatOK.Prop, match.Entity.Location)
 
+	// Fallback: if typed Photo/Location are nil, reconstruct from flat Metadata keys
+	if match.Entity.Photo == nil {
+		if md := match.Entity.GetMetadata(); md != nil {
+			propstatOK.Prop = appendPhotoPropsFromMetadata(propstatOK.Prop, md)
+		}
+	}
+	if match.Entity.Location == nil {
+		if md := match.Entity.GetMetadata(); md != nil {
+			propstatOK.Prop = appendLocationPropsFromMetadata(propstatOK.Prop, md)
+		}
+	}
+
 	// emit arbitrary metadata from the search index (e.g. oy.fileReference, oy.ftype)
 	for key, val := range match.Entity.GetMetadata() {
 		if val != "" {
@@ -317,6 +329,52 @@ func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.P
 	if v := photo.GetExposureDenominator(); v != 0 {
 		props = append(props, prop.Escaped("oc:photo-exposure-denominator",
 			strconv.FormatFloat(float64(v), 'f', 0, 32)))
+	}
+	return props
+}
+
+// appendPhotoPropsFromMetadata reads flat libre.graph.photo.* keys from Metadata map.
+func appendPhotoPropsFromMetadata(props []prop.PropertyXML, md map[string]string) []prop.PropertyXML {
+	if v, ok := md["libre.graph.photo.takenDateTime"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-taken-date-time", v))
+	}
+	if v, ok := md["libre.graph.photo.cameraMake"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-make", v))
+	}
+	if v, ok := md["libre.graph.photo.cameraModel"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-model", v))
+	}
+	if v, ok := md["libre.graph.photo.fNumber"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-f-number", v))
+	}
+	if v, ok := md["libre.graph.photo.focalLength"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-focal-length", v))
+	}
+	if v, ok := md["libre.graph.photo.iso"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-iso", v))
+	}
+	if v, ok := md["libre.graph.photo.orientation"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-orientation", v))
+	}
+	if v, ok := md["libre.graph.photo.exposureNumerator"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-exposure-numerator", v))
+	}
+	if v, ok := md["libre.graph.photo.exposureDenominator"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-exposure-denominator", v))
+	}
+	return props
+}
+
+// appendLocationPropsFromMetadata reads flat libre.graph.location.* keys from Metadata map.
+func appendLocationPropsFromMetadata(props []prop.PropertyXML, md map[string]string) []prop.PropertyXML {
+	lat, hasLat := md["libre.graph.location.latitude"]
+	lng, hasLng := md["libre.graph.location.longitude"]
+	if hasLat && lat != "" && hasLng && lng != "" {
+		props = append(props, prop.Escaped("oc:photo-location-latitude", lat))
+		props = append(props, prop.Escaped("oc:photo-location-longitude", lng))
+	}
+	if v, ok := md["libre.graph.location.altitude"]; ok && v != "" {
+		props = append(props, prop.Escaped("oc:photo-location-altitude", v))
 	}
 	return props
 }

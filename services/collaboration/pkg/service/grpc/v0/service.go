@@ -102,8 +102,8 @@ func (s *Service) OpenInApp(
 		Str("Requester", user.GetId().String()).
 		Logger()
 
-	// get the file extension to use the right wopi app url
-	fileExt := path.Ext(req.GetResourceInfo().GetPath())
+	// get the file extension to use the right wopi app url (case-insensitive)
+	fileExt := strings.ToLower(path.Ext(req.GetResourceInfo().GetPath()))
 
 	// get the appURL we need to use
 	appURL := s.getAppUrl(fileExt, req.GetViewMode())

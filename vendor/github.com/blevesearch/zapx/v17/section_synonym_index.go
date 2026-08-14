@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"log"
 	"math"
 	"sort"
 
@@ -687,7 +688,9 @@ func mergeAndPersistSynonymSection(segments []*SegmentBase, dropsIn []*roaring.B
 			for next != nil && err == nil {
 				synNewDocNum := newDocNums[itrI][next.Number()]
 				if synNewDocNum == docDropped {
-					return nil, nil, fmt.Errorf("see hit with dropped docNum")
+					log.Printf("zapx: skipping dropped synonym docNum=%d in merge", next.Number())
+					next, err = synItr.Next()
+					continue
 				}
 				nextTerm := next.Term()
 				var synNewID uint32

@@ -1308,9 +1308,9 @@ func (s *Service) StartWorkers(ctx context.Context) {
 		// be worse than proceeding with degraded merge.
 		var mergerAlarmFired bool
 		waitForMerger := func() {
-			const maxSegments = 200
+			const maxSegments = 30
 			const checkInterval = 2 * time.Second
-			const maxWait = 60 * time.Second
+			const maxWait = 120 * time.Second
 			start := time.Now()
 			for {
 				stats := s.StatsMap()
@@ -1329,18 +1329,17 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				}
 
 				// --- merger-dead detection ---
-				// If async errors have been fired AND the merge epoch is
-				// behind the root epoch, the merger goroutine is dead.
-				asyncErrors, _ := stats["TotOnErrors"].(uint64)
+				// Check if merge errors have occurred AND the merge epoch is stuck.
+				mergeErrors, _ := stats["TotFileMergeLoopErr"].(uint64)
 				rootEpoch, _ := stats["CurRootEpoch"].(uint64)
 				lastMerged, _ := stats["LastMergedEpoch"].(uint64)
-				mergerStuck := asyncErrors > 0 && rootEpoch > 0 && lastMerged < rootEpoch
+				mergerStuck := mergeErrors > 0 && rootEpoch > 0 && lastMerged < rootEpoch
 
 				if mergerStuck && !mergerAlarmFired {
 					mergerAlarmFired = true
 					s.logger.Error().
 						Uint64("segments", n).
-						Uint64("async_errors", asyncErrors).
+						Uint64("merge_errors", mergeErrors).
 						Uint64("root_epoch", rootEpoch).
 						Uint64("last_merged_epoch", lastMerged).
 						Msg("*** SEARCH ALARM: merger goroutine appears dead — " +

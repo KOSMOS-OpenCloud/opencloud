@@ -1518,6 +1518,17 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 		}
 		r.Metadata = filtered
 	}
+	// Extract cross-space move provenance (user.oc.oldids.N xattrs)
+	if m := info.ArbitraryMetadata.GetMetadata(); m != nil {
+		for i := 0; ; i++ {
+			key := "user.oc.oldids." + strconv.Itoa(i)
+			v, ok := m[key]
+			if !ok {
+				break
+			}
+			r.OldIDs = append(r.OldIDs, v)
+		}
+	}
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 	if parentID := info.GetParentId(); parentID != nil {
 		r.ParentID = storagespace.FormatResourceID(parentID)
@@ -2081,4 +2092,17 @@ func (s *Service) DebugSearch(query string, limit int) (interface{}, error) {
 		"doccount": docCount,
 		"matches":  matches,
 	}, nil
+}
+
+// ResolvePathID resolves a (possibly outdated) resource ID to the current
+// resource by searching the Bleve OldIDs index. Returns the current Resource
+// with ID, Path, RootID — or an error if the engine doesn't support it.
+func (s *Service) ResolvePathID(oldID string) (*Resource, error) {
+	type pathIDResolver interface {
+		ResolvePathID(oldID string) (*Resource, error)
+	}
+	if resolver, ok := s.engine.(pathIDResolver); ok {
+		return resolver.ResolvePathID(oldID)
+	}
+	return nil, fmt.Errorf("engine does not support ResolvePathID")
 }

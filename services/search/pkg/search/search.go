@@ -58,6 +58,7 @@ type Resource struct {
 	Type     uint64
 	Deleted  bool
 	Hidden   bool
+	OldIDs   []string // previous spaceID!nodeID values from cross-space moves
 }
 
 // ResolveReference makes sure the path is relative to the space root

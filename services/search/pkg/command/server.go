@@ -299,6 +299,22 @@ func Server(cfg *config.Config) *cobra.Command {
 					}
 					json.NewEncoder(w).Encode(results)
 				})
+				// /resolve-path-id?id=storageid$spaceid!nodeid — resolve old resource ID to current via Bleve OldIDs index
+				mux.HandleFunc("/resolve-path-id", func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					oldID := r.URL.Query().Get("id")
+					if oldID == "" {
+						http.Error(w, `{"error":"missing ?id= parameter"}`, 400)
+						return
+					}
+					resource, err := ss.ResolvePathID(oldID)
+					if err != nil {
+						w.WriteHeader(404)
+						json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+						return
+					}
+					json.NewEncoder(w).Encode(resource)
+				})
 				mux.Handle("/", origHandler)
 				debugServer.Handler = mux
 

@@ -269,6 +269,47 @@ func (b *Backend) NewBatch(size int) (search.BatchOperator, error) {
 	return NewBatch(b.index, size)
 }
 
+// ResolvePathID looks up a (possibly outdated) resource ID in the Bleve index
+// by searching the OldIDs field. Returns the current Resource (with ID, Path,
+// RootID) or an error if not found. Follows the chain recursively.
+func (b *Backend) ResolvePathID(oldID string) (*search.Resource, error) {
+	// Search for documents where OldIDs contains the given ID
+	q := bleve.NewTermQuery(oldID)
+	q.SetField("OldIDs")
+
+	req := bleve.NewSearchRequest(q)
+	req.Fields = []string{"*"}
+	req.Size = 1
+
+	res, err := b.index.Search(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.Hits.Len() == 0 {
+		return nil, errtypes.NotFound("resource ID not found in index: " + oldID)
+	}
+
+	resource := matchToResource(res.Hits[0])
+
+	// The found resource might itself have been moved again — follow the chain
+	// by checking if this resource's current ID is referenced as an OldID elsewhere.
+	// Max 100 hops to prevent loops.
+	for i := 0; i < 100; i++ {
+		nextQ := bleve.NewTermQuery(resource.ID)
+		nextQ.SetField("OldIDs")
+		nextReq := bleve.NewSearchRequest(nextQ)
+		nextReq.Fields = []string{"*"}
+		nextReq.Size = 1
+		nextRes, err := b.index.Search(nextReq)
+		if err != nil || nextRes.Hits.Len() == 0 {
+			break
+		}
+		resource = matchToResource(nextRes.Hits[0])
+	}
+
+	return resource, nil
+}
+
 // sanitizeUTF8 replaces invalid UTF-8 bytes with U+FFFD.
 // Prevents gRPC marshaling errors ("string field contains invalid UTF-8").
 func sanitizeUTF8(s string) string {

@@ -174,6 +174,11 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		for _, userID := range e.UserIDs {
 			users = append(users, userID.GetOpaqueId())
 		}
+
+	// todo
+	case ocEvents.TodoUpdate:
+		executant = e.Executant
+		users = append(users, e.ReceiverID)
 	case events.SpaceUnshared:
 		executant = e.Executant
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)

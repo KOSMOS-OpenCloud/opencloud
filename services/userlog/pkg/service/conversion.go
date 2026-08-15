@@ -121,6 +121,10 @@ func (c *Converter) ConvertEvent(eventid string, event any) (OC10Notification, e
 	// misc
 	case ocEvents.ResourceMention:
 		return c.resourceMention(eventid, Mention, ev.Executant, ev.Ref.GetResourceId(), ev.Timestamp)
+
+	// todo
+	case ocEvents.TodoUpdate:
+		return c.todoMessage(eventid, ev)
 	}
 
 }
@@ -355,6 +359,54 @@ func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string
 		Message:        msg,
 		MessageRaw:     msgraw,
 		MessageDetails: map[string]any{},
+	}, nil
+}
+
+func (c *Converter) todoMessage(eventid string, ev ocEvents.TodoUpdate) (OC10Notification, error) {
+	usr, err := c.getUser(context.Background(), ev.Executant)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	var nt NotificationTemplate
+	switch ev.Action {
+	case "delegated":
+		nt = TodoDelegated
+	case "date_changed":
+		nt = TodoDateChanged
+	case "completed":
+		nt = TodoCompleted
+	case "reopened":
+		nt = TodoReopened
+	default:
+		nt = TodoDelegated
+	}
+
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]any{
+		"username":    usr.GetDisplayName(),
+		"todosubject": ev.Subject,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	details := generateDetails(usr, nil, nil, nil)
+	details["todo"] = map[string]string{
+		"id":      ev.TodoID,
+		"subject": ev.Subject,
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       usr.GetUsername(),
+		Timestamp:      ev.Timestamp.Format(time.RFC3339Nano),
+		ResourceType:   "todo",
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: details,
 	}, nil
 }
 

@@ -56,6 +56,8 @@ const (
 	SettingUUIDProfileEventPostprocessingStepFinished = "fe0a3011-d886-49c8-b797-33d02fa426ef"
 	// SettingUUIDProfileEventResourceMention is the hardcoded setting UUID for the send in mail setting
 	SettingUUIDProfileEventResourceMention = "08aaa973-a622-449d-97dc-3857160d1e97"
+	// SettingUUIDProfileEventTodoUpdate is the hardcoded setting UUID for todo notification setting
+	SettingUUIDProfileEventTodoUpdate = "a3b1c2d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -451,6 +453,23 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 						Options: []*settingsmsg.MultiChoiceCollectionOption{
 							&optionInAppTrue,
 							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventTodoUpdate,
+				Name:        "event-todo-update-options",
+				DisplayName: TemplateTodoUpdate,
+				Description: TemplateTodoUpdateDescription,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailFalseDisabled,
 						},
 					},
 				},

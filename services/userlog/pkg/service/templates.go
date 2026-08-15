@@ -63,6 +63,26 @@ var (
 		Subject: l10n.Template("Instance will be shut down and deprovisioned"),
 		Message: l10n.Template("Attention! The instance will be shut down and deprovisioned on {date}. Download all your data before that date as no access past that date is possible."),
 	}
+
+	TodoDelegated = NotificationTemplate{
+		Subject: l10n.Template("Todo assigned to you"),
+		Message: l10n.Template("{user} assigned you the todo \"{todo}\""),
+	}
+
+	TodoDateChanged = NotificationTemplate{
+		Subject: l10n.Template("Todo date changed"),
+		Message: l10n.Template("{user} changed the date of todo \"{todo}\""),
+	}
+
+	TodoCompleted = NotificationTemplate{
+		Subject: l10n.Template("Todo completed"),
+		Message: l10n.Template("{user} completed the todo \"{todo}\""),
+	}
+
+	TodoReopened = NotificationTemplate{
+		Subject: l10n.Template("Todo reopened"),
+		Message: l10n.Template("{user} reopened the todo \"{todo}\""),
+	}
 )
 
 // holds the information to turn the raw template into a parseable go template
@@ -72,6 +92,7 @@ var _placeholders = map[string]string{
 	"{resource}": "{{ .resourcename }}",
 	"{virus}":    "{{ .virusdescription }}",
 	"{date}":     "{{ .date }}",
+	"{todo}":     "{{ .todosubject }}",
 }
 
 // NotificationTemplate is the data structure for the notifications

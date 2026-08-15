@@ -49,6 +49,9 @@ var _registeredEvents = []events.Unmarshaller{
 
 	// misc
 	ocEvents.ResourceMention{},
+
+	// todo
+	ocEvents.TodoUpdate{},
 }
 
 // Server is the entrypoint for the server command.

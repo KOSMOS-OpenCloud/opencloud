@@ -56,4 +56,8 @@ var (
 	TemplateIntervalWeekly = l10n.Template("Weekly")
 	// translation for the 'never' email interval option
 	TemplateIntervalNever = l10n.Template("Never")
+	// name of the notification option 'Todo Update'
+	TemplateTodoUpdate = l10n.Template("Todo Update")
+	// description of the notification option 'Todo Update'
+	TemplateTodoUpdateDescription = l10n.Template("Notify when a todo is assigned to me or updated")
 )

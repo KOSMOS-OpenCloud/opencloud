@@ -984,10 +984,8 @@ func (s *Service) PurgeDeleted(spaceID *provider.StorageSpaceId) error {
 	return nil
 }
 
-// ReEnrichSpace walks all files in a space, calls Taki/LLM for each,
-// and writes metadata to xattrs. By default only missing keys are written.
-// If force is true, all keys are overwritten (destructive — user corrections lost).
-// Bleve is updated automatically via ArbitraryMetadataUpdated events.
+// ReEnrichSpace walks all files in a space and enqueues them into the
+// enrich queue for processing by the enrich worker (Taki + Qdrant + Bleve).
 func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, forceOverwrite bool) error {
 	s.logger.Info().Str("space", spaceID.GetOpaqueId()).Bool("forceRescan", forceRescan).Bool("forceOverwrite", forceOverwrite).Msg("ReEnrichSpace starting")
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
@@ -1004,43 +1002,11 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 	}
 	rootID.OpaqueId = rootID.SpaceId
 
-	startTime := time.Now()
 	w := walker.NewWalker(s.gatewaySelector)
-
-	// Parallel Taki extraction
-	indexWorkers := s.cfg.Extractor.Tika.MaxWorkers
-	if indexWorkers < 1 {
-		indexWorkers = 8
-	}
-
-	var enriched, skipped, errors int64
-	workCh := make(chan *provider.Reference, indexWorkers*2)
-	var wg sync.WaitGroup
-
-	for i := 0; i < indexWorkers; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for ref := range workCh {
-				if s.doEnrichItem(ownerCtx, ref, forceRescan, forceOverwrite) {
-					atomic.AddInt64(&enriched, 1)
-				} else {
-					atomic.AddInt64(&skipped, 1)
-				}
-			}
-		}()
-	}
-
-	s.logger.Info().
-		Str("space", spaceID.GetOpaqueId()).
-		Bool("forceRescan", forceRescan).
-		Bool("forceOverwrite", forceOverwrite).
-		Int("workers", indexWorkers).
-		Msg("re-enrich: starting")
+	var queued int64
 
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
-			atomic.AddInt64(&errors, 1)
 			return err
 		}
 		if info == nil || info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
@@ -1050,20 +1016,16 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootID,
 		}
-		workCh <- ref
+		// Blocking send — walk waits when queue is full
+		s.enrichCh <- queueRequest{ref: ref, source: "grpc:ReEnrich", forceOverwrite: forceOverwrite}
+		atomic.AddInt64(&queued, 1)
 		return nil
 	})
 
-	close(workCh)
-	wg.Wait()
-
 	s.logger.Info().
 		Str("space", spaceID.GetOpaqueId()).
-		Int64("enriched", enriched).
-		Int64("skipped", skipped).
-		Int64("errors", errors).
-		Str("duration", time.Since(startTime).String()).
-		Msg("re-enrich: completed")
+		Int64("queued", queued).
+		Msg("re-enrich: walk complete, items queued")
 
 	return err
 }

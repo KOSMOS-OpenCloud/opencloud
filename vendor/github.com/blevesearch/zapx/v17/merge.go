@@ -268,7 +268,10 @@ func mergeTermFreqNormLocsByCopying(term []byte, postItr *PostingsIterator,
 	for err == nil && len(nextFreqNormBytes) > 0 {
 		hitNewDocNum := newDocNums[nextDocNum]
 		if hitNewDocNum == docDropped {
-			return 0, 0, 0, fmt.Errorf("see hit with dropped doc num")
+			log.Printf("zapx: skipping dropped docNum=%d in merge-by-copying (term=%q)", nextDocNum, term)
+			nextDocNum, nextFreq, nextNorm, nextFreqNormBytes, nextLocBytes, err =
+				postItr.nextBytes()
+			continue
 		}
 
 		newRoaring.Add(uint32(hitNewDocNum))

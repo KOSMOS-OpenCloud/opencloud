@@ -273,8 +273,8 @@ func (b *Backend) NewBatch(size int) (search.BatchOperator, error) {
 // First tries a direct ID lookup, then falls back to OldIDs (cross-space move).
 // Returns the current Resource (with ID, Path, RootID) or an error if not found.
 func (b *Backend) ResolvePathID(id string) (*search.Resource, error) {
-	// 1. Direct lookup by Bleve document ID
-	idReq := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
+	// 1. Direct lookup by ID field (query string parser handles $ and ! correctly)
+	idReq := bleve.NewSearchRequest(bleve.NewQueryStringQuery("ID:" + id))
 	idReq.Fields = []string{"*"}
 	idReq.Size = 1
 	if idRes, err := b.index.Search(idReq); err == nil && idRes.Hits.Len() > 0 {

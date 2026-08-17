@@ -131,12 +131,17 @@ func NewMapping() (mapping.IndexMapping, error) {
 	// are both indexed (searchable) AND stored (returned in hit.Fields).
 	// A separate SubDocumentMapping would override StoreDynamic inheritance.
 
-	// OldIDs: exact match for cross-space move provenance lookup
+	// ID + OldIDs: exact match, keyword analyzer, no _all
+	idMapping := bleve.NewTextFieldMapping()
+	idMapping.Analyzer = keyword.Name
+	idMapping.IncludeInAll = false
+
 	oldIDsMapping := bleve.NewTextFieldMapping()
 	oldIDsMapping.Analyzer = keyword.Name
 	oldIDsMapping.IncludeInAll = false
 
 	docMapping := bleve.NewDocumentMapping()
+	docMapping.AddFieldMappingsAt("ID", idMapping)
 	docMapping.AddFieldMappingsAt("Name", nameMapping)
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Favorites", lowercaseMapping)

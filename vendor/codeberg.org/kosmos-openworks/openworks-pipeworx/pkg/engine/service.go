@@ -1,0 +1,372 @@
+package engine
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/google/uuid"
+	"codeberg.org/kosmos-openworks/openworks-pipeworx/pkg/config"
+)
+
+// Logger is an optional structured logger for the engine.
+// Set JobEngine.Logger to receive operational log messages.
+// If nil, falls back to log.Printf.
+type Logger interface {
+	Debug(msg string, keysAndValues ...any)
+	Info(msg string, keysAndValues ...any)
+	Warn(msg string, keysAndValues ...any)
+	Error(msg string, keysAndValues ...any)
+}
+
+// defaultLogger uses stdlib log as fallback
+type defaultLogger struct{}
+
+func (l *defaultLogger) Debug(msg string, kv ...any) {}
+func (l *defaultLogger) Info(msg string, kv ...any)  { log.Printf("[INFO] %s %v", msg, kv) }
+func (l *defaultLogger) Warn(msg string, kv ...any)  { log.Printf("[WARN] %s %v", msg, kv) }
+func (l *defaultLogger) Error(msg string, kv ...any) { log.Printf("[ERROR] %s %v", msg, kv) }
+
+// JobStatus represents the state of a job
+type JobStatus string
+
+const (
+	StatusQueued    JobStatus = "queued"
+	StatusRunning   JobStatus = "running"
+	StatusCompleted JobStatus = "completed"
+	StatusFailed    JobStatus = "failed"
+	StatusCancelled JobStatus = "cancelled"
+	StatusExpired   JobStatus = "expired"
+)
+
+// Job is a queued/running/completed job
+type Job struct {
+	ID          string    `json:"jobId"`
+	Pipeline    string    `json:"pipeline"`
+	Status      JobStatus `json:"status"`
+	Progress    int       `json:"progress"`
+	Stage       string    `json:"stage,omitempty"`
+	StageData   any       `json:"stageData,omitempty"`
+	Total       int       `json:"total"`
+	Priority    int       `json:"priority,omitempty"`
+	Error       string    `json:"error,omitempty"`
+	Params      any       `json:"params,omitempty"`
+	Result      any       `json:"result,omitempty"`
+	DependsOn   []string  `json:"dependsOn,omitempty"`
+	ETA         time.Time `json:"eta,omitempty"`
+	UserID      string    `json:"userId"`
+	CreatedAt   time.Time `json:"createdAt"`
+	ValidTill   time.Time `json:"validTill,omitempty"`
+	WorkerID    string    `json:"workerId,omitempty"`
+	PickedAt    time.Time `json:"pickedAt,omitempty"`
+	CompletedAt time.Time `json:"completedAt,omitempty"`
+	Retries     int       `json:"retries,omitempty"`
+	CallbackURI string    `json:"callbackUri,omitempty"`
+}
+
+// JobEngine is the core dispatcher service.
+// It does NOT execute jobs — workers pick them via the poll endpoint.
+type JobEngine struct {
+	cfg         *config.PipelineConfig
+	auth        AuthExtractor
+	jobs        map[string]*Job
+	jobsMu      sync.RWMutex
+	stopCleanup chan struct{}
+
+	// Worker polling state (guarded by workerMu, separate from jobsMu to reduce contention)
+	workerMu     sync.RWMutex
+	heartbeats   map[string]time.Time       // workerID → last poll time
+	workerPick   map[string][]string        // workerID → offered job types
+	workerCap    map[string]int             // workerID → last reported capacity
+	pipeMatrix map[string]map[string]int   // workerID → { jobType → slots }
+	matrix     *PipeMatrix                 // persistent matrix (if loaded from file)
+	regTokens  map[string]string           // workerID → regToken (pipeline registration receipt)
+
+	// Optional backend store (XIS provides this, OpenCloud does not)
+	storeProvider StoreProvider
+
+	// OnJobDone is called (async) when a job reaches a terminal state
+	// (completed, failed-final, cancelled, expired). Set by the consumer
+	// to receive completion notifications.
+	OnJobDone func(*Job)
+
+	// Log is the optional structured logger. Set by consumer.
+	Log Logger
+}
+
+const (
+	// jobRetention removes completed/failed jobs older than 1 hour
+	jobRetention = 1 * time.Hour
+	// workerTTL removes workers that haven't polled in 10 minutes
+	workerTTL = 10 * time.Minute
+)
+
+// New creates a new JobEngine (pure dispatcher, no internal workers)
+func New(cfg *config.PipelineConfig, auth AuthExtractor) *JobEngine {
+	e := &JobEngine{
+		cfg:         cfg,
+		auth:        auth,
+		jobs:        make(map[string]*Job),
+		stopCleanup: make(chan struct{}),
+		heartbeats:  make(map[string]time.Time),
+		workerPick:  make(map[string][]string),
+		workerCap:   make(map[string]int),
+		pipeMatrix:  make(map[string]map[string]int),
+		regTokens:   make(map[string]string),
+		Log:         &defaultLogger{},
+	}
+
+	// start cleanup goroutine
+	go e.cleanupLoop()
+
+	return e
+}
+
+// Submit creates and queues a new job. The job sits in the queue
+// until a worker picks it via the poll endpoint.
+// SubmitOpts holds optional fields for job submission
+type SubmitOpts struct {
+	Params      any       `json:"params,omitempty"`
+	Priority    int       `json:"priority,omitempty"`
+	ETA         time.Time `json:"eta,omitempty"`
+	DependsOn   []string  `json:"dependsOn,omitempty"`
+	CallbackURI string    `json:"callbackUri,omitempty"`
+}
+
+func (e *JobEngine) Submit(pipelineID string, resources []string, userID string, targetPath string, createDirs bool, opts *SubmitOpts) (*Job, error) {
+	pipeline, ok := e.cfg.Pipelines[pipelineID]
+	if !ok {
+		return nil, fmt.Errorf("unknown pipeline: %s", pipelineID)
+	}
+
+	// Calculate validTill from pipeline job timeout
+	var validTill time.Time
+	if pipeline.Job.Timeout > 0 {
+		validTill = time.Now().Add(pipeline.Job.Timeout)
+	} else if pipeline.Executor.Timeout > 0 {
+		// legacy fallback
+		validTill = time.Now().Add(pipeline.Executor.Timeout)
+	} else {
+		validTill = time.Now().Add(1 * time.Hour) // default 1h
+	}
+
+	if opts == nil {
+		opts = &SubmitOpts{}
+	}
+
+	// Rate limit: check concurrent jobs for this pipeline
+	if pipeline.Job.RateLimit > 0 {
+		e.jobsMu.RLock()
+		active := 0
+		for _, j := range e.jobs {
+			if j.Pipeline == pipelineID && (j.Status == StatusQueued || j.Status == StatusRunning) {
+				active++
+			}
+		}
+		e.jobsMu.RUnlock()
+		if active >= pipeline.Job.RateLimit {
+			return nil, fmt.Errorf("rate limit exceeded: %d/%d active jobs for pipeline %s", active, pipeline.Job.RateLimit, pipelineID)
+		}
+	}
+
+	job := &Job{
+		ID:          uuid.New().String(),
+		Pipeline:    pipelineID,
+		Status:      StatusQueued,
+		Total:       len(resources),
+		Params:      opts.Params,
+		Priority:    opts.Priority,
+		ETA:         opts.ETA,
+		DependsOn:   opts.DependsOn,
+		CallbackURI: opts.CallbackURI,
+		UserID:      userID,
+		CreatedAt:   time.Now(),
+		ValidTill:   validTill,
+	}
+
+	e.jobsMu.Lock()
+	e.jobs[job.ID] = job
+	e.jobsMu.Unlock()
+
+	e.Log.Info("job submitted", "jobId", job.ID, "pipeline", pipelineID, "user", userID, "total", job.Total)
+	return job, nil
+}
+
+// validateCallbackURI checks that a callback URI is a valid HTTPS URL.
+func validateCallbackURI(raw string) error {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return fmt.Errorf("invalid callback URI: %w", err)
+	}
+	if u.Scheme != "https" && u.Scheme != "http" {
+		return fmt.Errorf("callback URI must use http or https scheme")
+	}
+	if u.Host == "" {
+		return fmt.Errorf("callback URI must have a host")
+	}
+	return nil
+}
+
+// fireCallback performs an HTTPS GET to the job's callback URI (if set).
+// Placeholders {jobid} and {status} in the URI are replaced with actual values.
+// The response body is not read. Runs with a 3s timeout.
+func (e *JobEngine) fireCallback(job *Job) {
+	if job.CallbackURI == "" {
+		return
+	}
+
+	uri := strings.ReplaceAll(job.CallbackURI, "{jobid}", job.ID)
+	uri = strings.ReplaceAll(uri, "{status}", string(job.Status))
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		e.Log.Warn("callback request error", "jobId", job.ID, "uri", uri, "error", err.Error())
+		return
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		e.Log.Warn("callback failed", "jobId", job.ID, "uri", uri, "error", err.Error())
+		return
+	}
+	resp.Body.Close()
+
+	e.Log.Info("callback fired", "jobId", job.ID, "uri", uri, "httpStatus", resp.StatusCode)
+}
+
+// GetJob returns a job by ID
+func (e *JobEngine) GetJob(jobID string) (*Job, bool) {
+	e.jobsMu.RLock()
+	defer e.jobsMu.RUnlock()
+	job, ok := e.jobs[jobID]
+	return job, ok
+}
+
+// GetUserJobs returns all jobs for a user, optionally filtered by status
+func (e *JobEngine) GetUserJobs(userID string, statusFilter JobStatus) []*Job {
+	e.jobsMu.RLock()
+	defer e.jobsMu.RUnlock()
+
+	var result []*Job
+	for _, job := range e.jobs {
+		if userID != "" && job.UserID != userID {
+			continue
+		}
+		if statusFilter != "" && job.Status != statusFilter {
+			continue
+		}
+		result = append(result, job)
+	}
+	return result
+}
+
+// CancelJob cancels a queued or running job
+func (e *JobEngine) CancelJob(jobID string) error {
+	e.jobsMu.Lock()
+	defer e.jobsMu.Unlock()
+
+	job, ok := e.jobs[jobID]
+	if !ok {
+		return fmt.Errorf("job not found: %s", jobID)
+	}
+	job.Status = StatusCancelled
+	job.CompletedAt = time.Now()
+	e.Log.Info("job cancelled", "jobId", jobID, "pipeline", job.Pipeline)
+	if e.OnJobDone != nil {
+		go e.OnJobDone(job)
+	}
+	go e.fireCallback(job)
+	return nil
+}
+
+// Pipelines returns all registered pipelines
+func (e *JobEngine) Pipelines() map[string]config.Pipeline {
+	return e.cfg.Pipelines
+}
+
+// SetPipeMatrix sets the capability matrix for workers
+func (e *JobEngine) SetPipeMatrix(matrix map[string]map[string]int) {
+	e.workerMu.Lock()
+	defer e.workerMu.Unlock()
+	e.pipeMatrix = matrix
+}
+
+// SetWorkerSlots sets the slots for a single worker in the pipe matrix
+func (e *JobEngine) SetWorkerSlots(workerID string, slots map[string]int) {
+	e.workerMu.Lock()
+	defer e.workerMu.Unlock()
+	e.pipeMatrix[workerID] = slots
+}
+
+// LoadMatrix loads the pipe matrix from a YAML file and applies it
+func (e *JobEngine) LoadMatrix(path string) error {
+	m, err := LoadPipeMatrix(path)
+	if err != nil {
+		return err
+	}
+	e.workerMu.Lock()
+	e.matrix = m
+	e.pipeMatrix = m.ToEngineFormat()
+	e.workerMu.Unlock()
+	return nil
+}
+
+// Shutdown stops the cleanup goroutine
+func (e *JobEngine) Shutdown() {
+	close(e.stopCleanup)
+}
+
+func (e *JobEngine) cleanupLoop() {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			now := time.Now()
+
+			// Clean up finished/expired jobs
+			e.jobsMu.Lock()
+			for id, job := range e.jobs {
+				if (job.Status == StatusCompleted || job.Status == StatusFailed ||
+					job.Status == StatusCancelled || job.Status == StatusExpired) &&
+					!job.CompletedAt.IsZero() && now.Sub(job.CompletedAt) > jobRetention {
+					delete(e.jobs, id)
+				}
+				if job.Status == StatusQueued && !job.ValidTill.IsZero() && now.After(job.ValidTill) {
+					job.Status = StatusExpired
+					job.CompletedAt = now
+					if e.OnJobDone != nil {
+						go e.OnJobDone(job)
+					}
+					go e.fireCallback(job)
+				}
+			}
+			e.jobsMu.Unlock()
+
+			// Clean up dead workers (no heartbeat for workerTTL)
+			e.workerMu.Lock()
+			for wid, last := range e.heartbeats {
+				if now.Sub(last) > workerTTL {
+					delete(e.heartbeats, wid)
+					delete(e.workerPick, wid)
+					delete(e.workerCap, wid)
+					delete(e.regTokens, wid)
+					// Note: pipeMatrix is NOT cleaned — it represents persistent authorization
+				}
+			}
+			e.workerMu.Unlock()
+
+		case <-e.stopCleanup:
+			return
+		}
+	}
+}

@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"log"
 	"math"
 	"os"
 	"sort"
@@ -490,9 +489,7 @@ func mergeTermFreqNormLocs(fieldsMap map[string]uint16, term []byte, postItr *Po
 	for next != nil && err == nil {
 		hitNewDocNum := newDocNums[next.Number()]
 		if hitNewDocNum == docDropped {
-			log.Printf("zapx: skipping dropped docNum=%d in merge (term=%q field leak through PostingsIterator)", next.Number(), term)
-			next, err = postItr.Next()
-			continue
+			return 0, 0, 0, nil, fmt.Errorf("see hit with dropped docNum")
 		}
 
 		newRoaring.Add(uint32(hitNewDocNum))

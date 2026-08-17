@@ -15,12 +15,9 @@
 package scorch
 
 import (
-	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sync/atomic"
-	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
 	index "github.com/blevesearch/bleve_index_api"
@@ -66,51 +63,9 @@ func (s *Scorch) introducerLoop() {
 	}()
 
 	var epochWatchers []*epochWatcher
-	mergePaused := false
 OUTER:
 	for {
 		atomic.AddUint64(&s.stats.TotIntroduceLoop, 1)
-
-		// Check segment count and pause introductions if too high
-		if s.maxSegmentsBeforeMergePause > 0 {
-			s.rootLock.RLock()
-			nsegs := 0
-			if s.root != nil {
-				nsegs = len(s.root.segment)
-			}
-			s.rootLock.RUnlock()
-
-			if nsegs >= s.maxSegmentsBeforeMergePause && !mergePaused {
-				mergePaused = true
-				s.fireEvent(EventKindMergeTaskIntroductionStart, 0)
-				fmt.Fprintf(os.Stderr, "[scorch] merge pause: %d segments >= limit %d, draining merges before accepting writes\n", nsegs, s.maxSegmentsBeforeMergePause)
-			} else if nsegs < s.maxSegmentsBeforeMergePause && mergePaused {
-				mergePaused = false
-				fmt.Fprintf(os.Stderr, "[scorch] merge resume: %d segments < limit %d, accepting writes again\n", nsegs, s.maxSegmentsBeforeMergePause)
-			}
-
-			if mergePaused {
-				// Only accept merges, persists and close — no new introductions
-				// Force-trigger the merger by requesting a merge via the control channel
-				select {
-				case s.forceMergeRequestCh <- &mergerCtrl{ctx: context.Background(), doneCh: nil}:
-				default:
-				}
-				select {
-				case <-s.closeCh:
-					break OUTER
-				case nextMerge := <-s.merges:
-					s.introduceMerge(nextMerge)
-				case persist := <-s.persists:
-					s.introducePersist(persist)
-				case epochWatcher := <-s.introducerNotifier:
-					epochWatchers = append(epochWatchers, epochWatcher)
-				case <-time.After(1 * time.Second):
-					// Timeout: re-check segment count in case merger reduced it
-				}
-				goto EPOCH_CHECK
-			}
-		}
 
 		select {
 		case <-s.closeCh:
@@ -132,8 +87,6 @@ OUTER:
 			s.introducePersist(persist)
 
 		}
-
-	EPOCH_CHECK:
 
 		var epochCurr uint64
 		s.rootLock.RLock()

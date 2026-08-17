@@ -70,6 +70,7 @@ type Searcher interface {
 	EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite ...bool)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
+	ResolvePathID(oldID string) (*Resource, error)
 }
 
 // IndexStatus tracks the current indexing state for status queries.

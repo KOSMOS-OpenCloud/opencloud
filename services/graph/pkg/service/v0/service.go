@@ -444,6 +444,9 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 					})
 				})
 			})
+			r.Route("/resources/{resourceID}", func(r chi.Router) {
+				r.Get("/resolve", svc.ResolveResourceID)
+			})
 		})
 	})
 

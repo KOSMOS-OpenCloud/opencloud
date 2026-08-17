@@ -53,6 +53,11 @@ service SearchProvider {
         body: "*"
     };
   }
+  rpc Resolve(ResolveRequest) returns (ResolveResponse) {
+    option (google.api.http) = {
+        get: "/api/v0/search/resolve"
+    };
+  }
 }
 
 service IndexProvider {
@@ -124,4 +129,16 @@ message IndexItemRequest {
 }
 
 message IndexItemResponse {
+}
+
+message ResolveRequest {
+  string resource_id = 1;  // possibly outdated storageid$spaceid!nodeid
+}
+
+message ResolveResponse {
+  string resource_id = 1;  // current storageid$spaceid!nodeid
+  string path = 2;         // current path relative to space root
+  string root_id = 3;      // space root ID
+  string name = 4;         // resource name
+  int32 status = 5;        // 0=found, 1=not_found
 }

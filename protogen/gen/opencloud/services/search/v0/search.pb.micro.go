@@ -56,6 +56,7 @@ type SearchProviderService interface {
 	Search(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*SearchResponse, error)
 	IndexSpace(ctx context.Context, in *IndexSpaceRequest, opts ...client.CallOption) (*IndexSpaceResponse, error)
 	IndexItem(ctx context.Context, in *IndexItemRequest, opts ...client.CallOption) (*IndexItemResponse, error)
+	Resolve(ctx context.Context, in *ResolveRequest, opts ...client.CallOption) (*ResolveResponse, error)
 }
 
 type searchProviderService struct {
@@ -100,12 +101,23 @@ func (c *searchProviderService) IndexItem(ctx context.Context, in *IndexItemRequ
 	return out, nil
 }
 
+func (c *searchProviderService) Resolve(ctx context.Context, in *ResolveRequest, opts ...client.CallOption) (*ResolveResponse, error) {
+	req := c.c.NewRequest(c.name, "SearchProvider.Resolve", in)
+	out := new(ResolveResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for SearchProvider service
 
 type SearchProviderHandler interface {
 	Search(context.Context, *SearchRequest, *SearchResponse) error
 	IndexSpace(context.Context, *IndexSpaceRequest, *IndexSpaceResponse) error
 	IndexItem(context.Context, *IndexItemRequest, *IndexItemResponse) error
+	Resolve(context.Context, *ResolveRequest, *ResolveResponse) error
 }
 
 func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, opts ...server.HandlerOption) error {
@@ -113,6 +125,7 @@ func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, 
 		Search(ctx context.Context, in *SearchRequest, out *SearchResponse) error
 		IndexSpace(ctx context.Context, in *IndexSpaceRequest, out *IndexSpaceResponse) error
 		IndexItem(ctx context.Context, in *IndexItemRequest, out *IndexItemResponse) error
+		Resolve(ctx context.Context, in *ResolveRequest, out *ResolveResponse) error
 	}
 	type SearchProvider struct {
 		searchProvider
@@ -148,6 +161,32 @@ func (h *searchProviderHandler) IndexSpace(ctx context.Context, in *IndexSpaceRe
 func (h *searchProviderHandler) IndexItem(ctx context.Context, in *IndexItemRequest, out *IndexItemResponse) error {
 	return h.SearchProviderHandler.IndexItem(ctx, in, out)
 }
+
+func (h *searchProviderHandler) Resolve(ctx context.Context, in *ResolveRequest, out *ResolveResponse) error {
+	return h.SearchProviderHandler.Resolve(ctx, in, out)
+}
+
+// ResolveRequest resolves a (possibly outdated) resource ID to its current location.
+type ResolveRequest struct {
+	ResourceId string `json:"resource_id,omitempty" protobuf:"bytes,1,opt,name=resource_id,json=resourceId"`
+}
+
+func (x *ResolveRequest) Reset()         { *x = ResolveRequest{} }
+func (x *ResolveRequest) String() string { return x.ResourceId }
+func (x *ResolveRequest) ProtoMessage()  {}
+
+// ResolveResponse contains the current resource location.
+type ResolveResponse struct {
+	ResourceId string `json:"resource_id,omitempty" protobuf:"bytes,1,opt,name=resource_id,json=resourceId"`
+	Path       string `json:"path,omitempty" protobuf:"bytes,2,opt,name=path"`
+	RootId     string `json:"root_id,omitempty" protobuf:"bytes,3,opt,name=root_id,json=rootId"`
+	Name       string `json:"name,omitempty" protobuf:"bytes,4,opt,name=name"`
+	Status     int32  `json:"status,omitempty" protobuf:"varint,5,opt,name=status"`
+}
+
+func (x *ResolveResponse) Reset()         { *x = ResolveResponse{} }
+func (x *ResolveResponse) String() string { return x.ResourceId }
+func (x *ResolveResponse) ProtoMessage()  {}
 
 // IndexItemRequest represents a request to (re-)index a single item.
 // Hand-added for kosmos branch — not generated from proto.

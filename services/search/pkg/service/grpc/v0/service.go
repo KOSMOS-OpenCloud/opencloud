@@ -255,6 +255,27 @@ func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ 
 	return nil
 }
 
+// Resolve resolves a (possibly outdated) resource ID to its current location via Bleve OldIDs index.
+func (s Service) Resolve(_ context.Context, in *searchsvc.ResolveRequest, out *searchsvc.ResolveResponse) error {
+	rid := in.ResourceId
+	if rid == "" {
+		return errors.New("resource_id is required")
+	}
+
+	resource, err := s.searcher.ResolvePathID(rid)
+	if err != nil {
+		out.Status = 1 // not found
+		return nil
+	}
+
+	out.ResourceId = resource.ID
+	out.Path = resource.Path
+	out.RootId = resource.RootID
+	out.Name = resource.Document.Name
+	out.Status = 0
+	return nil
+}
+
 // splitResourceID parses "storageid$spaceid!opaqueid" into [storageid, spaceid, opaqueid].
 func splitResourceID(rid string) []string {
 	dollarIdx := -1

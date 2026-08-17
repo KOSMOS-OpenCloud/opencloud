@@ -24,13 +24,20 @@ func (g Graph) ResolveResourceID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	g.logger.Info().Str("resourceID", resourceID).Msg("resolve: start")
+
 	// Search by ID field, then by OldIDs field (cross-space move fallback)
 	for _, query := range []string{"ID:" + resourceID, "OldIDs:" + resourceID} {
 		resp, err := g.searchService.Search(r.Context(), &searchsvc.SearchRequest{
 			Query:    query,
 			PageSize: 1,
 		})
-		if err != nil || resp.TotalMatches == 0 || len(resp.Matches) == 0 {
+		if err != nil {
+			g.logger.Info().Str("query", query).Err(err).Msg("resolve: search error")
+			continue
+		}
+		g.logger.Info().Str("query", query).Int32("total", resp.TotalMatches).Int("matches", len(resp.Matches)).Msg("resolve: search result")
+		if resp.TotalMatches == 0 || len(resp.Matches) == 0 {
 			continue
 		}
 		m := resp.Matches[0].Entity

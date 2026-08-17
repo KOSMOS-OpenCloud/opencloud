@@ -269,12 +269,24 @@ func (b *Backend) NewBatch(size int) (search.BatchOperator, error) {
 	return NewBatch(b.index, size)
 }
 
-// ResolvePathID looks up a (possibly outdated) resource ID in the Bleve index
-// by searching the OldIDs field. Returns the current Resource (with ID, Path,
-// RootID) or an error if not found. Follows the chain recursively.
-func (b *Backend) ResolvePathID(oldID string) (*search.Resource, error) {
-	// Search for documents where OldIDs contains the given ID
-	q := bleve.NewTermQuery(oldID)
+// ResolvePathID resolves a resource ID to its current location in the Bleve index.
+// First tries a direct ID lookup, then falls back to OldIDs (cross-space move).
+// Returns the current Resource (with ID, Path, RootID) or an error if not found.
+func (b *Backend) ResolvePathID(id string) (*search.Resource, error) {
+	// 1. Direct lookup by document ID
+	doc, err := b.index.Document(id)
+	if err == nil && doc != nil {
+		req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
+		req.Fields = []string{"*"}
+		req.Size = 1
+		res, err := b.index.Search(req)
+		if err == nil && res.Hits.Len() > 0 {
+			return matchToResource(res.Hits[0]), nil
+		}
+	}
+
+	// 2. OldIDs fallback (cross-space move)
+	q := bleve.NewTermQuery(id)
 	q.SetField("OldIDs")
 
 	req := bleve.NewSearchRequest(q)
@@ -286,7 +298,7 @@ func (b *Backend) ResolvePathID(oldID string) (*search.Resource, error) {
 		return nil, err
 	}
 	if res.Hits.Len() == 0 {
-		return nil, errtypes.NotFound("resource ID not found in index: " + oldID)
+		return nil, errtypes.NotFound("resource ID not found in index: " + id)
 	}
 
 	resource := matchToResource(res.Hits[0])

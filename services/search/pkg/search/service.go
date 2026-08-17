@@ -1491,6 +1491,14 @@ func (s *Service) doFastIndex(info *provider.ResourceInfo, ref *provider.Referen
 			}
 			r.OldIDs = append(r.OldIDs, v)
 		}
+		// debug: log all metadata keys for files with oldids or named "Neue Datei"
+		if len(r.OldIDs) > 0 || strings.Contains(r.Name, "Neue Datei") {
+			keys := make([]string, 0, len(m))
+			for k := range m {
+				keys = append(keys, k)
+			}
+			s.logger.Info().Strs("oldids", r.OldIDs).Strs("md_keys", keys).Str("name", r.Name).Str("id", r.ID).Msg("DEBUG oldids extraction")
+		}
 	}
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 	if parentID := info.GetParentId(); parentID != nil {

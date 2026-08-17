@@ -262,11 +262,14 @@ func (s Service) Resolve(_ context.Context, in *searchsvc.ResolveRequest, out *s
 		return errors.New("resource_id is required")
 	}
 
+	s.log.Info().Str("resource_id", rid).Msg("Resolve: searching")
 	resource, err := s.searcher.ResolvePathID(rid)
 	if err != nil {
+		s.log.Info().Str("resource_id", rid).Err(err).Msg("Resolve: not found")
 		out.Status = 1 // not found
 		return nil
 	}
+	s.log.Info().Str("resource_id", rid).Str("name", resource.Document.Name).Str("path", resource.Path).Msg("Resolve: found")
 
 	out.ResourceId = resource.ID
 	out.Path = resource.Path

@@ -6,8 +6,10 @@ import (
 	"net/url"
 
 	"github.com/go-chi/chi/v5"
+	revaCtx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"go-micro.dev/v4/metadata"
 )
 
 // ResolveResourceID resolves a resource ID to its current location via the
@@ -24,11 +26,16 @@ func (g Graph) ResolveResourceID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Forward auth token for the search service (same pattern as tags.go)
+	th := r.Header.Get(revaCtx.TokenHeader)
+	ctx := revaCtx.ContextSetToken(r.Context(), th)
+	ctx = metadata.Set(ctx, revaCtx.TokenHeader, th)
+
 	g.logger.Info().Str("resourceID", resourceID).Msg("resolve: start")
 
 	// Search by ID field, then by OldIDs field (cross-space move fallback)
 	for _, query := range []string{"ID:" + resourceID, "OldIDs:" + resourceID} {
-		resp, err := g.searchService.Search(r.Context(), &searchsvc.SearchRequest{
+		resp, err := g.searchService.Search(ctx, &searchsvc.SearchRequest{
 			Query:    query,
 			PageSize: 1,
 		})

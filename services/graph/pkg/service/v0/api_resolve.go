@@ -59,6 +59,7 @@ func (g Graph) ResolveResourceID(w http.ResponseWriter, r *http.Request) {
 			path = m.Ref.Path
 		}
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-cache, no-store")
 		json.NewEncoder(w).Encode(map[string]string{
 			"resource_id": rid,
 			"path":        path,

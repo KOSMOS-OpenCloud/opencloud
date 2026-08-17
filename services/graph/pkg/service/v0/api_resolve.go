@@ -3,6 +3,7 @@ package svc
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/go-chi/chi/v5"
 	searchsvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/search/v0"
@@ -17,7 +18,7 @@ import (
 //
 // GET /v1.0/resources/{resourceID}/resolve
 func (g Graph) ResolveResourceID(w http.ResponseWriter, r *http.Request) {
-	resourceID := chi.URLParam(r, "resourceID")
+	resourceID, _ := url.PathUnescape(chi.URLParam(r, "resourceID"))
 	if resourceID == "" {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing resourceID")
 		return

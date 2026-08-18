@@ -1573,7 +1573,7 @@ func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator)
 		r.ParentID = storagespace.FormatResourceID(parentID)
 	}
 
-	// Reconstruct typed Photo/Image/Location from ArbitraryMetadata
+	// Reconstruct typed Photo/Image/Location + OldIDs from ArbitraryMetadata
 	if m := stat.GetInfo().GetArbitraryMetadata().GetMetadata(); m != nil {
 		r.Image = reconstructImage(m)
 		r.Photo = reconstructPhoto(m)
@@ -1585,6 +1585,14 @@ func (s *Service) doIndexItemBatch(ref *provider.Reference, batch BatchOperator)
 				Bool("hasLocation", r.Location != nil).
 				Int("mdKeys", len(m)).
 				Msg("doIndexItemBatch: reconstructed EXIF from ArbitraryMetadata")
+		}
+		// Cross-space move provenance (user.oc.oldids.N)
+		for i := 0; ; i++ {
+			v, ok := m["user.oc.oldids."+strconv.Itoa(i)]
+			if !ok {
+				break
+			}
+			r.OldIDs = append(r.OldIDs, v)
 		}
 	} else {
 		s.logger.Debug().Str("name", stat.Info.Name).Msg("doIndexItemBatch: no ArbitraryMetadata")

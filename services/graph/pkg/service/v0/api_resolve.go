@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	revaCtx "github.com/opencloud-eu/reva/v2/pkg/ctx"
@@ -33,8 +34,14 @@ func (g Graph) ResolveResourceID(w http.ResponseWriter, r *http.Request) {
 
 	g.logger.Info().Str("resourceID", resourceID).Msg("resolve: start")
 
-	// Search by ID field, then by OldIDs field (cross-space move fallback)
-	for _, query := range []string{"ID:" + resourceID, "OldIDs:" + resourceID} {
+	// Build search queries: full ID, then OldIDs (with and without storageID prefix)
+	// OldIDs xattrs store spaceID!nodeID, but resource_ref may be storageID$spaceID!nodeID
+	queries := []string{"ID:" + resourceID, "OldIDs:" + resourceID}
+	if idx := strings.Index(resourceID, "$"); idx >= 0 {
+		shortID := resourceID[idx+1:] // spaceID!nodeID
+		queries = append(queries, "OldIDs:"+shortID)
+	}
+	for _, query := range queries {
 		resp, err := g.searchService.Search(ctx, &searchsvc.SearchRequest{
 			Query:    query,
 			PageSize: 1,

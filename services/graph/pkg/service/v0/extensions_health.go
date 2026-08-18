@@ -39,6 +39,10 @@ func (g Graph) GetExtensionsHealth(w http.ResponseWriter, r *http.Request) {
 		{"qdrant", g.config.Health.QdrantURL + "/collections/opencloud"},
 	}
 
+	if u := g.config.Health.MicrollmURL; u != "" {
+		checks = append(checks, healthCheck{"microllm", u + "/v1/models"})
+		checks = append(checks, healthCheck{"microllm-stats", u + "/stats"})
+	}
 	if u := g.config.Health.CollaboraURL; u != "" {
 		checks = append(checks, healthCheck{"collabora", u + "/hosting/discovery"})
 	}

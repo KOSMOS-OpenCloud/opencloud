@@ -51,6 +51,7 @@ type Health struct {
 	SearchDebugURL   string `yaml:"search_debug_url" env:"GRAPH_HEALTH_SEARCH_DEBUG_URL" desc:"URL of the search debug endpoint." introductionVersion:"%%NEXT%%"`
 	TakiURL          string `yaml:"taki_url" env:"GRAPH_HEALTH_TAKI_URL" desc:"URL of the Taki service." introductionVersion:"%%NEXT%%"`
 	QdrantURL        string `yaml:"qdrant_url" env:"GRAPH_HEALTH_QDRANT_URL" desc:"URL of the Qdrant vector database." introductionVersion:"%%NEXT%%"`
+	MicrollmURL      string `yaml:"microllm_url" env:"GRAPH_HEALTH_MICROLLM_URL" desc:"URL of the microllm proxy. Empty to skip." introductionVersion:"%%NEXT%%"`
 	CollaboraURL     string `yaml:"collabora_url" env:"GRAPH_HEALTH_COLLABORA_URL" desc:"URL of the Collabora service. Empty to skip." introductionVersion:"%%NEXT%%"`
 	CollaborationURL string `yaml:"collaboration_url" env:"GRAPH_HEALTH_COLLABORATION_URL" desc:"URL of the Collaboration (WOPI) service. Empty to skip." introductionVersion:"%%NEXT%%"`
 }

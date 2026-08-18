@@ -394,6 +394,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 			})
 			r.Route("/extensions", func(r chi.Router) {
 				r.Get("/apps", svc.GetSpaceApps)
+				r.With(requireAdmin).Get("/health", svc.GetExtensionsHealth)
 			})
 			r.With(requireAdmin).Route("/education", func(r chi.Router) {
 				r.Route("/schools", func(r chi.Router) {

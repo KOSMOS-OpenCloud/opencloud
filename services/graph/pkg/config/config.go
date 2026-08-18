@@ -42,7 +42,17 @@ type Config struct {
 
 	UserSoftDeleteRetentionTime time.Duration `yaml:"user_soft_delete_retention_time" env:"GRAPH_USER_SOFT_DELETE_RETENTION_TIME" desc:"The time after which a soft-deleted user is permanently deleted. If set to 0 (default), there is no soft delete retention time and users are deleted immediately after being soft-deleted. If set to a positive value, the user will be kept in the system for that duration before being permanently deleted." introductionVersion:"4.0.0"`
 
-	Store Store `yaml:"store"`
+	Store  Store  `yaml:"store"`
+	Health Health `yaml:"health"`
+}
+
+// Health configures the internal service URLs for the health endpoint.
+type Health struct {
+	SearchDebugURL   string `yaml:"search_debug_url" env:"GRAPH_HEALTH_SEARCH_DEBUG_URL" desc:"URL of the search debug endpoint." introductionVersion:"%%NEXT%%"`
+	TakiURL          string `yaml:"taki_url" env:"GRAPH_HEALTH_TAKI_URL" desc:"URL of the Taki service." introductionVersion:"%%NEXT%%"`
+	QdrantURL        string `yaml:"qdrant_url" env:"GRAPH_HEALTH_QDRANT_URL" desc:"URL of the Qdrant vector database." introductionVersion:"%%NEXT%%"`
+	CollaboraURL     string `yaml:"collabora_url" env:"GRAPH_HEALTH_COLLABORA_URL" desc:"URL of the Collabora service. Empty to skip." introductionVersion:"%%NEXT%%"`
+	CollaborationURL string `yaml:"collaboration_url" env:"GRAPH_HEALTH_COLLABORATION_URL" desc:"URL of the Collaboration (WOPI) service. Empty to skip." introductionVersion:"%%NEXT%%"`
 }
 
 type Spaces struct {

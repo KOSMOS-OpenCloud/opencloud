@@ -135,6 +135,11 @@ func DefaultConfig() *config.Config {
 			Nodes:    []string{"127.0.0.1:9233"},
 			Database: "graph",
 		},
+		Health: config.Health{
+			SearchDebugURL: "http://127.0.0.1:9224",
+			TakiURL:        "http://127.0.0.1:9998",
+			QdrantURL:      "http://127.0.0.1:6333",
+		},
 	}
 }
 

@@ -2000,8 +2000,8 @@ func (s *Service) processLayerJob(job layerJob) {
 	}
 	putReq.Header.Set("Content-Type", "application/pdf")
 	if md, ok := metadata.FromOutgoingContext(ownerCtx); ok {
-		if tok, ok := md[revactx.TokenHeader]; ok {
-			putReq.Header.Set(revactx.TokenHeader, tok)
+		if toks, ok := md[revactx.TokenHeader]; ok && len(toks) > 0 {
+			putReq.Header.Set(revactx.TokenHeader, toks[0])
 		}
 	}
 

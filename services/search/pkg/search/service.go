@@ -1,9 +1,13 @@
 package search
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -36,6 +40,7 @@ import (
 	"github.com/opencloud-eu/opencloud/services/search/pkg/content"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/metrics"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/qdrant"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -107,6 +112,9 @@ type Service struct {
 	indexCh        chan queueRequest
 	enrichCh       chan queueRequest
 	enrichHighCh   chan queueRequest
+	layerCh           chan layerJob // OCR layer writeback queue (opt-in)
+	ocrLayerWriteback bool // SEARCH_OCR_LAYER_WRITEBACK=true
+	ocrLayerMaxSize   uint64 // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
 	indexProcessed int64
 	enrichProcessed int64
 	indexFlushed   int64 // atomic: successful batch flushes
@@ -123,6 +131,13 @@ type queueRequest struct {
 	resourceID     string // for delete/move: formatted resource ID
 	parentID       string // for move: formatted parent ID
 	path           string // for move: new path
+}
+
+// layerJob is a queued OCR layer writeback job (remount of the OCR text
+// layer into the original PDF as a new file revision).
+type layerJob struct {
+	ref  *provider.Reference
+	opID int64
 }
 
 // GetIndexStatus returns the current indexing status.
@@ -177,6 +192,23 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		indexCh:      make(chan queueRequest, cfg.IndexQueueSize),
 		enrichCh:     make(chan queueRequest, cfg.EnrichQueueSize),
 		enrichHighCh: make(chan queueRequest, 100),
+		layerCh:      make(chan layerJob, 100),
+	}
+
+	// OCR layer writeback (opt-in, default off)
+	s.ocrLayerWriteback = os.Getenv("SEARCH_OCR_LAYER_WRITEBACK") == "true"
+	if v := os.Getenv("SEARCH_OCR_LAYER_MAX_SIZE"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			s.ocrLayerMaxSize = uint64(n)
+		}
+	}
+	if s.ocrLayerMaxSize == 0 {
+		s.ocrLayerMaxSize = 26214400 // 25 MiB
+	}
+	if s.ocrLayerWriteback {
+		logger.Info().
+			Int64("max_size", int64(s.ocrLayerMaxSize)).
+			Msg("ocr-layer writeback enabled (SEARCH_OCR_LAYER_WRITEBACK=true)")
 	}
 
 	// Initialize Qdrant vector store if enabled
@@ -1436,6 +1468,21 @@ func (s *Service) StartWorkers(ctx context.Context) {
 			}
 		}
 	}()
+
+	// OCR layer writeback worker: remounts the OCR text layer back into the
+	// PDF as a new file revision. Runs always, but jobs are only queued when
+	// SEARCH_OCR_LAYER_WRITEBACK=true (see doUpsertItem hook).
+	s.logger.Info().Msg("starting ocr-layer writeback worker")
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case job := <-s.layerCh:
+				s.processLayerJob(job)
+			}
+		}
+	}()
 }
 
 // doUpsertItem indexes or stores Resource data fields.
@@ -1648,6 +1695,30 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 		Dur("extract_ms", time.Since(tExtract)).
 		Msg("doUpsertItem: extract ok")
 
+	// OCR layer writeback (opt-in): Taka extracted this PDF via the grounded
+	// VLM (method contains "llm_ocr"), the file is a PDF within the size
+	// limit and does not carry the doc.ocr_layer xattr yet -> queue a
+	// layer remount job.
+	if s.ocrLayerWriteback && doc.Taki != nil &&
+		strings.Contains(doc.Taki.Method, "llm_ocr") &&
+		strings.HasPrefix(stat.Info.MimeType, "application/pdf") &&
+		stat.Info.Size <= s.ocrLayerMaxSize &&
+		!hasOCRLayerMarker(stat.GetInfo().GetArbitraryMetadata()) {
+		select {
+		case s.layerCh <- layerJob{ref: ref, opID: opID}:
+			s.logger.Info().
+				Int64("op", opID).
+				Str("name", doc.Name).
+				Str("layer_method", doc.Taki.Method).
+				Msg("ocr-layer: writeback queued")
+		default:
+			s.logger.Warn().
+				Int64("op", opID).
+				Str("name", doc.Name).
+				Msg("ocr-layer: writeback queue full, job dropped")
+		}
+	}
+
 	r := Resource{
 		ID: storagespace.FormatResourceID(stat.Info.Id),
 		RootID: storagespace.FormatResourceID(&provider.ResourceId{
@@ -1803,6 +1874,216 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 		return
 	}
 	s.logger.Info().Int64("op", opID).Str("name", doc.Name).Int("keys", len(newMetadata)).Dur("total_ms", time.Since(t0)).Msg("doUpsertItem: done")
+}
+
+// hasOCRLayerMarker reports whether the resource already carries the
+// doc.ocr_layer xattr (the file was layered before).
+func hasOCRLayerMarker(meta *provider.ArbitraryMetadata) bool {
+	if meta == nil || meta.Metadata == nil {
+		return false
+	}
+	v, ok := meta.Metadata["doc.ocr_layer"]
+	return ok && v != ""
+}
+
+// processLayerJob remounts the OCR text layer back into the PDF as a new
+// file revision: download original → open_taki /taki/remount-pdf →
+// CS3 gateway upload (InitiateFileUpload/POST) + xattr & object-ID
+// preservation check → doc.ocr_layer xattr.
+func (s *Service) processLayerJob(job layerJob) {
+	ref := job.ref
+	refID := ""
+	if ref.GetResourceId() != nil {
+		refID = storagespace.FormatResourceID(ref.GetResourceId())
+	}
+	t0 := time.Now()
+	s.logger.Info().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: writeback starting")
+
+	// 1. Service-account auth context (same as resInfo)
+	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Msg("ocr-layer: auth context failed")
+		return
+	}
+	ownerCtx = content.ContextWithTraceID(ownerCtx, fmt.Sprintf("op%d", job.opID))
+
+	// 2. Download the original PDF
+	tika, ok := s.extractor.(*content.Tika)
+	if !ok {
+		s.logger.Warn().Int64("op", job.opID).Msg("ocr-layer: extractor is not open_taki, cannot remount")
+		return
+	}
+	reader, err := tika.Retriever.Retrieve(ownerCtx, ref.GetResourceId())
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: download failed")
+		return
+	}
+	data, err := io.ReadAll(reader)
+	reader.Close()
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: read failed")
+		return
+	}
+
+	// 3. Remount the OCR layer via open_taki
+	layered, layer, skip, err := tika.RemountPDF(ownerCtx, data)
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: remount-pdf failed")
+		return
+	}
+	if skip != "" {
+		s.logger.Info().
+			Str("skip", skip).
+			Int64("op", job.opID).
+			Str("ref", refID).
+			Msg("ocr-layer: remount skipped by open_taki")
+		return
+	}
+	if layer == "empty" {
+		s.logger.Warn().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: no OCR regions, writeback skipped")
+		return
+	}
+
+	// 4. Write the layered PDF back as a new revision (CS3 upload protocol).
+	// The overwriting upload MUST keep the offloaded xattrs and the
+	// resource/object ID — verified in step 5.
+	gwClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Msg("ocr-layer: could not retrieve gateway client")
+		return
+	}
+
+	// 4a. Baseline: current offloaded xattrs of the resource
+	baseStat, err := gwClient.Stat(ownerCtx, &provider.StatRequest{
+		Ref:                   ref,
+		ArbitraryMetadataKeys: []string{"*"},
+	})
+	var baseMeta map[string]string
+	if err == nil && baseStat.GetStatus().GetCode() == rpc.Code_CODE_OK {
+		if am := baseStat.GetInfo().GetArbitraryMetadata(); am != nil {
+			baseMeta = am.GetMetadata()
+		}
+	}
+
+	upRes, err := gwClient.InitiateFileUpload(ownerCtx, &provider.InitiateFileUploadRequest{Ref: ref})
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: InitiateFileUpload failed")
+		return
+	}
+	if upRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		s.logger.Error().
+			Int32("status", int32(upRes.GetStatus().GetCode())).
+			Str("ref", refID).
+			Msg("ocr-layer: InitiateFileUpload rejected")
+		return
+	}
+
+	var ep string
+	for _, p := range upRes.GetProtocols() {
+		if p.GetProtocol() == "basic" {
+			ep = p.GetUploadEndpoint()
+			break
+		}
+	}
+	if ep == "" && len(upRes.GetProtocols()) > 0 {
+		ep = upRes.GetProtocols()[0].GetUploadEndpoint()
+	}
+	if ep == "" {
+		s.logger.Error().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: no upload protocol endpoint")
+		return
+	}
+
+	putReq, err := http.NewRequest(http.MethodPost, ep, bytes.NewReader(layered))
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Msg("ocr-layer: could not build upload request")
+		return
+	}
+	putReq.Header.Set("Content-Type", "application/pdf")
+	if md, ok := metadata.FromOutgoingContext(ownerCtx); ok {
+		if tok, ok := md[revactx.TokenHeader]; ok {
+			putReq.Header.Set(revactx.TokenHeader, tok)
+		}
+	}
+
+	upClient := &http.Client{Timeout: 10 * time.Minute}
+	resp, err := upClient.Do(putReq)
+	if err != nil {
+		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: upload failed")
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		s.logger.Error().
+			Int("status", resp.StatusCode).
+			Int64("op", job.opID).
+			Str("ref", refID).
+			Msg("ocr-layer: upload returned non-200")
+		resp.Body.Close()
+		return
+	}
+	resp.Body.Close()
+
+	// 5. Verify the new revision kept the offloaded xattrs and the
+	// resource/object ID.
+	postStat, err := gwClient.Stat(ownerCtx, &provider.StatRequest{
+		Ref:                   ref,
+		ArbitraryMetadataKeys: []string{"*"},
+	})
+	metadataLost := false
+	if err != nil || postStat.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		s.logger.Warn().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: post-upload stat failed, xattr preservation unverified")
+		metadataLost = true
+	} else {
+		postMeta := map[string]string{}
+		if am := postStat.GetInfo().GetArbitraryMetadata(); am != nil {
+			postMeta = am.GetMetadata()
+		}
+		for k := range baseMeta {
+			if _, ok := postMeta[k]; !ok {
+				metadataLost = true
+				s.logger.Error().
+					Str("key", k).
+					Int64("op", job.opID).
+					Str("ref", refID).
+					Msg("ocr-layer: xattr lost after new-revision upload")
+			}
+		}
+		if postStat.GetInfo().GetId() == nil ||
+			storagespace.FormatResourceID(postStat.GetInfo().GetId()) != storagespace.FormatResourceID(ref.GetResourceId()) {
+			metadataLost = true
+			s.logger.Error().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: resource ID changed after upload")
+		}
+	}
+
+	// 6. Mark the file as OCR-layered (xattr) so re-enrichment won't re-layer.
+	// Skipped when the upload lost metadata — the writeback must not be
+	// confirmed while the file state is inconsistent.
+	if !metadataLost {
+		mResp, err := gwClient.SetArbitraryMetadata(ownerCtx, &provider.SetArbitraryMetadataRequest{
+			Ref: ref,
+			ArbitraryMetadata: &provider.ArbitraryMetadata{
+				Metadata: map[string]string{"doc.ocr_layer": "1"},
+			},
+		})
+		if err != nil {
+			s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: xattr marker write failed")
+			return
+		}
+		if mResp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			s.logger.Error().
+				Int32("status", int32(mResp.GetStatus().GetCode())).
+				Str("ref", refID).
+				Msg("ocr-layer: xattr marker write rejected")
+			return
+		}
+	}
+
+	s.logger.Info().
+		Int64("op", job.opID).
+		Str("ref", refID).
+		Str("layer", layer).
+		Bool("metadata_preserved", !metadataLost).
+		Dur("total_ms", time.Since(t0)).
+		Msg("ocr-layer: writeback complete (new revision)")
 }
 
 func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {

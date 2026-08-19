@@ -78,6 +78,51 @@ func (t *Tika) GetEmbedding(text string) []float64 {
 	return result.Embedding
 }
 
+// RemountPDF sends the original PDF bytes to open_taki's /taki/remount-pdf
+// endpoint and returns the layered PDF.
+//
+// Return values:
+//   - layered: the remounted PDF bytes (nil on skip or for non-taki backends)
+//   - layer:   X-Taki-Layer header ("hit" | "miss" | "empty")
+//   - skip:     X-Taki-Skip reason on 409 (encrypted / signed / pdfa1); empty otherwise
+//   - err:      transport/parse errors
+//
+// A 409 is a clean refusal, not an error: it is returned with skip set and
+// err == nil so callers can skip the writeback without treating it as a failure.
+func (t *Tika) RemountPDF(ctx context.Context, data []byte) ([]byte, string, string, error) {
+	if !t.isTaki {
+		return nil, "", "", nil
+	}
+
+	req, err := http.NewRequest(http.MethodPost, t.tikaURL+"/taki/remount-pdf", bytes.NewReader(data))
+	if err != nil {
+		return nil, "", "", err
+	}
+	req.Header.Set("Content-Type", "application/pdf")
+	if traceID, ok := ctx.Value(traceIDKey{}).(string); ok && traceID != "" {
+		req.Header.Set("X-Taki-Trace-Id", traceID)
+	}
+
+	resp, err := t.httpClient.Do(req)
+	if err != nil {
+		return nil, "", "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	if resp.StatusCode == http.StatusConflict {
+		return nil, "", resp.Header.Get("X-Taki-Skip"), nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", "", fmt.Errorf("remount-pdf: unexpected status %d", resp.StatusCode)
+	}
+	return body, resp.Header.Get("X-Taki-Layer"), "", nil
+}
+
 // NewTikaExtractor creates a new Tika instance.
 func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger, cfg *config.Config) (*Tika, error) {
 	basic, err := NewBasicExtractor(logger)

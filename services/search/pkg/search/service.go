@@ -118,6 +118,7 @@ type Service struct {
 	ocrLayerMaxSize   uint64        // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
 	indexProcessed    int64
 	enrichProcessed   int64
+	enrichSkipped     int64                     // re-enrich items skipped (doc.type already present)
 	indexFlushed      int64                     // atomic: successful batch flushes
 	indexBatchItems   int64                     // atomic: items currently in unflushed batch
 	flushBlockedSince atomic.Pointer[time.Time] // set when flush starts, cleared when done
@@ -128,6 +129,7 @@ type queueRequest struct {
 	priority       string // high, normal, low
 	source         string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
 	forceOverwrite bool   // overwrite existing metadata (xattrs) during enrichment
+	forceRescan    bool   // re-extract even if doc.type already present (grpc:ReEnrich only)
 	op             string // "index" (default), "delete", "move"
 	resourceID     string // for delete/move: formatted resource ID
 	parentID       string // for move: formatted parent ID
@@ -1051,7 +1053,7 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 			ResourceId: &rootID,
 		}
 		// Blocking send — walk waits when queue is full
-		s.enrichCh <- queueRequest{ref: ref, source: "grpc:ReEnrich", forceOverwrite: forceOverwrite}
+		s.enrichCh <- queueRequest{ref: ref, source: "grpc:ReEnrich", forceOverwrite: forceOverwrite, forceRescan: forceRescan}
 		atomic.AddInt64(&queued, 1)
 		return nil
 	})
@@ -1062,6 +1064,22 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 		Msg("re-enrich: walk complete, items queued")
 
 	return err
+}
+
+// hasDocTypeXattr reports whether the file already carries a doc.type xattr
+// (i.e. it was enriched before). Makes re-enrich incremental: such files are
+// skipped (no Taki call, no writes) unless forced.
+func (s *Service) hasDocTypeXattr(ref *provider.Reference) bool {
+	_, stat, _ := s.resInfo(ref)
+	if stat == nil {
+		return false
+	}
+	metadata := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+	if metadata == nil {
+		return false
+	}
+	dt, ok := metadata["doc.type"]
+	return ok && dt != ""
 }
 
 // doEnrichItem extracts metadata via Taki and writes missing (or all if forceOverwrite) xattrs.
@@ -1236,6 +1254,7 @@ type QueueStats struct {
 	Pending      int    `json:"pending"`
 	Max          int    `json:"max"`
 	Processed    int64  `json:"processed"`
+	Skipped      int64  `json:"skipped,omitempty"`
 	Flushed      int64  `json:"flushed,omitempty"`
 	BatchItems   int64  `json:"batch_items,omitempty"`
 	FlushBlocked string `json:"flush_blocked_since,omitempty"`
@@ -1260,6 +1279,7 @@ func (s *Service) EnrichQueueStats() QueueStats {
 		Pending:   len(s.enrichCh) + len(s.enrichHighCh),
 		Max:       cap(s.enrichCh),
 		Processed: atomic.LoadInt64(&s.enrichProcessed),
+		Skipped:   atomic.LoadInt64(&s.enrichSkipped),
 	}
 }
 
@@ -1459,12 +1479,23 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				if !ok {
 					return
 				}
+				// Incremental re-enrich: skip files that are already enriched
+				// (doc.type xattr present) unless forced. Only affects the
+				// grpc:ReEnrich source — events (uploads, ...) are always processed.
+				if req.source == "grpc:ReEnrich" && !req.forceRescan && !req.forceOverwrite {
+					if s.hasDocTypeXattr(req.ref) {
+						s.logger.Debug().Str("path", req.ref.GetPath()).Msg("enrich-queue: skipped (doc.type present)")
+						atomic.AddInt64(&s.enrichSkipped, 1)
+						atomic.AddInt64(&s.enrichProcessed, 1)
+						continue
+					}
+				}
 				s.logger.Info().
 					Str("source", req.source).
 					Str("priority", req.priority).
 					Int("enrich_pending", len(s.enrichCh)).
 					Msg("enrich-queue: processing")
-				s.doUpsertItem(req.ref, nil)
+				s.doUpsertItem(req.ref, nil, req.forceOverwrite)
 				atomic.AddInt64(&s.enrichProcessed, 1)
 			}
 		}

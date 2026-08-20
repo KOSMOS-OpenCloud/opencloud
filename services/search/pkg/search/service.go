@@ -104,21 +104,21 @@ type Service struct {
 	serviceAccountID     string
 	serviceAccountSecret string
 
-	batchSize      int
-	indexStatus    IndexStatus
-	indexMu        sync.Mutex
-	upsertCounter  int64 // atomic op counter for doUpsertItem logging
+	batchSize     int
+	indexStatus   IndexStatus
+	indexMu       sync.Mutex
+	upsertCounter int64 // atomic op counter for doUpsertItem logging
 
-	indexCh        chan queueRequest
-	enrichCh       chan queueRequest
-	enrichHighCh   chan queueRequest
+	indexCh           chan queueRequest
+	enrichCh          chan queueRequest
+	enrichHighCh      chan queueRequest
 	layerCh           chan layerJob // OCR layer writeback queue (opt-in)
-	ocrLayerWriteback bool // SEARCH_OCR_LAYER_WRITEBACK=true
-	ocrLayerMaxSize   uint64 // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
-	indexProcessed int64
-	enrichProcessed int64
-	indexFlushed   int64 // atomic: successful batch flushes
-	indexBatchItems int64 // atomic: items currently in unflushed batch
+	ocrLayerWriteback bool          // SEARCH_OCR_LAYER_WRITEBACK=true
+	ocrLayerMaxSize   uint64        // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
+	indexProcessed    int64
+	enrichProcessed   int64
+	indexFlushed      int64                     // atomic: successful batch flushes
+	indexBatchItems   int64                     // atomic: items currently in unflushed batch
 	flushBlockedSince atomic.Pointer[time.Time] // set when flush starts, cleared when done
 }
 
@@ -136,7 +136,8 @@ type queueRequest struct {
 // layerJob is a queued OCR layer writeback job (remount of the OCR text
 // layer into the original PDF as a new file revision).
 type layerJob struct {
-	ref  *provider.Reference
+	ref  *provider.Reference  // full reference (space root + path) for Stat/Upload
+	node *provider.ResourceId // file node ID for the download (Retrieve expects a node ID)
 	opID int64
 }
 
@@ -164,7 +165,6 @@ func (s *Service) StatsMap() map[string]interface{} {
 	return map[string]interface{}{"error": "engine does not support StatsMap"}
 }
 
-
 // SetIndexProgress updates the space progress counters.
 func (s *Service) SetIndexProgress(current, total int) {
 	s.indexMu.Lock()
@@ -188,7 +188,7 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		serviceAccountID:     cfg.ServiceAccount.ServiceAccountID,
 		serviceAccountSecret: cfg.ServiceAccount.ServiceAccountSecret,
 
-		batchSize: cfg.BatchSize,
+		batchSize:    cfg.BatchSize,
 		indexCh:      make(chan queueRequest, cfg.IndexQueueSize),
 		enrichCh:     make(chan queueRequest, cfg.EnrichQueueSize),
 		enrichHighCh: make(chan queueRequest, 100),
@@ -1705,7 +1705,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 		stat.Info.Size <= s.ocrLayerMaxSize &&
 		!hasOCRLayerMarker(stat.GetInfo().GetArbitraryMetadata()) {
 		select {
-		case s.layerCh <- layerJob{ref: ref, opID: opID}:
+		case s.layerCh <- layerJob{ref: ref, node: stat.GetInfo().GetId(), opID: opID}:
 			s.logger.Info().
 				Int64("op", opID).
 				Str("name", doc.Name).
@@ -1785,14 +1785,14 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 		// Store embedding in Qdrant if enabled and embedding present
 		if s.vectorClient != nil && len(doc.Taki.Embed) > 0 {
 			payload := map[string]interface{}{
-				"name":     doc.Name,
-				"title":    doc.Title,
-				"mime":     doc.MimeType,
-				"size":     stat.Info.Size,
-				"mtime":    stat.Info.Mtime.Seconds,
-				"method":   doc.Taki.Method,
-				"path":     r.Path,
-				"root_id":  r.RootID,
+				"name":    doc.Name,
+				"title":   doc.Title,
+				"mime":    doc.MimeType,
+				"size":    stat.Info.Size,
+				"mtime":   stat.Info.Mtime.Seconds,
+				"method":  doc.Taki.Method,
+				"path":    r.Path,
+				"root_id": r.RootID,
 			}
 			if doc.Taki.Summary != "" {
 				payload["summary"] = doc.Taki.Summary
@@ -1913,7 +1913,7 @@ func (s *Service) processLayerJob(job layerJob) {
 		s.logger.Warn().Int64("op", job.opID).Msg("ocr-layer: extractor is not open_taki, cannot remount")
 		return
 	}
-	reader, err := tika.Retriever.Retrieve(ownerCtx, ref.GetResourceId())
+	reader, err := tika.Retriever.Retrieve(ownerCtx, job.node)
 	if err != nil {
 		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: download failed")
 		return
@@ -1959,10 +1959,12 @@ func (s *Service) processLayerJob(job layerJob) {
 		ArbitraryMetadataKeys: []string{"*"},
 	})
 	var baseMeta map[string]string
+	var baseID string
 	if err == nil && baseStat.GetStatus().GetCode() == rpc.Code_CODE_OK {
 		if am := baseStat.GetInfo().GetArbitraryMetadata(); am != nil {
 			baseMeta = am.GetMetadata()
 		}
+		baseID = storagespace.FormatResourceID(baseStat.GetInfo().GetId())
 	}
 
 	upRes, err := gwClient.InitiateFileUpload(ownerCtx, &provider.InitiateFileUploadRequest{Ref: ref})
@@ -2047,8 +2049,8 @@ func (s *Service) processLayerJob(job layerJob) {
 					Msg("ocr-layer: xattr lost after new-revision upload")
 			}
 		}
-		if postStat.GetInfo().GetId() == nil ||
-			storagespace.FormatResourceID(postStat.GetInfo().GetId()) != storagespace.FormatResourceID(ref.GetResourceId()) {
+		if baseID == "" || postStat.GetInfo().GetId() == nil ||
+			storagespace.FormatResourceID(postStat.GetInfo().GetId()) != baseID {
 			metadataLost = true
 			s.logger.Error().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: resource ID changed after upload")
 		}
@@ -2117,12 +2119,22 @@ func addPhotoMetadata(metadata map[string]string, photo *libregraph.Photo) {
 // reconstructImage builds a libregraph.Image from flat libre.graph.image.* metadata keys.
 func reconstructImage(m map[string]string) *libregraph.Image {
 	var img *libregraph.Image
-	init := func() { if img == nil { img = libregraph.NewImage() } }
+	init := func() {
+		if img == nil {
+			img = libregraph.NewImage()
+		}
+	}
 	if v, ok := m["libre.graph.image.width"]; ok {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); img.SetWidth(int32(i)) }
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+			init()
+			img.SetWidth(int32(i))
+		}
 	}
 	if v, ok := m["libre.graph.image.height"]; ok {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); img.SetHeight(int32(i)) }
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+			init()
+			img.SetHeight(int32(i))
+		}
 	}
 	return img
 }
@@ -2130,29 +2142,60 @@ func reconstructImage(m map[string]string) *libregraph.Image {
 // reconstructPhoto builds a libregraph.Photo from flat libre.graph.photo.* metadata keys.
 func reconstructPhoto(m map[string]string) *libregraph.Photo {
 	var p *libregraph.Photo
-	init := func() { if p == nil { p = libregraph.NewPhoto() } }
-	if v, ok := m["libre.graph.photo.cameraMake"]; ok && v != "" { init(); p.SetCameraMake(v) }
-	if v, ok := m["libre.graph.photo.cameraModel"]; ok && v != "" { init(); p.SetCameraModel(v) }
+	init := func() {
+		if p == nil {
+			p = libregraph.NewPhoto()
+		}
+	}
+	if v, ok := m["libre.graph.photo.cameraMake"]; ok && v != "" {
+		init()
+		p.SetCameraMake(v)
+	}
+	if v, ok := m["libre.graph.photo.cameraModel"]; ok && v != "" {
+		init()
+		p.SetCameraModel(v)
+	}
 	if v, ok := m["libre.graph.photo.fNumber"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetFNumber(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			p.SetFNumber(f)
+		}
 	}
 	if v, ok := m["libre.graph.photo.focalLength"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetFocalLength(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			p.SetFocalLength(f)
+		}
 	}
 	if v, ok := m["libre.graph.photo.iso"]; ok {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); p.SetIso(int32(i)) }
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+			init()
+			p.SetIso(int32(i))
+		}
 	}
 	if v, ok := m["libre.graph.photo.orientation"]; ok {
-		if i, err := strconv.ParseInt(v, 10, 32); err == nil { init(); p.SetOrientation(int32(i)) }
+		if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+			init()
+			p.SetOrientation(int32(i))
+		}
 	}
 	if v, ok := m["libre.graph.photo.takenDateTime"]; ok && v != "" {
-		if t, err := time.Parse("2006-01-02T15:04:05Z", v); err == nil { init(); p.SetTakenDateTime(t) }
+		if t, err := time.Parse("2006-01-02T15:04:05Z", v); err == nil {
+			init()
+			p.SetTakenDateTime(t)
+		}
 	}
 	if v, ok := m["libre.graph.photo.exposureNumerator"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetExposureNumerator(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			p.SetExposureNumerator(f)
+		}
 	}
 	if v, ok := m["libre.graph.photo.exposureDenominator"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); p.SetExposureDenominator(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			p.SetExposureDenominator(f)
+		}
 	}
 	return p
 }
@@ -2160,12 +2203,22 @@ func reconstructPhoto(m map[string]string) *libregraph.Photo {
 // reconstructLocation builds a libregraph.GeoCoordinates from flat libre.graph.location.* metadata keys.
 func reconstructLocation(m map[string]string) *libregraph.GeoCoordinates {
 	var loc *libregraph.GeoCoordinates
-	init := func() { if loc == nil { loc = libregraph.NewGeoCoordinates() } }
+	init := func() {
+		if loc == nil {
+			loc = libregraph.NewGeoCoordinates()
+		}
+	}
 	if v, ok := m["libre.graph.location.latitude"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); loc.SetLatitude(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			loc.SetLatitude(f)
+		}
 	}
 	if v, ok := m["libre.graph.location.longitude"]; ok {
-		if f, err := strconv.ParseFloat(v, 64); err == nil { init(); loc.SetLongitude(f) }
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			init()
+			loc.SetLongitude(f)
+		}
 	}
 	return loc
 }

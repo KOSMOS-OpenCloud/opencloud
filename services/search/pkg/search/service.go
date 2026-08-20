@@ -21,6 +21,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaborationv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/errtypes"
@@ -1967,7 +1968,15 @@ func (s *Service) processLayerJob(job layerJob) {
 		baseID = storagespace.FormatResourceID(baseStat.GetInfo().GetId())
 	}
 
-	upRes, err := gwClient.InitiateFileUpload(ownerCtx, &provider.InitiateFileUploadRequest{Ref: ref})
+	// Upload-Length in the opaque is mandatory: with length 0 reva finishes
+	// the upload immediately with an empty body (overwrites the file with
+	// 0 bytes).
+	upRes, err := gwClient.InitiateFileUpload(ownerCtx, &provider.InitiateFileUploadRequest{
+		Ref: ref,
+		Opaque: &typesv1beta1.Opaque{Map: map[string]*typesv1beta1.OpaqueEntry{
+			"Upload-Length": {Value: []byte(strconv.FormatInt(int64(len(layered)), 10))},
+		}},
+	})
 	if err != nil {
 		s.logger.Error().Err(err).Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: InitiateFileUpload failed")
 		return
@@ -1980,9 +1989,11 @@ func (s *Service) processLayerJob(job layerJob) {
 		return
 	}
 
+	// The CS3 "simple" protocol is a single HTTP PUT with the transfer token
+	// in the X-Reva-Transfer header (the datagateway proxies to the data server).
 	var ep, tt string
 	for _, p := range upRes.GetProtocols() {
-		if p.GetProtocol() == "basic" {
+		if p.GetProtocol() == "simple" {
 			ep, tt = p.GetUploadEndpoint(), p.GetToken()
 			break
 		}
@@ -1995,7 +2006,7 @@ func (s *Service) processLayerJob(job layerJob) {
 		return
 	}
 
-	putReq, err := http.NewRequest(http.MethodPost, ep, bytes.NewReader(layered))
+	putReq, err := http.NewRequest(http.MethodPut, ep, bytes.NewReader(layered))
 	if err != nil {
 		s.logger.Error().Err(err).Int64("op", job.opID).Msg("ocr-layer: could not build upload request")
 		return

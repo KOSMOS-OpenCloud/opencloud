@@ -1980,15 +1980,15 @@ func (s *Service) processLayerJob(job layerJob) {
 		return
 	}
 
-	var ep string
+	var ep, tt string
 	for _, p := range upRes.GetProtocols() {
 		if p.GetProtocol() == "basic" {
-			ep = p.GetUploadEndpoint()
+			ep, tt = p.GetUploadEndpoint(), p.GetToken()
 			break
 		}
 	}
 	if ep == "" && len(upRes.GetProtocols()) > 0 {
-		ep = upRes.GetProtocols()[0].GetUploadEndpoint()
+		ep, tt = upRes.GetProtocols()[0].GetUploadEndpoint(), upRes.GetProtocols()[0].GetToken()
 	}
 	if ep == "" {
 		s.logger.Error().Int64("op", job.opID).Str("ref", refID).Msg("ocr-layer: no upload protocol endpoint")
@@ -2001,6 +2001,7 @@ func (s *Service) processLayerJob(job layerJob) {
 		return
 	}
 	putReq.Header.Set("Content-Type", "application/pdf")
+	putReq.Header.Set("X-Reva-Transfer", tt)
 	if md, ok := metadata.FromOutgoingContext(ownerCtx); ok {
 		if toks, ok := md[revactx.TokenHeader]; ok && len(toks) > 0 {
 			putReq.Header.Set(revactx.TokenHeader, toks[0])

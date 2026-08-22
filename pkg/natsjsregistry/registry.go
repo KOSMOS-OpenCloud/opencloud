@@ -211,15 +211,18 @@ func (n *storeregistry) storeOptions(opts registry.Options) []store.Option {
 	natsOptions := nats.GetDefaultOptions()
 	natsOptions.Name = generators.GenerateConnectionName(serviceName, generators.NTypeRegistry)
 	natsOptions.User, natsOptions.Password = getAuth()
+	// A failing re-init or a closed connection must not kill the process
+	// (both used to os.Exit(1), taking down the whole container when JetStream
+	// dropped out — incident 2026-08-20). nats.go reconnects automatically
+	// (AllowReconnect is part of the default options); if the store re-init
+	// fails, the periodic TTL re-registration picks the registry back up.
 	natsOptions.ReconnectedCB = func(_ *nats.Conn) {
 		if err := n.Init(); err != nil {
-			fmt.Println("cannot reconnect to nats")
-			os.Exit(1)
+			fmt.Printf("cannot reinitialize nats registry after reconnect: %v (retrying via periodic re-registration)\n", err)
 		}
 	}
 	natsOptions.ClosedCB = func(_ *nats.Conn) {
-		fmt.Println("nats connection closed")
-		os.Exit(1)
+		fmt.Println("nats connection closed, waiting for automatic reconnect")
 	}
 	storeoptions = append(storeoptions, natsjskv.NatsOptions(natsOptions))
 

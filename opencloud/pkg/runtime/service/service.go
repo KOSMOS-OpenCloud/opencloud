@@ -2,14 +2,23 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
+	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	natsclient "github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
+	"github.com/opencloud-eu/reva/v2/pkg/events"
 
 	"github.com/cenkalti/backoff"
 	"github.com/mohae/deepcopy"
@@ -590,7 +599,37 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) error {
 	}
 }
 
-// pingNats will attempt to connect to nats, blocking until a connection is established
+// natsJSGateProbeTimeout bounds a single JetStream write probe: the server
+// must acknowledge the probe publish within this time.
+const natsJSGateProbeTimeout = 5 * time.Second
+
+// natsJSGateBudget bounds how long pingNats waits for JetStream to accept
+// writes before giving up and returning an error (the process then exits
+// and is restarted).
+const natsJSGateBudget = 10 * time.Minute
+
+// natsJSGateTarget is the nats connection endpoint the write probe uses.
+type natsJSGateTarget struct {
+	endpoint             string
+	enableTLS            bool
+	tlsInsecure          bool
+	tlsRootCACertificate string
+	username             string
+	password             string
+}
+
+// pingNats blocks until nats is reachable and its JetStream accepts writes.
+//
+// stream.NatsFromConfig below only guarantees a TCP connection: its
+// main-queue CreateStream/UpdateStream swallows the UpdateStream error, so
+// the old gate also passed while all JetStream filestore writes were
+// stalled (incident 2026-08-20: connections accepted, reads answered, every
+// KV write timed out → service registry empty → proxy 502). The gate is
+// therefore deepened by a bounded write probe: a synchronous publish to the
+// main queue that must be acknowledged within natsJSGateProbeTimeout. The
+// probe is a well-formed event envelope with an unknown event type; the
+// consumers discard and ack it, and the DeliverNew consumers that start
+// later never see it.
 func pingNats(cfg *occfg.Config) error {
 	// We need to get a natsconfig from somewhere. We can use any one.
 	evcfg := cfg.Postprocessing.Postprocessing.Events
@@ -603,6 +642,102 @@ func pingNats(cfg *occfg.Config) error {
 		AuthUsername:         evcfg.AuthUsername,
 		AuthPassword:         evcfg.AuthPassword,
 	})
+	if err != nil {
+		return err
+	}
+
+	deadline := time.Now().Add(natsJSGateBudget)
+	firstAttempt := true
+	probeTarget := natsJSGateTarget{
+		endpoint:             evcfg.Endpoint,
+		enableTLS:            evcfg.EnableTLS,
+		tlsInsecure:          evcfg.TLSInsecure,
+		tlsRootCACertificate: evcfg.TLSRootCACertificate,
+		username:             evcfg.AuthUsername,
+		password:             evcfg.AuthPassword,
+	}
+	for {
+		probeErr := natsJSGateWriteProbe(probeTarget)
+		if probeErr == nil {
+			return nil
+		}
+		if firstAttempt {
+			logger.New().Error().Err(probeErr).
+				Msgf("jetstream write probe failing, waiting up to %s for jetstream to accept writes", natsJSGateBudget)
+			firstAttempt = false
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("jetstream did not accept writes within %s: %w", natsJSGateBudget, probeErr)
+		}
+		time.Sleep(2 * time.Second)
+	}
+}
+
+// natsJSGateWriteProbe opens a short-lived connection to nats and
+// synchronously publishes one probe message to the main queue. It succeeds
+// only if JetStream acknowledges the write, which a stalled filestore
+// cannot — the write path is exactly what dead-locked the service registry
+// in the 2026-08-20 incident while reads kept answering.
+func natsJSGateWriteProbe(target natsJSGateTarget) error {
+	natsOpts := natsclient.GetDefaultOptions()
+	if target.endpoint != "" {
+		natsOpts.Servers = []string{target.endpoint}
+	}
+	if target.username != "" && target.password != "" {
+		natsOpts.User = target.username
+		natsOpts.Password = target.password
+	}
+	if target.enableTLS {
+		tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: target.tlsInsecure} //nolint:gosec
+		if target.tlsRootCACertificate != "" {
+			pemBytes, err := os.ReadFile(target.tlsRootCACertificate)
+			if err != nil {
+				return err
+			}
+			caPool := x509.NewCertPool()
+			if !caPool.AppendCertsFromPEM(pemBytes) {
+				return fmt.Errorf("invalid tls root ca certificate %s", target.tlsRootCACertificate)
+			}
+			tlsConfig.RootCAs = caPool
+		}
+		natsOpts.Secure = true
+		natsOpts.TLSConfig = tlsConfig
+	}
+
+	conn, err := natsOpts.Connect()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	js, err := jetstream.New(conn)
+	if err != nil {
+		return err
+	}
+
+	probeCtx, cancel := context.WithTimeout(context.Background(), natsJSGateProbeTimeout)
+	defer cancel()
+
+	// Well-formed event envelope with an unknown event type: consumers of
+	// the main queue unmarshal it, find no matching unmarshaller and
+	// discard + ack it.
+	probeEvent := struct {
+		ID       string            `json:"ID"`
+		Topic    string            `json:"Topic"`
+		Metadata map[string]string `json:"Metadata"`
+		Payload  []byte            `json:"Payload"`
+	}{
+		ID:       "opencloud-pingnats-write-probe",
+		Topic:    events.MainQueueName,
+		Metadata: map[string]string{events.MetadatakeyEventType: "opencloud.pingnats.writeprobe"},
+		Payload:  []byte{},
+	}
+	probePayload, err := json.Marshal(probeEvent)
+	if err != nil {
+		return err
+	}
+
+	_, err = js.Publish(probeCtx, events.MainQueueName, probePayload)
 	return err
 }
 

@@ -19,8 +19,23 @@ func RegisterService(ctx context.Context, logger log.Logger, service *mRegistry.
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
 	rOpts := []mRegistry.RegisterOption{mRegistry.RegisterTTL(GetRegisterTTL())}
-	if err := registry.Register(service, rOpts...); err != nil {
-		logger.Fatal().Err(err).Msgf("Registration error for external service %v", service.Name)
+
+	// A failing initial registration must not kill the process (it used to
+	// logger.Fatal here, taking down every service in the container while
+	// JetStream was not write-ready — incident 2026-08-20). Retry a few
+	// times, then hand over to the periodic re-registration below.
+	retryDelay := 500 * time.Millisecond
+	for attempt := 1; ; attempt++ {
+		err := registry.Register(service, rOpts...)
+		if err == nil {
+			break
+		}
+		logger.Error().Err(err).Msgf("registration error for external service %v (attempt %d/3)", service.Name, attempt)
+		if attempt == 3 {
+			break
+		}
+		time.Sleep(retryDelay)
+		retryDelay *= 2
 	}
 
 	t := time.NewTicker(GetRegisterInterval())

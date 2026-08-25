@@ -24,6 +24,8 @@ const (
 	EditionLTS = "lts"
 	// EditionKosmos indicates a custom build with immutable/container-permissions features.
 	EditionKosmos = "kosmos"
+	// EditionCloudCosmos indicates the OpenCore build (OpenCloud base + OpenCosmos deep migrations).
+	EditionCloudCosmos = "Cloud+Cosmos"
 )
 
 var (
@@ -59,7 +61,7 @@ func init() { //nolint:gochecknoinits
 }
 
 func initEdition() error {
-	regularEditions := []string{EditionDev, EditionRolling, EditionStable, EditionKosmos}
+	regularEditions := []string{EditionDev, EditionRolling, EditionStable, EditionKosmos, EditionCloudCosmos}
 	versionedEditions := []string{EditionLTS}
 	if !slices.ContainsFunc(slices.Concat(regularEditions, versionedEditions), func(s string) bool {
 		isRegularEdition := slices.Contains(regularEditions, Edition)

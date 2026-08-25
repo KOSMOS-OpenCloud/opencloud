@@ -35,7 +35,7 @@ RUN echo 'replace github.com/opencloud-eu/reva/v2 => /data/source/gitapps/reva' 
     go mod tidy && \
     go mod vendor && \
     cd opencloud && \
-    EDITION=kosmos make go-generate release-linux-docker-amd64 ENABLE_VIPS=true DIST=/dist
+    EDITION=Cloud+Cosmos make go-generate release-linux-docker-amd64 ENABLE_VIPS=true DIST=/dist
 
 # Stage 3: Runtime
 FROM docker.io/amd64/alpine:3.23

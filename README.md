@@ -1,70 +1,68 @@
-![OpenCloud logo](https://raw.githubusercontent.com/opencloud-eu/opencloud/refs/heads/main/opencloud_logo.png)
+![KOSMOS Logo](logo.png)
 
-[![status-badge](https://ci.opencloud.rocks/api/badges/3/status.svg)](https://ci.opencloud.rocks/repos/3)
- [![Matrix](https://img.shields.io/matrix/opencloud%3Amatrix.org?logo=matrix)](https://app.element.io/#/room/#opencloud:matrix.org)
- [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# OpenCore — Server Backend
 
-# Server Backend
+OpenCore ist der zentrale, revisionssichere und geschützte Datenort, der
+digitale Prozesse vertikal und horizontal skaliert.
 
+OpenCore besteht aus zwei Komponenten:
 
-> [!TIP]
-> For general information about OpenCloud and how to install please visit [OpenCloud on Github](https://github.com/opencloud-eu/) and [OpenCloud GmbH](https://opencloud.eu).
+- **OpenCloud** (dieses Repo) — das Server-Backend: Go-Services für
+  WebDAV, CS3-API, Suche, Job-Engine, IDP, Collaboration-Anbindung.
+- **OpenCosmos** (Komponenten: open_taki, microllm, Qdrant, Collabora) —
+  die KI- und Analyse-Schicht: LLM-basierte Dokumentenanalyse,
+  Semantiksuche, Audio-Transkription.
 
-This is the main repository of the OpenCloud server.
-It contains the golang codebase for the backend services.
+Basis ist [OpenCloud](https://github.com/opencloud-eu/opencloud)
+(opencloud-eu, Apache 2.0). Die KOSMOS-Erweiterungen liegen im Branch
+`kosmos`.
 
-## Getting Involved
+## Funktionen
 
-The OpenCloud server is released under [Apache 2.0](https://github.com/opencloud-eu/opencloud/blob/main/LICENSE).
-The project is thrilled to receive contributions in all forms.
-Start hacking now, there are many ways to get involved such as:
+- Revisionssicherer, unveränderbarer Dateispeicher (Immutable Spaces)
+- Volltext- und Semantiksuche (Bleve + Qdrant)
+- KI-gestützte Dokumentenverarbeitung (open_taki: OCR, Zusammenfassung,
+  Klassifikation, Transkription)
+- Metadatenpflege inklusive Aktenzeichen
+- WebDAV, Web-Client, Mobile Apps
+- Online-Office (Collabora)
+- Job-Engine mit typisierten Pipelines und Worker-Registry
+- Integration von Scanner, E-Mail-Posteingang und Dokumentenworkflows
 
-- Reporting [issues or bugs](https://github.com/opencloud-eu/opencloud/issues)
-- Requesting [features](https://github.com/opencloud-eu/opencloud/issues)
-- [Writing documentation](https://github.com/opencloud-eu/docs)
-- [Writing code or extend our tests](https://github.com/opencloud-eu/opencloud/pulls)
-- [Reviewing code](https://github.com/opencloud-eu/opencloud/pulls)
-- Helping others in the [community](https://app.element.io/#/room/#opencloud:matrix.org)
+## Komponenten des OpenCore-Stacks
 
-Every contribution is meaningful and appreciated!
-Please refer to our [Contribution Guidelines](https://github.com/opencloud-eu/opencloud/blob/main/CONTRIBUTING.md) if you want to get started.
+| Komponente | Zweck | Repo |
+|---|---|---|
+| opencloud | Server-Backend (dieses Repo) | KOSMOS-OpenCloud/opencloud |
+| opencloud_reva | Storage- und Orchestrierungsschicht (Reva) | KOSMOS-OpenCloud/opencloud_reva |
+| opencloud_web | Web-Client (Vue.js) | KOSMOS-OpenCloud/opencloud_web |
+| open_taki | KI-Dokumentenanalyse (Tika-Ersatz) | KOSMOS-EU/open_taki |
+| microllm | LLM-Routing und Loadbalancing | — |
 
-## Build OpenCloud
-
-To build the backend, follow these instructions:
-
-Generate the assets needed by e.g., the web UI and the builtin IDP
+## Build
 
 ``` console
 make generate
-```
-
-Then compile the `opencloud` binary
-
-``` console
 make -C opencloud build
-```
-That will produce the binary `opencloud/bin/opencloud`. It can be started as a local test instance right away with a two step command:
-
-```bash
 opencloud/bin/opencloud init && opencloud/bin/opencloud server
 ```
-This creates a server configuration (by default in `$HOME/.opencloud`) and starts the server.
 
-For more setup- and installation options consult the [Development Documentation](https://docs.opencloud.eu/).
+Für das KOSMOS-Build (Container-Image) siehe `BUILD_HOWTO.md` und
+`build_kosmos.sh`.
 
 ## Technology
 
-Important information for contributors about the technology in use.
-
-### Authentication
-
-The OpenCloud backend authenticates users via [OpenID Connect](https://openid.net/connect/) using either an external IdP like [Keycloak](https://www.keycloak.org/) or the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider.
-
-### Database
-
-The OpenCloud backend does not use a database. It stores all data in the filesystem. By default, the root directory of the backend is `$HOME/.opencloud/`.
+- **Authentication**: OpenID Connect via eingebautem IDP
+  (LibreGraph Connect) oder externem IdP
+- **Storage**: Dateisystem (kein Datenbank-Abhängigkeit), Reva als
+  Storage-Backend
+- **Search**: Bleve (Metadaten, Tags, Favoriten) + Qdrant (semantisch)
+- **AI**: open_taki → microllm → lokale LLM-Backends (vLLM)
 
 ## Security
 
-If you find a security-related issue, please contact [security@opencloud.eu](mailto:security@opencloud.eu) immediately.
+Sicherheitsrelevante Probleme: [info@kosmos.technology](mailto:info@kosmos.technology)
+
+## License
+
+[Apache 2.0](LICENSE)

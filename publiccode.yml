@@ -5,7 +5,7 @@ url: "https://gitlab.opencode.de/kosmos/opencloud"
 landingURL: "https://kosmos.technology/"
 softwareVersion: "7.2.0"
 releaseDate: "2026-08-25"
-logo: "logo.png"
+logo: "feature.png"
 platforms:
   - "linux"
 categories:
@@ -43,6 +43,7 @@ description:
       - "Skalierbarer Betrieb auf eigener Infrastruktur (Podman/nuhost6)"
       - "Integration von Scanner, E-Mail-Posteingang und Dokumentenworkflows"
     screenshots:
+      - "feature.png"
       - "screens/opencore_kosmos.jpg"
       - "screens/01.png"
       - "screens/02.png"

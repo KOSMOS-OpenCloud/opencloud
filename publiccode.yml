@@ -1,0 +1,96 @@
+publiccodeYmlVersion: "0.4"
+name: "OpenCloud KOSMOS Edition"
+applicationSuite: "KOSMOS"
+url: "https://gitlab.opencode.de/kosmos/opencloud"
+landingURL: "https://kosmos.technology/"
+softwareVersion: "7.2.0"
+releaseDate: "2026-08-25"
+logo: "opencloud_logo.png"
+platforms:
+  - "linux"
+categories:
+  - "knowledge-management"
+  - "document-management"
+  - "collaboration"
+developmentStatus: "stable"
+softwareType: "standalone/web"
+description:
+  de:
+    genericName: "Cloud-Dokumentenmanagement"
+    shortDescription: "Open-Source-Dokumenten- und Dateidienst mit revisionssicherem Speicher, Volltext- und Semantiksuche sowie KI-gestützter Dokumentenverarbeitung für die öffentliche Verwaltung."
+    longDescription: >
+      OpenCloud ist die Kernkomponente des OpenCore-Stacks (OpenCloud +
+      OpenCosmos): ein quelloffener Dokumenten- und Dateidienst für
+      Behörden und Kommunen. Er ersetzt das klassische DMS durch einen
+      revisionssicheren, geschützten zentralen Datenort, der digitalisierte
+      Prozesse vertikal und horizontal skaliert.
+
+      Der Server (OpenCloud) stellt Dateien über WebDAV, einen Web-Client und
+      eine CS3-API bereit. Das Storage-Backend Reva ermöglicht
+      Unveränderlichkeits-Regeln (Immutable Spaces), Aktenzeichen-Metadaten
+      und Anbindung an Scanserver. Ergänzend laufen KI-Dienste: open_taki
+      (LLM-basierte Dokumentenanalyse, OCR, Transkription), Semantiksuche
+      über Vektorspeicher und Routing über microllm.
+
+      Die Edition wird als praxisgeführtes Vortriebsprojekt in enger
+      Zusammenarbeit mit den Kommunen, die sie betreiben, fortlaufend
+      weiterentwickelt.
+    features:
+      - "Revisionssicherer, unveränderbarer Dateispeicher (Immutable Spaces)"
+      - "Volltext- und Semantiksuche mit KI-Metadaten"
+      - "WebDAV, Web-Client, Mobile Apps, Office-Integration (Collabora)"
+      - "KI-Dokumentenverarbeitung: OCR, Zusammenfassung, Klassifikation, Transkription"
+      - "Skalierbarer Betrieb auf eigener Infrastruktur (Podman/nuhost6)"
+      - "Integration von Scanner, E-Mail-Posteingang und Dokumentenworkflows"
+    screenshots:
+      - "screens/opencore_kosmos.jpg"
+      - "screens/01.png"
+      - "screens/02.png"
+      - "screens/03.png"
+      - "screens/04.png"
+      - "screens/05.png"
+      - "screens/06.png"
+      - "screens/07.png"
+  en:
+    genericName: "Cloud Document Management"
+    shortDescription: "Open-source document and file service with tamper-proof storage, full-text and semantic search and AI-powered document processing for public administrations."
+    longDescription: >
+      OpenCloud is the core component of the OpenCore stack (OpenCloud +
+      OpenCosmos): an open-source document and file service for
+      municipalities and public authorities. It replaces the classic DMS
+      with a tamper-proof, protected central data location that scales
+      digital processes vertically and horizontally.
+
+      The server provides files via WebDAV, a web client and a CS3 API. The
+      Reva storage backend supports immutability rules, file-plan metadata
+      and scanner integration. AI services complement the core: open_taki
+      (LLM-based document analysis, OCR, transcription), semantic search via
+      vector storage and LLM routing through microllm.
+
+      The edition is continuously developed as a practice-driven project in
+      close cooperation with the municipalities that run it.
+    features:
+      - "Tamper-proof immutable file storage"
+      - "Full-text and semantic search with AI metadata"
+      - "WebDAV, web client, mobile apps, office integration (Collabora)"
+      - "AI document processing: OCR, summarization, classification, transcription"
+      - "Scalable operation on own infrastructure (Podman/nuhost6)"
+      - "Scanner, e-mail inbox and document workflow integration"
+intendedAudience:
+  countries:
+    - "de"
+  scope:
+    - "local-authorities"
+    - "government"
+legal:
+  license: "Apache-2.0"
+maintenance:
+  type: "community"
+  contacts:
+    - name: "KOSMOS"
+      email: "info@kosmos.technology"
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - "de"
+    - "en"

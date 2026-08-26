@@ -3,7 +3,7 @@ name: "OpenCore KOSMOS Edition"
 applicationSuite: "KOSMOS"
 url: "https://gitlab.opencode.de/kosmos/opencloud"
 landingURL: "https://kosmos.technology/"
-softwareVersion: "7.2.1"
+softwareVersion: "7.2.2"
 releaseDate: "2026-08-26"
 logo: "feature.png"
 platforms:

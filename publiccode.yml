@@ -1,5 +1,5 @@
 publiccodeYmlVersion: "0.4"
-name: "OpenCloud KOSMOS Edition"
+name: "OpenCore KOSMOS Edition"
 applicationSuite: "KOSMOS"
 url: "https://gitlab.opencode.de/kosmos/opencloud"
 landingURL: "https://kosmos.technology/"

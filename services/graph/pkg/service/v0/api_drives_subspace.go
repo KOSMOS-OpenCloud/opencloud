@@ -11,6 +11,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/render"
+	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
@@ -164,6 +165,85 @@ func (g Graph) DeleteSubspace(w http.ResponseWriter, r *http.Request) {
 	default:
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
 	}
+}
+
+// spaceTypeProject is the value of the space-type xattr for project spaces.
+// It mirrors reva's decomposedfs constant so the graph API can detect the
+// subspace-creating case without depending on the storage driver.
+const spaceTypeProject = "project"
+
+// ensureSubspaceManager enforces the space-manager role before a grant is
+// created when that grant would turn a folder into a subspace. Subspace
+// registration only happens for a non-root container in a project space that
+// is not already in the subspace registry. For every other invite (space-root
+// membership, non-project spaces, files, already-a-subspace folders, or a
+// folder that already has grants) this is a no-op, so simple invites are
+// unaffected.
+func (s DriveItemPermissionsService) ensureSubspaceManager(ctx context.Context, gwc gateway.GatewayAPIClient, itemID *provider.ResourceId, info *provider.ResourceInfo) error {
+	// Space-root membership never creates a subspace.
+	if IsSpaceRoot(itemID) {
+		return nil
+	}
+	// Only folders can become subspaces.
+	if info == nil || info.GetType() != provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		return nil
+	}
+
+	spaceID := info.GetSpace().GetId().GetOpaqueId()
+	if spaceID == "" {
+		return nil
+	}
+	space, err := utils.GetSpace(ctx, spaceID, gwc)
+	if err != nil || space == nil {
+		return nil
+	}
+	// Only project spaces support subspaces.
+	if space.GetSpaceType() != spaceTypeProject {
+		return nil
+	}
+	// A folder that is already a subspace: further grants are simple members.
+	if containsSubspaceID(subspacesFromOpaque(space.GetOpaque()), info.GetId().GetOpaqueId()) {
+		return nil
+	}
+	// A folder that already has grants keeps its existing (sub)space status;
+	// only the first grant can trigger subspace registration.
+	existing, err := gwc.ListGrants(ctx, &provider.ListGrantsRequest{Ref: &provider.Reference{ResourceId: itemID}})
+	if err != nil {
+		return nil
+	}
+	if len(existing.GetGrants()) > 0 {
+		return nil
+	}
+
+	// This grant will create a subspace, so the caller must be a space manager.
+	return s.ensureSpaceManagerRole(ctx, gwc, space)
+}
+
+// containsSubspaceID reports whether the subspace list contains the given id.
+func containsSubspaceID(entries []SubspaceEntry, id string) bool {
+	for i := range entries {
+		if entries[i].ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+// ensureSpaceManagerRole checks that the current user holds the space-manager
+// role on the given space, mirroring the explicit subspace.add path in reva
+// (permissions.IsManager). Returns an access-denied error otherwise.
+func (s DriveItemPermissionsService) ensureSpaceManagerRole(ctx context.Context, gwc gateway.GatewayAPIClient, space *provider.StorageSpace) error {
+	members, err := utils.GetSpaceMembers(ctx, space.GetId().GetOpaqueId(), gwc, utils.ManagerRole)
+	if err != nil {
+		return err
+	}
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	for _, member := range members {
+		if member == userID {
+			return nil
+		}
+	}
+	return errorcode.New(errorcode.AccessDenied, "only a space manager can create a subspace")
 }
 
 // subspacesFromOpaque extracts the subspace list from a StorageSpace's opaque data.

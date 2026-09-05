@@ -124,6 +124,14 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		return libregraph.Permission{}, err
 	}
 
+	// Only a space manager may create a subspace. This invite would turn the
+	// folder into a subspace when it is the first grant on a non-root folder in
+	// a project space that is not already registered as a subspace. In that case
+	// the space-manager role is required; simple invites are unaffected.
+	if err := s.ensureSubspaceManager(ctx, gatewayClient, resourceId, statResponse.GetInfo()); err != nil {
+		return libregraph.Permission{}, err
+	}
+
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {
 		// only allow roles that are enabled in the config

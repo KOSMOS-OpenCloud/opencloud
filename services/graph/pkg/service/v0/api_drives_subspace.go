@@ -265,7 +265,7 @@ func (s DriveItemPermissionsService) ensureSpaceManagerRole(ctx context.Context)
 			if setting.GetId() != targetSetting.GetId() {
 				continue
 			}
-			if pv := setting.GetValue().GetPermissionValue(); pv != nil && pv.GetConstraint() == settingsmsg.Permission_CONSTRAINT_ALL {
+			if pv := setting.GetPermissionValue(); pv != nil && pv.GetConstraint() == settingsmsg.Permission_CONSTRAINT_ALL {
 				return nil
 			}
 		}

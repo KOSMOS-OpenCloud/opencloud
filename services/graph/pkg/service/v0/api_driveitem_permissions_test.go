@@ -72,7 +72,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cache = identitycache.NewIdentityCache(identitycache.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg = defaults.FullDefaultConfig()
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 		ctx = revactx.ContextSetUser(context.Background(), currentUser)
@@ -264,7 +264,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				// SecureViewer is enabled in ci, we need to remove it in the unit test
 				return s != unifiedrole.UnifiedRoleSecureViewerID
 			})
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
@@ -487,7 +487,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 			cfg = defaults.FullDefaultConfig()
 			cfg.UnifiedRoles.AvailableRoles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleDeniedID, unifiedrole.UnifiedRoleManagerID}
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, nil)
 
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)

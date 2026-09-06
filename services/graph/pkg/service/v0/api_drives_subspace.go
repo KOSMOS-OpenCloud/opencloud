@@ -14,8 +14,10 @@ import (
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
-
+	settingsmsg "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/messages/settings/v0"
+	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 )
 
 // SubspaceEntry matches the reva node.SubspaceEntry struct.
@@ -207,10 +209,9 @@ func (s DriveItemPermissionsService) ensureSubspaceManager(ctx context.Context, 
 	}
 
 	// This grant may create a subspace (reva autoAddSubspace will register it
-	// if it is the first grant on this folder). The caller must be a space
-	// manager; if the folder already has grants but is not yet a subspace the
-	// reva-side check will catch the half-baked case.
-	return s.ensureSpaceManagerRole(ctx, gwc, space)
+	// if it is the first grant on this folder). The caller must hold the
+	// "Manage space properties" permission (Admin / SpaceAdmin).
+	return s.ensureSpaceManagerRole(ctx)
 }
 
 // containsSubspaceID reports whether the subspace list contains the given id.
@@ -223,18 +224,50 @@ func containsSubspaceID(entries []SubspaceEntry, id string) bool {
 	return false
 }
 
-// ensureSpaceManagerRole checks that the current user holds the space-manager
-// role on the given space, mirroring the explicit subspace.add path in reva
-// (permissions.IsManager). Returns an access-denied error otherwise.
-func (s DriveItemPermissionsService) ensureSpaceManagerRole(ctx context.Context, gwc gateway.GatewayAPIClient, space *provider.StorageSpace) error {
-	members, err := utils.GetSpaceMembers(ctx, space.GetId().GetOpaqueId(), gwc, utils.ManagerRole)
+// ensureSpaceManagerRole checks that the current user holds the OpenCloud
+// "Manage space properties" permission (ManageSpaceProperties with constraint
+// All). This is the permission held by the Admin and SpaceAdmin app-roles and
+// is the correct basis for subspace management: it is independent of reva CS3
+// grants, so an Admin who is not an explicit member/owner of the space still
+// passes, while a plain Space-Manager (CS3 RemoveGrant) does not.
+// Returns an access-denied error otherwise.
+func (s DriveItemPermissionsService) ensureSpaceManagerRole(ctx context.Context) error {
+	if s.roleService == nil {
+		return errorcode.New(errorcode.AccessDenied, "only a space manager can create a subspace")
+	}
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+
+	assignments, err := s.roleService.ListRoleAssignments(ctx, &settingssvc.ListRoleAssignmentsRequest{
+		AccountUuid: userID,
+	})
 	if err != nil {
 		return err
 	}
-	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
-	for _, member := range members {
-		if member == userID {
-			return nil
+
+	roleIDs := make([]string, 0, len(assignments.GetAssignments()))
+	for _, a := range assignments.GetAssignments() {
+		roleIDs = append(roleIDs, a.GetRoleId())
+	}
+	if len(roleIDs) == 0 {
+		return errorcode.New(errorcode.AccessDenied, "only a space manager can create a subspace")
+	}
+
+	bundles, err := s.roleService.ListRoles(ctx, &settingssvc.ListBundlesRequest{
+		BundleIds: roleIDs,
+	})
+	if err != nil {
+		return err
+	}
+
+	targetSetting := defaults.ManageSpacePropertiesPermission(defaults.All)
+	for _, bundle := range bundles.GetBundles() {
+		for _, setting := range bundle.GetSettings() {
+			if setting.GetId() != targetSetting.GetId() {
+				continue
+			}
+			if pv := setting.GetValue().GetPermissionValue(); pv != nil && pv.GetConstraint() == settingsmsg.Permission_CONSTRAINT_ALL {
+				return nil
+			}
 		}
 	}
 	return errorcode.New(errorcode.AccessDenied, "only a space manager can create a subspace")

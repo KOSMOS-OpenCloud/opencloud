@@ -205,17 +205,11 @@ func (s DriveItemPermissionsService) ensureSubspaceManager(ctx context.Context, 
 	if containsSubspaceID(subspacesFromOpaque(space.GetOpaque()), info.GetId().GetOpaqueId()) {
 		return nil
 	}
-	// A folder that already has grants keeps its existing (sub)space status;
-	// only the first grant can trigger subspace registration.
-	existing, err := gwc.ListGrants(ctx, &provider.ListGrantsRequest{Ref: &provider.Reference{ResourceId: itemID}})
-	if err != nil {
-		return nil
-	}
-	if len(existing.GetGrants()) > 0 {
-		return nil
-	}
 
-	// This grant will create a subspace, so the caller must be a space manager.
+	// This grant may create a subspace (reva autoAddSubspace will register it
+	// if it is the first grant on this folder). The caller must be a space
+	// manager; if the folder already has grants but is not yet a subspace the
+	// reva-side check will catch the half-baked case.
 	return s.ensureSpaceManagerRole(ctx, gwc, space)
 }
 

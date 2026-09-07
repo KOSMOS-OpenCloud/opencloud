@@ -37,7 +37,7 @@ func DecomposedfsCommand(cfg *config.Config) *cobra.Command {
 		Short:   `cli tools to inspect and manipulate a decomposedfs storage.`,
 		GroupID: CommandGroupStorage,
 	}
-	decomposedCmd.AddCommand(metadataCmd(cfg), checkCmd(cfg))
+	decomposedCmd.AddCommand(metadataCmd(cfg), checkCmd(cfg), subspaceGrantsCmd(cfg))
 	return decomposedCmd
 }
 

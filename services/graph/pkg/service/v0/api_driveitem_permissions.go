@@ -32,9 +32,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/conversions"
 	"github.com/opencloud-eu/opencloud/pkg/l10n"
 	"github.com/opencloud-eu/opencloud/pkg/log"
-	settingssvc "github.com/opencloud-eu/opencloud/protogen/gen/opencloud/services/settings/v0"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/config"
-	"github.com/opencloud-eu/opencloud/services/settings/pkg/store/defaults"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/identity/cache"
@@ -69,7 +67,6 @@ type DriveItemPermissionsProvider interface {
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
 type DriveItemPermissionsService struct {
 	BaseGraphService
-	roleService RoleService
 }
 
 type permissionType int
@@ -91,13 +88,12 @@ type ListPermissionsQueryOptions struct {
 }
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache cache.IdentityCache, config *config.Config, roleService RoleService) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache cache.IdentityCache, config *config.Config) (DriveItemPermissionsService, error) {
 	publicBaseURL, err := url.Parse(config.Spaces.WebDavBase)
 	if err != nil {
 		return DriveItemPermissionsService{}, fmt.Errorf("could not parse graph.spaces.webdav_base: %w", err)
 	}
 	return DriveItemPermissionsService{
-		roleService: roleService,
 		BaseGraphService: BaseGraphService{
 			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
 			gatewaySelector: gatewaySelector,

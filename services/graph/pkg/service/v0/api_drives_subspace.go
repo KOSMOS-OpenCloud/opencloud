@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -293,18 +294,33 @@ func (g Graph) RemoveSubspaceMember(w http.ResponseWriter, r *http.Request) {
 // grants Drives.ReadWrite (the same check autoAddSubspace uses on the reva side).
 func (g Graph) ensureSpaceManagerPermission(ctx context.Context, gwc gateway.GatewayAPIClient, space *provider.StorageSpace) error {
 	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
-	members, err := utils.GetSpaceMembers(ctx, space.GetId().GetOpaqueId(), gwc, utils.ManagerRole)
+	spaceID := space.GetId().GetOpaqueId()
+
+	// Check Drives.ReadWrite on the space — the same permission Reva's
+	// ManageSpaceProperties checks. This is the global "space manager" right and
+	// does not depend on the per-node CS3 grant walk. Using CheckPermission
+	// (instead of GetSpaceMembers) avoids resolving group members, which the
+	// CS3 identity backend does not support (GetGroupMembers → CODE_NOT_FOUND)
+	// and which would otherwise fail for spaces whose manager grant is a group.
+	checkRes, err := gwc.CheckPermission(ctx, &cs3permissions.CheckPermissionRequest{
+		Permission: "Drives.ReadWrite",
+		SubjectRef: &cs3permissions.SubjectReference{
+			Spec: &cs3permissions.SubjectReference_UserId{
+				UserId: revactx.ContextMustGetUser(ctx).GetId(),
+			},
+		},
+		Ref: &provider.Reference{
+			ResourceId: &provider.ResourceId{StorageId: spaceID},
+		},
+	})
 	if err != nil {
-		g.logger.Error().Err(err).Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Msg("subspace-perm: GetSpaceMembers failed")
+		g.logger.Error().Err(err).Str("spaceID", spaceID).Str("user", userID).Msg("subspace-perm: CheckPermission failed")
 		return errorcode.New(errorcode.GeneralException, "could not check space manager permission")
 	}
-	g.logger.Info().Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Strs("managers", members).Msg("subspace-perm: manager check")
-	for _, member := range members {
-		if member == userID {
-			return nil
-		}
+	if checkRes.GetStatus().GetCode() == rpc.Code_CODE_OK {
+		return nil
 	}
-	g.logger.Warn().Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Strs("managers", members).Msg("subspace-perm: user not a space manager")
+	g.logger.Warn().Str("spaceID", spaceID).Str("user", userID).Str("status", checkRes.GetStatus().GetCode().String()).Msg("subspace-perm: user not a space manager")
 	return errorcode.New(errorcode.AccessDenied, "only a space manager can manage subspace members")
 }
 

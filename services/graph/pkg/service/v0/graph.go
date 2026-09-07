@@ -69,6 +69,7 @@ type Graph struct {
 	historyClient            ehsvc.EventHistoryService
 	traceProvider            trace.TracerProvider
 	natskv                   jetstream.KeyValue
+	driveItemPermissionsService DriveItemPermissionsProvider
 }
 
 // ServeHTTP implements the Service interface.

@@ -4,18 +4,22 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"github.com/opencloud-eu/reva/v2/pkg/utils"
 
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
+	"github.com/opencloud-eu/opencloud/services/graph/pkg/validate"
 )
 
 // SubspaceEntry matches the reva node.SubspaceEntry struct.
@@ -171,6 +175,151 @@ func (g Graph) DeleteSubspace(w http.ResponseWriter, r *http.Request) {
 // It mirrors reva's decomposedfs constant so the graph API can detect the
 // subspace-creating case without depending on the storage driver.
 const spaceTypeProject = "project"
+
+// InviteSubspaceMember adds a user or group as a member of a subspace folder.
+// Unlike a normal invite this does not rely on the CS3 grant walk: the caller
+// must hold the global ManageSpaceProperties permission (space manager /
+// admin), which is checked explicitly here.
+// POST /drives/{driveID}/items/{itemID}/subspace/permissions
+func (g Graph) InviteSubspaceMember(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		return
+	}
+	itemID, err := parseIDParam(r, "itemID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
+		return
+	}
+
+	invite := &libregraph.DriveItemInvite{}
+	if err = StrictJSONUnmarshal(r.Body, invite); err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	if err = validate.StructCtx(ctx, invite); err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusServiceUnavailable, "gateway not available")
+		return
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(&driveID), gatewayClient)
+	if err != nil || space == nil {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "space not found")
+		return
+	}
+	if space.GetSpaceType() != spaceTypeProject {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "subspace members are only supported in project spaces")
+		return
+	}
+	// Only a user with the global ManageSpaceProperties permission may manage
+	// subspace members. This is the check the normal invite path is missing.
+	if err := g.ensureSpaceManagerPermission(ctx, gatewayClient, space); err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permission, err := g.subspaceInvite(ctx, &itemID, *invite)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &ListResponse{Value: []any{permission}})
+}
+
+// RemoveSubspaceMember removes a member (share) from a subspace folder.
+// Analogous to InviteSubspaceMember but for deletion. Removing the last grant
+// on a folder deregisters it as a subspace (reva autoRemoveSubspace).
+// DELETE /drives/{driveID}/items/{itemID}/subspace/permissions/{permissionID}
+func (g Graph) RemoveSubspaceMember(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	driveID, err := parseIDParam(r, "driveID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid driveID")
+		return
+	}
+	itemID, err := parseIDParam(r, "itemID")
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid itemID")
+		return
+	}
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusServiceUnavailable, "gateway not available")
+		return
+	}
+
+	space, err := utils.GetSpace(ctx, storagespace.FormatResourceID(&driveID), gatewayClient)
+	if err != nil || space == nil {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "space not found")
+		return
+	}
+	if space.GetSpaceType() != spaceTypeProject {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "subspace members are only supported in project spaces")
+		return
+	}
+	if err := g.ensureSpaceManagerPermission(ctx, gatewayClient, space); err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	if err := g.subspaceDeletePermission(ctx, &itemID, permissionID); err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
+// ensureSpaceManagerPermission checks that the acting user holds the global
+// ManageSpaceProperties permission (space manager / admin). It checks the
+// ManagerRole membership on the space, which is populated from the role that
+// grants Drives.ReadWrite (the same check autoAddSubspace uses on the reva side).
+func (g Graph) ensureSpaceManagerPermission(ctx context.Context, gwc gateway.GatewayAPIClient, space *provider.StorageSpace) error {
+	members, err := utils.GetSpaceMembers(ctx, space.GetId().GetOpaqueId(), gwc, utils.ManagerRole)
+	if err != nil {
+		return errorcode.New(errorcode.GeneralException, "could not check space manager permission")
+	}
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	for _, member := range members {
+		if member == userID {
+			return nil
+		}
+	}
+	return errorcode.New(errorcode.AccessDenied, "only a space manager can manage subspace members")
+}
+
+// subspaceInvite performs the grant creation for a subspace member. It reuses
+// the DriveItemPermissionsService.InviteWithoutSubspaceCheck logic (which
+// creates the share via the gateway) but skips the ensureSubspaceManager check
+// because the ManagerRole check was already done in the handler. The Reva-side
+// AddGrant bypass (ManageSpaceProperties) is what actually lets the share be
+// created without a CS3 grant walk.
+func (g Graph) subspaceInvite(ctx context.Context, itemID *provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+	return g.driveItemPermissionsService.InviteWithoutSubspaceCheck(ctx, itemID, invite)
+}
+
+// subspaceDeletePermission removes a share by its permissionID on a subspace
+// folder. Mirrors DeletePermission but without the role check (already done).
+func (g Graph) subspaceDeletePermission(ctx context.Context, _ *provider.ResourceId, permissionID string) error {
+	return g.removeUserShare(ctx, permissionID)
+}
 
 // ensureSubspaceManager enforces the space-manager role before a grant is
 // created when that grant would turn a folder into a subspace. Subspace

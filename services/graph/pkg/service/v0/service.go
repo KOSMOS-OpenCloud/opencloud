@@ -195,9 +195,10 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 	}
 
 	svc := Graph{
-		BaseGraphService:         baseGraphService,
-		mux:                      m,
-		specialDriveItemsCache:   spacePropertiesCache,
+		BaseGraphService:              baseGraphService,
+		mux:                           m,
+		specialDriveItemsCache:        spacePropertiesCache,
+		driveItemPermissionsService:   driveItemPermissionsService,
 		eventsPublisher:          options.EventsPublisher,
 		eventsConsumer:           options.EventsConsumer,
 		searchService:            options.SearchService,
@@ -296,6 +297,10 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						r.Post("/subspace", svc.SetSubspace)
 						r.Delete("/subspace", svc.DeleteSubspace)
 						r.Get("/space", svc.GetItemSpaceContext)
+						r.Route("/subspace/permissions", func(r chi.Router) {
+							r.Post("/", svc.InviteSubspaceMember)
+							r.Delete("/{permissionID}", svc.RemoveSubspaceMember)
+						})
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {

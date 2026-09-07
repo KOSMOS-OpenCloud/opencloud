@@ -51,6 +51,7 @@ const (
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
+	InviteWithoutSubspaceCheck(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	SpaceRootInvite(ctx context.Context, driveID *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
 	ListPermissions(ctx context.Context, itemID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
 	ListSpaceRootPermissions(ctx context.Context, driveID *storageprovider.ResourceId, queryOptions ListPermissionsQueryOptions) (libregraph.CollectionOfPermissionsWithAllowedValues, error)
@@ -131,6 +132,37 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	if err := s.ensureSubspaceManager(ctx, gatewayClient, resourceId, statResponse.GetInfo()); err != nil {
 		return libregraph.Permission{}, err
 	}
+
+	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId)
+}
+
+// InviteWithoutSubspaceCheck performs the same operation as Invite but skips
+// the ensureSubspaceManager check. Intended for the subspace-permission
+// endpoints where the ManagerRole check is done explicitly at the handler
+// level (via the global ManageSpaceProperties permission) and the Reva-side
+// AddGrant bypass allows the share to be created without a CS3 grant walk.
+func (s DriveItemPermissionsService) InviteWithoutSubspaceCheck(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
+	tenantId := revactx.ContextMustGetUser(ctx).GetId().GetTenantId()
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	statResponse, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceId}})
+	if err := errorcode.FromStat(statResponse, err); err != nil {
+		s.logger.Warn().Err(err).Interface("stat.res", statResponse).Msg("stat failed")
+		return libregraph.Permission{}, err
+	}
+
+	var condition string
+	if condition, err = roleConditionForResourceType(statResponse.GetInfo()); err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId)
+}
+
+func (s DriveItemPermissionsService) doInvite(ctx context.Context, gatewayClient gateway.GatewayAPIClient, statResponse *storageprovider.StatResponse, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite, condition, tenantId string) (libregraph.Permission, error) {
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {

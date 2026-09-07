@@ -292,16 +292,19 @@ func (g Graph) RemoveSubspaceMember(w http.ResponseWriter, r *http.Request) {
 // ManagerRole membership on the space, which is populated from the role that
 // grants Drives.ReadWrite (the same check autoAddSubspace uses on the reva side).
 func (g Graph) ensureSpaceManagerPermission(ctx context.Context, gwc gateway.GatewayAPIClient, space *provider.StorageSpace) error {
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
 	members, err := utils.GetSpaceMembers(ctx, space.GetId().GetOpaqueId(), gwc, utils.ManagerRole)
 	if err != nil {
+		g.logger.Error().Err(err).Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Msg("subspace-perm: GetSpaceMembers failed")
 		return errorcode.New(errorcode.GeneralException, "could not check space manager permission")
 	}
-	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	g.logger.Info().Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Strs("managers", members).Msg("subspace-perm: manager check")
 	for _, member := range members {
 		if member == userID {
 			return nil
 		}
 	}
+	g.logger.Warn().Str("spaceID", space.GetId().GetOpaqueId()).Str("user", userID).Strs("managers", members).Msg("subspace-perm: user not a space manager")
 	return errorcode.New(errorcode.AccessDenied, "only a space manager can manage subspace members")
 }
 
@@ -312,7 +315,12 @@ func (g Graph) ensureSpaceManagerPermission(ctx context.Context, gwc gateway.Gat
 // AddGrant bypass (ManageSpaceProperties) is what actually lets the share be
 // created without a CS3 grant walk.
 func (g Graph) subspaceInvite(ctx context.Context, itemID *provider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error) {
-	return g.driveItemPermissionsService.InviteWithoutSubspaceCheck(ctx, itemID, invite)
+	g.logger.Info().Str("itemID", itemID.GetOpaqueId()).Str("role", invite.GetRoles()[0]).Str("recipient", invite.GetRecipients()[0].GetObjectId()).Msg("subspace-perm: invoking InviteWithoutSubspaceCheck")
+	permission, err := g.driveItemPermissionsService.InviteWithoutSubspaceCheck(ctx, itemID, invite)
+	if err != nil {
+		g.logger.Error().Err(err).Str("itemID", itemID.GetOpaqueId()).Msg("subspace-perm: InviteWithoutSubspaceCheck failed")
+	}
+	return permission, err
 }
 
 // subspaceDeletePermission removes a share by its permissionID on a subspace

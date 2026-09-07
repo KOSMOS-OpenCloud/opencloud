@@ -208,6 +208,13 @@ func (s DriveItemPermissionsService) ensureSubspaceManager(ctx context.Context, 
 		return nil
 	}
 
+	// The space owner can always manage grants on their own space,
+	// including creating subspaces by adding the first grant to a folder.
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	if ownerID := space.GetOwner().GetId().GetOpaqueId(); ownerID == userID {
+		return nil
+	}
+
 	// This grant may create a subspace (reva autoAddSubspace will register it
 	// if it is the first grant on this folder). The caller must hold the
 	// "Manage space properties" permission (Admin / SpaceAdmin).

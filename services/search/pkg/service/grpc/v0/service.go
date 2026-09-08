@@ -229,8 +229,9 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 
 // IndexItem (re-)indexes a single resource by its resource ID.
 // The resource_id format is "storageid$spaceid!opaqueid".
-// Fire-and-forget: antwortet sofort, Extraktion läuft im Hintergrund.
-func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ *searchsvc.IndexItemResponse) error {
+// Synchron: blockiert bis die Taki-Extraktion abgeschlossen ist (oder ctx beendet).
+// ForceSync=true in der EnqueueEnrich-Option aktiviert den Completion-Callback.
+func (s Service) IndexItem(ctx context.Context, in *searchsvc.IndexItemRequest, _ *searchsvc.IndexItemResponse) error {
 	rid := in.ResourceId
 	if rid == "" {
 		return errors.New("resource_id is required")
@@ -250,9 +251,20 @@ func (s Service) IndexItem(_ context.Context, in *searchsvc.IndexItemRequest, _ 
 		Path: ".",
 	}
 
-	s.log.Info().Str("resource_id", rid).Bool("force_overwrite", in.ForceOverwrite).Msg("IndexItem: enqueuing (priority=high)")
-	s.searcher.EnqueueEnrich(ref, search.EnrichPriorityHigh, "grpc:IndexItem", in.ForceOverwrite)
-	return nil
+	s.log.Info().Str("resource_id", rid).Bool("force_overwrite", in.ForceOverwrite).Msg("IndexItem: enqueuing (priority=high, sync)")
+	done := s.searcher.EnqueueEnrich(ref, search.EnrichPriorityHigh, "grpc:IndexItem", in.ForceOverwrite, true)
+	if done == nil {
+		return nil // kein Sync-Modus (nicht möglich bei grpc:IndexItem, defensive)
+	}
+	// Warten bis Completion oder ctx-Terminierung
+	select {
+	case <-done:
+		s.log.Info().Str("resource_id", rid).Msg("IndexItem: enrichment complete")
+		return nil
+	case <-ctx.Done():
+		s.log.Warn().Str("resource_id", rid).Msg("IndexItem: ctx done before enrichment complete")
+		return ctx.Err()
+	}
 }
 
 // Resolve resolves a (possibly outdated) resource ID to its current location via Bleve OldIDs index.

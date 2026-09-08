@@ -197,11 +197,11 @@ func (s Service) processEvent(e raw.Event) error {
 		e.Ack()
 	case events.FileUploaded:
 		s.index.EnqueueIndex(ev.Ref, "event:FileUploaded")
-		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal, "event:FileUploaded", false, false)
+		s.index.EnqueueEnrich(ev.Ref, search.EnrichPriorityNormal, "event:FileUploaded")
 		e.Ack()
 	case events.UploadReady:
 		s.index.EnqueueIndex(ev.FileRef, "event:UploadReady")
-		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal, "event:UploadReady", false, false)
+		s.index.EnqueueEnrich(ev.FileRef, search.EnrichPriorityNormal, "event:UploadReady")
 		e.Ack()
 	case events.SpaceRenamed:
 		// Space rename: no single ref, handled by IndexSpace separately

@@ -437,17 +437,9 @@ func (_mock *Searcher) EnqueueIndex(ref *providerv1beta1.Reference, source strin
 }
 
 // EnqueueEnrich provides a mock function for the type Searcher
-func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite bool, forceSync bool) <-chan struct{} {
-	var ret []interface{}
-	if len(_mock.ExpectedCalls) > 0 {
-		ret = _mock.ExpectedCalls[0].ReturnArguments
-	}
-	_mock.Called(ref, priority, source, forceOverwrite, forceSync)
-	var ret0 chan struct{}
-	if len(ret) > 0 {
-		ret0, _ = ret[0].(chan struct{})
-	}
-	return ret0
+func (_mock *Searcher) EnqueueEnrich(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite ...bool) {
+	_mock.Called(ref, priority, source, forceOverwrite)
+	return
 }
 
 // Searcher_EnqueueEnrich_Call is a *mock.Call
@@ -455,19 +447,25 @@ type Searcher_EnqueueEnrich_Call struct {
 	*mock.Call
 }
 
-func (_e *Searcher_Expecter) EnqueueEnrich(ref interface{}, priority interface{}, source interface{}, forceOverwrite interface{}, forceSync interface{}) *Searcher_EnqueueEnrich_Call {
-	args := []interface{}{ref, priority, source, forceOverwrite, forceSync}
+func (_e *Searcher_Expecter) EnqueueEnrich(ref interface{}, priority interface{}, source interface{}, forceOverwrite ...interface{}) *Searcher_EnqueueEnrich_Call {
+	args := []interface{}{ref, priority, source}
+	args = append(args, forceOverwrite...)
 	return &Searcher_EnqueueEnrich_Call{Call: _e.mock.On("EnqueueEnrich", args...)}
 }
 
-func (_c *Searcher_EnqueueEnrich_Call) Run(run func(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite bool, forceSync bool)) *Searcher_EnqueueEnrich_Call {
+func (_c *Searcher_EnqueueEnrich_Call) Run(run func(ref *providerv1beta1.Reference, priority string, source string, forceOverwrite ...bool)) *Searcher_EnqueueEnrich_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*providerv1beta1.Reference), args[1].(string), args[2].(string), args[3].(bool), args[4].(bool))
+		run(args[0].(*providerv1beta1.Reference), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *Searcher_EnqueueEnrich_Call) Return(done <-chan struct{}) *Searcher_EnqueueEnrich_Call {
-	_c.Call.Return(done)
+func (_c *Searcher_EnqueueEnrich_Call) Return() *Searcher_EnqueueEnrich_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Searcher_EnqueueEnrich_Call) RunAndReturn(run func(ref *providerv1beta1.Reference, priority string)) *Searcher_EnqueueEnrich_Call {
+	_c.Run(run)
 	return _c
 }

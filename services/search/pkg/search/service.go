@@ -73,7 +73,7 @@ type Searcher interface {
 	PurgeItem(rID *provider.Reference)
 	UpsertItem(ref *provider.Reference)
 	EnqueueIndex(ref *provider.Reference, source string)
-	EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite bool, forceSync bool) (done <-chan struct{})
+	EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite ...bool)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 	ResolvePathID(oldID string) (*Resource, error)
@@ -113,8 +113,6 @@ type Service struct {
 	indexCh           chan queueRequest
 	enrichCh          chan queueRequest
 	enrichHighCh      chan queueRequest
-	syncWaiters       map[string]chan struct{}
-	syncWaitersMu     sync.Mutex
 	layerCh           chan layerJob // OCR layer writeback queue (opt-in)
 	ocrLayerWriteback bool          // SEARCH_OCR_LAYER_WRITEBACK=true
 	ocrLayerMaxSize   uint64        // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
@@ -128,7 +126,6 @@ type Service struct {
 
 type queueRequest struct {
 	ref            *provider.Reference
-	doneID         string // if set, Enrich-Worker signalisiert Completion über syncDoneCh
 	priority       string // high, normal, low
 	source         string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
 	forceOverwrite bool   // overwrite existing metadata (xattrs) during enrichment
@@ -198,7 +195,6 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		indexCh:      make(chan queueRequest, cfg.IndexQueueSize),
 		enrichCh:     make(chan queueRequest, cfg.EnrichQueueSize),
 		enrichHighCh: make(chan queueRequest, 100),
-		syncWaiters: make(map[string]chan struct{}),
 		layerCh:      make(chan layerJob, 100),
 	}
 
@@ -1208,7 +1204,7 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 // UpsertItem indexes or stores Resource data fields (legacy, calls both queues).
 func (s *Service) UpsertItem(ref *provider.Reference) {
 	s.EnqueueIndex(ref, "legacy:UpsertItem")
-	s.EnqueueEnrich(ref, EnrichPriorityNormal, "legacy:UpsertItem", false, false)
+	s.EnqueueEnrich(ref, EnrichPriorityNormal, "legacy:UpsertItem")
 }
 
 // EnqueueIndex sends a Bleve-only index request for a single item (metadata, no Taki).
@@ -1219,29 +1215,9 @@ func (s *Service) EnqueueIndex(ref *provider.Reference, source string) {
 }
 
 // EnqueueEnrich sends a Taki enrichment request (Taki + Qdrant + xattrs + Bleve with content).
-// forceSync (nur grpc:IndexItem / UI-Reindex): meldet die Done-Channel-ID zurück,
-// die nach Completion des Enrich-Jobs closed wird (120s Timeout).
-func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite bool, forceSync bool) (done <-chan struct{}) {
-	req := queueRequest{ref: ref, priority: priority, source: source, forceOverwrite: forceOverwrite}
-
-	if priority == EnrichPriorityHigh && source == "grpc:IndexItem" && forceSync {
-		doneID := fmt.Sprintf("%s$%s!%s",
-			ref.GetResourceId().GetStorageId(),
-			ref.GetResourceId().GetSpaceId(),
-			ref.GetResourceId().GetOpaqueId())
-		req.doneID = doneID
-		waitCh := make(chan struct{})
-		s.syncWaitersMu.Lock()
-		s.syncWaiters[doneID] = waitCh
-		s.syncWaitersMu.Unlock()
-
-		go func() {
-			<-time.After(120 * time.Second)
-			s.releaseSyncWaiter(doneID)
-		}()
-		done = waitCh
-	}
-
+func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source string, forceOverwrite ...bool) {
+	overwrite := len(forceOverwrite) > 0 && forceOverwrite[0]
+	req := queueRequest{ref: ref, priority: priority, source: source, forceOverwrite: overwrite}
 	if priority == EnrichPriorityHigh {
 		select {
 		case s.enrichHighCh <- req:
@@ -1254,11 +1230,8 @@ func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source
 				Str("source", source).
 				Int("enrich_high_max", cap(s.enrichHighCh)).
 				Msg("enrich-queue-high: full, dropping")
-			if req.doneID != "" {
-				s.releaseSyncWaiter(req.doneID) // close(waitCh) — sofort fertig, Job wurde dropped
-			}
 		}
-		return done
+		return
 	}
 	select {
 	case s.enrichCh <- req:
@@ -1273,24 +1246,6 @@ func (s *Service) EnqueueEnrich(ref *provider.Reference, priority string, source
 			Str("priority", priority).
 			Int("enrich_max", cap(s.enrichCh)).
 			Msg("enrich-queue: full, dropping")
-	}
-	return done
-}
-
-// notifySyncDone signalisiert Completion eines sync-waitenden Enrich-Jobs.
-// Ruft releaseSyncWaiter auf, falls der Job nicht dropped wurde.
-func (s *Service) notifySyncDone(doneID string) {
-	s.releaseSyncWaiter(doneID)
-}
-
-// releaseSyncWaiter entfernt den Waiter und signalisiert Completion.
-func (s *Service) releaseSyncWaiter(doneID string) {
-	s.syncWaitersMu.Lock()
-	ch, ok := s.syncWaiters[doneID]
-	delete(s.syncWaiters, doneID)
-	s.syncWaitersMu.Unlock()
-	if ok {
-		close(ch)
 	}
 }
 
@@ -1502,9 +1457,6 @@ func (s *Service) StartWorkers(ctx context.Context) {
 					Msg("enrich-queue: processing (high priority)")
 				s.doUpsertItem(req.ref, nil, req.forceOverwrite)
 				atomic.AddInt64(&s.enrichProcessed, 1)
-				if req.doneID != "" {
-					s.notifySyncDone(req.doneID)
-				}
 				continue
 			default:
 			}
@@ -1523,9 +1475,6 @@ func (s *Service) StartWorkers(ctx context.Context) {
 					Msg("enrich-queue: processing (high priority)")
 				s.doUpsertItem(req.ref, nil, req.forceOverwrite)
 				atomic.AddInt64(&s.enrichProcessed, 1)
-				if req.doneID != "" {
-					s.notifySyncDone(req.doneID)
-				}
 			case req, ok := <-s.enrichCh:
 				if !ok {
 					return

@@ -25,7 +25,7 @@ func (g Graph) ReindexItem(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Str("itemID", resourceID).Bool("overwrite", forceOverwrite).Msg("reindex item requested (sync)")
 
 	// Synchron: wartet bis Completion (gRPC-Service blockiert bis Enrichment fertig)
-	_, err = g.searchService.IndexItem(r.Context(), &searchsvc.IndexItemRequest{
+	err = g.searchService.IndexItem(r.Context(), &searchsvc.IndexItemRequest{
 		ResourceId:     resourceID,
 		ForceOverwrite: forceOverwrite,
 	})

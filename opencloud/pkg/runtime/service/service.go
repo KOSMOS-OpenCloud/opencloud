@@ -633,6 +633,12 @@ type natsJSGateTarget struct {
 func pingNats(cfg *occfg.Config) error {
 	// We need to get a natsconfig from somewhere. We can use any one.
 	evcfg := cfg.Postprocessing.Postprocessing.Events
+	logger.New().Info().
+		Str("endpoint", evcfg.Endpoint).
+		Str("cluster", evcfg.Cluster).
+		Bool("tls", evcfg.EnableTLS).
+		Msg("nats ping: starting connection")
+
 	_, err := stream.NatsFromConfig("initial", true, stream.NatsConfig{
 		Endpoint:             evcfg.Endpoint,
 		Cluster:              evcfg.Cluster,
@@ -643,11 +649,16 @@ func pingNats(cfg *occfg.Config) error {
 		AuthPassword:         evcfg.AuthPassword,
 	})
 	if err != nil {
+		logger.New().Error().Err(err).
+			Str("endpoint", evcfg.Endpoint).
+			Msg("nats ping: failed to connect")
 		return err
 	}
+	logger.New().Info().Str("endpoint", evcfg.Endpoint).Msg("nats ping: connected")
 
 	deadline := time.Now().Add(natsJSGateBudget)
 	firstAttempt := true
+	attemptCount := 0
 	probeTarget := natsJSGateTarget{
 		endpoint:             evcfg.Endpoint,
 		enableTLS:            evcfg.EnableTLS,
@@ -657,16 +668,29 @@ func pingNats(cfg *occfg.Config) error {
 		password:             evcfg.AuthPassword,
 	}
 	for {
+		attemptCount++
 		probeErr := natsJSGateWriteProbe(probeTarget)
 		if probeErr == nil {
+			logger.New().Info().
+				Int("attempts", attemptCount).
+				Msg("nats ping: jetstream write probe succeeded")
 			return nil
 		}
 		if firstAttempt {
 			logger.New().Error().Err(probeErr).
-				Msgf("jetstream write probe failing, waiting up to %s for jetstream to accept writes", natsJSGateBudget)
+				Str("endpoint", evcfg.Endpoint).
+				Msgf("nats ping: jetstream write probe failing, waiting up to %s for jetstream to accept writes", natsJSGateBudget)
 			firstAttempt = false
+		} else if attemptCount%10 == 0 {
+			logger.New().Warn().Err(probeErr).
+				Int("attempt", attemptCount).
+				Msg("nats ping: jetstream write probe still failing")
 		}
 		if time.Now().After(deadline) {
+			logger.New().Error().
+				Int("attempts", attemptCount).
+				Err(probeErr).
+				Msg("nats ping: jetstream did not accept writes within deadline")
 			return fmt.Errorf("jetstream did not accept writes within %s: %w", natsJSGateBudget, probeErr)
 		}
 		time.Sleep(2 * time.Second)
@@ -704,14 +728,24 @@ func natsJSGateWriteProbe(target natsJSGateTarget) error {
 		natsOpts.TLSConfig = tlsConfig
 	}
 
+	logger.New().Debug().
+		Str("endpoint", target.endpoint).
+		Bool("tls", target.enableTLS).
+		Msg("nats write probe: connecting")
+
 	conn, err := natsOpts.Connect()
 	if err != nil {
+		logger.New().Error().Err(err).
+			Str("endpoint", target.endpoint).
+			Msg("nats write probe: connect failed")
 		return err
 	}
 	defer conn.Close()
 
 	js, err := jetstream.New(conn)
 	if err != nil {
+		logger.New().Error().Err(err).
+			Msg("nats write probe: jetstream.New failed")
 		return err
 	}
 
@@ -737,7 +771,14 @@ func natsJSGateWriteProbe(target natsJSGateTarget) error {
 		return err
 	}
 
+	logger.New().Debug().Msg("nats write probe: publishing to main queue")
+
 	_, err = js.Publish(probeCtx, events.MainQueueName, probePayload)
+	if err != nil {
+		logger.New().Error().Err(err).
+			Str("topic", events.MainQueueName).
+			Msg("nats write probe: publish failed")
+	}
 	return err
 }
 

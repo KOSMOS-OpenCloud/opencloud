@@ -91,16 +91,29 @@ func Server(cfg *config.Config) *cobra.Command {
 				natsOpts = append(natsOpts, nats.MaxConnections(cfg.Nats.MaxConnections))
 				logger.Info().Int("max", cfg.Nats.MaxConnections).Msg("NATS max connections set")
 			}
+			logger.Info().
+				Str("host", cfg.Nats.Host).
+				Int("port", cfg.Nats.Port).
+				Str("cluster", cfg.Nats.ClusterID).
+				Str("store_dir", cfg.Nats.StoreDir).
+				Bool("tls", cfg.Nats.EnableTLS).
+				Msg("NATS server starting")
 			natsServer, err := nats.NewNATSServer(
 				logging.NewLogWrapper(logger),
 				natsOpts...,
 			)
 			if err != nil {
+				logger.Error().Err(err).Msg("NATS server: failed to create server")
 				return err
 			}
 
 			gr.Add(runner.New(cfg.Service.Name+".svc", func() error {
-				return natsServer.ListenAndServe()
+				logger.Info().Msg("NATS server: ListenAndServe starting")
+				err := natsServer.ListenAndServe()
+				if err != nil {
+					logger.Error().Err(err).Msg("NATS server: ListenAndServe returned error")
+				}
+				return err
 			}, func() {
 				logger.Info().Msg("Gracefully shutting down the NATS server...")
 				natsServer.Shutdown()

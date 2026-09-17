@@ -90,9 +90,14 @@ func Create(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
+			tokenLabel, _ := cmd.Flags().GetString("label")
+			if tokenLabel == "" {
+				tokenLabel = "Generated via CLI"
+			}
+
 			appPassword, err := next.GenerateAppPassword(granteeCtx, &applicationsv1beta1.GenerateAppPasswordRequest{
 				TokenScope: scopes,
-				Label:      "Generated via CLI",
+				Label:      tokenLabel,
 				Expiration: &typesv1beta1.Timestamp{
 					Seconds: uint64(time.Now().Add(expiry).Unix()),
 				},
@@ -118,6 +123,11 @@ func Create(cfg *config.Config) *cobra.Command {
 		"expiration",
 		time.Hour*72,
 		"expiration of the app password, e.g. 72h, 1h, 1m, 1s. Default is 72h.",
+	)
+	createCmd.Flags().String(
+		"label",
+		"",
+		"label for the token (e.g. 'build-pod worker'). Default: 'Generated via CLI'.",
 	)
 
 	return createCmd

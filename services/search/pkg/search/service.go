@@ -358,6 +358,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		mountpointMap[grantSpaceID] = space.Id.OpaqueId
 	}
 
+	// Precompute subspace path filters for project spaces where the user
+	// has only subspace-navigation access (no InitiateFileDownload on root).
+	subspacePathFilters := s.buildSubspacePathFilters(ctx, gatewayClient, spaces)
+
 	s.logger.Info().Str("list_spaces_duration", time.Since(listSpacesStart).String()).Int("spaces", len(spaces)).Msg("search: spaces listed")
 
 	matches := matchArray{}
@@ -389,7 +393,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for space := range work {
-				res, err := s.searchIndex(ctx, req, space, mountpointMap[space.Id.OpaqueId])
+				res, err := s.searchIndex(ctx, req, space, mountpointMap[space.Id.OpaqueId], subspacePathFilters[space.Root.GetSpaceId()])
 				if err != nil && err != errSkipSpace {
 					return err
 				}
@@ -442,7 +446,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	if s.vectorClient != nil && (contentTerm != "" || isFreetext(req.Query)) {
 		contentReq := *req
 		contentReq.Query = qdrantQuery
-		vectorMatches := s.searchVector(ctx, &contentReq, gatewayClient, spaces, mountpointMap)
+		vectorMatches := s.searchVector(ctx, &contentReq, gatewayClient, spaces, mountpointMap, subspacePathFilters)
 		if len(vectorMatches) > 0 {
 			// Merge: add vector results that aren't already in keyword results
 			existingIDs := map[string]bool{}
@@ -489,7 +493,7 @@ func isFreetext(query string) bool {
 }
 
 // searchVector performs semantic search via Qdrant and returns matching resources.
-func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace, mountpointMap map[string]string) []*searchmsg.Match {
+func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace, mountpointMap map[string]string, subspacePathFilters map[string][]string) []*searchmsg.Match {
 	// Get embedding for query from open_taki
 	embedding := s.getQueryEmbedding(req.Query)
 	if embedding == nil {
@@ -533,6 +537,15 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 		// Filter by space permissions — skip results from spaces the user cannot access
 		if !allowedSpaces[resourceID.SpaceId] {
 			continue
+		}
+
+		// Subspace access filter — for project spaces with subspace-only access,
+		// skip results outside the allowed subspace paths.
+		if allowedPaths, ok := subspacePathFilters[resourceID.SpaceId]; ok && len(allowedPaths) > 0 {
+			hitPath, _ := p["path"].(string)
+			if !isPathInAllowedSubspaces(utils.MakeRelativePath(hitPath), allowedPaths) {
+				continue
+			}
 		}
 
 		name, _ := p["name"].(string)
@@ -584,6 +597,77 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 }
 
 // getQueryEmbedding gets an embedding for the search query via the taki extractor.
+// buildSubspacePathFilters precomputes allowed subspace paths for project spaces
+// where the user has only subspace-navigation access (no InitiateFileDownload).
+// Returns a map of spaceID → allowed subspace paths.
+func (s *Service) buildSubspacePathFilters(ctx context.Context, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace) map[string][]string {
+	result := map[string][]string{}
+	for _, space := range spaces {
+		if space.SpaceType != _spaceTypeProject {
+			continue
+		}
+		perms := space.GetRootInfo().GetPermissionSet()
+		if perms == nil || perms.InitiateFileDownload {
+			continue // full access — no filtering needed
+		}
+		// User has only listing permissions → subspace-only user.
+		// Extract subspace paths from space opaque.
+		subspaces := subspaceEntriesFromOpaque(space.Opaque)
+		if len(subspaces) == 0 {
+			continue
+		}
+		// Determine which subspaces the user can actually access via Stat.
+		var allowedPaths []string
+		for _, ss := range subspaces {
+			ref := &provider.Reference{
+				ResourceId: space.Root,
+				Path:       utils.MakeRelativePath(ss.Path),
+			}
+			statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+			if err != nil || statRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+				continue
+			}
+			// User can stat this subspace → they have access
+			allowedPaths = append(allowedPaths, utils.MakeRelativePath(ss.Path))
+		}
+		if len(allowedPaths) > 0 {
+			result[space.Root.GetSpaceId()] = allowedPaths
+		}
+	}
+	return result
+}
+
+// subspaceEntriesFromOpaque extracts the subspace list from a StorageSpace's opaque data.
+type subspaceEntry struct {
+	ID   string `json:"id"`
+	Path string `json:"path"`
+}
+
+func subspaceEntriesFromOpaque(opaque *typesv1beta1.Opaque) []subspaceEntry {
+	if opaque == nil {
+		return nil
+	}
+	entry, ok := opaque.Map["subspaces"]
+	if !ok {
+		return nil
+	}
+	var entries []subspaceEntry
+	if err := json.Unmarshal(entry.Value, &entries); err != nil {
+		return nil
+	}
+	return entries
+}
+
+// isPathInAllowedSubspaces checks if a hit path is inside any of the allowed subspace paths.
+func isPathInAllowedSubspaces(hitPath string, allowedPaths []string) bool {
+	for _, allowed := range allowedPaths {
+		if strings.HasPrefix(hitPath, allowed+"/") || hitPath == allowed {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Service) getQueryEmbedding(query string) []float64 {
 	tikaExtractor, ok := s.extractor.(*content.Tika)
 	if !ok || !tikaExtractor.IsTaki() {
@@ -592,7 +676,7 @@ func (s *Service) getQueryEmbedding(query string) []float64 {
 	return tikaExtractor.GetEmbedding(query)
 }
 
-func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string) (*searchsvc.SearchIndexResponse, error) {
+func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string, allowedSubspacePaths []string) (*searchsvc.SearchIndexResponse, error) {
 	if req.Ref != nil &&
 		(req.Ref.ResourceId.StorageId != space.Root.StorageId ||
 			req.Ref.ResourceId.SpaceId != space.Root.SpaceId) {
@@ -731,6 +815,20 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		}
 
 		matches = append(matches, match)
+	}
+
+	// Subspace access filter: for project spaces where the user only has
+	// subspace access, restrict results to files within allowed subspace paths.
+	if len(allowedSubspacePaths) > 0 {
+		filtered := make([]*searchmsg.Match, 0, len(matches))
+		for _, match := range matches {
+			hitPath := utils.MakeRelativePath(match.Entity.Ref.GetPath())
+			if isPathInAllowedSubspaces(hitPath, allowedSubspacePaths) {
+				filtered = append(filtered, match)
+			}
+		}
+		s.logger.Debug().Int("before", len(matches)).Int("after", len(filtered)).Strs("allowed", allowedSubspacePaths).Msg("subspace search filter applied")
+		matches = filtered
 	}
 
 	res.Matches = matches

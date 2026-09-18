@@ -4,7 +4,9 @@ package natsjskv
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/cornelk/hashmap"
@@ -13,6 +15,11 @@ import (
 	"go-micro.dev/v4/store"
 	"go-micro.dev/v4/util/cmd"
 )
+
+// kosmos-patch: connection cooldown to prevent ephemeral port exhaustion
+const patchVersion = "kosmos-natsjskv-cooldown-v1"
+
+var cooldownHits atomic.Int64
 
 var (
 	// ErrBucketNotFound is returned when the requested bucket does not exist.
@@ -43,6 +50,9 @@ type natsStore struct {
 	conn    *nats.Conn
 	js      nats.JetStreamContext
 	buckets *hashmap.Map[string, nats.KeyValue]
+
+	lastConnAttempt time.Time     // cooldown: last failed connection attempt
+	connCooldown    time.Duration // cooldown: minimum interval between connection attempts
 }
 
 func init() {
@@ -92,6 +102,8 @@ func (n *natsStore) Init(opts ...store.Option) error {
 
 	n.conn = conn
 	n.js = js
+	n.lastConnAttempt = time.Time{} // reset cooldown on successful connect
+	fmt.Printf("[%s] NATS connected successfully\n", patchVersion)
 
 	// Create default config if no configs present
 	if len(n.kvConfigs) == 0 {
@@ -408,6 +420,22 @@ func (n *natsStore) initConn() error {
 	if n.conn != nil {
 		return nil
 	}
+
+	// Cooldown: don't hammer NATS with reconnect attempts.
+	// Without this, every failed Write/Read triggers a new TCP connection
+	// attempt, exhausting ephemeral ports within minutes under load.
+	// Patch: kosmos-natsjskv-cooldown-v1
+	if n.connCooldown == 0 {
+		n.connCooldown = 10 * time.Second
+	}
+	if !n.lastConnAttempt.IsZero() && time.Since(n.lastConnAttempt) < n.connCooldown {
+		hits := cooldownHits.Add(1)
+		if hits == 1 || hits%100 == 0 {
+			fmt.Printf("[%s] NATS reconnect cooldown active (suppressed %d attempts)\n", patchVersion, hits)
+		}
+		return errors.New("NATS connection cooldown active, retry later")
+	}
+	n.lastConnAttempt = time.Now()
 
 	return n.Init()
 }

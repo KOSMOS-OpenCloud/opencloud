@@ -356,6 +356,11 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.AccessLog(logger),
 		middleware.ContextLogger(logger),
 		middleware.HTTPSRedirect,
+
+		// Rewrite datagateway url tokens to dataprovider endpoint and
+		// rewrite Location headers in TUS responses to signed datagateway urls
+		middleware.NewDataGatewayMiddleware("/data", cfg.TransferSecret, cfg.TransferTimeout).Handler,
+
 		middleware.Security(cspConfig),
 		router.Middleware(serviceSelector, cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(

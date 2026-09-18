@@ -83,8 +83,11 @@ func (m *DataGatewayMiddleware) Handler(next http.Handler) http.Handler {
 			r.Header.Del(TokenTransportHeader)
 
 			ctx := context.WithValue(r.Context(), DatagatewaySkipRoutingKey, true)
-			ctx, cancel := context.WithTimeout(ctx, m.Timeout)
-			defer cancel()
+			if m.Timeout > 0 {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, m.Timeout)
+				defer cancel()
+			}
 
 			r = r.WithContext(ctx)
 		}

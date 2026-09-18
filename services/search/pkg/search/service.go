@@ -543,7 +543,7 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 		// skip results outside the allowed subspace paths.
 		if allowedPaths, ok := subspacePathFilters[resourceID.SpaceId]; ok && len(allowedPaths) > 0 {
 			hitPath, _ := p["path"].(string)
-			if !isPathInAllowedSubspaces(utils.MakeRelativePath(hitPath), allowedPaths) {
+			if !IsPathInAllowedSubspaces(utils.MakeRelativePath(hitPath), allowedPaths) {
 				continue
 			}
 		}
@@ -607,12 +607,11 @@ func (s *Service) buildSubspacePathFilters(ctx context.Context, gatewayClient ga
 			continue
 		}
 		perms := space.GetRootInfo().GetPermissionSet()
-		if perms == nil || perms.InitiateFileDownload {
+		if !IsSubspaceOnlyUser(perms) {
 			continue // full access — no filtering needed
 		}
-		// User has only listing permissions → subspace-only user.
 		// Extract subspace paths from space opaque.
-		subspaces := subspaceEntriesFromOpaque(space.Opaque)
+		subspaces := SubspaceEntriesFromOpaque(space.Opaque)
 		if len(subspaces) == 0 {
 			continue
 		}
@@ -638,12 +637,13 @@ func (s *Service) buildSubspacePathFilters(ctx context.Context, gatewayClient ga
 }
 
 // subspaceEntriesFromOpaque extracts the subspace list from a StorageSpace's opaque data.
-type subspaceEntry struct {
+// SubspaceEntry represents a subspace in the search filter context.
+type SubspaceEntry struct {
 	ID   string `json:"id"`
 	Path string `json:"path"`
 }
 
-func subspaceEntriesFromOpaque(opaque *typesv1beta1.Opaque) []subspaceEntry {
+func SubspaceEntriesFromOpaque(opaque *typesv1beta1.Opaque) []SubspaceEntry {
 	if opaque == nil {
 		return nil
 	}
@@ -651,15 +651,25 @@ func subspaceEntriesFromOpaque(opaque *typesv1beta1.Opaque) []subspaceEntry {
 	if !ok {
 		return nil
 	}
-	var entries []subspaceEntry
+	var entries []SubspaceEntry
 	if err := json.Unmarshal(entry.Value, &entries); err != nil {
 		return nil
 	}
 	return entries
 }
 
+// isSubspaceOnlyUser returns true if the permissions indicate a subspace-only user
+// (has Stat but lacks InitiateFileDownload — only listing/navigation access).
+func IsSubspaceOnlyUser(perms *provider.ResourcePermissions) bool {
+	if perms == nil || !perms.Stat {
+		return false
+	}
+	return !perms.InitiateFileDownload && !perms.InitiateFileUpload &&
+		!perms.CreateContainer && !perms.Delete && !perms.AddGrant && !perms.Move
+}
+
 // isPathInAllowedSubspaces checks if a hit path is inside any of the allowed subspace paths.
-func isPathInAllowedSubspaces(hitPath string, allowedPaths []string) bool {
+func IsPathInAllowedSubspaces(hitPath string, allowedPaths []string) bool {
 	for _, allowed := range allowedPaths {
 		if strings.HasPrefix(hitPath, allowed+"/") || hitPath == allowed {
 			return true
@@ -823,7 +833,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		filtered := make([]*searchmsg.Match, 0, len(matches))
 		for _, match := range matches {
 			hitPath := utils.MakeRelativePath(match.Entity.Ref.GetPath())
-			if isPathInAllowedSubspaces(hitPath, allowedSubspacePaths) {
+			if IsPathInAllowedSubspaces(hitPath, allowedSubspacePaths) {
 				filtered = append(filtered, match)
 			}
 		}

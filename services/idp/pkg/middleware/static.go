@@ -33,6 +33,18 @@ func Static(root string, fs http.FileSystem, tp trace.TracerProvider) func(http.
 			r = r.WithContext(ctx)
 
 			// serve the static assets for the identifier web app
+			if strings.HasPrefix(r.URL.Path, "/signin/v1/identifier/static/") {
+				// Assets referenced as ./static/ relative to /signin/v1/identifier/
+				if strings.HasSuffix(r.URL.Path, "/") {
+					span.SetAttributes(attribute.KeyValue{Key: "path", Value: attribute.StringValue(r.URL.Path)})
+					span.SetStatus(codes.Error, "asset not found")
+					http.NotFound(w, r)
+				} else {
+					span.SetAttributes(attribute.KeyValue{Key: "server", Value: attribute.StringValue(r.URL.Path)})
+					static.ServeHTTP(w, r)
+				}
+				return
+			}
 			if strings.HasPrefix(r.URL.Path, "/signin/v1/static/") {
 				if strings.HasSuffix(r.URL.Path, "/") {
 					// but no listing of folders

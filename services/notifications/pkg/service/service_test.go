@@ -118,7 +118,7 @@ Click here to view it: files/shares/with-me
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -143,7 +143,7 @@ Even though this share has been revoked you still might have access through othe
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -168,7 +168,7 @@ Click here to view it: f/spaceid
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -195,7 +195,7 @@ Click here to check it: f/spaceid
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -219,7 +219,7 @@ Even though this membership has expired you still might have access through othe
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -331,7 +331,7 @@ Click here to view it: files/shares/with-me
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedHTMLBody: `<!DOCTYPE html>
@@ -361,7 +361,7 @@ https://opencloud.eu
                             <br>
                             <br>
                             --- <br>
-                            OpenCloud - a safe home for all your data<br>
+                            OpenCore - your data protected<br>
                             <a href="https://opencloud.eu">https://opencloud.eu</a>
                         </footer>
                     </td>
@@ -399,7 +399,7 @@ Click here to view it: f/spaceid
 
 
 ---
-OpenCloud - a safe home for all your data
+OpenCore - your data protected
 https://opencloud.eu
 `,
 			expectedSender: sharer.GetDisplayName(),
@@ -430,7 +430,7 @@ https://opencloud.eu
                             <br>
                             <br>
                             --- <br>
-                            OpenCloud - a safe home for all your data<br>
+                            OpenCore - your data protected<br>
                             <a href="https://opencloud.eu">https://opencloud.eu</a>
                         </footer>
                     </td>

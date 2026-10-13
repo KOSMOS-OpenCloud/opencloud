@@ -50,7 +50,7 @@ func DefaultConfig() *config.Config {
 				Regex: ".+",
 				Href:  "{{.OC_URL}}",
 				Titles: map[string]string{
-					"en": "OpenCloud Instance",
+					"en": "OpenCore Instance",
 				},
 			},
 		},

@@ -48,7 +48,7 @@ const ResponsiveScreen = (props) => {
   const { theme } = useContext(OpenCloudContext);
 
   const logo = (theme && !withoutLogo) ? (
-        <img src={'/' + theme.common?.logo} className="oc-logo" alt="OpenCloud Logo"/>
+        <img src={'/' + theme.common?.logo} className="oc-logo" alt="OpenCore Logo"/>
     ) : null;
 
   const content = loading ? <Loading/> : (withoutPadding ? children : <DialogContent>{children}</DialogContent>);
@@ -86,7 +86,7 @@ const ResponsiveScreen = (props) => {
       </div>
       <footer className="oc-footer-message">
         <Trans i18nKey="konnect.footer.slogan">
-          <strong>OpenCloud</strong> - excellent file sharing
+          <strong>OpenCore</strong> - your data protected
         </Trans>
       </footer>
     </Grid>

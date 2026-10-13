@@ -1,7 +1,7 @@
 {
   "common": {
-    "name": "OpenCloud",
-    "slogan": "OpenCloud – Excellent file sharing",
+    "name": "OpenCore",
+    "slogan": "OpenCore – your data protected",
     "logo": "themes/opencloud/assets/logo.svg",
     "urls": {
       "accessDeniedHelp": "",

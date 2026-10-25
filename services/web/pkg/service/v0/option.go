@@ -27,6 +27,7 @@ type Options struct {
 	CoreFS           fs.FS
 	AppFS            fs.FS
 	ThemeFS          *fsx.FallbackFS
+	ExternalApps     func() []config.ExternalApp
 }
 
 // newOptions initializes the available default options.
@@ -100,5 +101,13 @@ func AppsHTTPEndpoint(val string) Option {
 func CoreFS(val fs.FS) Option {
 	return func(o *Options) {
 		o.CoreFS = val
+	}
+}
+
+// ExternalApps provides a function to set the externalApps option,
+// the function is called for every config.json request to deliver the current list of external applications.
+func ExternalApps(val func() []config.ExternalApp) Option {
+	return func(o *Options) {
+		o.ExternalApps = val
 	}
 }

@@ -59,13 +59,15 @@ func Server(opts ...Option) (http.Service, error) {
 		fsx.NewReadOnlyFs(fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.AppsPath)),
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/apps"),
 	)
-	// build and inject the list of applications into the config
-	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS.Secondary().IOFS(), appsFS.Primary().IOFS()) {
-		options.Config.Web.Config.ExternalApps = append(
-			options.Config.Web.Config.ExternalApps,
-			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
-		)
-	}
+	// build the list of applications, it is rebuilt when apps.yaml or the application files change
+	appsReloader := apps.NewReloader(
+		options.Logger,
+		options.Config.Apps,
+		path.Join(options.Config.HTTP.Root, _customAppsEndpoint),
+		options.Config.Web.Config.ExternalApps,
+		appsFS.Secondary().IOFS(), appsFS.Primary().IOFS(),
+	)
+	options.Config.Web.Config.ExternalApps = appsReloader.ExternalApps()
 
 	coreFS := fsx.NewFallbackFS(
 		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
@@ -84,6 +86,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.AppsHTTPEndpoint(_customAppsEndpoint),
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
+		svc.ExternalApps(appsReloader.ExternalApps),
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,

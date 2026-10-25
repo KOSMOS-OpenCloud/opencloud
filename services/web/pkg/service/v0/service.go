@@ -54,6 +54,7 @@ func NewService(opts ...Option) (Service, error) {
 		config:          options.Config,
 		mux:             m,
 		gatewaySelector: options.GatewaySelector,
+		externalApps:    options.ExternalApps,
 	}
 
 	themeService, err := theme.NewService(
@@ -108,6 +109,7 @@ type Web struct {
 	config          *config.Config
 	mux             *chi.Mux
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	externalApps    func() []config.ExternalApp
 }
 
 // ServeHTTP implements the Service interface.
@@ -134,7 +136,13 @@ func (p Web) getPayload() (payload []byte, err error) {
 	// ensure that the server url has a trailing slash
 	p.config.Web.Config.Server = strings.TrimRight(p.config.Web.Config.Server, "/") + "/"
 
-	return json.Marshal(p.config.Web.Config)
+	// the external apps can change at runtime, they are taken from a copy to keep the shared config untouched
+	webConfig := p.config.Web.Config
+	if p.externalApps != nil {
+		webConfig.ExternalApps = p.externalApps()
+	}
+
+	return json.Marshal(webConfig)
 }
 
 // Config implements the Service interface.

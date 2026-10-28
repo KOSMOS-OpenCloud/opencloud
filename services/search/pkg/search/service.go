@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -122,6 +123,8 @@ type Service struct {
 	indexFlushed      int64                     // atomic: successful batch flushes
 	indexBatchItems   int64                     // atomic: items currently in unflushed batch
 	flushBlockedSince atomic.Pointer[time.Time] // set when flush starts, cleared when done
+	reEnrichGen       atomic.Int64              // bumped by CancelReEnrich, stale grpc:ReEnrich items are dropped
+	enrichCancelled   int64                     // atomic: queued re-enrich items dropped after a cancel
 }
 
 type queueRequest struct {
@@ -130,6 +133,7 @@ type queueRequest struct {
 	source         string // origin: "event:UploadReady", "event:FileUploaded", "grpc:IndexItem", "grpc:ReEnrich", etc.
 	forceOverwrite bool   // overwrite existing metadata (xattrs) during enrichment
 	forceRescan    bool   // re-extract even if doc.type already present (grpc:ReEnrich only)
+	reEnrichGen    int64  // re-enrich generation at enqueue time (grpc:ReEnrich only)
 	op             string // "index" (default), "delete", "move"
 	resourceID     string // for delete/move: formatted resource ID
 	parentID       string // for move: formatted parent ID
@@ -1148,10 +1152,16 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 
 	w := walker.NewWalker(s.gatewaySelector)
 	var queued int64
+	generation := s.reEnrichGen.Load()
 
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			return err
+		}
+		// After a cancel every callback fails: the walker then skips each remaining subtree
+		// before listing it, so the walk unwinds without further ListContainer calls.
+		if s.reEnrichGen.Load() != generation {
+			return ErrReEnrichCancelled
 		}
 		if info == nil || info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 			return nil
@@ -1161,10 +1171,18 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 			ResourceId: &rootID,
 		}
 		// Blocking send — walk waits when queue is full
-		s.enrichCh <- queueRequest{ref: ref, source: "grpc:ReEnrich", forceOverwrite: forceOverwrite, forceRescan: forceRescan}
+		s.enrichCh <- queueRequest{ref: ref, source: "grpc:ReEnrich", forceOverwrite: forceOverwrite, forceRescan: forceRescan, reEnrichGen: generation}
 		atomic.AddInt64(&queued, 1)
 		return nil
 	})
+
+	if s.reEnrichGen.Load() != generation {
+		s.logger.Info().
+			Str("space", spaceID.GetOpaqueId()).
+			Int64("queued", queued).
+			Msg("re-enrich: cancelled")
+		return ErrReEnrichCancelled
+	}
 
 	s.logger.Info().
 		Str("space", spaceID.GetOpaqueId()).
@@ -1172,6 +1190,19 @@ func (s *Service) ReEnrichSpace(spaceID *provider.StorageSpaceId, forceRescan, f
 		Msg("re-enrich: walk complete, items queued")
 
 	return err
+}
+
+// ErrReEnrichCancelled is returned by ReEnrichSpace when CancelReEnrich was called during the walk.
+var ErrReEnrichCancelled = errors.New("re-enrich cancelled")
+
+// CancelReEnrich stops running re-enrich walks and drops their queued items.
+// Items from other sources (upload events, IndexItem, ...) are not affected.
+func (s *Service) CancelReEnrich() {
+	generation := s.reEnrichGen.Add(1)
+	s.logger.Info().
+		Int64("generation", generation).
+		Int("enrich_pending", len(s.enrichCh)).
+		Msg("re-enrich: cancel requested")
 }
 
 // hasDocTypeXattr reports whether the file already carries a doc.type xattr
@@ -1547,8 +1578,12 @@ func (s *Service) StartWorkers(ctx context.Context) {
 
 	// Enrich Worker: Taki extraction + Qdrant + xattrs + Bleve (full content)
 	// High-priority items (UI reindex) are processed before normal items.
-	s.logger.Info().Msg("starting enrich-queue worker")
-	go func() {
+	enrichWorkers := s.cfg.EnrichWorkers
+	if enrichWorkers < 1 {
+		enrichWorkers = 1
+	}
+	s.logger.Info().Int("workers", enrichWorkers).Msg("starting enrich-queue worker")
+	enrichWorker := func() {
 		for {
 			// Drain high-priority channel first
 			select {
@@ -1587,6 +1622,11 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				if !ok {
 					return
 				}
+				// Drop re-enrich items queued before the last CancelReEnrich.
+				if req.source == "grpc:ReEnrich" && req.reEnrichGen != s.reEnrichGen.Load() {
+					atomic.AddInt64(&s.enrichCancelled, 1)
+					continue
+				}
 				// Incremental re-enrich: skip files that are already enriched
 				// (doc.type xattr present) unless forced. Only affects the
 				// grpc:ReEnrich source — events (uploads, ...) are always processed.
@@ -1607,7 +1647,10 @@ func (s *Service) StartWorkers(ctx context.Context) {
 				atomic.AddInt64(&s.enrichProcessed, 1)
 			}
 		}
-	}()
+	}
+	for i := 0; i < enrichWorkers; i++ {
+		go enrichWorker()
+	}
 
 	// OCR layer writeback worker: remounts the OCR text layer back into the
 	// PDF as a new file revision. Runs always, but jobs are only queued when

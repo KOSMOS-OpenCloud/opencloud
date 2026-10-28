@@ -126,6 +126,13 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 	spaceID := in.GetSpaceId()
 	reEnrich := in.GetReEnrich()
 	forceOverwrite := in.GetForceOverwrite()
+	if strings.HasPrefix(spaceID, "reenrich-cancel:") {
+		if svc, ok := s.searcher.(*search.Service); ok {
+			svc.CancelReEnrich()
+			return nil
+		}
+		return errors.New("re-enrich cancel not supported by this searcher")
+	}
 	if strings.HasPrefix(spaceID, "reenrich-overwrite:") {
 		reEnrich = true
 		forceOverwrite = true
@@ -207,6 +214,10 @@ func (s Service) IndexSpace(_ context.Context, in *searchsvc.IndexSpaceRequest, 
 			}
 			if reEnrich {
 				if err := s.searcher.ReEnrichSpace(space.GetId(), in.GetForceReindex(), forceOverwrite); err != nil {
+					if errors.Is(err, search.ErrReEnrichCancelled) {
+						s.log.Info().Int("spaces_done", i).Int("spaces", len(spaces)).Msg("re-enrich of all spaces cancelled")
+						break
+					}
 					s.log.Error().Err(err).Str("space", space.GetId().GetOpaqueId()).Msg("failed to re-enrich space, continuing")
 					indexErrors++
 				}

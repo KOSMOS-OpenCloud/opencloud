@@ -75,6 +75,7 @@ func DefaultConfig() *config.Config {
 		BatchSize:                  50,
 		IndexQueueSize:             50000,
 		EnrichQueueSize:            50000,
+		EnrichWorkers:              1,
 		PersisterNapTimeMs:         500,
 		PersisterNapUnderNumFiles:  500,
 	}

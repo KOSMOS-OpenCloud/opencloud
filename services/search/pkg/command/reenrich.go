@@ -46,8 +46,9 @@ events — no separate reindex needed after re-enrich.`,
 			insecureFlag, _ := cmd.Flags().GetBool("insecure")
 			forceRescan, _ := cmd.Flags().GetBool("force-rescan")
 			forceOverwrite, _ := cmd.Flags().GetBool("force-overwrite")
+			cancelFlag, _ := cmd.Flags().GetBool("cancel")
 
-			if spaceFlag == "" && !allSpacesFlag {
+			if spaceFlag == "" && !allSpacesFlag && !cancelFlag {
 				return errors.New("either --space or --all-spaces is required")
 			}
 
@@ -81,6 +82,16 @@ events — no separate reindex needed after re-enrich.`,
 
 			c := searchsvc.NewSearchProviderClient(conn)
 			ctx := context.Background()
+
+			if cancelFlag {
+				_, err = c.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{SpaceId: "reenrich-cancel:"})
+				if err != nil {
+					fmt.Println("re-enrich cancel failed: " + err.Error())
+					return err
+				}
+				fmt.Println("Re-enrichment cancel requested. Queued re-enrich items are dropped, the walk stops.")
+				return nil
+			}
 
 			mode := "skip enriched, write missing keys only"
 			if forceRescan && forceOverwrite {
@@ -123,6 +134,7 @@ events — no separate reindex needed after re-enrich.`,
 	cmd.Flags().Bool("insecure", false, "disable TLS for gRPC.")
 	cmd.Flags().Bool("force-rescan", false, "re-process files that already have doc.type (default: skip them).")
 	cmd.Flags().Bool("force-overwrite", false, "overwrite ALL metadata (destructive, requires confirmation).")
+	cmd.Flags().Bool("cancel", false, "stop running re-enrich walks and drop their queued items.")
 
 	return cmd
 }

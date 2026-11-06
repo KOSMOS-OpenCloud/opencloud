@@ -8,6 +8,7 @@ import (
 	bleveQuery "github.com/blevesearch/bleve/v2/search/query"
 	"github.com/opencloud-eu/opencloud/pkg/ast"
 	"github.com/opencloud-eu/opencloud/pkg/kql"
+	"github.com/opencloud-eu/opencloud/services/search/pkg/query"
 )
 
 // lowercaseFields lists the bleve fields whose index mapping uses a
@@ -112,6 +113,9 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 		case *ast.StringNode:
 			k := getField(n.Key)
 			v := n.Value
+			if k != "ID" && k != "Size" && isWildcardOnly(v) {
+				return nil, 0, &query.WildcardOnlyError{Key: n.Key, Value: v}
+			}
 			if k != "ID" && k != "Size" {
 				v = bleveEscaper.Replace(n.Value)
 			}
@@ -246,8 +250,18 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 	return prev, offset, nil
 }
 
+// isWildcardOnly reports whether a value has no literal character besides
+// wildcards, quotes and blanks ("*", "**", "\"*\"", "?*").
+func isWildcardOnly(value string) bool {
+	return strings.Trim(value, "*?\" \t") == ""
+}
+
 func nextNode(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 	if n, ok := nodes[offset].(*ast.GroupNode); ok {
+		if n.Key != "" {
+			// NOT key:(a OR b) — apply the group key like walk does
+			n = normalizeGroupingProperty(n)
+		}
 		gq, _, err := walk(0, n.Nodes)
 		if err != nil {
 			return nil, 0, err

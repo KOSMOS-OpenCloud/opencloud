@@ -219,8 +219,15 @@ Char <-
         return c.text, nil
     }
 
+// KeyChar allows digits and underscores after the first letter of a key
+// segment (doc.received_date, sender.vat_id, photo.f2).
+KeyChar <-
+    [A-Za-z0-9_] {
+        return c.text, nil
+    }
+
 Key <-
-    Char+ ("." Char+)* {
+    Char KeyChar* ("." KeyChar+)* {
         return c.text, nil
     }
 

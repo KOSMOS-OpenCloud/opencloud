@@ -958,6 +958,35 @@ func TestParse_DottedKey(t *testing.T) {
 				},
 			},
 		},
+		// Underscores and digits after the first letter of a segment
+		// (metadata keys like doc.received_date, sender.vat_id).
+		{
+			name: `metadata.sender.vat_id:DE123456789`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "metadata.sender.vat_id", Value: "DE123456789"},
+				},
+			},
+		},
+		{
+			name: `metadata.booking.doc_type:IfrEingangsrechnung AND NOT metadata.booking.status:E`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "metadata.booking.doc_type", Value: "IfrEingangsrechnung"},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.OperatorNode{Value: kql.BoolNOT},
+					&ast.StringNode{Key: "metadata.booking.status", Value: "E"},
+				},
+			},
+		},
+		{
+			name: `photo.f2:x`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.f2", Value: "x"},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

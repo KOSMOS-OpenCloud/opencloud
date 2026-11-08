@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/opencloud-eu/opencloud/services/search/pkg/search"
@@ -145,6 +146,113 @@ func TestIsSubspaceOnlyUser(t *testing.T) {
 			result := search.IsSubspaceOnlyUser(tt.perms)
 			if result != tt.expected {
 				t.Errorf("IsSubspaceOnlyUser(%v) = %v, want %v", tt.perms, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestSubspaceAccessHitVisible(t *testing.T) {
+	// space root member who is not a member of ./stats (regression: such hits
+	// leaked names and metadata of subspace content)
+	rootMember := &search.SubspaceAccess{
+		Allowed: []string{"./hr"},
+		Denied:  []string{"./stats"},
+	}
+	// subspace-only user, member of ./hr only
+	subspaceOnly := &search.SubspaceAccess{
+		RestrictToAllowed: true,
+		Allowed:           []string{"./hr"},
+		Denied:            []string{"./stats"},
+	}
+	// subspace-only user without any accessible subspace
+	subspaceOnlyNone := &search.SubspaceAccess{
+		RestrictToAllowed: true,
+		Denied:            []string{"./stats", "./hr"},
+	}
+	// nested: member of ./hr, but not of ./hr/salaries
+	nested := &search.SubspaceAccess{
+		Allowed: []string{"./hr"},
+		Denied:  []string{"./hr/salaries"},
+	}
+
+	tests := []struct {
+		name     string
+		access   *search.SubspaceAccess
+		hitPath  string
+		expected bool
+	}{
+		{"nil access shows everything", nil, "./stats/report.pdf", true},
+		{"root member: hit outside subspaces", rootMember, "./legal/contract.pdf", true},
+		{"root member: hit in own subspace", rootMember, "./hr/list.xlsx", true},
+		{"root member: hit in foreign subspace", rootMember, "./stats/report.pdf", false},
+		{"root member: foreign subspace root", rootMember, "./stats", false},
+		{"root member: prefix collision", rootMember, "./statsarchive/a.pdf", true},
+		{"subspace-only: hit in own subspace", subspaceOnly, "./hr/list.xlsx", true},
+		{"subspace-only: hit outside subspaces", subspaceOnly, "./legal/contract.pdf", false},
+		{"subspace-only: hit in foreign subspace", subspaceOnly, "./stats/report.pdf", false},
+		{"subspace-only without subspaces sees nothing", subspaceOnlyNone, "./legal/contract.pdf", false},
+		{"nested: denied inner subspace wins", nested, "./hr/salaries/2026.xlsx", false},
+		{"nested: allowed outer subspace", nested, "./hr/list.xlsx", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if result := tt.access.HitVisible(tt.hitPath); result != tt.expected {
+				t.Errorf("HitVisible(%q) = %v, want %v", tt.hitPath, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestSubspaceAccessPermissionsFor(t *testing.T) {
+	outerPerms := &sprovider.ResourcePermissions{Stat: true, InitiateFileDownload: true}
+	innerPerms := &sprovider.ResourcePermissions{Stat: true, InitiateFileDownload: true, InitiateFileUpload: true}
+	access := &search.SubspaceAccess{
+		Allowed: []string{"./hr", "./hr/team"},
+		AllowedPermissions: map[string]*sprovider.ResourcePermissions{
+			"./hr":      outerPerms,
+			"./hr/team": innerPerms,
+		},
+	}
+
+	if got := access.PermissionsFor("./hr/list.xlsx"); got != outerPerms {
+		t.Errorf("expected outer subspace permissions, got %v", got)
+	}
+	if got := access.PermissionsFor("./hr/team/plan.docx"); got != innerPerms {
+		t.Errorf("expected innermost subspace permissions, got %v", got)
+	}
+	if got := access.PermissionsFor("./legal/contract.pdf"); got != nil {
+		t.Errorf("expected nil outside subspaces, got %v", got)
+	}
+	var nilAccess *search.SubspaceAccess
+	if got := nilAccess.PermissionsFor("./hr/list.xlsx"); got != nil {
+		t.Errorf("expected nil for nil access, got %v", got)
+	}
+}
+
+func TestIsSubspaceMember(t *testing.T) {
+	okStatus := &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_OK}
+	bypassOpaque := &typesv1beta1.Opaque{Map: map[string]*typesv1beta1.OpaqueEntry{
+		"subspace-management-bypass": {Decoder: "plain", Value: []byte("true")},
+	}}
+	allPerms := &sprovider.ResourcePermissions{Stat: true, InitiateFileDownload: true, AddGrant: true}
+
+	tests := []struct {
+		name     string
+		statRes  *sprovider.StatResponse
+		expected bool
+	}{
+		{"member with download", &sprovider.StatResponse{Status: okStatus, Info: &sprovider.ResourceInfo{PermissionSet: allPerms}}, true},
+		{"bypass only (global space admin, no grant)", &sprovider.StatResponse{Status: okStatus, Info: &sprovider.ResourceInfo{PermissionSet: allPerms, Opaque: bypassOpaque}}, false},
+		{"stat without download", &sprovider.StatResponse{Status: okStatus, Info: &sprovider.ResourceInfo{PermissionSet: &sprovider.ResourcePermissions{Stat: true, ListContainer: true}}}, false},
+		{"not found", &sprovider.StatResponse{Status: &rpcv1beta1.Status{Code: rpcv1beta1.Code_CODE_NOT_FOUND}}, false},
+		{"nil response", nil, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if result := search.IsSubspaceMember(tt.statRes); result != tt.expected {
+				t.Errorf("IsSubspaceMember() = %v, want %v", result, tt.expected)
 			}
 		})
 	}

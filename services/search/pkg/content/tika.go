@@ -32,6 +32,36 @@ func ContextWithTraceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, traceIDKey{}, id)
 }
 
+// skipFeaturesKey is the context key for Taki features to leave out of one request.
+type skipFeaturesKey struct{}
+
+// ContextWithoutFeatures returns a context that removes the named features
+// (e.g. "docmeta") from the X-Taki-Features header of the next extraction:
+// a document that arrived with its own metadata (source saskia, archikart, ...)
+// still gets content/OCR for the index, but no metadata LLM run.
+func ContextWithoutFeatures(ctx context.Context, features ...string) context.Context {
+	return context.WithValue(ctx, skipFeaturesKey{}, features)
+}
+
+// featuresWithout removes the listed features from a comma separated feature string.
+func featuresWithout(features string, skip []string) string {
+	if features == "" || len(skip) == 0 {
+		return features
+	}
+	skipped := map[string]bool{}
+	for _, f := range skip {
+		skipped[strings.ToLower(strings.TrimSpace(f))] = true
+	}
+	var kept []string
+	for _, f := range strings.Split(features, ",") {
+		f = strings.TrimSpace(f)
+		if f != "" && !skipped[strings.ToLower(f)] {
+			kept = append(kept, f)
+		}
+	}
+	return strings.Join(kept, ",")
+}
+
 // Tika is used to extract content from a resource.
 // Supports both Apache Tika and open_taki (drop-in replacement).
 // When open_taki is detected, uses the v2 protocol for enhanced extraction.
@@ -300,8 +330,12 @@ func (t Tika) extractTakiV2(ctx context.Context, ri *provider.ResourceInfo, data
 
 	req.Header.Set("Content-Type", ri.MimeType)
 	req.Header.Set("X-Taki-Protocol", "v2")
-	if t.features != "" {
-		req.Header.Set("X-Taki-Features", t.features)
+	features := t.features
+	if skip, ok := ctx.Value(skipFeaturesKey{}).([]string); ok && len(skip) > 0 {
+		features = featuresWithout(features, skip)
+	}
+	if features != "" {
+		req.Header.Set("X-Taki-Features", features)
 	}
 	req.Header.Set("X-Taki-Source-Ref", sourceRef)
 

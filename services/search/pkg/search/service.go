@@ -115,6 +115,7 @@ type Service struct {
 	enrichCh          chan queueRequest
 	enrichHighCh      chan queueRequest
 	layerCh           chan layerJob // OCR layer writeback queue (opt-in)
+	docMetaSkipSources map[string]bool // SEARCH_ENRICH_DOCMETA_SKIP_SOURCES: xattr "source" values without docmeta LLM
 	ocrLayerWriteback bool          // SEARCH_OCR_LAYER_WRITEBACK=true
 	ocrLayerMaxSize   uint64        // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
 	indexProcessed    int64
@@ -216,6 +217,16 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 		logger.Info().
 			Int64("max_size", int64(s.ocrLayerMaxSize)).
 			Msg("ocr-layer writeback enabled (SEARCH_OCR_LAYER_WRITEBACK=true)")
+	}
+
+	// Documents that arrive with their own metadata set (xattr "source", e.g.
+	// saskia via OpenYard) skip the Taki metadata LLM (feature "docmeta");
+	// content and OCR are still extracted for the index.
+	s.docMetaSkipSources = parseSkipSources(os.Getenv("SEARCH_ENRICH_DOCMETA_SKIP_SOURCES"))
+	if len(s.docMetaSkipSources) > 0 {
+		logger.Info().
+			Interface("sources", s.docMetaSkipSources).
+			Msg("docmeta enrichment disabled for these sources (SEARCH_ENRICH_DOCMETA_SKIP_SOURCES)")
 	}
 
 	// Initialize Qdrant vector store if enabled
@@ -362,9 +373,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		mountpointMap[grantSpaceID] = space.Id.OpaqueId
 	}
 
-	// Precompute subspace path filters for project spaces where the user
-	// has only subspace-navigation access (no InitiateFileDownload on root).
-	subspacePathFilters := s.buildSubspacePathFilters(ctx, gatewayClient, spaces)
+	// Precompute subspace visibility for project spaces with subspaces: hide
+	// subspaces the user is not a member of, restrict subspace-only users to
+	// their subspaces.
+	subspaceAccess := s.buildSubspaceAccess(ctx, gatewayClient, spaces)
 
 	s.logger.Info().Str("list_spaces_duration", time.Since(listSpacesStart).String()).Int("spaces", len(spaces)).Msg("search: spaces listed")
 
@@ -397,7 +409,12 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for space := range work {
-				res, err := s.searchIndex(ctx, req, space, mountpointMap[space.Id.OpaqueId], subspacePathFilters[space.Root.GetSpaceId()])
+				// grant spaces share the project space id but use share-relative paths
+				var spaceSubspaceAccess *SubspaceAccess
+				if space.SpaceType == _spaceTypeProject {
+					spaceSubspaceAccess = subspaceAccess[space.Root.GetSpaceId()]
+				}
+				res, err := s.searchIndex(ctx, req, space, mountpointMap[space.Id.OpaqueId], spaceSubspaceAccess)
 				if err != nil && err != errSkipSpace {
 					return err
 				}
@@ -450,7 +467,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	if s.vectorClient != nil && (contentTerm != "" || isFreetext(req.Query)) {
 		contentReq := *req
 		contentReq.Query = qdrantQuery
-		vectorMatches := s.searchVector(ctx, &contentReq, gatewayClient, spaces, mountpointMap, subspacePathFilters)
+		vectorMatches := s.searchVector(ctx, &contentReq, gatewayClient, spaces, mountpointMap, subspaceAccess)
 		if len(vectorMatches) > 0 {
 			// Merge: add vector results that aren't already in keyword results
 			existingIDs := map[string]bool{}
@@ -497,7 +514,7 @@ func isFreetext(query string) bool {
 }
 
 // searchVector performs semantic search via Qdrant and returns matching resources.
-func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace, mountpointMap map[string]string, subspacePathFilters map[string][]string) []*searchmsg.Match {
+func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace, mountpointMap map[string]string, subspaceAccess map[string]*SubspaceAccess) []*searchmsg.Match {
 	// Get embedding for query from open_taki
 	embedding := s.getQueryEmbedding(req.Query)
 	if embedding == nil {
@@ -543,11 +560,11 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 			continue
 		}
 
-		// Subspace access filter — for project spaces with subspace-only access,
-		// skip results outside the allowed subspace paths.
-		if allowedPaths, ok := subspacePathFilters[resourceID.SpaceId]; ok && len(allowedPaths) > 0 {
+		// Subspace access filter — skip results inside subspaces the user is
+		// not a member of, and outside their subspaces for subspace-only users.
+		if access, ok := subspaceAccess[resourceID.SpaceId]; ok {
 			hitPath, _ := p["path"].(string)
-			if !IsPathInAllowedSubspaces(utils.MakeRelativePath(hitPath), allowedPaths) {
+			if !access.HitVisible(utils.MakeRelativePath(hitPath)) {
 				continue
 			}
 		}
@@ -601,41 +618,103 @@ func (s *Service) searchVector(ctx context.Context, req *searchsvc.SearchRequest
 }
 
 // getQueryEmbedding gets an embedding for the search query via the taki extractor.
-// buildSubspacePathFilters precomputes allowed subspace paths for project spaces
-// where the user has only subspace-navigation access (no InitiateFileDownload).
-// Returns a map of spaceID → allowed subspace paths.
-func (s *Service) buildSubspacePathFilters(ctx context.Context, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace) map[string][]string {
-	result := map[string][]string{}
+// subspaceManagementBypassOpaqueKey is set by reva (decomposedfs GetMD) on a
+// ResourceInfo whose permissions only stem from the global subspace management
+// bypass, i.e. the user is not a member of that resource.
+const subspaceManagementBypassOpaqueKey = "subspace-management-bypass"
+
+// SubspaceAccess describes which subspaces of a project space the current user
+// may see in search results.
+type SubspaceAccess struct {
+	// RestrictToAllowed is set for subspace-only users (no access to the space
+	// root): only hits inside Allowed are visible.
+	RestrictToAllowed bool
+	// Allowed are the subspace paths the user is a member of.
+	Allowed []string
+	// Denied are the subspace paths the user is not a member of. Hits inside
+	// them are never visible, even for members of the space root, because
+	// subspaces cut off the grant inheritance from above.
+	Denied []string
+	// AllowedPermissions holds the user's permissions on each allowed subspace root.
+	AllowedPermissions map[string]*provider.ResourcePermissions
+}
+
+// HitVisible reports whether a hit at the given space-relative path may be shown.
+func (a *SubspaceAccess) HitVisible(hitPath string) bool {
+	if a == nil {
+		return true
+	}
+	if IsPathInAllowedSubspaces(hitPath, a.Denied) {
+		return false
+	}
+	if a.RestrictToAllowed {
+		return IsPathInAllowedSubspaces(hitPath, a.Allowed)
+	}
+	return true
+}
+
+// PermissionsFor returns the permissions of the innermost allowed subspace that
+// contains hitPath, or nil when the hit is not inside an allowed subspace.
+func (a *SubspaceAccess) PermissionsFor(hitPath string) *provider.ResourcePermissions {
+	if a == nil {
+		return nil
+	}
+	var bestPath string
+	for _, allowedPath := range a.Allowed {
+		if IsPathInAllowedSubspaces(hitPath, []string{allowedPath}) && len(allowedPath) > len(bestPath) {
+			bestPath = allowedPath
+		}
+	}
+	if bestPath == "" {
+		return nil
+	}
+	return a.AllowedPermissions[bestPath]
+}
+
+// IsSubspaceMember decides from a Stat of the subspace root whether the user
+// is a member of the subspace. Access granted by the subspace management
+// bypass alone does not count.
+func IsSubspaceMember(statRes *provider.StatResponse) bool {
+	if statRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return false
+	}
+	info := statRes.GetInfo()
+	if utils.ReadPlainFromOpaque(info.GetOpaque(), subspaceManagementBypassOpaqueKey) == "true" {
+		return false
+	}
+	return info.GetPermissionSet().GetInitiateFileDownload()
+}
+
+// buildSubspaceAccess precomputes the subspace visibility for every project
+// space with subspaces. Returns a map of spaceID → access.
+func (s *Service) buildSubspaceAccess(ctx context.Context, gatewayClient gateway.GatewayAPIClient, spaces []*provider.StorageSpace) map[string]*SubspaceAccess {
+	result := map[string]*SubspaceAccess{}
 	for _, space := range spaces {
 		if space.SpaceType != _spaceTypeProject {
 			continue
 		}
-		perms := space.GetRootInfo().GetPermissionSet()
-		if !IsSubspaceOnlyUser(perms) {
-			continue // full access — no filtering needed
-		}
-		// Extract subspace paths from space opaque.
 		subspaces := SubspaceEntriesFromOpaque(space.Opaque)
 		if len(subspaces) == 0 {
 			continue
 		}
-		// Determine which subspaces the user can actually access via Stat.
-		var allowedPaths []string
-		for _, ss := range subspaces {
-			ref := &provider.Reference{
+		access := &SubspaceAccess{
+			RestrictToAllowed:  IsSubspaceOnlyUser(space.GetRootInfo().GetPermissionSet()),
+			AllowedPermissions: map[string]*provider.ResourcePermissions{},
+		}
+		for _, subspace := range subspaces {
+			subspacePath := utils.MakeRelativePath(subspace.Path)
+			statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
 				ResourceId: space.Root,
-				Path:       utils.MakeRelativePath(ss.Path),
-			}
-			statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
-			if err != nil || statRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+				Path:       subspacePath,
+			}})
+			if err != nil || !IsSubspaceMember(statRes) {
+				access.Denied = append(access.Denied, subspacePath)
 				continue
 			}
-			// User can stat this subspace → they have access
-			allowedPaths = append(allowedPaths, utils.MakeRelativePath(ss.Path))
+			access.Allowed = append(access.Allowed, subspacePath)
+			access.AllowedPermissions[subspacePath] = statRes.GetInfo().GetPermissionSet()
 		}
-		if len(allowedPaths) > 0 {
-			result[space.Root.GetSpaceId()] = allowedPaths
-		}
+		result[space.Root.GetSpaceId()] = access
 	}
 	return result
 }
@@ -690,7 +769,7 @@ func (s *Service) getQueryEmbedding(query string) []float64 {
 	return tikaExtractor.GetEmbedding(query)
 }
 
-func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string, allowedSubspacePaths []string) (*searchsvc.SearchIndexResponse, error) {
+func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest, space *provider.StorageSpace, mountpointID string, subspaceAccess *SubspaceAccess) (*searchsvc.SearchIndexResponse, error) {
 	if req.Ref != nil &&
 		(req.Ref.ResourceId.StorageId != space.Root.StorageId ||
 			req.Ref.ResourceId.SpaceId != space.Root.SpaceId) {
@@ -831,17 +910,24 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		matches = append(matches, match)
 	}
 
-	// Subspace access filter: for project spaces where the user only has
-	// subspace access, restrict results to files within allowed subspace paths.
-	if len(allowedSubspacePaths) > 0 {
+	// Subspace access filter: drop hits inside subspaces the user is not a
+	// member of (and outside their subspaces for subspace-only users). Hits
+	// inside an allowed subspace carry the subspace permissions, not the
+	// space root permissions.
+	if subspaceAccess != nil {
 		filtered := make([]*searchmsg.Match, 0, len(matches))
 		for _, match := range matches {
 			hitPath := utils.MakeRelativePath(match.Entity.Ref.GetPath())
-			if IsPathInAllowedSubspaces(hitPath, allowedSubspacePaths) {
-				filtered = append(filtered, match)
+			if !subspaceAccess.HitVisible(hitPath) {
+				continue
 			}
+			if subspacePermissions := subspaceAccess.PermissionsFor(hitPath); subspacePermissions != nil {
+				isDir := match.GetEntity().GetMimeType() == "httpd/unix-directory"
+				match.Entity.Permissions = convertToWebDAVPermissions(false, false, isDir, subspacePermissions)
+			}
+			filtered = append(filtered, match)
 		}
-		s.logger.Debug().Int("before", len(matches)).Int("after", len(filtered)).Strs("allowed", allowedSubspacePaths).Msg("subspace search filter applied")
+		s.logger.Debug().Int("before", len(matches)).Int("after", len(filtered)).Strs("allowed", subspaceAccess.Allowed).Strs("denied", subspaceAccess.Denied).Msg("subspace search filter applied")
 		matches = filtered
 	}
 
@@ -1246,6 +1332,12 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 	traceID := fmt.Sprintf("enrich_%s", storagespace.FormatResourceID(stat.Info.Id))
 	ctx = content.ContextWithTraceID(ctx, traceID)
 
+	// Source-dependent docmeta, same rule as for uploads (SEARCH_ENRICH_DOCMETA_SKIP_SOURCES)
+	skipDocMeta := s.skipDocMetaFor(stat.GetInfo().GetArbitraryMetadata().GetMetadata())
+	if skipDocMeta {
+		ctx = content.ContextWithoutFeatures(ctx, "docmeta")
+	}
+
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
 		s.logger.Error().Err(err).Str("path", path).Msg("re-enrich: extraction failed")
@@ -1285,7 +1377,7 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 	addImageMetadata(metadata, doc.Image)
 	addLocationMetadata(metadata, doc.Location)
 	addPhotoMetadata(metadata, doc.Photo)
-	if doc.Taki != nil {
+	if doc.Taki != nil && !skipDocMeta {
 		addDocMetadata(metadata, doc.Taki.DocMeta)
 	}
 	if len(metadata) == 0 {
@@ -1857,6 +1949,17 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 	traceID := fmt.Sprintf("op%d", opID)
 	ctx = content.ContextWithTraceID(ctx, traceID)
 
+	// Source-dependent docmeta: a document whose "source" xattr is listed in
+	// SEARCH_ENRICH_DOCMETA_SKIP_SOURCES brought its metadata along (e.g. a
+	// Saskia Anordnung via OpenYard); no metadata LLM run for it.
+	skipDocMeta := s.skipDocMetaFor(stat.GetInfo().GetArbitraryMetadata().GetMetadata())
+	if skipDocMeta {
+		ctx = content.ContextWithoutFeatures(ctx, "docmeta")
+		s.logger.Info().Int64("op", opID).Str("name", stat.Info.Name).
+			Str("source", stat.GetInfo().GetArbitraryMetadata().GetMetadata()["source"]).
+			Msg("doUpsertItem: docmeta skipped for source")
+	}
+
 	tExtract := time.Now()
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
@@ -2012,7 +2115,22 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 	addImageMetadata(metadata, doc.Image)
 	addLocationMetadata(metadata, doc.Location)
 	addPhotoMetadata(metadata, doc.Photo)
-	if doc.Taki != nil {
+	existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+	if doc.Taki != nil && doc.Taki.DocMeta != nil && !skipDocMeta {
+		// The client (OpenYard) sets "source" right after the upload, often while
+		// Taki is still extracting: stat again before trusting the LLM result.
+		if _, fresh, _ := s.resInfo(ref); fresh != nil {
+			if freshMeta := fresh.GetInfo().GetArbitraryMetadata().GetMetadata(); freshMeta != nil {
+				existing = freshMeta
+				if s.skipDocMetaFor(freshMeta) {
+					skipDocMeta = true
+					s.logger.Info().Int64("op", opID).Str("name", doc.Name).Str("source", freshMeta["source"]).
+						Msg("doUpsertItem: docmeta discarded, source set during extraction")
+				}
+			}
+		}
+	}
+	if doc.Taki != nil && !skipDocMeta {
 		addDocMetadata(metadata, doc.Taki.DocMeta)
 	}
 	if len(metadata) == 0 {
@@ -2021,7 +2139,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 
 	// Only write metadata keys that don't already exist on the resource,
 	// unless forceOverwrite is set (UI reindex with overwrite option).
-	existing := stat.GetInfo().GetArbitraryMetadata().GetMetadata()
+	// "existing" is the fresh stat from above when the client set metadata meanwhile.
 	newMetadata := map[string]string{}
 	for k, v := range metadata {
 		if v == "" {
@@ -2612,4 +2730,26 @@ func (s *Service) ResolvePathID(oldID string) (*Resource, error) {
 		return resolver.ResolvePathID(oldID)
 	}
 	return nil, fmt.Errorf("engine does not support ResolvePathID")
+}
+
+// parseSkipSources reads SEARCH_ENRICH_DOCMETA_SKIP_SOURCES: a comma separated,
+// case-insensitive list of "source" xattr values (saskia, archikart, ...).
+func parseSkipSources(value string) map[string]bool {
+	sources := map[string]bool{}
+	for _, source := range strings.Split(value, ",") {
+		source = strings.ToLower(strings.TrimSpace(source))
+		if source != "" {
+			sources[source] = true
+		}
+	}
+	return sources
+}
+
+// skipDocMetaFor reports whether the document's "source" xattr is one of the
+// sources that deliver their own metadata.
+func (s *Service) skipDocMetaFor(metadata map[string]string) bool {
+	if len(s.docMetaSkipSources) == 0 || metadata == nil {
+		return false
+	}
+	return s.docMetaSkipSources[strings.ToLower(strings.TrimSpace(metadata["source"]))]
 }

@@ -115,7 +115,7 @@ type Service struct {
 	enrichCh          chan queueRequest
 	enrichHighCh      chan queueRequest
 	layerCh           chan layerJob // OCR layer writeback queue (opt-in)
-	docMetaSkipSources map[string]bool // SEARCH_ENRICH_DOCMETA_SKIP_SOURCES: xattr "source" values without docmeta LLM
+	docMetaSkipSources map[string]bool // SEARCH_ENRICH_DOCMETA_SKIP_SOURCES: xattr "source" values without LLM enrichment
 	ocrLayerWriteback bool          // SEARCH_OCR_LAYER_WRITEBACK=true
 	ocrLayerMaxSize   uint64        // SEARCH_OCR_LAYER_MAX_SIZE, default 25 MiB
 	indexProcessed    int64
@@ -1335,7 +1335,7 @@ func (s *Service) doEnrichItem(ctx context.Context, ref *provider.Reference, for
 	// Source-dependent docmeta, same rule as for uploads (SEARCH_ENRICH_DOCMETA_SKIP_SOURCES)
 	skipDocMeta := s.skipDocMetaFor(stat.GetInfo().GetArbitraryMetadata().GetMetadata())
 	if skipDocMeta {
-		ctx = content.ContextWithoutFeatures(ctx, "docmeta")
+		ctx = content.ContextWithoutFeatures(ctx, docMetaSkipFeatures...)
 	}
 
 	doc, err := s.extractor.Extract(ctx, stat.Info)
@@ -1954,7 +1954,7 @@ func (s *Service) doUpsertItem(ref *provider.Reference, batch BatchOperator, for
 	// Saskia Anordnung via OpenYard); no metadata LLM run for it.
 	skipDocMeta := s.skipDocMetaFor(stat.GetInfo().GetArbitraryMetadata().GetMetadata())
 	if skipDocMeta {
-		ctx = content.ContextWithoutFeatures(ctx, "docmeta")
+		ctx = content.ContextWithoutFeatures(ctx, docMetaSkipFeatures...)
 		s.logger.Info().Int64("op", opID).Str("name", stat.Info.Name).
 			Str("source", stat.GetInfo().GetArbitraryMetadata().GetMetadata()["source"]).
 			Msg("doUpsertItem: docmeta skipped for source")
@@ -2731,6 +2731,15 @@ func (s *Service) ResolvePathID(oldID string) (*Resource, error) {
 	}
 	return nil, fmt.Errorf("engine does not support ResolvePathID")
 }
+
+// docMetaSkipFeatures are the open_taki features a document from a skip source
+// (SEARCH_ENRICH_DOCMETA_SKIP_SOURCES) does not get: every LLM stage. docmeta and
+// store_detect bring the metadata the source already delivered; meta, entities and
+// summary are one more LLM chat call per document (open_taki enrichWithLLM) that a
+// backup copy or a Saskia Anordnung does not need. Only embedding stays, so the
+// document is still found by the vector search; text/OCR for the index is not a
+// feature and always runs. 2026-11-08.
+var docMetaSkipFeatures = []string{"docmeta", "store_detect", "meta", "entities", "summary"}
 
 // parseSkipSources reads SEARCH_ENRICH_DOCMETA_SKIP_SOURCES: a comma separated,
 // case-insensitive list of "source" xattr values (saskia, archikart, ...).

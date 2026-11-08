@@ -13,6 +13,9 @@ func TestFeaturesWithout(t *testing.T) {
 	if got := featuresWithout(features, nil); got != features {
 		t.Errorf("nil skip changed features: %q", got)
 	}
+	if got := featuresWithout(features, []string{"docmeta", "store_detect", "meta", "entities", "summary"}); got != "embedding" {
+		t.Errorf("skip source keeps only embedding, got %q", got)
+	}
 	if got := featuresWithout("docmeta", []string{"DocMeta"}); got != "" {
 		t.Errorf("case-insensitive skip = %q", got)
 	}

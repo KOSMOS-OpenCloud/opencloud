@@ -67,7 +67,13 @@ type storeregistry struct {
 	lock       sync.RWMutex
 }
 
-// Init inits the registry
+// Init inits the registry.
+//
+// Init is also called from the nats ReconnectedCB (see storeOptions). It replaces the
+// store, i.e. it opens a new nats connection. The previous store must be closed, otherwise
+// every reconnect leaves one more open connection behind – and every new connection carries
+// the same callback, so the count doubles per reconnect event (2^14 = 16k connections seen
+// on xwork, 28k on brandis, ephemeral ports exhausted; opencloud/TODO_20261031.md, 2026-11-08).
 func (n *storeregistry) Init(opts ...registry.Option) error {
 	n.lock.Lock()
 	defer n.lock.Unlock()
@@ -75,8 +81,18 @@ func (n *storeregistry) Init(opts ...registry.Option) error {
 	for _, o := range opts {
 		o(&n.opts)
 	}
+	previous := n.store
 	n.store = natsjskv.NewStore(n.storeOptions(n.opts)...)
-	return n.store.Init(n.storeOptions(n.opts)...)
+	err := n.store.Init(n.storeOptions(n.opts)...)
+	if previous != nil {
+		// asynchronously: Init may run inside the previous connection's own callback
+		go func() {
+			if closeErr := previous.Close(); closeErr != nil {
+				fmt.Printf("nats registry: closing previous store after re-init: %v\n", closeErr)
+			}
+		}()
+	}
+	return err
 }
 
 // Options returns the configured options

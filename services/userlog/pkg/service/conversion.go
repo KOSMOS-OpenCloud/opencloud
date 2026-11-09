@@ -125,6 +125,10 @@ func (c *Converter) ConvertEvent(eventid string, event any) (OC10Notification, e
 	// todo
 	case ocEvents.TodoUpdate:
 		return c.todoMessage(eventid, ev)
+
+	// opendock dApps
+	case ocEvents.DockNotification:
+		return c.dockMessage(eventid, ev)
 	}
 
 }
@@ -406,6 +410,47 @@ func (c *Converter) todoMessage(eventid string, ev ocEvents.TodoUpdate) (OC10Not
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
+		MessageDetails: details,
+	}, nil
+}
+
+// dockMessage takes subject and message as sent by the dApp; the executant becomes {user}.
+func (c *Converter) dockMessage(eventid string, ev ocEvents.DockNotification) (OC10Notification, error) {
+	var usr *user.User
+	userName := ""
+	if ev.Executant.GetOpaqueId() != "" {
+		dockUser, err := c.getUser(context.Background(), ev.Executant)
+		if err != nil {
+			return OC10Notification{}, err
+		}
+		usr = dockUser
+		userName = dockUser.GetUsername()
+	}
+
+	details := generateDetails(usr, nil, nil, nil)
+	details["dock"] = map[string]string{
+		"plugin": ev.Plugin,
+		"kind":   ev.Kind,
+		"id":     ev.ObjectID,
+		"route":  ev.Route,
+	}
+
+	messageRich := ev.MessageRich
+	if messageRich == "" || usr == nil {
+		messageRich = ev.Message
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       userName,
+		Timestamp:      ev.Timestamp.Format(time.RFC3339Nano),
+		ResourceID:     ev.ObjectID,
+		ResourceType:   "dock",
+		Subject:        ev.Subject,
+		SubjectRaw:     ev.Subject,
+		Message:        ev.Message,
+		MessageRaw:     messageRich,
 		MessageDetails: details,
 	}, nil
 }

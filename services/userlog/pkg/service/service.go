@@ -179,6 +179,11 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	case ocEvents.TodoUpdate:
 		executant = e.Executant
 		users = append(users, e.ReceiverID)
+
+	// opendock dApps
+	case ocEvents.DockNotification:
+		executant = e.Executant
+		users = append(users, e.ReceiverIDs...)
 	case events.SpaceUnshared:
 		executant = e.Executant
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)

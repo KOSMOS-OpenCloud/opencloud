@@ -40,3 +40,25 @@ func (TodoUpdate) Unmarshal(v []byte) (interface{}, error) {
 	err := json.Unmarshal(v, &e)
 	return e, err
 }
+
+// DockNotification is emitted by OpenDock (dApps such as chat or tudu) for a persistent notification.
+// Subject and message come ready-made from the dApp, so new dApps need no change here.
+// MessageRich may use the placeholder {user} (the executant); Route is a web route opened on click.
+type DockNotification struct {
+	Executant   *user.UserId // who triggered the notification
+	ReceiverIDs []string     // users to notify (user opaque ids)
+	Plugin      string       // dApp plugin, e.g. "chat"
+	Kind        string       // kind within the plugin, e.g. "message", "mention"
+	ObjectID    string       // id of the object in the dApp (room, todo)
+	Subject     string
+	Message     string
+	MessageRich string // optional, with {user}
+	Route       string // optional web route, e.g. "/files/rooms/<id>"
+	Timestamp   time.Time
+}
+
+func (DockNotification) Unmarshal(v []byte) (interface{}, error) {
+	e := DockNotification{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}

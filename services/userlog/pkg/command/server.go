@@ -52,6 +52,9 @@ var _registeredEvents = []events.Unmarshaller{
 
 	// todo
 	ocEvents.TodoUpdate{},
+
+	// opendock dApps
+	ocEvents.DockNotification{},
 }
 
 // Server is the entrypoint for the server command.

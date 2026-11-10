@@ -1294,13 +1294,16 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyPostMessageOrigin:            f.cfg.Commons.OpenCloudURL,
 		fileinfo.KeyLicenseCheckForEditIsEnabled: f.cfg.App.LicenseCheckEnable,
 
-		fileinfo.KeyUserCanNotWriteRelative: false,
+		// "Save As" (PutRelativeFile) only for read-write sessions, otherwise
+		// view-only links could bypass DisableExport by saving a copy
+		fileinfo.KeyUserCanNotWriteRelative: true,
 	}
 
 	switch wopiContext.ViewMode {
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE:
 		infoMap[fileinfo.KeyUserCanWrite] = true
 		infoMap[fileinfo.KeyUserCanRename] = true
+		infoMap[fileinfo.KeyUserCanNotWriteRelative] = false
 
 	case appproviderv1beta1.ViewMode_VIEW_MODE_READ_ONLY:
 		// nothing special to do here for now

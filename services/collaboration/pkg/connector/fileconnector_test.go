@@ -1788,7 +1788,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: false,
+				UserCanNotWriteRelative: true,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,
@@ -1893,7 +1893,7 @@ var _ = Describe("FileConnector", func() {
 				BreadcrumbFolderName:    "/path/to",
 				BreadcrumbFolderURL:     "https://cloud.opencloud.test/s/ABC123",
 				DisablePrint:            true,
-				UserCanNotWriteRelative: false,
+				UserCanNotWriteRelative: true,
 				SupportsLocks:           true,
 				SupportsUpdate:          true,
 				SupportsRename:          true,
@@ -1981,7 +1981,7 @@ var _ = Describe("FileConnector", func() {
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                    int64(998877),
 				BaseFileName:            "test.txt",
-				UserCanNotWriteRelative: false,
+				UserCanNotWriteRelative: true,
 				DisableExport:           true,
 				DisableCopy:             true,
 				DisablePrint:            true,

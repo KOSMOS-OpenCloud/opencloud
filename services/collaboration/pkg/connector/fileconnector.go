@@ -758,8 +758,10 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 	if err != nil {
 		return nil, err
 	}
+	// the name is relative to the folder of the current file, like the target
+	// (finalTarget is relative to the resolved folder and may have a prefix)
 	return NewResponseSuccessBodyNameUrl(
-		finalTarget,
+		path.Join(path.Dir(path.Clean(target)), path.Base(finalTarget)),
 		wopiSrcURL.String(),
 		createHostUrl("write", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
 		createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),

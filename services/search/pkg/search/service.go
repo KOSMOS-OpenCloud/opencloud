@@ -640,17 +640,30 @@ type SubspaceAccess struct {
 }
 
 // HitVisible reports whether a hit at the given space-relative path may be shown.
+// With nested subspaces the innermost subspace containing the hit decides, so a
+// member of ./a/b sees hits in ./a/b even when not a member of ./a.
 func (a *SubspaceAccess) HitVisible(hitPath string) bool {
 	if a == nil {
 		return true
 	}
-	if IsPathInAllowedSubspaces(hitPath, a.Denied) {
-		return false
+	innermostDenied := innermostSubspace(hitPath, a.Denied)
+	innermostAllowed := innermostSubspace(hitPath, a.Allowed)
+	if innermostDenied != "" || innermostAllowed != "" {
+		return len(innermostAllowed) > len(innermostDenied)
 	}
-	if a.RestrictToAllowed {
-		return IsPathInAllowedSubspaces(hitPath, a.Allowed)
+	return !a.RestrictToAllowed
+}
+
+// innermostSubspace returns the longest subspace path containing hitPath, or ""
+// when hitPath is not inside any of the given subspaces.
+func innermostSubspace(hitPath string, subspacePaths []string) string {
+	var innermostPath string
+	for _, subspacePath := range subspacePaths {
+		if IsPathInAllowedSubspaces(hitPath, []string{subspacePath}) && len(subspacePath) > len(innermostPath) {
+			innermostPath = subspacePath
+		}
 	}
-	return true
+	return innermostPath
 }
 
 // PermissionsFor returns the permissions of the innermost allowed subspace that

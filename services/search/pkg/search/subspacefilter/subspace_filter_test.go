@@ -174,6 +174,12 @@ func TestSubspaceAccessHitVisible(t *testing.T) {
 		Allowed: []string{"./hr"},
 		Denied:  []string{"./hr/salaries"},
 	}
+	// nested: not a member of ./service, but of ./service/kuehn (regression:
+	// the denied outer subspace hid the user's own inner subspace)
+	nestedInnerAllowed := &search.SubspaceAccess{
+		Allowed: []string{"./service/kuehn", "./service/kuehn/inbox"},
+		Denied:  []string{"./service", "./service/berger"},
+	}
 
 	tests := []struct {
 		name     string
@@ -193,6 +199,11 @@ func TestSubspaceAccessHitVisible(t *testing.T) {
 		{"subspace-only without subspaces sees nothing", subspaceOnlyNone, "./legal/contract.pdf", false},
 		{"nested: denied inner subspace wins", nested, "./hr/salaries/2026.xlsx", false},
 		{"nested: allowed outer subspace", nested, "./hr/list.xlsx", true},
+		{"nested inner allowed: inner subspace root", nestedInnerAllowed, "./service/kuehn", true},
+		{"nested inner allowed: innermost subspace", nestedInnerAllowed, "./service/kuehn/inbox/doc.pdf", true},
+		{"nested inner allowed: outer denied subspace", nestedInnerAllowed, "./service/list.xlsx", false},
+		{"nested inner allowed: sibling denied subspace", nestedInnerAllowed, "./service/berger/doc.pdf", false},
+		{"nested inner allowed: outside subspaces", nestedInnerAllowed, "./legal/contract.pdf", true},
 	}
 
 	for _, tt := range tests {

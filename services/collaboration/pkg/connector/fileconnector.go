@@ -683,9 +683,10 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		return NewResponse(500), nil
 	}
 
-	if strings.HasPrefix(target, ".") {
+	if strings.HasPrefix(target, ".") && !strings.Contains(target, "/") {
 		// the target is an extension, so we need to use the original
-		// name with the modified extension
+		// name with the modified extension. A target with folders like
+		// "../Other/name.ods" is a path, not an extension
 		oldStatPath := oldStatRes.GetInfo().GetPath()
 		ext := path.Ext(oldStatPath)
 		target = strings.TrimSuffix(path.Base(oldStatPath), ext) + target

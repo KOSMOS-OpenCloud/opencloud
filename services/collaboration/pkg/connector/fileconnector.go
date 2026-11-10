@@ -691,13 +691,20 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		target = strings.TrimSuffix(path.Base(oldStatPath), ext) + target
 	}
 
-	finalTarget := target
+	// the web Save As picker may send a target in another folder of the space
+	targetFolderID, relativeTarget, err := f.resolveRelativeTarget(ctx, gwc, oldStatRes.GetInfo().GetParentId(), target)
+	if err != nil {
+		logger.Error().Err(err).Msg("PutRelativeFileSuggested: invalid target")
+		return NewResponse(400), nil
+	}
+
+	finalTarget := relativeTarget
 	newLogger := logger
 	for isDone := false; !isDone; {
 		targetPath := utils.MakeRelativePath(finalTarget)
 		// need to change the file reference of the wopicontext to point to the new path
 		wopiContext.FileReference = &providerv1beta1.Reference{
-			ResourceId: oldStatRes.GetInfo().GetParentId(),
+			ResourceId: targetFolderID,
 			Path:       targetPath,
 		}
 
@@ -720,8 +727,9 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		case 409:
 			// if conflict generate a different name and retry.
 			// this should happen only once
-			actualFilename, _ := f.extractFilenameAndPrefix(target)
-			finalTarget = f.generatePrefix() + " " + actualFilename
+			// the prefix goes in front of the file name, not in front of the folders
+			actualFilename, _ := f.extractFilenameAndPrefix(path.Base(relativeTarget))
+			finalTarget = path.Join(path.Dir(relativeTarget), f.generatePrefix()+" "+actualFilename)
 		default:
 			// TODO: code 400 might happen, what to do?
 			// in other cases, just return the error
@@ -813,10 +821,17 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		return NewResponse(500), nil
 	}
 
-	targetPath := utils.MakeRelativePath(target)
+	// the web Save As picker may send a target in another folder of the space
+	targetFolderID, relativeTarget, err := f.resolveRelativeTarget(ctx, gwc, oldStatRes.GetInfo().GetParentId(), target)
+	if err != nil {
+		logger.Error().Err(err).Msg("PutRelativeFileRelative: invalid target")
+		return NewResponse(400), nil
+	}
+
+	targetPath := utils.MakeRelativePath(relativeTarget)
 	// need to change the file reference of the wopicontext to point to the new path
 	wopiContext.FileReference = &providerv1beta1.Reference{
-		ResourceId: oldStatRes.GetInfo().GetParentId(),
+		ResourceId: targetFolderID,
 		Path:       targetPath,
 	}
 
@@ -859,8 +874,9 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 			return nil, err2
 		}
 
-		actualFilename, _ := f.extractFilenameAndPrefix(target)
-		finalTarget := f.generatePrefix() + " " + actualFilename
+		// the prefix goes in front of the file name, not in front of the folders
+		actualFilename, _ := f.extractFilenameAndPrefix(path.Base(target))
+		finalTarget := path.Join(path.Dir(target), f.generatePrefix()+" "+actualFilename)
 
 		newLogger.Error().
 			Str("LockID", lockID).
@@ -1482,6 +1498,48 @@ func (f *FileConnector) extractFilenameAndPrefix(filename string) (string, strin
 func (f *FileConnector) generatePrefix() string {
 	byteArray := binary.BigEndian.AppendUint64([]byte{}, uint64(time.Now().UnixMilli()))
 	return base64.RawURLEncoding.EncodeToString(bytes.TrimLeft(byteArray, "\x00"))
+}
+
+// resolveRelativeTarget resolves a PutRelativeFile target against the folder
+// of the current file. Besides a plain file name the target may contain
+// folders, e.g. "Sub/name.ods" or "../Other/name.ods" as sent by the web
+// Save As picker. Leading ".." segments are resolved by walking up the parent
+// ids, because the storage doesn't resolve ".." in a relative reference. The
+// target must stay inside the space of the current file.
+//
+// It returns the folder to use as reference and the remaining relative path.
+func (f *FileConnector) resolveRelativeTarget(ctx context.Context, gwc gatewayv1beta1.GatewayAPIClient, folderID *providerv1beta1.ResourceId, target string) (*providerv1beta1.ResourceId, string, error) {
+	cleanTarget := path.Clean(target)
+	if cleanTarget == "." || cleanTarget == ".." || path.IsAbs(cleanTarget) || strings.HasSuffix(cleanTarget, "/..") {
+		return nil, "", fmt.Errorf("invalid target %q", target)
+	}
+
+	remainingTarget := cleanTarget
+	for strings.HasPrefix(remainingTarget, "../") {
+		// the space root has no parent, the target would leave the space
+		if folderID.GetOpaqueId() == folderID.GetSpaceId() {
+			return nil, "", fmt.Errorf("target %q leaves the space", target)
+		}
+
+		folderStatRes, err := gwc.Stat(ctx, &providerv1beta1.StatRequest{
+			Ref: &providerv1beta1.Reference{ResourceId: folderID},
+		})
+		if err != nil {
+			return nil, "", err
+		}
+		if folderStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+			return nil, "", fmt.Errorf("stat of folder failed: %s", folderStatRes.GetStatus().GetMessage())
+		}
+
+		parentID := folderStatRes.GetInfo().GetParentId()
+		if parentID.GetOpaqueId() == "" {
+			return nil, "", fmt.Errorf("target %q leaves the space", target)
+		}
+		folderID = parentID
+		remainingTarget = strings.TrimPrefix(remainingTarget, "../")
+	}
+
+	return folderID, remainingTarget, nil
 }
 
 // The adjustWopiReference should be called first so the file reference

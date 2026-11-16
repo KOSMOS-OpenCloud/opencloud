@@ -405,6 +405,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				r.Get("/apps", svc.GetSpaceApps)
 				r.With(requireAdmin).Get("/health", svc.GetExtensionsHealth)
 				r.With(requireAdmin).Get("/opencore/authDirectories", svc.ListAuthDirectories)
+				r.With(requireAdmin).Get("/opencore/authDirectories/{directory}/users/{login}", svc.LookupAuthDirectoryUser)
 			})
 			r.With(requireAdmin).Route("/education", func(r chi.Router) {
 				r.Route("/schools", func(r chi.Router) {

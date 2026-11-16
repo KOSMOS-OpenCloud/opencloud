@@ -69,26 +69,16 @@ type Client struct {
 	ApplicationType        string   `yaml:"application_type"`
 }
 
-// Directory is one external authentication directory for the 'directories'
-// identity manager (identity_manager=directories). idm stays the directory for
-// all users; only the password check is delegated here. See OPENCORE_DIRECTORY.md.
-type Directory struct {
-	Name       string   `yaml:"name" json:"name"`               // selectable id, e.g. "nu"; "internal" is reserved for idm
-	Label      string   `yaml:"label" json:"label"`             // shown in the user editor
-	URIs       []string `yaml:"uris" json:"uris"`               // >= 1, tried in order (failover)
-	DNTemplate string   `yaml:"dn_template" json:"dn_template"` // direct bind, e.g. "uid=%s,ou=Users,dc=nugmbh,dc=p,dc=nu"
-	CACertFile string   `yaml:"cacert_file" json:"cacert_file"` // optional, for ldaps
-}
-
 type Settings struct {
 	Iss string `yaml:"iss" env:"OC_URL;OC_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use." introductionVersion:"1.0.0"`
 
 	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph', 'guest' and 'directories'." introductionVersion:"1.0.0"`
 
-	// Directories and AuthDirectoryAttribute are used by the 'directories' identity
-	// manager (identity_manager=directories) to delegate the password check per user.
-	Directories            []Directory `yaml:"directories"`
-	AuthDirectoryAttribute string      `yaml:"auth_directory_attribute" env:"IDP_AUTH_DIRECTORY_ATTRIBUTE" desc:"idm attribute holding the per-user auth directory name (directories identity manager)." introductionVersion:"1.0.0"`
+	// AuthDirectoryAttribute is used by the 'directories' identity manager
+	// (identity_manager=directories) to delegate the password check per user. The
+	// list of directories itself is shared config: shared.Commons.Directories
+	// (the 'shared.directories' section of opencloud.yaml), read by idp and graph.
+	AuthDirectoryAttribute string `yaml:"auth_directory_attribute" env:"IDP_AUTH_DIRECTORY_ATTRIBUTE" desc:"idm attribute holding the per-user auth directory name (directories identity manager)." introductionVersion:"1.0.0"`
 
 	URIBasePath string `yaml:"uri_base_path" env:"IDP_URI_BASE_PATH" desc:"IDP uri base path (defaults to '')." introductionVersion:"1.0.0"`
 

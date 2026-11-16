@@ -21,6 +21,7 @@ import (
 	"github.com/libregraph/lico/server"
 	"github.com/opencloud-eu/opencloud/pkg/ldap"
 	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/assets"
 	cs3BackendSupport "github.com/opencloud-eu/opencloud/services/idp/pkg/backends/cs3/bootstrap"
@@ -91,7 +92,7 @@ func NewService(opts ...Option) Service {
 		if err := initLicoInternalLDAPEnvVars(&options.Config.Ldap); err != nil {
 			logger.Fatal().Err(err).Msg("could not initialize ldap env vars")
 		}
-		if err := initDirectoriesEnvVars(&options.Config.IDP); err != nil {
+		if err := initDirectoriesEnvVars(options.Config); err != nil {
 			logger.Fatal().Err(err).Msg("could not initialize directories env vars")
 		}
 	default:
@@ -273,16 +274,20 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 // initDirectoriesEnvVars hands the external directory list and the auth-directory
 // attribute name to the lico bootstrap via the environment (same pattern as the
 // other backends). The directories are serialized as JSON.
-func initDirectoriesEnvVars(idp *config.Settings) error {
-	blob, err := json.Marshal(idp.Directories)
+func initDirectoriesEnvVars(cfg *config.Config) error {
+	var directories []shared.Directory
+	if cfg.Commons != nil {
+		directories = cfg.Commons.Directories
+	}
+	blob, err := json.Marshal(directories)
 	if err != nil {
 		return fmt.Errorf("could not marshal directories: %w", err)
 	}
 	env := map[string]string{
 		"DIRECTORIES_JSON": string(blob),
 	}
-	if idp.AuthDirectoryAttribute != "" {
-		env["DIRECTORIES_AUTH_ATTRIBUTE"] = idp.AuthDirectoryAttribute
+	if cfg.IDP.AuthDirectoryAttribute != "" {
+		env["DIRECTORIES_AUTH_ATTRIBUTE"] = cfg.IDP.AuthDirectoryAttribute
 	}
 	for k, v := range env {
 		if err := os.Setenv(k, v); err != nil {

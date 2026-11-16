@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
+	"github.com/opencloud-eu/opencloud/pkg/shared"
 	"github.com/opencloud-eu/opencloud/services/graph/pkg/errorcode"
 )
 
@@ -27,6 +28,39 @@ type AuthDirectoryBackend interface {
 
 type authDirectoryBody struct {
 	AuthDirectory string `json:"authDirectory"`
+}
+
+// authDirectoryItem is one selectable auth directory for the user editor.
+type authDirectoryItem struct {
+	Name  string `json:"name"`
+	Label string `json:"label"`
+}
+
+// authDirectoryList is the response for GET /extensions/opencore/authDirectories.
+type authDirectoryList struct {
+	Value []authDirectoryItem `json:"value"`
+}
+
+// ListAuthDirectories returns the auth directories an admin can assign to a user:
+// the built-in "internal" pseudo-entry first, then every configured external
+// directory. OpenCore extension; the user editor uses this to populate the auth
+// source dropdown. Connection details are never exposed, only name and label.
+func (g Graph) ListAuthDirectories(w http.ResponseWriter, r *http.Request) {
+	var directories []shared.Directory
+	if g.config.Commons != nil {
+		directories = g.config.Commons.Directories
+	}
+	items := make([]authDirectoryItem, 0, len(directories)+1)
+	items = append(items, authDirectoryItem{Name: internalAuthDirectory, Label: internalAuthDirectory})
+	for _, dir := range directories {
+		label := dir.Label
+		if label == "" {
+			label = dir.Name
+		}
+		items = append(items, authDirectoryItem{Name: dir.Name, Label: label})
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, authDirectoryList{Value: items})
 }
 
 func authDirectoryUserID(w http.ResponseWriter, r *http.Request) (string, bool) {

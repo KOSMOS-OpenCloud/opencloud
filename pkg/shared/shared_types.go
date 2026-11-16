@@ -63,6 +63,18 @@ type Cache struct {
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
+// Directory is one external authentication directory for the OpenCore
+// 'directories' identity manager. idm stays the directory for all users; only
+// the password check is delegated to this LDAP for users whose auth directory
+// points here. See opendock/OPENCORE_DIRECTORY.md.
+type Directory struct {
+	Name       string   `yaml:"name" json:"name"`               // selectable id, e.g. "nu"; "internal" is reserved for idm
+	Label      string   `yaml:"label" json:"label"`             // shown in the user editor
+	URIs       []string `yaml:"uris" json:"uris"`               // >= 1, tried in order (failover)
+	DNTemplate string   `yaml:"dn_template" json:"dn_template"` // direct bind, e.g. "uid=%s,ou=Users,dc=nugmbh,dc=p,dc=nu"
+	CACertFile string   `yaml:"cacert_file" json:"cacert_file"` // optional, for ldaps
+}
+
 type Commons struct {
 	TracesExporter     string          `yaml:"traces_exporter" env:"OTEL_TRACES_EXPORTER" desc:"The exporter used for traces. Supports 'otlp', 'console' and 'none' (default)." introductionVersion:"6.0.0"`
 	Log                *Log            `yaml:"log"`
@@ -80,6 +92,12 @@ type Commons struct {
 	SystemUserAPIKey   string          `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY" desc:"API key for all system users." introductionVersion:"1.0.0"`
 	AdminUserID        string          `yaml:"admin_user_id" env:"OC_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand." introductionVersion:"1.0.0"`
 	MultiTenantEnabled bool            `yaml:"multi_tenant_enabled" env:"OC_MULTI_TENANT_ENABLED" desc:"Set this to true to enable multi-tenant support." introductionVersion:"4.0.0"`
+	// Directories is the shared list of external authentication directories for the
+	// OpenCore 'directories' identity manager. It is read by both the idp (to
+	// delegate the per-user password check) and the graph service (to offer the
+	// directories in the user editor and to look up usernames). Single source of
+	// truth. See opendock/OPENCORE_DIRECTORY.md.
+	Directories []Directory `yaml:"directories"`
 
 	// NOTE: you will not fing GRPCMaxReceivedMessageSize size being used in the code. The envvar is actually extracted in revas `pool` package: https://github.com/cs3org/reva/blob/edge/pkg/rgrpc/todo/pool/connection.go
 	// It is mentioned here again so it is documented

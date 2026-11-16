@@ -1,10 +1,12 @@
 package parser
 
 import (
+	"encoding/json"
 	"errors"
 
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
+	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/config/defaults"
 
@@ -42,6 +44,29 @@ func Validate(cfg *config.Config) error {
 	case "ldap":
 		if cfg.Ldap.BindPassword == "" {
 			return shared.MissingLDAPBindPassword(cfg.Service.Name)
+		}
+	case "directories":
+		// The 'directories' identity manager keeps the internal idm as the primary
+		// directory for all users and only delegates the password check for users
+		// explicitly assigned to an external directory. It uses the same idm bind as
+		// the 'ldap' manager, so the same bind password is required.
+		if cfg.Ldap.BindPassword == "" {
+			return shared.MissingLDAPBindPassword(cfg.Service.Name)
+		}
+		// Fail fast on a malformed directory list. An empty list is valid: every user
+		// then stays internal, behaving identically to the 'ldap' manager. The check
+		// reuses the exact rules the backend applies at runtime, so a broken config is
+		// detected at deployment time instead of by a user hitting a broken login.
+		var dirs []shared.Directory
+		if cfg.Commons != nil {
+			dirs = cfg.Commons.Directories
+		}
+		blob, err := json.Marshal(dirs)
+		if err != nil {
+			return err
+		}
+		if _, err := directories.ParseDirectories(string(blob)); err != nil {
+			return err
 		}
 	}
 

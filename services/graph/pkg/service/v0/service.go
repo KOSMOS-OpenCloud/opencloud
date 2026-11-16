@@ -195,19 +195,19 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 	}
 
 	svc := Graph{
-		BaseGraphService:              baseGraphService,
-		mux:                           m,
-		specialDriveItemsCache:        spacePropertiesCache,
-		driveItemPermissionsService:   driveItemPermissionsService,
-		eventsPublisher:          options.EventsPublisher,
-		eventsConsumer:           options.EventsConsumer,
-		searchService:            options.SearchService,
-		identityEducationBackend: options.IdentityEducationBackend,
-		keycloakClient:           options.KeycloakClient,
-		historyClient:            options.EventHistoryClient,
-		traceProvider:            options.TraceProvider,
-		valueService:             options.ValueService,
-		natskv:                   options.NatsKeyValue,
+		BaseGraphService:            baseGraphService,
+		mux:                         m,
+		specialDriveItemsCache:      spacePropertiesCache,
+		driveItemPermissionsService: driveItemPermissionsService,
+		eventsPublisher:             options.EventsPublisher,
+		eventsConsumer:              options.EventsConsumer,
+		searchService:               options.SearchService,
+		identityEducationBackend:    options.IdentityEducationBackend,
+		keycloakClient:              options.KeycloakClient,
+		historyClient:               options.EventHistoryClient,
+		traceProvider:               options.TraceProvider,
+		valueService:                options.ValueService,
+		natskv:                      options.NatsKeyValue,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {
@@ -360,6 +360,10 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 					})
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
+					r.With(requireAdmin).Route("/authDirectory", func(r chi.Router) {
+						r.Get("/", svc.GetUserAuthDirectory)
+						r.Put("/", svc.SetUserAuthDirectory)
+					})
 					if svc.roleService != nil {
 						r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
 							r.Get("/", svc.ListAppRoleAssignments)

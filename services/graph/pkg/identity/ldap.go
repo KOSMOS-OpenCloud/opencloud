@@ -88,6 +88,7 @@ type userAttributeMap struct {
 	userType       string
 	identities     string
 	lastSignIn     string
+	authDirectory  string
 }
 
 type ldapAttributeValues map[string][]string
@@ -123,6 +124,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		userType:       config.UserTypeAttribute,
 		identities:     identitiesAttribute,
 		lastSignIn:     lastSignAttribute,
+		authDirectory:  authDirectoryAttrOrDefault(config.AuthDirectoryAttribute),
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -1415,4 +1417,14 @@ func isUserEnabledUpdate(user libregraph.UserUpdate) bool {
 		return false
 	}
 	return user.AccountEnabled != nil
+}
+
+// authDirectoryAttrOrDefault returns the configured LDAP attribute for the
+// per-user auth directory, defaulting to the OpenCore attribute name. See
+// OPENCORE_DIRECTORY.md.
+func authDirectoryAttrOrDefault(attr string) string {
+	if attr == "" {
+		return "openCoreAuthDirectory"
+	}
+	return attr
 }

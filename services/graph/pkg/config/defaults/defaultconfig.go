@@ -97,6 +97,7 @@ func DefaultConfig() *config.Config {
 				//        ideally this needs to	be constant for the lifetime of a users
 				UserIDAttribute:           "openCloudUUID",
 				UserTypeAttribute:         "openCloudUserType",
+				AuthDirectoryAttribute:    "openCoreAuthDirectory",
 				UserEnabledAttribute:      "openCloudUserEnabled",
 				DisableUserMechanism:      "attribute",
 				LdapDisabledUsersGroupDN:  "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",

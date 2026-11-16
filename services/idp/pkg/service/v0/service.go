@@ -3,6 +3,7 @@ package svc
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,6 +24,7 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/assets"
 	cs3BackendSupport "github.com/opencloud-eu/opencloud/services/idp/pkg/backends/cs3/bootstrap"
+	directoriesBackendSupport "github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories/bootstrap"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/config"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/middleware"
 	"github.com/riandyrn/otelchi"
@@ -73,6 +75,24 @@ func NewService(opts ...Option) Service {
 		ldapBackendSupport.MustRegister()
 		if err := initLicoInternalLDAPEnvVars(&options.Config.Ldap); err != nil {
 			logger.Fatal().Err(err).Msg("could not initialize ldap env vars")
+		}
+	case "directories":
+		// The "directories" manager delegates the password check per user to an
+		// external directory, but keeps idm as the directory for identity, groups
+		// and claims. It needs the same idm (LDAP_*) env as the ldap backend plus
+		// the directory list.
+		if err := ldap.WaitForCA(options.Logger, options.Config.IDP.Insecure, options.Config.Ldap.TLSCACert); err != nil {
+			logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
+		}
+		if options.Config.IDP.Insecure {
+			options.Config.Ldap.TLSCACert = ""
+		}
+		directoriesBackendSupport.MustRegister()
+		if err := initLicoInternalLDAPEnvVars(&options.Config.Ldap); err != nil {
+			logger.Fatal().Err(err).Msg("could not initialize ldap env vars")
+		}
+		if err := initDirectoriesEnvVars(&options.Config.IDP); err != nil {
+			logger.Fatal().Err(err).Msg("could not initialize directories env vars")
 		}
 	default:
 		guestBackendSupport.MustRegister()
@@ -247,6 +267,28 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 		}
 	}
 
+	return nil
+}
+
+// initDirectoriesEnvVars hands the external directory list and the auth-directory
+// attribute name to the lico bootstrap via the environment (same pattern as the
+// other backends). The directories are serialized as JSON.
+func initDirectoriesEnvVars(idp *config.Settings) error {
+	blob, err := json.Marshal(idp.Directories)
+	if err != nil {
+		return fmt.Errorf("could not marshal directories: %w", err)
+	}
+	env := map[string]string{
+		"DIRECTORIES_JSON": string(blob),
+	}
+	if idp.AuthDirectoryAttribute != "" {
+		env["DIRECTORIES_AUTH_ATTRIBUTE"] = idp.AuthDirectoryAttribute
+	}
+	for k, v := range env {
+		if err := os.Setenv(k, v); err != nil {
+			return fmt.Errorf("could not set directories env var %s", k)
+		}
+	}
 	return nil
 }
 

@@ -19,6 +19,7 @@ import (
 
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories"
 	kidentifier "github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories/identifier"
+	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories/keystore"
 )
 
 const identityManagerName = "directories"
@@ -128,10 +129,23 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 		authDirAttr = "openCoreAuthDirectory"
 	}
 
+	// Optional per-user key store (opendock/OPENCORE_KEYSTORE.md §10). Without a
+	// path it is disabled and Logon behaves exactly as before.
+	var keystoreHook *keystore.Hook
+	userKeystore, err := keystore.Open(os.Getenv("KEYSTORE_PATH"), os.Getenv("KEYSTORE_SERVICE_KEYS"), os.Getenv("KEYSTORE_SESSION_TTL"))
+	if err != nil {
+		return nil, err
+	}
+	if userKeystore != nil {
+		keystoreHook = keystore.NewHook(userKeystore, logger)
+		logger.Infoln("directories backend: key store enabled")
+	}
+
 	identifierBackend, err := kidentifier.NewBackend(kidentifier.Config{
 		LDAP:        embedded,
 		Logger:      logger,
 		Dirs:        dirs,
+		Keystore:    keystoreHook,
 		IDMURI:      os.Getenv("LDAP_URI"),
 		IDMBindDN:   os.Getenv("LDAP_BINDDN"),
 		IDMBindPW:   os.Getenv("LDAP_BINDPW"),

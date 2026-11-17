@@ -21,6 +21,7 @@ import (
 	licoldap "github.com/libregraph/lico/identifier/backends/ldap"
 
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories"
+	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories/keystore"
 )
 
 const directoriesIdentifierBackendName = "identifier-directories"
@@ -32,6 +33,10 @@ type Backend struct {
 
 	logger logrus.FieldLogger
 	dirs   *directories.DirectorySet
+
+	// keystore opens the user's key store on logon and closes it when the
+	// session is destroyed. nil when the key store is disabled.
+	keystore *keystore.Hook
 
 	// parameters to look the user up in idm (DN + auth-directory attribute) and
 	// to perform the internal bind. Mirror of what the embedded backend uses.
@@ -52,6 +57,9 @@ type Config struct {
 	LDAP   *licoldap.LDAPIdentifierBackend
 	Logger logrus.FieldLogger
 	Dirs   *directories.DirectorySet
+
+	// Keystore is optional; nil disables the key store.
+	Keystore *keystore.Hook
 
 	IDMURI      string
 	IDMBindDN   string
@@ -85,6 +93,7 @@ func NewBackend(c Config) (*Backend, error) {
 		LDAPIdentifierBackend: c.LDAP,
 		logger:                c.Logger,
 		dirs:                  c.Dirs,
+		keystore:              c.Keystore,
 		idmURI:                c.IDMURI,
 		idmBindDN:             c.IDMBindDN,
 		idmBindPW:             c.IDMBindPW,
@@ -113,7 +122,11 @@ func (b *Backend) Logon(ctx context.Context, audience, username, password string
 
 	if directories.IsInternal(authDir) {
 		// internal: full reuse of the unchanged idm backend (search + bind + claims).
-		return b.LDAPIdentifierBackend.Logon(ctx, audience, username, password)
+		success, internalUserID, internalSessionRef, internalUser, logonErr := b.LDAPIdentifierBackend.Logon(ctx, audience, username, password)
+		if logonErr == nil && success && internalUserID != nil && internalSessionRef == nil {
+			internalSessionRef = b.keystore.LoggedOn(ctx, *internalUserID, password)
+		}
+		return success, internalUserID, internalSessionRef, internalUser, logonErr
 	}
 
 	dir, ok := b.dirs.Pick(authDir)
@@ -139,7 +152,16 @@ func (b *Backend) Logon(ctx context.Context, audience, username, password string
 	}
 	userID := user.Subject()
 	b.logger.WithFields(logrus.Fields{"username": username, "directory": dir.Name}).Debugln("directories external logon")
-	return true, &userID, nil, user, nil
+	return true, &userID, b.keystore.LoggedOn(ctx, userID, password), user, nil
+}
+
+// DestroySession closes the key store session opened in Logon; any other
+// session reference goes to the embedded backend.
+func (b *Backend) DestroySession(ctx context.Context, sessionRef *string) error {
+	if b.keystore.SessionDestroyed(ctx, sessionRef) {
+		return nil
+	}
+	return b.LDAPIdentifierBackend.DestroySession(ctx, sessionRef)
 }
 
 // lookupAuthDirectory finds the user in idm and returns its auth-directory value.

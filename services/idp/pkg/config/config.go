@@ -80,6 +80,12 @@ type Settings struct {
 	// (the 'shared.directories' section of opencloud.yaml), read by idp and graph.
 	AuthDirectoryAttribute string `yaml:"auth_directory_attribute" env:"IDP_AUTH_DIRECTORY_ATTRIBUTE" desc:"idm attribute holding the per-user auth directory name (directories identity manager)." introductionVersion:"1.0.0"`
 
+	// Keystore* configure the per-user key store of the 'directories' identity
+	// manager. An empty path disables it.
+	KeystorePath        string `yaml:"keystore_path" env:"IDP_KEYSTORE_PATH" desc:"Path of the per-user key store file (directories identity manager). Empty disables the key store." introductionVersion:"1.0.0"`
+	KeystoreServiceKeys string `yaml:"keystore_service_keys" env:"IDP_KEYSTORE_SERVICE_KEYS" desc:"Comma separated list of service keys that may use an open key store, each as name=publickey (X25519, base64url without padding)." introductionVersion:"1.0.0"`
+	KeystoreSessionTTL  string `yaml:"keystore_session_ttl" env:"IDP_KEYSTORE_SESSION_TTL" desc:"Maximum lifetime of a key store session that ends without logout, as a duration like 12h. Empty means 12h." introductionVersion:"1.0.0"`
+
 	URIBasePath string `yaml:"uri_base_path" env:"IDP_URI_BASE_PATH" desc:"IDP uri base path (defaults to '')." introductionVersion:"1.0.0"`
 
 	SignInURI    string `yaml:"sign_in_uri" env:"IDP_SIGN_IN_URI" desc:"IDP sign-in url." introductionVersion:"1.0.0"`

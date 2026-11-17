@@ -289,6 +289,11 @@ func initDirectoriesEnvVars(cfg *config.Config) error {
 	if cfg.IDP.AuthDirectoryAttribute != "" {
 		env["DIRECTORIES_AUTH_ATTRIBUTE"] = cfg.IDP.AuthDirectoryAttribute
 	}
+	if cfg.IDP.KeystorePath != "" {
+		env["KEYSTORE_PATH"] = cfg.IDP.KeystorePath
+		env["KEYSTORE_SERVICE_KEYS"] = cfg.IDP.KeystoreServiceKeys
+		env["KEYSTORE_SESSION_TTL"] = cfg.IDP.KeystoreSessionTTL
+	}
 	for k, v := range env {
 		if err := os.Setenv(k, v); err != nil {
 			return fmt.Errorf("could not set directories env var %s", k)

@@ -208,5 +208,13 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 	identifierIdentityManager := managers.NewIdentifierIdentityManager(identityManagerConfig, activeIdentifier)
 	logger.Infoln("using directories identifier backed identity manager")
 
+	if userKeystore != nil {
+		return &keystoreIdentityManager{
+			IdentifierIdentityManager: identifierIdentityManager,
+			userKeystore:              userKeystore,
+			logger:                    logger,
+		}, nil
+	}
+
 	return identifierIdentityManager, nil
 }

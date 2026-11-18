@@ -129,11 +129,19 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	// folder into a subspace when it is the first grant on a non-root folder in
 	// a project space that is not already registered as a subspace. In that case
 	// the space-manager role is required; simple invites are unaffected.
-	if err := s.ensureSubspaceManager(ctx, gatewayClient, resourceId, statResponse.GetInfo()); err != nil {
-		return libregraph.Permission{}, err
-	}
+	//
+	// DEACTIVATED 2026-11-18: a normal invite no longer creates a subspace (see
+	// doInvite, subspaceMember=false; reva registers a subspace only for a
+	// grant marked as subspace membership). The check protected nothing any
+	// more but still denied plain folder shares of non-managers in project
+	// spaces ("only a space manager can create a subspace"). Whether a user
+	// may share is decided by reva (AddGrant permission).
+	// if err := s.ensureSubspaceManager(ctx, gatewayClient, resourceId, statResponse.GetInfo()); err != nil {
+	// 	return libregraph.Permission{}, err
+	// }
 
-	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId)
+	// A normal invite is a plain share. It never registers a subspace.
+	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId, false)
 }
 
 // InviteWithoutSubspaceCheck performs the same operation as Invite but skips
@@ -159,10 +167,20 @@ func (s DriveItemPermissionsService) InviteWithoutSubspaceCheck(ctx context.Cont
 		return libregraph.Permission{}, err
 	}
 
-	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId)
+	// Subspace membership: the grant is marked so that reva registers the
+	// folder as subspace. Only this path may create a subspace.
+	return s.doInvite(ctx, gatewayClient, statResponse, resourceId, invite, condition, tenantId, true)
 }
 
-func (s DriveItemPermissionsService) doInvite(ctx context.Context, gatewayClient gateway.GatewayAPIClient, statResponse *storageprovider.StatResponse, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite, condition, tenantId string) (libregraph.Permission, error) {
+// subspaceGrantOpaqueKey marks a CreateShareRequest as an explicit subspace
+// membership. It mirrors reva's utils.SubspaceGrantOpaqueKey: the gateway
+// forwards it to the storage AddGrant, and only a grant carrying it registers
+// the folder as subspace. A share without it stays a plain share.
+const subspaceGrantOpaqueKey = "subspacegrant"
+
+// doInvite creates the share. subspaceMember marks the share as a subspace
+// membership (see subspaceGrantOpaqueKey); it is false for every normal invite.
+func (s DriveItemPermissionsService) doInvite(ctx context.Context, gatewayClient gateway.GatewayAPIClient, statResponse *storageprovider.StatResponse, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite, condition, tenantId string, subspaceMember bool) (libregraph.Permission, error) {
 
 	unifiedRolePermissions := []*libregraph.UnifiedRolePermission{{AllowedResourceActions: invite.LibreGraphPermissionsActions}}
 	for _, roleID := range invite.GetRoles() {
@@ -217,6 +235,9 @@ func (s DriveItemPermissionsService) doInvite(ctx context.Context, gatewayClient
 			},
 		}
 		createShareRequest := createShareRequestToGroup(group, statResponse.GetInfo(), cs3ResourcePermissions)
+		if subspaceMember {
+			createShareRequest.Opaque = utils.AppendPlainToOpaque(createShareRequest.GetOpaque(), subspaceGrantOpaqueKey, "true")
+		}
 		if invite.ExpirationDateTime != nil {
 			createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
 		}
@@ -271,6 +292,9 @@ func (s DriveItemPermissionsService) doInvite(ctx context.Context, gatewayClient
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
+			if subspaceMember {
+				createShareRequest.Opaque = utils.AppendPlainToOpaque(createShareRequest.GetOpaque(), subspaceGrantOpaqueKey, "true")
+			}
 			if invite.ExpirationDateTime != nil {
 				createShareRequest.GetGrant().Expiration = utils.TimeToTS(*invite.ExpirationDateTime)
 			}

@@ -14,7 +14,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/opencloud-eu/opencloud/pkg/kosmoskeystore"
+	userkeystore "github.com/opencloud-eu/opencloud/pkg/keystore"
 )
 
 const testBearer = "Bearer token-of-alice"
@@ -97,11 +97,11 @@ func TestRoutesSessionFlow(t *testing.T) {
 
 	// the service fetches its sealed session secret and opens it
 	status, responseBody = callRoute(t, router, http.MethodGet, RoutesPathPrefix+"/session/"+serviceKeyID, testBearer, nil)
-	var sealedSecret kosmoskeystore.Envelope
+	var sealedSecret userkeystore.Envelope
 	if status != http.StatusOK || json.Unmarshal(responseBody, &sealedSecret) != nil {
 		t.Fatalf("session: %d %s", status, responseBody)
 	}
-	sessionSecret, err := kosmoskeystore.OpenSessionSecret(servicePrivateKey, sealedSecret, testUser)
+	sessionSecret, err := userkeystore.OpenSessionSecret(servicePrivateKey, sealedSecret, testUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,8 +116,8 @@ func TestRoutesSessionFlow(t *testing.T) {
 	if _, err := rand.Read(contentKey); err != nil {
 		t.Fatal(err)
 	}
-	userEnvelope, err := kosmoskeystore.SealContentKey(kosmoskeystore.DirectoryKey{
-		KeyID: userKey.KeyID, PublicKey: userKey.PublicKey, Kind: kosmoskeystore.KindUser, Owner: testUser,
+	userEnvelope, err := userkeystore.SealContentKey(userkeystore.DirectoryKey{
+		KeyID: userKey.KeyID, PublicKey: userKey.PublicKey, Kind: userkeystore.KindUser, Owner: testUser,
 	}, entryContext, contentKey)
 	if err != nil {
 		t.Fatal(err)
@@ -126,14 +126,14 @@ func TestRoutesSessionFlow(t *testing.T) {
 		SessionSecret: sessionSecret, Envelope: userEnvelope, EntryContext: entryContext, TargetKeyID: serviceKeyID,
 	}
 	status, responseBody = callRoute(t, router, http.MethodPost, RoutesPathPrefix+"/rewrap", testBearer, validRewrap)
-	var serviceEnvelope kosmoskeystore.Envelope
+	var serviceEnvelope userkeystore.Envelope
 	if status != http.StatusOK || json.Unmarshal(responseBody, &serviceEnvelope) != nil {
 		t.Fatalf("rewrap: %d %s", status, responseBody)
 	}
 	if bytes.Contains(responseBody, contentKey) {
 		t.Fatal("response carries the content key in the clear")
 	}
-	reopenedContentKey, err := kosmoskeystore.OpenContentKey(servicePrivateKey, serviceEnvelope, entryContext)
+	reopenedContentKey, err := userkeystore.OpenContentKey(servicePrivateKey, serviceEnvelope, entryContext)
 	if err != nil || !bytes.Equal(reopenedContentKey, contentKey) {
 		t.Fatalf("service cannot open the re-encrypted content key: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestRoutesSessionFlow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	attackerKeyID, _ := kosmoskeystore.KeyID(attackerKey.PublicKey().Bytes())
+	attackerKeyID, _ := userkeystore.KeyID(attackerKey.PublicKey().Bytes())
 	foreignTarget := validRewrap
 	foreignTarget.TargetKeyID = attackerKeyID
 	status, responseBody = callRoute(t, router, http.MethodPost, RoutesPathPrefix+"/rewrap", testBearer, foreignTarget)

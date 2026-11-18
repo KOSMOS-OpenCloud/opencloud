@@ -11,7 +11,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/opencloud-eu/opencloud/pkg/kosmoskeystore"
+	userkeystore "github.com/opencloud-eu/opencloud/pkg/keystore"
 )
 
 const (
@@ -41,7 +41,7 @@ func TestParseServiceKeys(t *testing.T) {
 		t.Fatalf("valid list: %v %d", err, len(serviceDirectory))
 	}
 	serviceKey, err := serviceDirectory.LookupKey(context.Background(), serviceDirectory.KeyIDs()[0])
-	if err != nil || serviceKey.Owner != "opendock" || serviceKey.Kind != kosmoskeystore.KindService {
+	if err != nil || serviceKey.Owner != "opendock" || serviceKey.Kind != userkeystore.KindService {
 		t.Fatalf("lookup: %v %+v", err, serviceKey)
 	}
 	for _, invalidList := range []string{"opendock", "=" + encodedPublicKey, "opendock=!!", "opendock=c2hvcnQ"} {
@@ -83,7 +83,7 @@ func TestHookLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := kosmoskeystore.OpenSessionSecret(servicePrivateKey, sealedSecret, testUser); err != nil {
+	if _, err := userkeystore.OpenSessionSecret(servicePrivateKey, sealedSecret, testUser); err != nil {
 		t.Fatalf("service cannot open its session secret: %v", err)
 	}
 	createdKey, err := keystore.PublicKey(ctx, testUser)
@@ -104,7 +104,7 @@ func TestHookLifecycle(t *testing.T) {
 	if !hook.SessionDestroyed(ctx, sessionRef) {
 		t.Fatal("own session ref not recognised")
 	}
-	if _, err := keystore.SessionSecretFor(ctx, testUser, serviceKeyID); err != kosmoskeystore.ErrLocked {
+	if _, err := keystore.SessionSecretFor(ctx, testUser, serviceKeyID); err != userkeystore.ErrLocked {
 		t.Fatalf("after logout: %v", err)
 	}
 	foreignRef := "other:-:" + testUser

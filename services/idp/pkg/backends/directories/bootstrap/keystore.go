@@ -12,7 +12,7 @@ import (
 	"github.com/libregraph/lico/oidc/provider"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opencloud-eu/opencloud/pkg/kosmoskeystore"
+	userkeystore "github.com/opencloud-eu/opencloud/pkg/keystore"
 	"github.com/opencloud-eu/opencloud/services/idp/pkg/backends/directories/keystore"
 )
 
@@ -21,7 +21,7 @@ import (
 type keystoreIdentityManager struct {
 	*managers.IdentifierIdentityManager
 
-	userKeystore *kosmoskeystore.Keystore
+	userKeystore *userkeystore.Keystore
 	oidcProvider *provider.Provider
 	logger       logrus.FieldLogger
 }

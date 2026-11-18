@@ -1,5 +1,5 @@
 // Package keystore connects the 'directories' identifier backend with
-// pkg/kosmoskeystore: the user's key store is opened where the password is at
+// pkg/keystore: the user's key store is opened where the password is at
 // hand (Logon) and closed when lico destroys the session. A failing key store
 // never blocks a login. See opendock/OPENCORE_KEYSTORE.md §10.
 package keystore
@@ -14,19 +14,19 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/opencloud-eu/opencloud/pkg/kosmoskeystore"
+	userkeystore "github.com/opencloud-eu/opencloud/pkg/keystore"
 )
 
 // sessionRefPrefix marks session references issued by this package. lico
 // keeps the reference in its logon cookie and hands it back on logout.
-const sessionRefPrefix = "kosmos-keystore:"
+const sessionRefPrefix = "keystore:"
 
 // DefaultSessionTTL bounds a key store session that ends without logout.
 const DefaultSessionTTL = 12 * time.Hour
 
-// Operations is the part of kosmoskeystore.Keystore the hook needs.
+// Operations is the part of userkeystore.Keystore the hook needs.
 type Operations interface {
-	Create(ctx context.Context, userID, password string) (kosmoskeystore.DirectoryKey, error)
+	Create(ctx context.Context, userID, password string) (userkeystore.DirectoryKey, error)
 	Unlock(ctx context.Context, userID, password string) error
 	Lock(ctx context.Context, userID string) error
 }
@@ -55,9 +55,9 @@ func (h *Hook) LoggedOn(ctx context.Context, userID, password string) *string {
 		return nil
 	}
 	unlockErr := h.operations.Unlock(ctx, userID, password)
-	if errors.Is(unlockErr, kosmoskeystore.ErrNotFound) {
+	if errors.Is(unlockErr, userkeystore.ErrNotFound) {
 		createdKey, createErr := h.operations.Create(ctx, userID, password)
-		if createErr != nil && !errors.Is(createErr, kosmoskeystore.ErrExists) {
+		if createErr != nil && !errors.Is(createErr, userkeystore.ErrExists) {
 			h.logger.WithError(createErr).WithField("id", userID).Warnln("keystore: create failed, login continues without key store")
 			return nil
 		}
@@ -70,7 +70,7 @@ func (h *Hook) LoggedOn(ctx context.Context, userID, password string) *string {
 	case unlockErr == nil:
 		sessionRef := sessionRefPrefix + userID
 		return &sessionRef
-	case errors.Is(unlockErr, kosmoskeystore.ErrUnlock):
+	case errors.Is(unlockErr, userkeystore.ErrUnlock):
 		h.logger.WithField("id", userID).Warnln("keystore: login password does not open the key store, it stays locked")
 	default:
 		h.logger.WithError(unlockErr).WithField("id", userID).Warnln("keystore: unlock failed, login continues without key store")
@@ -91,16 +91,16 @@ func (h *Hook) SessionDestroyed(ctx context.Context, sessionRef *string) bool {
 	return true
 }
 
-// ServiceDirectory is the kosmoskeystore.Directory of the configured service
+// ServiceDirectory is the userkeystore.Directory of the configured service
 // keys. Only these keys can receive session secrets and re-encrypted content
 // keys within a session.
-type ServiceDirectory map[string]kosmoskeystore.DirectoryKey
+type ServiceDirectory map[string]userkeystore.DirectoryKey
 
-// LookupKey implements kosmoskeystore.Directory.
-func (d ServiceDirectory) LookupKey(_ context.Context, keyID string) (kosmoskeystore.DirectoryKey, error) {
+// LookupKey implements userkeystore.Directory.
+func (d ServiceDirectory) LookupKey(_ context.Context, keyID string) (userkeystore.DirectoryKey, error) {
 	serviceKey, found := d[keyID]
 	if !found {
-		return kosmoskeystore.DirectoryKey{}, kosmoskeystore.ErrUnknownKey
+		return userkeystore.DirectoryKey{}, userkeystore.ErrUnknownKey
 	}
 	return serviceKey, nil
 }
@@ -132,12 +132,12 @@ func ParseServiceKeys(serviceKeysList string) (ServiceDirectory, error) {
 		if err != nil {
 			return nil, fmt.Errorf("keystore: service key of %q is not base64url: %w", serviceName, err)
 		}
-		keyID, err := kosmoskeystore.KeyID(publicKey)
+		keyID, err := userkeystore.KeyID(publicKey)
 		if err != nil {
 			return nil, fmt.Errorf("keystore: service key of %q: %w", serviceName, err)
 		}
-		serviceDirectory[keyID] = kosmoskeystore.DirectoryKey{
-			KeyID: keyID, PublicKey: publicKey, Kind: kosmoskeystore.KindService, Owner: serviceName,
+		serviceDirectory[keyID] = userkeystore.DirectoryKey{
+			KeyID: keyID, PublicKey: publicKey, Kind: userkeystore.KindService, Owner: serviceName,
 		}
 	}
 	return serviceDirectory, nil
@@ -145,7 +145,7 @@ func ParseServiceKeys(serviceKeysList string) (ServiceDirectory, error) {
 
 // Open builds the key store from its settings. An empty path means the key
 // store is disabled; the result is then nil without error.
-func Open(storePath, serviceKeysList, sessionTTL string) (*kosmoskeystore.Keystore, error) {
+func Open(storePath, serviceKeysList, sessionTTL string) (*userkeystore.Keystore, error) {
 	if storePath == "" {
 		return nil, nil
 	}
@@ -160,11 +160,11 @@ func Open(storePath, serviceKeysList, sessionTTL string) (*kosmoskeystore.Keysto
 			return nil, fmt.Errorf("keystore: session ttl %q: %w", sessionTTL, err)
 		}
 	}
-	boltStore, err := kosmoskeystore.OpenBoltStore(storePath)
+	boltStore, err := userkeystore.OpenBoltStore(storePath)
 	if err != nil {
 		return nil, fmt.Errorf("keystore: open %s: %w", storePath, err)
 	}
-	return kosmoskeystore.New(kosmoskeystore.Options{
+	return userkeystore.New(userkeystore.Options{
 		Store:         boltStore,
 		Directory:     serviceDirectory,
 		ServiceKeyIDs: serviceDirectory.KeyIDs(),

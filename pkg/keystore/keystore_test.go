@@ -1,4 +1,4 @@
-package kosmoskeystore
+package keystore
 
 import (
 	"bytes"

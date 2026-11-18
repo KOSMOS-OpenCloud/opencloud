@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opencloud-eu/opencloud/pkg/kosmoskeystore"
+	userkeystore "github.com/opencloud-eu/opencloud/pkg/keystore"
 )
 
 // RoutesPathPrefix is where the key store routes are mounted. It lies below
@@ -20,11 +20,11 @@ const RoutesPathPrefix = "/signin/v1/keystore"
 // maxRequestBodyBytes bounds a rewrap request (one envelope plus ids).
 const maxRequestBodyBytes = 16 * 1024
 
-// SessionOperations is the part of kosmoskeystore.Keystore the routes need.
+// SessionOperations is the part of userkeystore.Keystore the routes need.
 type SessionOperations interface {
-	PublicKey(ctx context.Context, userID string) (kosmoskeystore.DirectoryKey, error)
-	SessionSecretFor(ctx context.Context, userID, serviceKeyID string) (kosmoskeystore.Envelope, error)
-	Rewrap(ctx context.Context, request kosmoskeystore.RewrapRequest) (kosmoskeystore.Envelope, error)
+	PublicKey(ctx context.Context, userID string) (userkeystore.DirectoryKey, error)
+	SessionSecretFor(ctx context.Context, userID, serviceKeyID string) (userkeystore.Envelope, error)
+	Rewrap(ctx context.Context, request userkeystore.RewrapRequest) (userkeystore.Envelope, error)
 }
 
 // Authenticator validates the bearer token of a request and returns the user
@@ -58,10 +58,10 @@ type publicKeyResponse struct {
 }
 
 type rewrapRequestBody struct {
-	SessionSecret []byte                  `json:"sessionSecret"`
-	Envelope      kosmoskeystore.Envelope `json:"envelope"`
-	EntryContext  string                  `json:"entryContext"`
-	TargetKeyID   string                  `json:"targetKid"`
+	SessionSecret []byte                `json:"sessionSecret"`
+	Envelope      userkeystore.Envelope `json:"envelope"`
+	EntryContext  string                `json:"entryContext"`
+	TargetKeyID   string                `json:"targetKid"`
 }
 
 type errorResponse struct {
@@ -111,7 +111,7 @@ func (routes *Routes) rewrap(responseWriter http.ResponseWriter, request *http.R
 		return
 	}
 	defer clear(requestBody.SessionSecret)
-	rewrappedEnvelope, err := routes.operations.Rewrap(request.Context(), kosmoskeystore.RewrapRequest{
+	rewrappedEnvelope, err := routes.operations.Rewrap(request.Context(), userkeystore.RewrapRequest{
 		UserID:        userID,
 		SessionSecret: requestBody.SessionSecret,
 		Envelope:      requestBody.Envelope,
@@ -128,15 +128,15 @@ func (routes *Routes) rewrap(responseWriter http.ResponseWriter, request *http.R
 // writeError maps key store errors to a status and a stable error code.
 func (routes *Routes) writeError(responseWriter http.ResponseWriter, userID string, err error) {
 	switch {
-	case errors.Is(err, kosmoskeystore.ErrNotFound):
+	case errors.Is(err, userkeystore.ErrNotFound):
 		writeJSON(responseWriter, http.StatusNotFound, errorResponse{Error: "no_keystore"})
-	case errors.Is(err, kosmoskeystore.ErrLocked):
+	case errors.Is(err, userkeystore.ErrLocked):
 		writeJSON(responseWriter, http.StatusConflict, errorResponse{Error: "keystore_locked"})
-	case errors.Is(err, kosmoskeystore.ErrSessionSecret):
+	case errors.Is(err, userkeystore.ErrSessionSecret):
 		writeJSON(responseWriter, http.StatusForbidden, errorResponse{Error: "session_secret_mismatch"})
-	case errors.Is(err, kosmoskeystore.ErrTargetNotAllowed), errors.Is(err, kosmoskeystore.ErrUnknownKey):
+	case errors.Is(err, userkeystore.ErrTargetNotAllowed), errors.Is(err, userkeystore.ErrUnknownKey):
 		writeJSON(responseWriter, http.StatusForbidden, errorResponse{Error: "target_not_allowed"})
-	case errors.Is(err, kosmoskeystore.ErrEnvelope):
+	case errors.Is(err, userkeystore.ErrEnvelope):
 		writeJSON(responseWriter, http.StatusUnprocessableEntity, errorResponse{Error: "envelope_not_openable"})
 	default:
 		routes.logger.WithError(err).WithField("id", userID).Warnln("keystore: request failed")

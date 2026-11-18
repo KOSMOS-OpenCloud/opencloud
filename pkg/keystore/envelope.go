@@ -1,4 +1,4 @@
-package kosmoskeystore
+package keystore
 
 import (
 	"crypto/ecdh"
@@ -15,15 +15,15 @@ const SuiteX25519AES256GCM = "HPKE-X25519-SHA256-A256GCM"
 
 const (
 	envelopeVersion    = 1
-	infoPrefixContent  = "kosmos/keystore/v1/cek"
-	infoPrefixSession  = "kosmos/keystore/v1/session"
+	infoPrefixContent  = "opencore/keystore/v1/cek"
+	infoPrefixSession  = "opencore/keystore/v1/session"
 	jwkCurveX25519     = "X25519"
 	x25519KeySizeBytes = 32
 )
 
 // ErrEnvelope is returned when an envelope cannot be opened: wrong recipient,
 // wrong context, tampered data or an unsupported format.
-var ErrEnvelope = errors.New("kosmoskeystore: envelope cannot be opened")
+var ErrEnvelope = errors.New("keystore: envelope cannot be opened")
 
 // Envelope carries a secret sealed for exactly one recipient key. The secret
 // is bound to the recipient key id and to a caller-chosen context (for a
@@ -41,7 +41,7 @@ type Envelope struct {
 // the directory.
 func KeyID(publicKey []byte) (string, error) {
 	if len(publicKey) != x25519KeySizeBytes {
-		return "", fmt.Errorf("kosmoskeystore: public key must be %d bytes, got %d", x25519KeySizeBytes, len(publicKey))
+		return "", fmt.Errorf("keystore: public key must be %d bytes, got %d", x25519KeySizeBytes, len(publicKey))
 	}
 	return jwkThumbprint(jwkCurveX25519, publicKey), nil
 }
@@ -78,11 +78,11 @@ func seal(recipient DirectoryKey, infoPrefix, bindingContext string, plaintext [
 		return Envelope{}, err
 	}
 	if recipient.KeyID != recipientKeyID {
-		return Envelope{}, fmt.Errorf("kosmoskeystore: directory key id %q does not match its public key", recipient.KeyID)
+		return Envelope{}, fmt.Errorf("keystore: directory key id %q does not match its public key", recipient.KeyID)
 	}
 	ecdhPublicKey, err := ecdh.X25519().NewPublicKey(recipient.PublicKey)
 	if err != nil {
-		return Envelope{}, fmt.Errorf("kosmoskeystore: invalid recipient public key: %w", err)
+		return Envelope{}, fmt.Errorf("keystore: invalid recipient public key: %w", err)
 	}
 	hpkePublicKey, err := hpke.NewDHKEMPublicKey(ecdhPublicKey)
 	if err != nil {

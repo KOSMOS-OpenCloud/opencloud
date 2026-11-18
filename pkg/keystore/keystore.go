@@ -1,4 +1,4 @@
-// Package kosmoskeystore holds one X25519 key pair per user on behalf of the
+// Package keystore holds one X25519 key pair per user on behalf of the
 // IdP and re-encrypts content keys for other recipients. The private key
 // never leaves the package: callers hand in an envelope and get back an
 // envelope for another recipient key.
@@ -14,7 +14,7 @@
 // therefore needs both the keystore record and the service's private key.
 //
 // The package has no dependency on lico, graph or any other service.
-package kosmoskeystore
+package keystore
 
 import (
 	"bytes"
@@ -32,22 +32,22 @@ import (
 
 var (
 	// ErrExists is returned by Create when the user already has a keystore.
-	ErrExists = errors.New("kosmoskeystore: keystore already exists")
+	ErrExists = errors.New("keystore: keystore already exists")
 	// ErrUnlock is returned when the password does not open the password
 	// wrap: wrong password, or the password was changed without the keystore
 	// being told (admin reset, change in an external directory).
-	ErrUnlock = errors.New("kosmoskeystore: password does not open the keystore")
+	ErrUnlock = errors.New("keystore: password does not open the keystore")
 	// ErrLocked is returned when there is no open session or it has expired.
-	ErrLocked = errors.New("kosmoskeystore: keystore is locked")
+	ErrLocked = errors.New("keystore: keystore is locked")
 	// ErrSessionSecret is returned when the session secret is wrong or stale.
-	ErrSessionSecret = errors.New("kosmoskeystore: session secret does not match")
+	ErrSessionSecret = errors.New("keystore: session secret does not match")
 	// ErrUnknownKey is returned by a Directory for a key id it does not hold.
-	ErrUnknownKey = errors.New("kosmoskeystore: key id not in directory")
+	ErrUnknownKey = errors.New("keystore: key id not in directory")
 	// ErrTargetNotAllowed is returned when the target key may not be used
 	// for this kind of re-encryption.
-	ErrTargetNotAllowed = errors.New("kosmoskeystore: target key not allowed")
+	ErrTargetNotAllowed = errors.New("keystore: target key not allowed")
 	// ErrConflict is returned when the record changed concurrently.
-	ErrConflict = errors.New("kosmoskeystore: record changed concurrently")
+	ErrConflict = errors.New("keystore: record changed concurrently")
 )
 
 // KeyKind tells who owns a published key.
@@ -109,17 +109,17 @@ type Keystore struct {
 const (
 	symmetricKeySizeBytes = 32
 	saltSizeBytes         = 16
-	aadPasswordWrap       = "kosmos/keystore/v1/passwordwrap"
-	aadSessionWrap        = "kosmos/keystore/v1/sessionwrap"
+	aadPasswordWrap       = "opencore/keystore/v1/passwordwrap"
+	aadSessionWrap        = "opencore/keystore/v1/sessionwrap"
 )
 
 // New validates the options and returns a Keystore.
 func New(options Options) (*Keystore, error) {
 	if options.Store == nil || options.Directory == nil {
-		return nil, errors.New("kosmoskeystore: store and directory are required")
+		return nil, errors.New("keystore: store and directory are required")
 	}
 	if options.SessionTTL <= 0 {
-		return nil, errors.New("kosmoskeystore: session ttl must be positive")
+		return nil, errors.New("keystore: session ttl must be positive")
 	}
 	if options.Argon == (ArgonParameters{}) {
 		options.Argon = DefaultArgonParameters
@@ -196,10 +196,10 @@ func (k *Keystore) Unlock(ctx context.Context, userID, password string) error {
 	for _, serviceKeyID := range k.options.ServiceKeyIDs {
 		serviceKey, err := k.options.Directory.LookupKey(ctx, serviceKeyID)
 		if err != nil {
-			return fmt.Errorf("kosmoskeystore: service key %q: %w", serviceKeyID, err)
+			return fmt.Errorf("keystore: service key %q: %w", serviceKeyID, err)
 		}
 		if serviceKey.Kind != KindService {
-			return fmt.Errorf("kosmoskeystore: key %q is not a service key: %w", serviceKeyID, ErrTargetNotAllowed)
+			return fmt.Errorf("keystore: key %q is not a service key: %w", serviceKeyID, ErrTargetNotAllowed)
 		}
 		sealedSecret, err := seal(serviceKey, infoPrefixSession, userID, sessionSecret)
 		if err != nil {
@@ -433,7 +433,7 @@ func decryptAESGCM(key, nonce, ciphertext, additionalData []byte) ([]byte, error
 		return nil, err
 	}
 	if len(nonce) != aead.NonceSize() {
-		return nil, errors.New("kosmoskeystore: bad nonce size")
+		return nil, errors.New("keystore: bad nonce size")
 	}
 	return aead.Open(nil, nonce, ciphertext, additionalData)
 }

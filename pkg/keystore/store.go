@@ -1,4 +1,4 @@
-package kosmoskeystore
+package keystore
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 // ErrNotFound is returned by a Store when a user has no record.
-var ErrNotFound = errors.New("kosmoskeystore: no keystore for this user")
+var ErrNotFound = errors.New("keystore: no keystore for this user")
 
 // UserRecord is everything the keystore persists for one user. It holds
 // ciphertext and public data only; neither the private key nor a session

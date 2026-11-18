@@ -68,9 +68,15 @@ Verwaltungs-Bypass fehlende Rechte.
 
 Gelesen wird über die Datei-ID (`GET /dav/spaces/<id>`). So greifen auch Empfänger zu, die kein Space-Mitglied sind.
 
+In den Schritten 0 bis 3 und 6 prüft das Skript zusätzlich die beiden Listen, aus denen die Oberfläche die Ansicht
+des Empfängers baut: „Mit mir geteilt“ (`GET /graph/v1beta1/me/drive/sharedWithMe`) und die Space-Liste
+(`GET /graph/v1.0/me/drives`). Eine Freigabe steht unter „Mit mir geteilt“ und nie als Space. Eine
+Subspace-Mitgliedschaft steht nie unter „Mit mir geteilt“, dafür erscheint der Space in der Space-Liste.
+
 ### Grenzen
 
-- Die Oberfläche (Icon, Indikator, Panels) prüft das Skript nicht.
+- Das Skript ruft dieselben Endpunkte wie die Oberfläche. Nicht geprüft ist, was der Browser selbst entscheidet:
+  welches Panel welchen Endpunkt nimmt und wie Icon und Indikator gezeichnet werden.
 - Nicht abgedeckt: Gruppen, öffentliche Links, Suche, verschachtelte Subspaces. Verschachtelte Subspaces und
   Freigabe plus Mitglied am selben Ordner prüfen die reva-Specs
   (`opencloud_reva/pkg/storage/pkg/decomposedfs/subspace_share_boundary_test.go`, Lauf: `opencloud_reva/testbench/`).

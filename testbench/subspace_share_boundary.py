@@ -291,6 +291,17 @@ class Instance:
     def space_context(self, path):
         return self.admin.graph_json("GET", self.item_url(path, "/space")).get("type", "")
 
+    def in_shared_with_me(self, session, path):
+        """True, wenn der Ordner in „Mit mir geteilt“ des Nutzers steht (so zeigt ihn die Oberfläche als Freigabe)."""
+        listing = session.graph_json("GET", "/graph/v1beta1/me/drive/sharedWithMe")
+        shared_ids = {entry.get("remoteItem", {}).get("id", "") for entry in listing.get("value", [])}
+        return self.item_ids[path] in shared_ids
+
+    def sees_space(self, session):
+        """True, wenn der Test-Space in der Space-Liste des Nutzers steht (so zeigt ihn die Oberfläche als Space)."""
+        listing = session.graph_json("GET", "/graph/v1.0/me/drives")
+        return self.drive_id in {drive.get("id", "") for drive in listing.get("value", [])}
+
     def can_read(self, session, path):
         """Lesen der Datei über ihre ID. So greifen auch Freigabe-Empfänger zu, die kein Space-Mitglied sind."""
         resource_id = urllib.parse.quote(self.item_ids[path], safe="")
@@ -307,6 +318,22 @@ def access_matrix(instance, recorder, run_folder, expectations):
                 time.sleep(2)
                 actual = instance.can_read(instance.sessions[role], f"{run_folder}/{file_path}")
             recorder.check(f"{role} liest {file_path}", expected, actual)
+
+
+def list_views(instance, recorder, run_folder, shared_with_me, space_list):
+    """Die Listen der Oberfläche: shared_with_me {(ROLLE, ordner): True/False}, space_list {ROLLE: True/False}."""
+    for (role, folder), expected in shared_with_me.items():
+        actual = instance.in_shared_with_me(instance.sessions[role], f"{run_folder}/{folder}")
+        if actual != expected:
+            time.sleep(2)
+            actual = instance.in_shared_with_me(instance.sessions[role], f"{run_folder}/{folder}")
+        recorder.check(f"{role} hat {folder} unter „Mit mir geteilt“", expected, actual)
+    for role, expected in space_list.items():
+        actual = instance.sees_space(instance.sessions[role])
+        if actual != expected:
+            time.sleep(2)
+            actual = instance.sees_space(instance.sessions[role])
+        recorder.check(f"{role} hat den Test-Space in der Space-Liste", expected, actual)
 
 
 def plan(host, space_name, logins):
@@ -341,6 +368,8 @@ def run_scenario(instance, recorder, run_folder):
     access_matrix(instance, recorder, run_folder, {
         "plain/p.txt": {"ADMIN": True, "MEMBER": True, "RECIPIENT": False, "SUBMEMBER": False, "OUTSIDER": False},
     })
+    list_views(instance, recorder, run_folder, {},
+               {"ADMIN": True, "MEMBER": True, "RECIPIENT": False, "SUBMEMBER": False, "OUTSIDER": False})
 
     recorder.step = "1 normale Freigabe open → RECIPIENT"
     status, open_share = instance.share_plain(path_of("open"), instance.sessions["RECIPIENT"])
@@ -352,6 +381,9 @@ def run_scenario(instance, recorder, run_folder):
         "plain/p.txt": {"RECIPIENT": False},
         "secret/s.txt": {"RECIPIENT": False},
     })
+    # eine Freigabe erscheint beim Empfänger als Freigabe, nicht als Space
+    list_views(instance, recorder, run_folder, {("RECIPIENT", "open"): True, ("OUTSIDER", "open"): False},
+               {"RECIPIENT": False, "MEMBER": True})
 
     recorder.step = "2 Subspace secret mit SUBMEMBER"
     status, secret_member = instance.add_subspace_member(path_of("secret"), instance.sessions["SUBMEMBER"])
@@ -365,6 +397,10 @@ def run_scenario(instance, recorder, run_folder):
         "plain/p.txt": {"MEMBER": True, "SUBMEMBER": False},
         "open/a.txt": {"MEMBER": True, "RECIPIENT": True, "SUBMEMBER": False},
     })
+    # eine Subspace-Mitgliedschaft erscheint als Space, nicht unter „Mit mir geteilt“
+    list_views(instance, recorder, run_folder,
+               {("SUBMEMBER", "secret"): False, ("RECIPIENT", "open"): True},
+               {"SUBMEMBER": True, "RECIPIENT": False, "OUTSIDER": False})
 
     recorder.step = "3 normale Freigabe secret/inner → RECIPIENT (im Subspace)"
     status, inner_share = instance.share_plain(path_of("secret/inner"), instance.sessions["RECIPIENT"])
@@ -374,6 +410,8 @@ def run_scenario(instance, recorder, run_folder):
         "secret/inner/i.txt": {"RECIPIENT": True, "MEMBER": False, "SUBMEMBER": True, "OUTSIDER": False},
         "secret/s.txt": {"RECIPIENT": False, "MEMBER": False},
     })
+    # auch eine Freigabe innerhalb eines Subspace bleibt beim Empfänger eine Freigabe
+    list_views(instance, recorder, run_folder, {("RECIPIENT", "secret/inner"): True}, {"RECIPIENT": False})
 
     recorder.step = "4 Freigabe mixed → RECIPIENT, Subspace mixed/vault mit SUBMEMBER"
     status, mixed_share = instance.share_plain(path_of("mixed"), instance.sessions["RECIPIENT"])
@@ -419,6 +457,9 @@ def run_scenario(instance, recorder, run_folder):
         "open/a.txt": {"MEMBER": True, "RECIPIENT": False},
         "secret/inner/i.txt": {"MEMBER": True, "RECIPIENT": False},
     })
+    list_views(instance, recorder, run_folder,
+               {("RECIPIENT", "open"): False, ("RECIPIENT", "secret/inner"): False, ("RECIPIENT", "mixed"): False},
+               {"SUBMEMBER": False, "RECIPIENT": False, "MEMBER": True})
 
 
 def run(host, space_name, insecure, credentials):

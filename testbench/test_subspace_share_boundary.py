@@ -77,6 +77,15 @@ class FakeInstance:
     def space_context(self, path):
         return "subspace" if self.enclosing_subspace(self.relative(path)) else "space"
 
+    def in_shared_with_me(self, session, path):
+        folder = self.relative(path)
+        return session.role in self.grants.get(folder, set()) and folder not in self.subspaces
+
+    def sees_space(self, session):
+        if session.role in ("ADMIN", "MEMBER"):
+            return True
+        return any(session.role in self.grants.get(folder, set()) for folder in self.subspaces)
+
     def can_read(self, session, path):
         if session.role == "ADMIN":  # Space-Manager
             return True
@@ -127,6 +136,8 @@ class ScenarioTest(unittest.TestCase):
         failed_names = [entry["name"] for entry in recorder.failed()]
         self.assertIn("Freigabe erzeugt keinen Subspace", failed_names)
         self.assertIn("MEMBER liest open/a.txt", failed_names)
+        self.assertIn("RECIPIENT hat open unter „Mit mir geteilt“", failed_names)
+        self.assertIn("RECIPIENT hat den Test-Space in der Space-Liste", failed_names)
 
     def test_member_share_attempt_is_only_noted(self):
         recorder = self.run_scenario(FakeInstance())

@@ -23,6 +23,7 @@ import (
 	pkgmiddleware "github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/pkg/oidc"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/reload"
 	"github.com/opencloud-eu/opencloud/pkg/runner"
 	"github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/tracing"
@@ -335,10 +336,11 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		URLVerifier:        signURLVerifier,
 	})
 
-	cspConfig, err := middleware.LoadCSPConfig(cfg)
+	securityReloader, err := middleware.NewSecurityReloader(cfg)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to load CSP configuration.")
 	}
+	reload.Register("proxy.csp", securityReloader.Reload)
 
 	return alice.New(
 		chimiddleware.RealIP,
@@ -361,7 +363,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		// rewrite Location headers in TUS responses to signed datagateway urls
 		middleware.NewDataGatewayMiddleware("/data", cfg.TransferSecret, cfg.TransferTimeout).Handler,
 
-		middleware.Security(cspConfig),
+		securityReloader.Middleware(),
 		router.Middleware(serviceSelector, cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,

@@ -25,8 +25,9 @@ func LoadCSPConfig(proxyCfg *config.Config) (*config.CSP, error) {
 // LoadCSPConfig loads CSP header configuration from a yaml file.
 func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, error) {
 	// substitute env vars and load to struct
-	gofig.WithOptions(gofig.ParseEnv)
-	gofig.AddDriver(yaml.Driver)
+	// a separate instance per call, the global instance would merge the content of earlier calls into a reload
+	cspLoader := gofig.NewWithOptions("csp", gofig.ParseEnv)
+	cspLoader.AddDriver(yaml.Driver)
 
 	presetMap := map[string]any{}
 	err := yamlv3.Unmarshal(presetYamlContent, &presetMap)
@@ -44,14 +45,14 @@ func loadCSPConfig(presetYamlContent, customYamlContent []byte) (*config.CSP, er
 		return nil, err
 	}
 
-	err = gofig.LoadSources("yaml", mergedYamlContent)
+	err = cspLoader.LoadSources("yaml", mergedYamlContent)
 	if err != nil {
 		return nil, err
 	}
 
 	// read yaml
 	cspConfig := config.CSP{}
-	err = gofig.BindStruct("", &cspConfig)
+	err = cspLoader.BindStruct("", &cspConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -139,9 +140,16 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		Directives: cspConfig.Directives,
 	}
 
-	secureMiddleware := secure.New(secure.Options{
+	secureMiddleware := newSecureMiddleware(cspBuilder.MustBuild())
+	return func(next http.Handler) http.Handler {
+		return secureMiddleware.Handler(next)
+	}
+}
+
+func newSecureMiddleware(contentSecurityPolicy string) *secure.Secure {
+	return secure.New(secure.Options{
 		BrowserXssFilter:             true,
-		ContentSecurityPolicy:        cspBuilder.MustBuild(),
+		ContentSecurityPolicy:        contentSecurityPolicy,
 		ContentTypeNosniff:           true,
 		CustomFrameOptionsValue:      "SAMEORIGIN",
 		FrameDeny:                    true,
@@ -151,7 +159,4 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		PermittedCrossDomainPolicies: "none",
 		RobotTag:                     "none",
 	})
-	return func(next http.Handler) http.Handler {
-		return secureMiddleware.Handler(next)
-	}
 }

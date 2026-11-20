@@ -9,6 +9,7 @@ import (
 	"github.com/opencloud-eu/opencloud/opencloud/pkg/register"
 	"github.com/opencloud-eu/opencloud/pkg/clihelper"
 	"github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/reload"
 
 	"github.com/spf13/cobra"
 )
@@ -35,6 +36,8 @@ func Execute() error {
 		app.AddCommand(command)
 	}
 	app.SetArgs(os.Args[1:])
-	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	// SIGHUP re-reads the configuration parts registered by the services instead of stopping the process
+	reload.Listen(ctx)
 	return app.ExecuteContext(ctx)
 }

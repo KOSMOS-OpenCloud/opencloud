@@ -28,6 +28,7 @@ type Options struct {
 	AppFS            fs.FS
 	ThemeFS          *fsx.FallbackFS
 	ExternalApps     func() []config.ExternalApp
+	WebConfig        func() config.Web
 }
 
 // newOptions initializes the available default options.
@@ -109,5 +110,13 @@ func CoreFS(val fs.FS) Option {
 func ExternalApps(val func() []config.ExternalApp) Option {
 	return func(o *Options) {
 		o.ExternalApps = val
+	}
+}
+
+// WebConfig provides a function to set the webConfig option,
+// the function is called for every config.json request to deliver the current web configuration.
+func WebConfig(val func() config.Web) Option {
+	return func(o *Options) {
+		o.WebConfig = val
 	}
 }

@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"path"
+	"sync/atomic"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/opencloud-eu/reva/v2/pkg/rgrpc/todo/pool"
@@ -11,11 +12,14 @@ import (
 	"github.com/opencloud-eu/opencloud/pkg/cors"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"
 	"github.com/opencloud-eu/opencloud/pkg/registry"
+	"github.com/opencloud-eu/opencloud/pkg/reload"
 	"github.com/opencloud-eu/opencloud/pkg/service/http"
 	"github.com/opencloud-eu/opencloud/pkg/version"
 	"github.com/opencloud-eu/opencloud/pkg/x/io/fsx"
 	"github.com/opencloud-eu/opencloud/services/web"
 	"github.com/opencloud-eu/opencloud/services/web/pkg/apps"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/config"
+	"github.com/opencloud-eu/opencloud/services/web/pkg/config/parser"
 	svc "github.com/opencloud-eu/opencloud/services/web/pkg/service/v0"
 )
 
@@ -67,7 +71,22 @@ func Server(opts ...Option) (http.Service, error) {
 		options.Config.Web.Config.ExternalApps,
 		appsFS.Secondary().IOFS(), appsFS.Primary().IOFS(),
 	)
+	// the web configuration is kept exchangeable, SIGHUP re-reads it
+	var currentWeb atomic.Pointer[config.Web]
+	initialWeb := options.Config.Web
+	currentWeb.Store(&initialWeb)
 	options.Config.Web.Config.ExternalApps = appsReloader.ExternalApps()
+
+	reload.Register("web.apps", appsReloader.Reload)
+	reload.Register("web.config", func() error {
+		reloadedWeb, err := parser.ReloadWeb(options.Config)
+		if err != nil {
+			return err
+		}
+		currentWeb.Store(&reloadedWeb)
+		appsReloader.SetBaseApps(reloadedWeb.Config.ExternalApps)
+		return nil
+	})
 
 	coreFS := fsx.NewFallbackFS(
 		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
@@ -87,6 +106,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
 		svc.ExternalApps(appsReloader.ExternalApps),
+		svc.WebConfig(func() config.Web { return *currentWeb.Load() }),
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,

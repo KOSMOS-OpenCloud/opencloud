@@ -67,17 +67,46 @@ func (r *Reloader) ExternalApps() []config.ExternalApp {
 	// remember the signature in any case, a broken apps.yaml is reported only once per change
 	r.signature = currentSignature
 
-	var reloadedConfig map[string]config.App
-	if err := r.bindApps(&reloadedConfig); err != nil {
+	if err := r.rebuild(); err != nil {
 		r.logger.Error().Err(err).Str("file", r.appsFile).Msg("failed to reload apps configuration, keeping the previous state")
-	} else {
+	}
+
+	return r.externalApps
+}
+
+// Reload rebuilds the list of external applications regardless of the file signature.
+// A broken apps.yaml keeps the previous apps configuration and returns the error.
+func (r *Reloader) Reload() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.signature = r.computeSignature()
+
+	return r.rebuild()
+}
+
+// SetBaseApps replaces the external applications configured outside apps.yaml and rebuilds the list.
+func (r *Reloader) SetBaseApps(baseApps []config.ExternalApp) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.baseApps = slices.Clone(baseApps)
+	r.externalApps = r.buildExternalApps(r.appsConfig)
+}
+
+// rebuild binds apps.yaml and builds the list, the caller holds the lock.
+// If apps.yaml can not be bound the list is built from the previous apps configuration.
+func (r *Reloader) rebuild() error {
+	var reloadedConfig map[string]config.App
+	bindErr := r.bindApps(&reloadedConfig)
+	if bindErr == nil {
 		r.appsConfig = reloadedConfig
 	}
 
 	r.externalApps = r.buildExternalApps(r.appsConfig)
 	r.logger.Info().Int("apps", len(r.externalApps)).Msg("reloaded external applications")
 
-	return r.externalApps
+	return bindErr
 }
 
 func (r *Reloader) buildExternalApps(appsConfig map[string]config.App) []config.ExternalApp {

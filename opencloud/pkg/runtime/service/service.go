@@ -25,6 +25,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/log"
+	"github.com/opencloud-eu/opencloud/pkg/reload"
 	"github.com/opencloud-eu/opencloud/pkg/runner"
 	ogrpc "github.com/opencloud-eu/opencloud/pkg/service/grpc"
 	"github.com/opencloud-eu/opencloud/pkg/shared"
@@ -118,6 +119,7 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		log.Pretty(opts.Config.Log.Pretty),
 		log.Level(opts.Config.Log.Level),
 	)
+	reload.SetLogger(l)
 
 	s := &Service{
 		Services:   make([]serviceFuncMap, len(_waitFuncs)),

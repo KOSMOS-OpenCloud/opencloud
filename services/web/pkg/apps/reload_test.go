@@ -82,3 +82,50 @@ func TestReloader_ExternalApps(t *testing.T) {
 	g.Expect(externalApps).To(gomega.HaveLen(2))
 	g.Expect(appConfig(externalApps, "notes")).To(gomega.BeNil())
 }
+
+func TestReloader_ReloadAndSetBaseApps(t *testing.T) {
+	g := gomega.NewWithT(t)
+
+	configDir := t.TempDir()
+	appsDir := t.TempDir()
+	t.Setenv("OC_CONFIG_DIR", configDir)
+
+	appsFile := filepath.Join(configDir, "apps.yaml")
+	writeFile := func(name, content string) {
+		g.Expect(os.MkdirAll(filepath.Dir(name), 0o755)).To(gomega.Succeed())
+		g.Expect(os.WriteFile(name, []byte(content), 0o644)).To(gomega.Succeed())
+	}
+	appIDs := func(externalApps []config.ExternalApp) []string {
+		ids := make([]string, 0, len(externalApps))
+		for _, externalApp := range externalApps {
+			ids = append(ids, externalApp.ID)
+		}
+		return ids
+	}
+
+	writeFile(filepath.Join(appsDir, "chat", "manifest.json"), `{"entrypoint": "index.js"}`)
+	writeFile(filepath.Join(appsDir, "chat", "index.js"), `// chat`)
+	writeFile(appsFile, "chat:\n  config:\n    models: [first]\n")
+
+	initialConfig := map[string]config.App{"chat": {Config: map[string]any{"models": []any{"first"}}}}
+	baseApps := []config.ExternalApp{{ID: "base", Path: "/base.js"}}
+	reloader := apps.NewReloader(log.NopLogger(), initialConfig, "/assets/apps", baseApps, os.DirFS(appsDir))
+
+	// a forced reload with unchanged files succeeds and keeps the list
+	g.Expect(reloader.Reload()).To(gomega.Succeed())
+	g.Expect(appIDs(reloader.ExternalApps())).To(gomega.ConsistOf("base", "chat"))
+
+	// new base apps replace the previous ones, the applications from the filesystem stay
+	reloader.SetBaseApps([]config.ExternalApp{{ID: "other", Path: "/other.js"}})
+	g.Expect(appIDs(reloader.ExternalApps())).To(gomega.ConsistOf("other", "chat"))
+
+	// a broken apps.yaml is reported by the forced reload, the previous state stays
+	writeFile(appsFile, "chat:\n  config:\n    models: [first\n")
+	g.Expect(reloader.Reload()).To(gomega.HaveOccurred())
+	g.Expect(appIDs(reloader.ExternalApps())).To(gomega.ConsistOf("other", "chat"))
+
+	// a missing apps.yaml is valid
+	g.Expect(os.Remove(appsFile)).To(gomega.Succeed())
+	g.Expect(reloader.Reload()).To(gomega.Succeed())
+	g.Expect(appIDs(reloader.ExternalApps())).To(gomega.ConsistOf("other", "chat"))
+}

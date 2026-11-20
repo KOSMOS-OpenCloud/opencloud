@@ -55,6 +55,7 @@ func NewService(opts ...Option) (Service, error) {
 		mux:             m,
 		gatewaySelector: options.GatewaySelector,
 		externalApps:    options.ExternalApps,
+		webConfig:       options.WebConfig,
 	}
 
 	themeService, err := theme.NewService(
@@ -110,6 +111,7 @@ type Web struct {
 	mux             *chi.Mux
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	externalApps    func() []config.ExternalApp
+	webConfig       func() config.Web
 }
 
 // ServeHTTP implements the Service interface.
@@ -120,24 +122,30 @@ func (p Web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (p Web) getPayload() (payload []byte, err error) {
 	// render dynamically using config
 
+	// the web configuration can change at runtime, everything below works on a copy to keep the shared config untouched
+	currentWeb := p.config.Web
+	if p.webConfig != nil {
+		currentWeb = p.webConfig()
+	}
+	webConfig := currentWeb.Config
+
 	// build theme url
-	if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
-		p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
+	if themeServer, err := url.Parse(currentWeb.ThemeServer); err == nil {
+		webConfig.Theme = themeServer.String() + currentWeb.ThemePath
 	} else {
-		p.config.Web.Config.Theme = p.config.Web.ThemePath
+		webConfig.Theme = currentWeb.ThemePath
 	}
 
 	// make apps render as empty array if it is empty
 	// TODO remove once https://github.com/golang/go/issues/27589 is fixed
-	if len(p.config.Web.Config.Apps) == 0 {
-		p.config.Web.Config.Apps = make([]string, 0)
+	if len(webConfig.Apps) == 0 {
+		webConfig.Apps = make([]string, 0)
 	}
 
 	// ensure that the server url has a trailing slash
-	p.config.Web.Config.Server = strings.TrimRight(p.config.Web.Config.Server, "/") + "/"
+	webConfig.Server = strings.TrimRight(webConfig.Server, "/") + "/"
 
-	// the external apps can change at runtime, they are taken from a copy to keep the shared config untouched
-	webConfig := p.config.Web.Config
+	// the external apps can change at runtime
 	if p.externalApps != nil {
 		webConfig.ExternalApps = p.externalApps()
 	}

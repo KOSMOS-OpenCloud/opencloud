@@ -82,3 +82,63 @@ Subspace-Mitgliedschaft steht nie unter „Mit mir geteilt“, dafür erscheint 
   (`opencloud_reva/pkg/storage/pkg/decomposedfs/subspace_share_boundary_test.go`, Lauf: `opencloud_reva/testbench/`).
 - Stand 2026-11-18: noch nie gegen eine Instanz gelaufen, Testnutzer fehlen. Ungeprüfte Annahmen: Basic Auth mit
   App-Token an Graph und WebDAV, Lesen per Datei-ID für Freigabe-Empfänger, die Rollen-IDs im Skript.
+
+## state_snapshot.py — Zustand vor und nach einem Deploy vergleichen
+
+Anlass: os.brandis 2026-10-12. Ein `opencloud init` beim Neuaufbau erzeugte eine neue Runtime-Config mit neuen IDs
+und Secrets (`storage_users.mount_id`, `admin_user_id`, `system_user_id`, `graph.application.id`, Service-Accounts,
+`jwt_secret` …). Die Space-IDs blieben, die Storage-ID davor war neu, alte Clients liefen auf 404. Das Skript hält den
+Stand vor einem OpenCloud-Deploy fest und meldet danach jede verschwundene oder geänderte ID.
+
+```
+cd /data/source/gitapps/opencloud/testbench
+python3 -m unittest -v                                   # Tests des Skripts selbst, ohne Instanz
+python3 state_snapshot.py save cloud.xwork.cloud         # VOR dem Deploy
+python3 state_snapshot.py compare cloud.xwork.cloud      # NACH dem Deploy
+python3 state_snapshot.py show cloud.xwork.cloud         # gespeicherten Stand ansehen
+```
+
+Das Skript liest nur. Exit 0 = gleich, 1 = Abweichung, 2 = Ablauf abgebrochen, 3 = kein Snapshot oder Quelle nicht
+erreichbar. Nur für Deployments des Containers opencloud, nicht für Web-Extensions oder andere Dienste.
+
+### Was verglichen wird
+
+| Quelle | Inhalt | Zugang |
+|---|---|---|
+| Host | alle Werte der `/etc/opencloud/opencloud.yaml`; Secrets nur als Fingerabdruck (sha256, 12 Zeichen) | `ssh root@<host>`, `podman exec` |
+| Host | `idm/ldap.crt`, `idm/ldap.key`, `idp/private-key.pem`, `idp/encryption.key` als Fingerabdruck | wie oben |
+| API | OIDC-Issuer und Signaturschlüssel, Anwendungs-ID, globale Rollen, Freigabe-Rollen | Graph |
+| API | Spaces: ID (mit Storage-ID davor), Name, Alias, Typ, Besitzer, Root | Graph |
+| API | Mitglieder der Project-Spaces mit Rollen-ID | Graph, nur wo das Konto Zugriff hat |
+| API | Nutzer mit globaler Rolle, Gruppen mit Mitgliedern | Graph, nur mit der Rolle Admin |
+
+- `FEHLT` und `GEÄNDERT` sind Abweichungen (Exit 1). `neu` ist nur ein Hinweis: zwischen den Läufen darf jemand
+  einen Space anlegen oder ein Mitglied hinzufügen.
+- Verglichen werden nur Quellen, die in beiden Ständen gelesen wurden. Die Ausgabe nennt je Quelle „verglichen“ oder
+  „NICHT verglichen“. `coverage/*` hält fest, wie vollständig die API-Sicht war (`drives all|own`, `users all|self`,
+  `groups all|none`). Wechselt das Konto zwischen `save` und `compare`, zeigt sich das dort.
+- Image und Startzeit des Containers stehen nur zur Anzeige im Snapshot, sie ändern sich bei jedem Deploy.
+
+### Zugang zur API
+
+1. `OC_BEARER=<access-token>` in der Umgebung (Token einer Sitzung, 5 Minuten gültig, z. B. aus dem Brave-Debug).
+2. `testbench/DIST`: `SNAPSHOT_ADMIN__<HOST>=login:app-token`, sonst `E2E_ADMIN__<HOST>` (Schreibweise wie oben).
+
+Ohne Zugang liest das Skript nur den Host und sagt das in der Ausgabe. `--no-api` macht das ausdrücklich,
+`--require-api` bricht stattdessen ab. Für vollständige Rollen (alle Nutzer, alle Gruppen, Mitglieder aller Spaces)
+braucht es ein Konto mit der Rolle Admin, das Mitglied der Spaces ist oder sie verwalten darf.
+
+### Ablage
+
+Snapshots liegen unter `testbench/snapshots/<host>.json` (gitignored, Rechte 600). Sie enthalten IDs, Space- und
+Nutzernamen, keine Secrets im Klartext. `save` hebt den vorherigen Snapshot als `<host>.json.previous` auf
+(`--force`: nicht aufheben). Andere Datei: `--snapshot <pfad>`.
+
+### Grenzen
+
+- Der YAML-Leser ist kein vollständiger Parser (nur Standardbibliothek): Mappings, Listen, Skalare. Reicht für die
+  von `opencloud init` erzeugte Datei, nicht für Anker, mehrzeilige Werte oder Flow-Syntax.
+- Globale Rollen aller Nutzer und Gruppen sind bisher nicht gegen eine Instanz geprüft (Stand 2026-11-21: es lag
+  kein Admin-Token vor, der Lauf gegen cloud.xwork.cloud lief als Space Admin: `users self`, `groups none`,
+  4 von 29 Project-Spaces ohne lesbare Mitglieder).
+- Inhalte der Spaces (Dateien, Freigaben auf Ordner, Subspaces) werden nicht erfasst.

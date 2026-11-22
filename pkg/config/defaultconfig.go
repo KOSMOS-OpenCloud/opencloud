@@ -21,6 +21,7 @@ import (
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/config/defaults"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/config/defaults"
 	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/config/defaults"
+	signal "github.com/opencloud-eu/opencloud/services/signal/pkg/config/defaults"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/config/defaults"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/config/defaults"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/config/defaults"
@@ -77,6 +78,7 @@ func DefaultConfig() *Config {
 		Groups:            groups.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
 		Jobengine:         jobengine.DefaultConfig(),
+		Signal:            signal.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
 		Invitations:       invitations.DefaultConfig(),
 		Nats:              nats.DefaultConfig(),

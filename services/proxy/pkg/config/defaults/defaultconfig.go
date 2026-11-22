@@ -285,6 +285,22 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/api/v0/jobs",
 					Service:  "eu.opencloud.web.jobengine",
 				},
+				// kosmos: Craft Signal relay. Tickets and the session list need the signed-in user; the two
+				// WebSocket routes (/signal, /signal/bulk) come without a header a browser could set and are
+				// let in by the ticket in their first frame. The specific routes stand before the open one.
+				{
+					Endpoint: "/signal/ticket",
+					Service:  "eu.opencloud.web.signal",
+				},
+				{
+					Endpoint: "/signal/sessions",
+					Service:  "eu.opencloud.web.signal",
+				},
+				{
+					Endpoint:    "/signal",
+					Service:     "eu.opencloud.web.signal",
+					Unprotected: true,
+				},
 				{
 					Endpoint: "/auth-app/tokens",
 					Service:  "eu.opencloud.web.auth-app",

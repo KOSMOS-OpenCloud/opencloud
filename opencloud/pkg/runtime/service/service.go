@@ -47,6 +47,7 @@ import (
 	groups "github.com/opencloud-eu/opencloud/services/groups/pkg/command"
 	idm "github.com/opencloud-eu/opencloud/services/idm/pkg/command"
 	jobengine "github.com/opencloud-eu/opencloud/services/jobengine/pkg/command"
+	signal "github.com/opencloud-eu/opencloud/services/signal/pkg/command"
 	idp "github.com/opencloud-eu/opencloud/services/idp/pkg/command"
 	invitations "github.com/opencloud-eu/opencloud/services/invitations/pkg/command"
 	nats "github.com/opencloud-eu/opencloud/services/nats/pkg/command"
@@ -219,6 +220,12 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		cfg.Jobengine.Context = ctx
 		cfg.Jobengine.Commons = cfg.Commons
 		return jobengine.Execute(cfg.Jobengine)
+	})
+	// kosmos: the Craft Signal relay (collaboration of the Craft apps), see services/signal.
+	reg(3, opts.Config.Signal.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
+		cfg.Signal.Context = ctx
+		cfg.Signal.Commons = cfg.Commons
+		return signal.Execute(cfg.Signal)
 	})
 	reg(3, opts.Config.OCS.Service.Name, func(ctx context.Context, cfg *occfg.Config) error {
 		cfg.OCS.Context = ctx

@@ -57,7 +57,7 @@ clone_or_update "$PIPEWORX_DIR" "openworks-pipeworx" "main" "$PIPEWORX_GIT"
 
 # Craft Signal relay (service signal) — public, pinned to a tag; fetched fresh each build.
 SIGNAL_RELAY_GIT="${SIGNAL_RELAY_GIT:-https://github.com/flash7777/craft-signal-relay.git}"
-SIGNAL_RELAY_REF="${SIGNAL_RELAY_REF:-v0.1.0}"
+SIGNAL_RELAY_REF="${SIGNAL_RELAY_REF:-v0.2.0}"
 SIGNAL_RELAY_DIR="${SCRIPT_DIR}/../craft-signal-relay-build"
 echo "  Cloning craft-signal-relay (${SIGNAL_RELAY_REF})..."
 rm -rf "$SIGNAL_RELAY_DIR"

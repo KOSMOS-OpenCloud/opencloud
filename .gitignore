@@ -72,3 +72,6 @@ web-dist/
 pipeworx-src/
 signal-relay-src/
 x1.png
+
+# TODOs liegen in BRIEFINGS/todos, nicht im Repo
+TODO_*.md

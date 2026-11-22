@@ -18,8 +18,8 @@ import (
 	revactx "github.com/opencloud-eu/reva/v2/pkg/ctx"
 	"github.com/opencloud-eu/reva/v2/pkg/token/manager/jwt"
 
-	"forge.mux.nu/xworx/opencraft/relay/frame"
-	relay "forge.mux.nu/xworx/opencraft/relay/signal"
+	"github.com/flash7777/craft-signal-relay/frame"
+	relay "github.com/flash7777/craft-signal-relay/signal"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	signalhttp "github.com/opencloud-eu/opencloud/services/signal/pkg/server/http"

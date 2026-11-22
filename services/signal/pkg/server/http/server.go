@@ -7,7 +7,7 @@ import (
 
 	"go-micro.dev/v4"
 
-	relay "forge.mux.nu/xworx/opencraft/relay/signal"
+	relay "github.com/flash7777/craft-signal-relay/signal"
 
 	"github.com/opencloud-eu/opencloud/pkg/account"
 	"github.com/opencloud-eu/opencloud/pkg/middleware"

@@ -55,6 +55,14 @@ clone_or_update "$ZAPX_V17_DIR" "opencloud_zapx_v17" "${EXPECT_BRANCH}"
 PIPEWORX_GIT="${PIPEWORX_GIT:-https://github.com/KOSMOS-OpenWorks}"
 clone_or_update "$PIPEWORX_DIR" "openworks-pipeworx" "main" "$PIPEWORX_GIT"
 
+# Craft Signal relay (service signal) — public, pinned to a tag; fetched fresh each build.
+SIGNAL_RELAY_GIT="${SIGNAL_RELAY_GIT:-https://github.com/flash7777/craft-signal-relay.git}"
+SIGNAL_RELAY_REF="${SIGNAL_RELAY_REF:-v0.1.0}"
+SIGNAL_RELAY_DIR="${SCRIPT_DIR}/../craft-signal-relay-build"
+echo "  Cloning craft-signal-relay (${SIGNAL_RELAY_REF})..."
+rm -rf "$SIGNAL_RELAY_DIR"
+git clone --quiet --depth 1 -b "${SIGNAL_RELAY_REF}" "${SIGNAL_RELAY_GIT}" "$SIGNAL_RELAY_DIR" 2>&1 | tail -2
+
 OC_BRANCH="$(git branch --show-current 2>/dev/null || echo '?')"
 REVA_BRANCH="$(cd "$REVA_DIR" && git branch --show-current 2>/dev/null || echo '?')"
 WEB_BRANCH="$(cd "$WEB_DIR" && git branch --show-current 2>/dev/null || echo '?')"
@@ -75,6 +83,8 @@ echo "  Syncing zapx-v17-src from ${ZAPX_V17_DIR} ..."
 rsync -a --delete --exclude='.git' "$ZAPX_V17_DIR/" zapx-v17-src/
 echo "  Syncing pipeworx-src from ${PIPEWORX_DIR} ..."
 rsync -a --delete --exclude='.git' "$PIPEWORX_DIR/" pipeworx-src/
+echo "  Syncing signal-relay-src from ${SIGNAL_RELAY_DIR} (${SIGNAL_RELAY_REF}) ..."
+rsync -a --delete --exclude='.git' "$SIGNAL_RELAY_DIR/" signal-relay-src/
 
 # Build or fetch web-dist
 echo "=== Stage: build-web ==="

@@ -1,4 +1,4 @@
-// Package service connects the Craft Signal relay (the hub from opencraft/relay) to OpenCloud: who asks
+// Package service connects the Craft Signal relay (the hub from github.com/flash7777/craft-signal-relay) to OpenCloud: who asks
 // comes from the reva token the proxy puts on the request, what they may do with a document from a stat
 // through the gateway with that same token.
 package service
@@ -16,7 +16,7 @@ import (
 	"github.com/opencloud-eu/reva/v2/pkg/storagespace"
 	"google.golang.org/grpc/metadata"
 
-	relay "forge.mux.nu/xworx/opencraft/relay/signal"
+	relay "github.com/flash7777/craft-signal-relay/signal"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 )

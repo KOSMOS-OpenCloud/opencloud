@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/pflag"
 	"go.opentelemetry.io/otel/trace"
 
-	relay "forge.mux.nu/xworx/opencraft/relay/signal"
+	relay "github.com/flash7777/craft-signal-relay/signal"
 
 	"github.com/opencloud-eu/opencloud/pkg/log"
 	"github.com/opencloud-eu/opencloud/services/signal/pkg/config"

@@ -5,7 +5,7 @@ go 1.25.8
 require (
 	codeberg.org/kosmos-openworks/openworks-pipeworx v0.0.0
 	dario.cat/mergo v1.0.2
-	forge.mux.nu/xworx/opencraft/relay v0.0.0
+	github.com/flash7777/craft-signal-relay v0.0.0
 	github.com/CiscoM31/godata v1.0.11
 	github.com/KimMachineGun/automemlimit v0.7.5
 	github.com/Masterminds/semver v1.5.0
@@ -420,5 +420,6 @@ replace github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/opencloud-
 
 replace codeberg.org/kosmos-openworks/openworks-pipeworx => ./pipeworx-src
 
-// kosmos: the Craft Signal relay lives in opencraft (relay/); build_kosmos.sh syncs it here.
-replace forge.mux.nu/xworx/opencraft/relay => ./signal-relay-src
+// kosmos: the Craft Signal relay (github.com/flash7777/craft-signal-relay); build_kosmos.sh fetches the
+// pinned tag (SIGNAL_RELAY_REF) and syncs it here.
+replace github.com/flash7777/craft-signal-relay => ./signal-relay-src

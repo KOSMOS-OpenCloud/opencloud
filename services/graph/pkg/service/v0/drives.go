@@ -198,7 +198,7 @@ func parseDriveRequest(r *http.Request) (*godata.GoDataRequest, bool, error) {
 }
 
 // getDrives implements the Service interface.
-func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, error) {
+func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]driveWithKind, error) {
 	ctx := r.Context()
 	log := g.logger.SubloggerWithRequestID(ctx).With().Interface("query", r.URL.Query()).Bool("unrestricted", unrestricted).Logger()
 	log.Debug().Msg("calling get drives")
@@ -215,6 +215,12 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drives: error parsing odata request")
 		return nil, err
+	}
+
+	kindFilter, err := extractDriveKindFilter(odataReq)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not get drives: error parsing kind filter")
+		return nil, errorcode.New(errorcode.NotSupported, err.Error())
 	}
 
 	filters, err := generateCs3Filters(odataReq)
@@ -253,7 +259,8 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion, expandPermissions, getFieldMask(odataReq))
+	storageSpaces := filterSpacesByKind(res.StorageSpaces, kindFilter)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, storageSpaces, apiVersion, expandPermissions, getFieldMask(odataReq))
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drives: error parsing grpc response")
 		return nil, errorcode.New(errorcode.GeneralException, err.Error())
@@ -265,7 +272,7 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
 
-	return spaces, nil
+	return withDriveKinds(spaces, storageSpaces), nil
 }
 
 // GetSingleDrive does a lookup of a single space by spaceId
@@ -337,7 +344,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	case num == 1:
 		render.Status(r, http.StatusOK)
-		render.JSON(w, r, spaces[0])
+		render.JSON(w, r, withDriveKinds(spaces, res.StorageSpaces)[0])
 	default:
 		log.Debug().Int("number", num).Msg("could not get drive: expected to find a single drive but fetched more")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get drive: expected to find a single drive but fetched more")
@@ -397,8 +404,14 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	driveBody, driveKind, err := extractDriveKind(r.Body)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not create drive: invalid kind")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	drive := libregraph.Drive{}
-	if err := StrictJSONUnmarshal(r.Body, &drive); err != nil {
+	if err := StrictJSONUnmarshal(driveBody, &drive); err != nil {
 		log.Debug().Err(err).Interface("body", r.Body).Msg("could not create drive: invalid body schema definition")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
@@ -435,6 +448,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.DriveAlias != nil {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
+	}
+
+	if driveKind != nil && *driveKind != "" {
+		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, spaceKindOpaqueKey, *driveKind)
 	}
 
 	if driveType == _spaceTypePersonal {
@@ -495,7 +512,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusCreated)
-	render.JSON(w, r, spaces[0])
+	render.JSON(w, r, withDriveKinds(spaces, []*storageprovider.StorageSpace{space})[0])
 }
 
 // UpdateDrive updates the properties of a storage drive (space).
@@ -520,8 +537,14 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With().Str("url", webDavBaseURL.String()).Logger()
 
+	driveBody, driveKind, err := extractDriveKind(r.Body)
+	if err != nil {
+		log.Debug().Err(err).Msg("could not update drive: invalid kind")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	drive := libregraph.DriveUpdate{}
-	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
+	if err = StrictJSONUnmarshal(driveBody, &drive); err != nil {
 		log.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: error: %v", err.Error()))
 		return
@@ -564,6 +587,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.DriveAlias != nil {
 		updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, "spaceAlias", *drive.DriveAlias)
+	}
+
+	if driveKind != nil && *driveKind != "" {
+		updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, spaceKindOpaqueKey, *driveKind)
 	}
 
 	for _, special := range drive.Special {
@@ -658,7 +685,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, spaces[0])
+	render.JSON(w, r, withDriveKinds(spaces, []*storageprovider.StorageSpace{resp.StorageSpace})[0])
 }
 
 func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, apiVersion APIVersion, expandPermissions bool, fieldMask map[string]struct{}) ([]*libregraph.Drive, error) {

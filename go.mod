@@ -7,6 +7,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/flash7777/craft-signal-relay v0.0.0
 	github.com/CiscoM31/godata v1.0.11
+	github.com/KOSMOS-OpenCloud/opencore-envelope v0.1.1
 	github.com/KimMachineGun/automemlimit v0.7.5
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc/v2 v2.1.0

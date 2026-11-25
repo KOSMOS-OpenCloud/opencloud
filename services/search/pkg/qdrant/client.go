@@ -118,6 +118,12 @@ func (c *Client) Search(vector []float64, limit int) ([]SearchResult, error) {
 		"vector":       vector,
 		"limit":        limit,
 		"with_payload": true,
+		// resources in the trash bin keep their point, but are no hits
+		"filter": map[string]interface{}{
+			"must_not": []map[string]interface{}{
+				{"key": DeletedPayloadKey, "match": map[string]interface{}{"value": true}},
+			},
+		},
 	}
 	body, _ := json.Marshal(payload)
 
@@ -144,4 +150,112 @@ type SearchResult struct {
 	ID      string                 `json:"id"`
 	Score   float64                `json:"score"`
 	Payload map[string]interface{} `json:"payload"`
+}
+
+// DeletedPayloadKey marks a point whose resource is in the trash bin.
+const DeletedPayloadKey = "deleted"
+
+// pointsPerRequest limits how many points or operations one request carries.
+const pointsPerRequest = 500
+
+// PayloadUpdate sets payload fields on the given points. Points that do not
+// exist are skipped.
+type PayloadUpdate struct {
+	IDs     []string
+	Payload map[string]interface{}
+}
+
+// hasIDFilter selects points by id. Unlike a plain id list it does not fail
+// for ids without a point (folders and files that were never embedded).
+func hasIDFilter(ids []string) map[string]interface{} {
+	return map[string]interface{}{
+		"must": []map[string]interface{}{{"has_id": ids}},
+	}
+}
+
+func (c *Client) post(operation, path string, requestBody interface{}) ([]byte, error) {
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, fmt.Errorf("qdrant: %s: %w", operation, err)
+	}
+	req, err := http.NewRequest("POST",
+		fmt.Sprintf("%s/collections/%s/%s", c.url, c.collection, path),
+		bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("qdrant: %s: %w", operation, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("qdrant: %s: %w", operation, err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("qdrant: %s failed (%d): %s", operation, resp.StatusCode, string(respBody))
+	}
+	return respBody, nil
+}
+
+// Delete removes the points with the given ids. Ids without a point are ignored.
+func (c *Client) Delete(ids []string) error {
+	for start := 0; start < len(ids); start += pointsPerRequest {
+		end := min(start+pointsPerRequest, len(ids))
+		if _, err := c.post("delete", "points/delete", map[string]interface{}{
+			"filter": hasIDFilter(ids[start:end]),
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SetPayload merges payload fields into existing points, other fields stay.
+func (c *Client) SetPayload(updates []PayloadUpdate) error {
+	operations := make([]map[string]interface{}, 0, len(updates))
+	for _, update := range updates {
+		for start := 0; start < len(update.IDs); start += pointsPerRequest {
+			end := min(start+pointsPerRequest, len(update.IDs))
+			operations = append(operations, map[string]interface{}{
+				"set_payload": map[string]interface{}{
+					"payload": update.Payload,
+					"filter":  hasIDFilter(update.IDs[start:end]),
+				},
+			})
+		}
+	}
+	for start := 0; start < len(operations); start += pointsPerRequest {
+		end := min(start+pointsPerRequest, len(operations))
+		if _, err := c.post("set payload", "points/batch", map[string]interface{}{
+			"operations": operations[start:end],
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Retrieve returns the point with the given id including vector and payload.
+// The second return value is false if there is no such point.
+func (c *Client) Retrieve(id string) (Point, bool, error) {
+	respBody, err := c.post("retrieve", "points", map[string]interface{}{
+		"ids":          []string{id},
+		"with_payload": true,
+		"with_vector":  true,
+	})
+	if err != nil {
+		return Point{}, false, err
+	}
+	var result struct {
+		Result []Point `json:"result"`
+	}
+	if err := json.Unmarshal(respBody, &result); err != nil {
+		return Point{}, false, fmt.Errorf("qdrant: retrieve: %w", err)
+	}
+	if len(result.Result) == 0 {
+		return Point{}, false, nil
+	}
+	return result.Result[0], true, nil
 }

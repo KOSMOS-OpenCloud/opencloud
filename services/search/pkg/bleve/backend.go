@@ -2,6 +2,7 @@ package bleve
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -325,4 +326,43 @@ func sanitizeUTF8(s string) string {
 		return s
 	}
 	return strings.ToValidUTF8(s, "\uFFFD")
+}
+
+// affectedResourceFields are the fields AffectedResources loads. A secondary
+// index only needs to identify and place a resource, not its whole document.
+var affectedResourceFields = []string{"ID", "RootID", "Path", "ParentID", "Type", "Deleted", "Name"}
+
+// AffectedResources returns the document with the given id and, if it is a
+// container, all documents below it. These are the documents a delete,
+// restore, purge or move of id touches. Only affectedResourceFields are set.
+func (b *Backend) AffectedResources(id string) ([]*search.Resource, error) {
+	rootRequest := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
+	rootRequest.Fields = affectedResourceFields
+	rootResult, err := b.index.Search(rootRequest)
+	if err != nil {
+		return nil, err
+	}
+	if rootResult.Hits.Len() == 0 {
+		return nil, errors.New("entity not found")
+	}
+	rootResource := matchToResource(rootResult.Hits[0])
+	resources := []*search.Resource{rootResource}
+	if rootResource.Type != uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+		return resources, nil
+	}
+
+	descendantRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(
+		bleve.NewQueryStringQuery("RootID:"+rootResource.RootID),
+		bleve.NewQueryStringQuery("Path:"+escapeQuery(rootResource.Path+"/*")),
+	))
+	descendantRequest.Size = math.MaxInt
+	descendantRequest.Fields = affectedResourceFields
+	descendantResult, err := b.index.Search(descendantRequest)
+	if err != nil {
+		return nil, err
+	}
+	for _, match := range descendantResult.Hits {
+		resources = append(resources, matchToResource(match))
+	}
+	return resources, nil
 }

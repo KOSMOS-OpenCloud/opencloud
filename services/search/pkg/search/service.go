@@ -102,6 +102,8 @@ type Service struct {
 	metrics         *metrics.Metrics
 	cfg             *config.Config
 	vectorClient    *qdrant.Client
+	// secondaryIndexes follow the engine on delete, restore, purge and move
+	secondaryIndexes []SecondaryIndex
 
 	serviceAccountID     string
 	serviceAccountSecret string
@@ -139,6 +141,7 @@ type queueRequest struct {
 	resourceID     string // for delete/move: formatted resource ID
 	parentID       string // for move: formatted parent ID
 	path           string // for move: new path
+	oldResourceID  string // for move: document ID before the last cross-space move, empty if none
 }
 
 // layerJob is a queued OCR layer writeback job (remount of the OCR text
@@ -237,6 +240,7 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng E
 			logger.Warn().Err(err).Msg("qdrant: collection init failed, vector search disabled")
 			s.vectorClient = nil
 		} else {
+			s.secondaryIndexes = append(s.secondaryIndexes, newVectorIndex(s.vectorClient))
 			logger.Info().
 				Str("url", cfg.Vector.URL).
 				Str("collection", cfg.Vector.Collection).
@@ -1645,26 +1649,32 @@ func (s *Service) StartWorkers(ctx context.Context) {
 					if err := s.engine.Delete(req.resourceID); err != nil {
 						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: delete failed")
 					}
+					s.secondarySetDeleted(req.resourceID, true)
 				case "move":
 					flush()
-					if err := s.engine.Move(req.resourceID, req.parentID, req.path); err != nil {
-						s.logger.Error().Err(err).Str("path", req.path).Msg("index-queue: move failed")
+					if s.moveInIndex(req, batch) {
+						batchCount++
 					}
 				case "purge":
 					flush()
+					purgedResources := s.affectedResources(&Resource{ID: req.resourceID})
 					if err := s.engine.Purge(req.resourceID, false); err != nil {
 						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: purge failed")
 					}
+					s.secondaryPurge(req.resourceID, purgedResources)
 				case "purge-deleted":
 					flush()
+					purgedResources := onlyDeleted(s.affectedResources(&Resource{ID: req.resourceID}))
 					if err := s.engine.Purge(req.resourceID, true); err != nil {
 						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: purge-deleted failed")
 					}
+					s.secondaryPurge(req.resourceID, purgedResources)
 				case "restore":
 					flush()
 					if err := s.engine.Restore(req.resourceID); err != nil {
 						s.logger.Error().Err(err).Str("id", req.resourceID).Msg("index-queue: restore failed")
 					}
+					s.secondarySetDeleted(req.resourceID, false)
 				default: // "index" or empty
 					s.doIndexItemBatch(req.ref, batch)
 					batchCount++
@@ -2653,15 +2663,75 @@ func (s *Service) MoveItem(ref *provider.Reference) {
 
 	select {
 	case s.indexCh <- queueRequest{
-		op:         "move",
-		resourceID: storagespace.FormatResourceID(stat.GetInfo().GetId()),
-		parentID:   storagespace.FormatResourceID(stat.GetInfo().GetParentId()),
-		path:       path,
-		source:     "event:MoveItem",
+		op:            "move",
+		ref:           &provider.Reference{ResourceId: stat.GetInfo().GetId()},
+		resourceID:    storagespace.FormatResourceID(stat.GetInfo().GetId()),
+		parentID:      storagespace.FormatResourceID(stat.GetInfo().GetParentId()),
+		path:          path,
+		oldResourceID: previousResourceID(stat.GetInfo()),
+		source:        "event:MoveItem",
 	}:
 	default:
 		s.logger.Warn().Str("path", path).Msg("index-queue full, dropping move")
 	}
+}
+
+// previousResourceID returns the document ID a resource had before its last
+// cross-space move, or "" if it never changed spaces. The storage writes the
+// former spaceID!nodeID to user.oc.oldids.N on the target, the newest entry has
+// the highest N. The index document ID also carries the storage ID.
+func previousResourceID(info *provider.ResourceInfo) string {
+	metadata := info.GetArbitraryMetadata().GetMetadata()
+	previousID := ""
+	for oldIDIndex := 0; ; oldIDIndex++ {
+		oldID, ok := metadata["user.oc.oldids."+strconv.Itoa(oldIDIndex)]
+		if !ok {
+			break
+		}
+		previousID = oldID
+	}
+	if previousID == "" || strings.Contains(previousID, "$") {
+		return previousID
+	}
+	return info.GetId().GetStorageId() + "$" + previousID
+}
+
+// moveInIndex applies a queued move to the index. A move inside a space keeps
+// the resource ID, the document is updated in place. A cross-space move gives
+// the resource a new ID in the target space: engine.Move finds no document for
+// it, and the document of the source stays behind. In that case the old
+// document is purged and the target is indexed from storage. It returns true
+// if the target was added to the batch.
+func (s *Service) moveInIndex(req queueRequest, batch BatchOperator) bool {
+	if req.oldResourceID != "" {
+		// Also runs for later moves of a resource that once changed spaces: the
+		// old document is gone by then and Purge reports that it found nothing.
+		if purgeErr := s.engine.Purge(req.oldResourceID, false); purgeErr != nil {
+			s.logger.Debug().Err(purgeErr).Str("old_id", req.oldResourceID).Str("id", req.resourceID).Msg("index-queue: move: no document purged for the previous id")
+		} else {
+			s.logger.Info().Str("old_id", req.oldResourceID).Str("id", req.resourceID).Str("path", req.path).Msg("index-queue: move: purged document of the previous id (cross-space move)")
+		}
+	}
+
+	movedResource := &Resource{ID: req.resourceID, Path: utils.MakeRelativePath(req.path)}
+	movedResource.Name = filepath.Base(movedResource.Path)
+	if req.oldResourceID != "" {
+		s.secondaryRekey(req.oldResourceID, movedResource)
+	}
+
+	moveErr := s.engine.Move(req.resourceID, req.parentID, req.path)
+	if moveErr == nil {
+		s.secondaryMove(req.resourceID, s.affectedResources(movedResource))
+		return false
+	}
+	if req.oldResourceID == "" {
+		s.logger.Error().Err(moveErr).Str("path", req.path).Msg("index-queue: move failed")
+		return false
+	}
+
+	s.logger.Info().Err(moveErr).Str("id", req.resourceID).Str("path", req.path).Msg("index-queue: move: target not in index, indexing it (cross-space move)")
+	s.doIndexItemBatch(req.ref, batch)
+	return true
 }
 
 func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.StatResponse, string) {

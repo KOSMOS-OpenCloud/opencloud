@@ -81,6 +81,23 @@ func TestReloader_ExternalApps(t *testing.T) {
 	externalApps = reloader.ExternalApps()
 	g.Expect(externalApps).To(gomega.HaveLen(2))
 	g.Expect(appConfig(externalApps, "notes")).To(gomega.BeNil())
+
+	// groups from apps.yaml reach the list and override the groups of the manifest
+	appGroups := func(externalApps []config.ExternalApp, id string) []string {
+		for _, externalApp := range externalApps {
+			if externalApp.ID == id {
+				return externalApp.Groups
+			}
+		}
+		return nil
+	}
+	g.Expect(appGroups(externalApps, "notes")).To(gomega.BeNil())
+	writeFile(filepath.Join(appsDir, "notes", "manifest.json"), `{"entrypoint": "index.js", "groups": ["Manifest"]}`)
+	externalApps = reloader.ExternalApps()
+	g.Expect(appGroups(externalApps, "notes")).To(gomega.Equal([]string{"Manifest"}))
+	writeFile(appsFile, "notes:\n  groups: [Construct, Planung]\n")
+	externalApps = reloader.ExternalApps()
+	g.Expect(appGroups(externalApps, "notes")).To(gomega.Equal([]string{"Construct", "Planung"}))
 }
 
 func TestReloader_ReloadAndSetBaseApps(t *testing.T) {

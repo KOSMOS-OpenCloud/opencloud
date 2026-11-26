@@ -52,6 +52,11 @@ type Application struct {
 
 	// Config contains the application-specific configuration
 	Config map[string]any `json:"config,omitempty"`
+
+	// Groups lists the display names of the groups whose members may use the application.
+	// Without groups the application is open to every user. The list only steers the web ui
+	// (app menu, routes), the backend of an application has to check access on its own.
+	Groups []string `json:"groups,omitempty"`
 }
 
 // ToExternal converts an Application to an ExternalApp configuration
@@ -60,6 +65,7 @@ func (a Application) ToExternal(entrypoint string) config.ExternalApp {
 		ID:     a.ID,
 		Path:   filepathx.JailJoin(entrypoint, a.Entrypoint),
 		Config: a.Config,
+		Groups: a.Groups,
 	}
 }
 
@@ -170,6 +176,12 @@ func build(fSystem fs.FS, id string, globalConfig config.App) (Application, erro
 
 		// overload the disabled state, consider it secure and allow overloading
 		application.Disabled = source.Disabled
+
+		// overload the groups, the operator decides per instance who may use the application,
+		// a source without groups keeps the groups of the manifest
+		if source.Groups != nil {
+			application.Groups = source.Groups
+		}
 
 		return nil
 	}

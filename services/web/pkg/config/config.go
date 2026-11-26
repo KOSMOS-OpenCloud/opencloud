@@ -99,6 +99,8 @@ type ExternalApp struct {
 	Path string `json:"path,omitempty" yaml:"path"`
 	// Config is completely dynamic, because it depends on the extension
 	Config map[string]any `json:"config,omitempty" yaml:"config"`
+	// Groups lists the display names of the groups whose members may use the app, empty means every user
+	Groups []string `json:"groups,omitempty" yaml:"groups"`
 }
 
 // ExternalAppConfig defines an external web app configuration.
@@ -117,6 +119,8 @@ type Web struct {
 type App struct {
 	Disabled bool           `yaml:"disabled"`
 	Config   map[string]any `yaml:"config"`
+	// Groups overrides the groups of the app manifest, the display names of the groups whose members may use the app
+	Groups []string `yaml:"groups"`
 }
 
 // TokenManager is the config for using the reva token manager

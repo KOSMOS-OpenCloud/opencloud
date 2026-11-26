@@ -27,6 +27,44 @@ func TestApplication_ToExternal(t *testing.T) {
 	g.Expect(externalApp.ID).To(gomega.Equal("app"))
 	g.Expect(externalApp.Path).To(gomega.Equal("path/entrypoint.js"))
 	g.Expect(externalApp.Config).To(gomega.Equal(app.Config))
+	g.Expect(externalApp.Groups).To(gomega.BeNil())
+
+	app.Groups = []string{"Construct"}
+	g.Expect(app.ToExternal("path").Groups).To(gomega.Equal([]string{"Construct"}))
+}
+
+func TestBuild_Groups(t *testing.T) {
+	g := gomega.NewWithT(t)
+	dir := &fstest.MapFile{Mode: fs.ModeDir}
+	appFiles := func(manifestGroups string) fstest.MapFS {
+		return fstest.MapFS{
+			"app":               dir,
+			"app/entrypoint.js": &fstest.MapFile{},
+			"app/manifest.json": &fstest.MapFile{
+				Data: []byte(`{"entrypoint":"entrypoint.js"` + manifestGroups + `}`),
+			},
+		}
+	}
+
+	// without groups the application is open to every user
+	application, err := apps.Build(appFiles(""), "app", config.App{})
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(application.Groups).To(gomega.BeNil())
+
+	// the manifest delivers the groups
+	application, err = apps.Build(appFiles(`, "groups": ["Construct"]`), "app", config.App{})
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(application.Groups).To(gomega.Equal([]string{"Construct"}))
+
+	// apps.yaml of the instance overrides the groups of the manifest
+	application, err = apps.Build(appFiles(`, "groups": ["Construct"]`), "app", config.App{Groups: []string{"Planung", "Statik"}})
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(application.Groups).To(gomega.Equal([]string{"Planung", "Statik"}))
+
+	// apps.yaml sets groups for an application whose manifest has none
+	application, err = apps.Build(appFiles(""), "app", config.App{Groups: []string{"Construct"}})
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(application.Groups).To(gomega.Equal([]string{"Construct"}))
 }
 
 func TestBuild(t *testing.T) {
